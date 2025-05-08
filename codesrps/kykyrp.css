@@ -1,0 +1,63 @@
+  .kykyrp{
+  width:420px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+  text-align:justify;
+  margin:0 auto;
+}
+
+.kykyrp img{
+  padding:4px;
+  border:#000 1px solid;
+  width:420px;
+  height:200px;
+  object-fit:cover;
+  display:block;
+}
+
+.kykyrp .contenurp img{
+  float:left;
+  width:200px;
+  height:100px;
+  margin-right:10px;
+}
+
+.kykyrp .feat{
+  position:relative;
+  width:420px;
+  height:200px;
+}
+
+
+.kykyrp .feat h1{
+  color:#000;
+  background-color:#fff;
+  text-align:center;
+  width:100%;
+  padding:10px;
+  font-weight:normal;
+  font-size:24px;
+  letter-spacing:2px;
+font-family: 'Anton', sans-serif;
+  display:block;
+  position:absolute;
+top: calc(100px - 38px);
+  text-transform:uppercase;
+  opacity:0;
+  transition:400ms;
+}
+
+.kykyrp:hover .feat h1{
+  opacity:0.60;
+}
+
+
+.kykyrp .contenurp h1{
+  font-family: 'Satisfy', cursive;
+  font-size:22px;
+  font-weight:normal;
+  line-height:24px;
+  background-color:#fff;
+  color:#4F624E;
+}

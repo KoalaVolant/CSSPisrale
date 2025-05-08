@@ -1,0 +1,51 @@
+  .leroy{
+  width:435px;
+  margin:0 auto;
+  padding:35px;
+background-image:url('https://images.freecreatives.com/wp-content/uploads/2016/03/Free-Grunge-Wallpaper-Pattern-.jpg'); 
+  background-size:100%;
+}
+
+.leroy img{
+  width:200px;
+height:150px;
+  padding:3px;
+  border:1px solid #fff;
+}
+
+.leroy div{
+  background-color:#fff;
+  color:#181C11;
+  font-size:11px;
+  line-height:12px;
+  position:relative;
+  z-index:900;
+  padding:25px;
+  text-align:justify;
+  border-bottom:#000 solid 5px;
+}
+
+.leroy b, .leroy strong{
+  color:#4E5B37;
+}
+
+.leroy h1{
+color:#fff;
+background-image:url('https://s-media-cache-ak0.pinimg.com/originals/b0/2f/12/b02f12d14b88297841f356f453eccd24.jpg'); 
+  background-size:100%;
+  padding:10px;
+  font-size:18px;
+  line-height:20px;
+  text-transform:uppercase;
+  position:relative;
+  text-align:center;
+  margin-left:-5px;
+z-index:999;
+  margin-bottom:-15px;
+  font-family: 'Vidaloka', serif;
+  -moz-transform: rotate(-2deg);
+-webkit-transform: rotate(-2deg);
+-o-transform: rotate(-2deg);
+-ms-transform: rotate(-2deg);
+transform: rotate(-2deg);
+}

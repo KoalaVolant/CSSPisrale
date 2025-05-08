@@ -1,0 +1,42 @@
+.pineapple{
+background-color:#FCE43A;
+border-left:15px solid #E8A500;
+border-right:15px solid #E8A500;
+color:#000;
+padding:35px 25px 25px 25px;
+text-align:justify;
+font-family:Verdana;
+font-size:14px;
+line-height:18px;
+}
+
+.wraple{
+width:500px;
+}
+
+.imgple{
+-webkit-border-top-left-radius: 100px;
+-webkit-border-top-right-radius: 100px;
+-moz-border-radius-topleft: 100px;
+-moz-border-radius-topright: 100px;
+border-top-left-radius: 100px;
+border-top-right-radius: 100px;
+background-size:cover;
+width:500px;
+height:200px;
+position:relative;
+}
+
+.imgple h1{
+position:absolute;
+top:160px;
+color:#fff;
+font-size:30px;
+}
+
+.imgple h5{
+position:absolute;
+top:185px;
+right:0px;
+}
+}

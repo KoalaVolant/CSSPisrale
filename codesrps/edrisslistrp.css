@@ -1,0 +1,74 @@
+.vert{
+  width:500px;
+  margin:0 auto;
+background: #081e09; /* Old browsers */
+background: -moz-linear-gradient(top, #081e09 0%, #001400 99%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, #081e09 0%,#001400 99%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, #081e09 0%,#001400 99%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#081e09', endColorstr='#001400',GradientType=0 );
+height:930px;
+}
+
+.vert img{
+  width:500px;
+}
+
+.vert h1{
+  color:#fff;
+font-family: 'Dynalight', cursive;
+  text-align:center;
+  font-size:35px;
+  font-weight:normal;
+  padding:15px;
+  margin-top:-5px;
+  width:470px;
+  background-color:#000;
+}
+
+.poison{
+  width:500px;
+  margin:0 auto;
+}
+
+.blocpoison{
+  width:225px; 
+  padding:5px;
+  margin-top:-25px;
+  float:left;
+  background-color:#000;
+  font-size:11px;
+  line-height:12px;
+  color:#D6D6D6;
+}
+
+.blocpoison span{
+height:200px;
+  padding:10px;
+  display:block;
+  margin-top:-15px;
+    overflow:auto;
+}
+
+.blocpoison a:link, .blocpoison a:visited{
+  color:#93BB93;
+  text-decoration:none;
+}
+
+.blocpoison a:hover{
+  color:#2C890C;
+  text-decoration:none;
+}
+
+.poison h2{
+  font-weight:normal;
+  text-shadow: 0px 0px 3px rgba(150, 150, 150, 1);
+  font-size:30px;
+    color:#fff;
+  margin-top:-10px;
+  margin-left:10px;
+font-family: 'Dynalight', cursive;
+}
+
+.poison .d{
+  float:right;
+}

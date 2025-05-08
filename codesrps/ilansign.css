@@ -1,0 +1,42 @@
+.ilansign{
+  width:400px;
+  margin:0 auto;
+}
+
+.ilansign img{
+  width:180px;
+  margin:5px;
+  height:100px;
+  object-fit:cover;
+  border-left:5px solid #fff;
+  -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+    z-index:5;
+  position:relative;
+}
+
+.ilansign img+img{
+  border-left:none;
+  border-right:5px solid #fff;
+}
+
+.ilansign h1{
+  font-family: 'Chicle', cursive;
+  font-size:22px;
+  background-color:#fff;
+  padding:5px;
+  width:130px;
+  margin-top:-65px;
+  border:#dedede 1px solid;
+  margin-left:125px;
+  text-align:center;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  font-weight:normal;
+  color:#4668A6;
+  z-index:10;
+  position:relative;
+}

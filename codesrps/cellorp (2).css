@@ -1,0 +1,58 @@
+.wracello{
+  background-color:#BBBBBB;
+  width:500px;
+  padding:15px;
+}
+
+.cellilo{
+  width:400px;
+  height:200px;
+  margin:0 auto;
+  border:#fff solid 2px;
+  background-size:cover;
+}
+
+.wracello h1{
+  padding:10px;
+  font-size:24px;
+  font-family: 'Oswald', sans-serif;
+  text-align:center;
+  color:#1D1D1D;
+  margin:0 auto;
+  background-color:#fff;
+  padding:5px;
+  width:395px;
+  line-height:26px;
+  text-transform:uppercase;
+  transition:300ms;
+}
+
+.wracello p b{
+  color:#098A40;
+}
+
+.wracello h1:hover{
+  color:#6F6F6F;
+ transition:300ms;
+}
+
+.puddy{
+  height:10px;
+  background-color:#868686;
+  clear:both;
+  margin:0 auto;
+  width:450px;
+}
+
+.wracello p{
+  width:400px;
+  margin:0 auto;
+  background-color:#fff;
+  padding:20px;
+  border-top:5px #585858 solid;
+  border-bottom:5px #585858 solid;
+  color:#626262;
+  font-size:12px;
+  line-height:15px;
+  text-align:justify;
+}

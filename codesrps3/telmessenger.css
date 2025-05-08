@@ -1,0 +1,58 @@
+/* ROOT */ 
+
+:root{ 
+--filter1phone:brightness(10) invert(1); 
+--phone-fond-text:#1c1c1c;
+--phone-fond-vous:#21382e; 
+--phone-fond-1:url('https://i.imgur.com/PFqU4Bb.jpg');
+--phone-fond-2:linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+    url('https://i.imgur.com/hWbpK6G.jpg');
+}
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+/* RESTE DU CODE */ 
+
+.phonemessenger, .phonemessenger *{ box-sizing:border-box; font-family: 'Open Sans', sans-serif; }
+.phonemessenger{ margin:0 auto; }
+.phonemessenger br{ display:none; }
+.phonemessenger img{ object-fit:cover; }
+
+.phonemessenger{ width:350px; position:relative;
+   background:url('https://i.imgur.com/1Y5dISU.png'); padding-top:67px;
+background-size: 100%; height:730px; background-repeat:no-repeat; }
+.phonemessenger:after{ content:" "; position:absolute; top:20px;
+   left:16px; width:312px; height:680px; z-index:1;
+   background:var(--phone-fond-1); 
+	background-size: cover; background-position:center; }
+.phonemessenger *{ position:relative; z-index:5; }
+
+/* Test */
+
+.phone-firstmessenger{ display:flex; justify-content:flex-end; margin-right:30px; margin-bottom:10px;}
+.phone-firstmessenger img{ height:44px; border-radius:50%; }
+.phone-firstmessenger .filterphone{ margin-right:10px; border-radius:0;  mix-blend-mode: difference;
+  filter: var(--filter1phone); }
+
+.phonemessenger .phonemess-discuss{ color:#f0f0f0; padding:10px; 
+	width:312px; margin-left:16px; display:flex; 
+	justify-content:space-between;  align-items:center; background:var(--phone-fond-text);}
+.phonemessenger .phonemess-discuss img{ width:30px; height:30px; border-radius:50%; }
+.phonemessenger .phonemess-discuss .pm-icons-profil{ width:auto; filter:var(--filter1phone); height:22px; }
+.phonemessenger .phonemess-discuss .pm-pseudo-profil{ margin-left:10px; width:173px; }
+
+.phonemess-content{ width:312px; height:530px; overflow:auto; 
+	padding:15px; margin-left:16px; padding-bottom:40px;
+	 background:     var(--phone-fond-2);
+ background-size:cover; position:relative; }
+
+
+.phonemess-content .pm-content-jour{ text-align:center; display:block; color:#f0f0f0; 
+	text-transform:uppercase; font-size:10px; margin:10px 0; }
+.phonemess-content .pm-content-vous{ background:var(--phone-fond-vous); border-radius:15px;
+	 padding:10px; color:#dedede; margin:5px 0; margin-left:auto; display:block; max-width:75%;  }
+.phonemess-content .pm-content-autre{ display:flex; margin:20px 0; }
+.phonemess-content .pm-content-autre img:nth-child(2){ margin-top:5px;width:30px; height:30px; border-radius:50%;  }
+.phonemess-content .pm-content-autre div span{ max-width:200px; display:block; background:var(--phone-fond-text);
+padding:10px; color:#dedede; border-radius:15px; margin-left:10px; margin-bottom:5px;}
+
+.pm-icons-fin{ width:315px; position:relative; bottom:42px; left:49%; transform:translateX(-50%); }

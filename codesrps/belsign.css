@@ -1,0 +1,97 @@
+/* Sign Belial */ 
+
+.bel{
+  width:400px;
+  background-image:url('http://panovapanova.com/wp-content/uploads/2012/11/pattern_2.jpg');
+  padding:10px;
+  -webkit-border-radius: 60px;
+-moz-border-radius: 60px;
+border-radius: 60px;
+-webkit-transition: background 600ms ease;
+-moz-transition: background 600ms ease;
+-ms-transition: background 600ms ease;
+-o-transition: background 600ms ease;
+transition: background 600ms ease;
+}
+
+.bel:hover{
+  background-image:url('http://sf.co.ua/13/08/wallpaper-2966267.jpg');
+  background-size:40%;
+ -webkit-transition: background 600ms ease;
+-moz-transition: background 600ms ease;
+-ms-transition: background 600ms ease;
+-o-transition: background 600ms ease;
+transition: background 600ms ease;
+}
+
+.bel img{
+  width:400px;
+  height:150px;
+  v-webkit-border-radius: 90px;
+-moz-border-radius: 90px;
+border-radius: 90px;
+}
+
+.bel .one, .bel:hover .two{
+  display:block;
+    -webkit-transition: all 800ms;
+-moz-transition: all 800ms;
+-ms-transition: all 800ms;
+-o-transition: all 800ms;
+transition: all 800ms;
+}
+
+.bel:hover .one, .bel .two{
+  display:none;
+    -webkit-transition: all 800ms;
+-moz-transition: all 800ms;
+-ms-transition: all 800ms;
+-o-transition: all 800ms;
+transition: all 800ms;
+}
+
+
+.bel h1, .bel h2{
+  text-shadow: 1px 1px 2px rgba(150, 150, 150, 1);
+    text-align:center;
+  font-weight:bolder;
+  -webkit-transition: all 800ms;
+-moz-transition: all 800ms;
+-ms-transition: all 800ms;
+-o-transition: all 800ms;
+transition: all 800ms;
+}
+
+.bel:hover h1, .bel:hover h2{
+  font-weight:normal;
+  -webkit-transition: all 800ms;
+-moz-transition: all 800ms;
+-ms-transition: all 800ms;
+-o-transition: all 800ms;
+transition: all 800ms;
+}
+
+.bel .one{
+  color:#000;
+}
+
+.bel .two, .bel:hover h2{
+  color:#fff;
+}
+
+.bel h1{
+  text-transform:uppercase;
+  letter-spacing:5px;
+  font-size:20px;
+    font-family: 'Cormorant Unicase', serif;
+    font-family: 'Atma', cursive;
+}
+
+.bel h2{
+  color:#000;
+  letter-spacing:2px;
+  font-family:Times New Roman;
+  font-size:11px;
+  margin-top:-30px;
+  line-height:12px;
+}

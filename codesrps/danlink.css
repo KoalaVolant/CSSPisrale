@@ -1,0 +1,621 @@
+/* Pa */ 
+
+.pakapoue{
+  width:850px;
+  height:580px;
+  margin:0;
+  background-image:url('https://img15.hostingpics.net/pics/603643003.png');
+  background-size:cover;
+  padding:0px 20px 20px 20px;
+}
+
+.pakapoue h1{
+  margin-top:-15px;
+    color: #FF2B30;
+  text-shadow: 0px 0px 8px #FF2B30;
+    font-family: 'Love Ya Like A Sister', cursive;
+  text-align:center;
+  font-size:55px;
+  background-color:#000;
+  padding:3px;
+  display:block;
+  letter-spacing:3px;
+  margin-bottom:15px;
+}
+  
+.explication{
+  background-color:#000;
+  color:#ABABB1 !important;
+  padding:15px;
+  font-size:12px;
+  line-height:15px;
+  width:800px;
+  margin:0 auto;
+  text-align:justify;
+}
+
+.explication strong, .explication b{
+      color: #fff;
+    font-family: 'Love Ya Like A Sister', cursive;
+  font-size:26px;
+  font-weight:normal;
+  letter-spacing:2px;
+  display:block;
+}
+
+.blockapoue{
+  width:800px;
+}
+
+.gauche, .milieu{
+  width:200px;
+  height:250px;
+  float:left;
+  margin-top:15px;
+}
+
+.prochain{
+  font-size:22px;
+  background-color:#000;
+  padding:10px;
+      text-shadow: 0px 0px 3px #fff;
+  border:#FF2B30 4px dotted;
+}
+
+.prochain h2{
+  text-transform:uppercase;
+  text-shadow:none;
+}
+
+.gauche img{
+  margin-top:10px;
+}
+
+.milieu{
+  margin-left:20px;
+}
+
+.milieu h1{
+      color: #fff;
+  text-shadow: 0px 0px 8px #fff;
+  font-size:23px;
+  text-align:center;
+    font-family: 'Love Ya Like A Sister', cursive;
+  margin-top:15px;
+}
+
+.milieu a{
+ background-color:#1A1A1D;
+  padding:5px;
+  text-align:center;
+  font-size:14px;
+  color:#fff;
+  text-transform:uppercase;
+  display:block;
+  margin-top:5px;
+  text-decoration:none;
+}
+
+.milieu a:hover{
+  background-color:#180505;
+  color:#FF2B30;
+}
+
+.droite{
+  margin-left:15px;
+  width:360px;
+  float:left;
+ margin-top:15px;
+}
+
+.droite .infos{
+  padding:10px;
+  background-color:#000;
+  font-size:12px;
+  line-height:14px;
+  margin-top:10px;
+}
+
+.droite h4{
+        color: #fff;
+  text-shadow: 0px 0px 8px #fff;
+  font-size:14px;
+}
+  
+/* Logo */ 
+
+/* body{
+  background-image:url('http://img11.hostingpics.net/pics/674868MarathondeFanfictions.png');
+  background-repeat:no-repeat;
+  background-position: top center;
+} */
+
+.bodyline{
+border-left:#F9D002 5px solid;
+  border-right:#F9D002 5px solid;
+}
+
+
+/* piou piou */
+
+
+/* BLOC TITRE CATEGORIE */
+.tleCAT{
+margin:5px auto 0; 
+width:800px; padding:20px 0; text-align:center;
+background:#3A474E; /* MODIFIABLE */
+}
+/* TITRE CATEGORIE */
+.tleCAT h2{
+margin:0;
+font-size:32px; font-family:Arial; text-transform:uppercase;
+color:white; letter-spacing:3px;  /* MODIFIABLE */
+}
+/* CONTENU CATEGORIE */
+.mdlCAT {
+margin:auto; width:800px; padding:10px 0 25px;
+background:#DEDEDF; /* MODIFIABLE */
+}
+/* BAS CATEGORIE */
+.btmCAT {
+margin:auto; margin-bottom:15px;
+width:800px; height:15px;
+background:#3A474E; /* MODIFIABLE */
+}
+/* BLOC FORUM */
+.FRM {
+margin:auto; width:750px; text-align:center;
+}
+/* TITRE FORUM */
+.tleFRM {
+width:750px; padding:10px 0 5px; 
+text-align:left; font-size:16px; font-family:Arial;
+text-transform:uppercase; letter-spacing:1px;
+}
+.tleFRM a{
+display:inline-block; vertical-align:middle;
+color:#E6E6E6 !important; /* MODIFIABLE */
+}
+/* NOMBRE SUJETS & MESSAGES FORUM */
+.nbFRM {
+display:inline-block; vertical-align:middle;
+width:200px; margin-top:-10px;
+text-transform:uppercase; font-size:9px; text-align:left;
+color:#E6E6E6; /* MODIFIABLE */
+}
+/* ICÔNES FORUM */
+.imgFRM {
+display:inline-block; vertical-align:top;
+width:35px; height:100px;
+}
+/* BLOC DESCRIPTION */
+#descFRM {
+display:inline-block; vertical-align:top; margin:0 10px;
+width:425px; height:100px; overflow:hidden; text-align:justify;
+background:white; /* MODIFIABLE */
+}
+/* DESCRIPTION FORUM */
+.descFRM {
+  position:relative; z-index:3; margin:auto; margin-top:10px;
+width:400px; height:70px; padding:5px; overflow:auto;
+font-size:9px; text-align:justify;
+background:white; color:black; /* MODIFIABLE */
+}
+/* DERNIER MESSAGE FORUM */
+.lmsgFRM {
+display:inline-block; vertical-align:top; 
+width:250px; height:70px; padding:15px 5px 15px 0; 
+text-align:center; text-transform:uppercase; font-size:12px; line-height:normal;
+background:white; color:black; /* MODIFIABLE */
+}
+/* TITRE DERNIER MESSAGE FORUM */
+.lmsgFRM a {
+font-size:14px; color:black; /* MODIFIABLE */
+}
+/* TAILLE PSEUDONYME DERNIER POSTEUR FORUM */
+.lmsgFRM .gensmall {
+font-size:14px; /* MODIFIABLE */
+}
+/* AVATAR DERNIER POSTEUR FORUM */
+.avaFRM {
+float:right; margin-top:-5px; margin-right:7px; 
+width:53px; height:83px; overflow:hidden;
+}
+.avaFRM img{
+width:50px; filter:grayscale(1); -webkit-filter:grayscale(1);
+transition:all 0.45s ease-in-out; -webkit-transition:all 0.45s ease-in-out;
+  -webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+}
+.FRM:hover .avaFRM img{
+filter:grayscale(0); -webkit-filter:grayscale(0);
+}
+/* BLOC SOUS-FORUMS */
+.sfFRM {
+margin:auto; margin-top:10px;
+width:750px; text-align:center; font-size:10px;
+background:white; color:#3A474E; /* MODIFIABLE */
+}
+/* LIENS SOUS-FORUMS */
+.sfFRM a{
+display:inline-block; vertical-align:middle; margin:5px 0; margin-right:1px;
+text-transform:uppercase; color:#3A474E !important; /* MODIFIABLE */
+}
+
+/* fjdijijijdie */
+
+.pseudokapoue{
+  text-align:center;
+  font-size:25px;
+  letter-spacing:-1px;
+  text-transform:uppercase;
+}
+
+
+.postbody{
+  text-align:justify;
+  padding:15px;
+}
+
+ava{
+  width:600px;
+  display:block;
+}
+
+.rank{ /* Couleur du rang */
+  background-color:#8dcbd8;
+  color:#000;
+  width:165px ;
+  font-size:18px;
+  padding:18px;
+  margin-bottom:-25px;
+  text-align:center;
+}
+
+
+.name{ /* Pseudo */ 
+  font-size:23px;
+  color:#000;
+  text-align:center;
+  display:block;
+
+}
+
+.profil{ /* Couleur générale du profil complet */
+  background-color:#000;
+  padding:15px;
+ -webkit-border-radius: 15px;
+-moz-border-radius: 15px;
+border-radius: 15px;
+  color:#fff;
+}
+
+.contour{ /* Fond du profil */
+ background-color:#1A1A1D;
+  padding:10px;
+}
+
+ava{
+  width:600px;
+    display:block;
+}
+
+a:hover{
+  text-decoration:none !important;
+}
+
+/* Autour */
+
+.forumline{
+background-color: #000;
+  margin-bottom:25px;
+	 }
+
+
+td.cat,td.catHead,td.catSides,td.catLeft,td.catRight,td.catBottom {
+	background-color:#000;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+	 height: 28px;
+  font-size:25px !important;
+  color:#fff;
+	}
+
+/*************************************** Mise en forme Catégorie ******************/
+
+.bodyline{
+    padding-left:0px;
+  padding-right:0px;
+  padding-top:0px;
+
+}
+
+body{
+  margin-top:0px;
+  margin-bottom:0px;
+  padding-top:0px;
+  padding-bottom:0px;
+}
+
+.cate_bloc {
+  background: #000;
+  padding: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-align: center;
+  font-size:10px;
+}
+.cate_title{
+}
+
+.cate_title h2 {
+  display: block;
+  padding-top: 30px;
+  height: 37px;
+  margin-bottom:15px;
+font-family: 'Love Ya Like A Sister', cursive;
+text-transform:uppercase;
+  font-size: 55px;
+  letter-spacing:1px;
+  color: #BC1E1D;
+  text-shadow: 0px 0px 8px #BC1E1D;
+  text-align:center;
+}
+
+.cate_title:hover h2{
+  letter-spacing:8px;
+}
+
+
+/*Bloc des catégories*/
+.cate_bloc {
+  background-color: #180505;
+  width: 800px;
+  margin: auto;
+  margin-bottom: 10px;
+  padding-top: 50px;
+  padding-bottom: 1px;
+  font-family: "abeatbykai", sans-serif;
+  font-size: 12px;
+  color: gray;
+}
+
+.cate_forum, .cate_forum:hover, .cate_title h2, .cate_title:hover h2, #qeel:hover #title_qeel, #qeel #title_qeel, .milieu a, .milieu a:hover{
+  -webkit-transition: all 500ms ease;
+-moz-transition: all 500ms ease;
+-ms-transition: all 500ms ease;
+-o-transition: all 500ms ease;
+transition: all 500ms ease;
+}
+
+/*Bloc des forums*/
+.cate_forum {
+  height: 125px;
+  width: 720px;
+  margin-bottom:55px;
+  background-color:#1A1A1D;
+  border-left:#550F10 10px solid;
+    border-right:#550F10 10px solid;
+}
+
+.cate_forum:hover{
+    border-left:#000 10px solid;
+    border-right:#000 10px solid;
+}
+
+
+/*Bloc gris du mileu*/
+.cate_forum_middle {
+  position: relative;
+  float: left;
+  margin-top: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
+  width: 420px;
+  height: 53px;
+  padding: 10px;
+  padding-top: 17px;
+}
+
+/*Titres des forums*/
+.forumlink {
+ position: absolute; 
+  top:-40px;
+  right:35px;
+  padding:5px;
+  text-align:left;
+  width:100%;
+    color: #9B9B9B;
+  text-shadow: 0px 0px 3px #9B9B9B;
+  z-index: 2;
+  height: 25px;
+  font-family: 'Love Ya Like A Sister', cursive;
+  font-size: 25px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  font-weight: normal;
+}
+
+.forumlink a:hover{
+  text-decoration:none !important;
+}
+
+/*Description des forums*/
+.forum_desc {
+  height: 80px;
+  overflow-y: auto;
+  padding-right: 5px;
+  text-align: justify;
+  margin-top:-10px;
+  color:#B4B4B4 !important;
+  font-family:Verdana;
+  font-size:11px;
+  margin-bottom:5px;
+}
+
+.forum_desc a{
+  color:#fff;
+  text-transform:uppercase;
+  font-size:11px;
+}
+
+/*Image Old New Lock*/
+.old_new_lock {
+  float: left;
+  width:78px;
+}
+
+/*Bloc gris des statistiques et du dernier message*/
+.cate_forum_last {
+  position: relative;
+  float: left;
+  margin-top: 10px;
+  width: 160px;
+  height: 70px;
+  padding: 5px;
+  text-align: center;
+}
+/*Statistiques*/
+.forum_last_stats {
+  margin-left: 3px;
+  margin-right: 3px;
+  margin-bottom: 10px;
+  padding-bottom: 3px;
+  font-size: 10px;
+}
+/*Police du dernier message*/
+.forum_last_mess, .forum_last_mess a.gensmall {
+  font-size: 12px;
+}
+/*Couleur des liens du dernier message*/
+.forum_last_mess a {
+  color: #fff;
+}
+
+/*Sous forum*/ 
+.ssf{
+  width:720px;
+  clear:both;
+}
+
+ .ssf a{
+  font-size:12px;
+    clear:both;
+} 
+
+.ssf a:hover{
+  text-transform:none !important;
+}
+
+/*Les barres de défilement dans les catégories*/
+.forum_desc::-webkit-scrollbar {height:12px; width:5px; background:none; margin-right:5px;}
+.forum_desc::-webkit-scrollbar-thumb {background:#550F10; height:30px; border-radius:30px;}
+.forum_desc::-webkit-scrollbar-corner {background:none;}
+
+
+/************************************************** Fin mise en forme catégorie **************************************************/
+
+/************************************************ QEEL ************************************************/
+    #qeel, #qeel * { box-sizing: border-box; }
+
+    /* Mise en place du QEEL et de sa couleur de fond */
+    #qeel {
+      width: 80%;
+      margin: auto;
+      padding: 10px;
+  padding-bottom:40px;
+      text-align: center;
+  background-color:#180505;
+    }
+
+    /* On retire le sous-lignement des liens dans le QEEL */
+    #qeel a, #qeel a:hover { text-decoration: none !important; }
+
+    /* Mise en place et forme du titre du QEEL */
+    #qeel #title_qeel {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 48px;
+  letter-spacing:3px;
+      font-weight: 400;
+      padding-bottom: 2px;
+  color: #BC1E1D;
+  text-shadow: 0px 0px 8px #BC1E1D;
+font-family: 'Love Ya Like A Sister', cursive;
+  margin-top:-60px;
+    }
+
+#qeel:hover #title_qeel{
+    letter-spacing:10px;
+}
+
+    /* Mise en forme de la séparation sous le titre dun QEEL
+    #qeel hr#separation_qeel {
+      width: 765px;
+      background: #565C4C;
+      border-color: #565C4C;
+      color: #565C4C;
+    } */
+
+    /* Mise ne place des deux aprties du QEEL */
+    #qeel #droite_qeel, #qeel #gauche_qeel {
+      display: inline-block;
+      vertical-align: top;
+      height: 265px;
+    }
+
+    /* Mise en palce de la aprtie de droite du QEEL contenant les 3 cadres. */
+    #qeel #droite_qeel {
+      width: 490px;
+      margin-left: 15px;
+    }
+
+
+    /* Mise en forme de tous les cadres de droite */
+    #qeel #droite_qeel .cadre_qeel {
+      width: 490px;
+      height: 80px;
+      padding: 10px;
+      background: #1A1A1D;
+      overflow: auto;
+      text-align: left;
+    }
+
+    /* Pour le cadre du centr eon ajoute des marges de haut et bas. */
+    #qeel #droite_qeel .cadre_qeel:nth-of-type(2) {
+      margin-top: 13px;
+      margin-bottom: 13px;
+    }
+
+    /* Mise en forme du texte dans les cadre et le texte gensmall dans les cadre. */
+    #qeel #droite_qeel .cadre_qeel, #qeel #droite_qeel .cadre_qeel .gensmall {
+      color: #B4B4B4;
+      line-height: 14px;
+      font-size: 12px;
+    }
+
+    /* Permet de retirer les crochets des groupes */
+    #qeel #droite_qeel .cadre_qeel#groupes { font-size: 0px; }
+
+    /* MEt en forme les liens des groupes */
+  #qeel #droite_qeel .cadre_qeel#groupes a {
+      display: inline-block;
+      vertical-align: top;
+      font-size: 12px;
+  margin-left:5px;
+    }
+
+#groupes a::after {
+  content: " • "; 
+}
+ /* Mise ne forme de la table des connectés dernières 24h. Fait en sorte qu'il n'y ait pas de marges. */
+ #qeel #droite_qeel .cadre_qeel #connectes_avant { border-collapse: collapse; background: none; }
+    #qeel #droite_qeel .cadre_qeel #connectes_avant td.row1 { border: none; padding: 0; background: none; }
+
+    /* Pour le texte qui n'est pas remplacé en Javascript, on met à 0 pour retirer le texte de base,
+    puis mets une taille correcte au texte que l'on veut (donc els choiffres, l'utilisateur enregistré */
+  #qeel #droite_qeel .cadre_qeel .no_blah { font-size: 0px; letter-spacing: 0px; line-height: 0px; }
+    /*  On emt aussi une couleur spéciale aux infors importantes/en gras. */
+ #qeel #droite_qeel .cadre_qeel .gensmall .no_blah > strong { color: #fff; font-size: 12px; }
+    #qeel #droite_qeel .cadre_qeel .gensmall .no_blah > a { font-size: 12px; }
+   

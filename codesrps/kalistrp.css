@@ -1,0 +1,35 @@
+/* Fiche Liste RP Kalina */
+
+.kalistrp{ width:450px; margin:0 auto; font-family:Verdana; font-size:13px; color:#333; } 
+.kalistrp *{ box-sizing:border-box; }
+
+.kalent{ height:180px; width:100%; position:relative; background-color:#555852; }
+.kalent img{ width:236px; height:180px; object-fit:cover; position:absolute; right: 30px; } 
+.kalent h1{ color:#fff; font-family: 'Prata', serif; font-size:24px; margin:0; position:absolute; bottom:30px; left: 40px; text-shadow: 3px 5px 2px #474747; letter-spacing:3px; }
+.kalent h1 em{ font-size:13px; font-family: 'Glegoo', serif; font-weight:normal; color:#dedede; }
+
+.kalistrp .rpbloc{ background-color:#fff; margin:10px 0px; padding:20px; width:100%; position:relative; text-align:right; border-bottom:#8AB663 2px solid;}
+.kalistrp .rpbloc h2{ color:#fff; background-color:#8AB663; font-family: 'Glegoo', serif; text-transform:uppercase; font-size:15px; margin:0px; text-align:left; height:100px;
+  width:45%; clip-path: polygon(0 0, 0% 100%, 100% 0); padding:10px; 
+  position:absolute; top:0px; left:0px; }
+.kalistrp .rpbloc h2 span{ display:block; 
+-moz-transform: rotate(-25deg);
+-webkit-transform: rotate(-25deg);
+-o-transform: rotate(-25deg);
+-ms-transform: rotate(-25deg);
+transform: rotate(-25deg);
+}
+
+.kalistrp .rpright{ text-align:left; }
+.kalistrp .rpright h2{ left:auto; right:0px; clip-path: polygon(0 0, 100% 100%, 100% 0); text-align:right; }
+.kalistrp .rpbloc.rpright h2 span{ -moz-transform: rotate(25deg);
+-webkit-transform: rotate(25deg);
+-o-transform: rotate(25deg);
+-ms-transform: rotate(25deg);
+  transform: rotate(25deg); 
+    position: absolute;
+    left: 67%;
+    top: 29%;}
+
+.kalistrp a, .kalistrp a:link, .kalistrp a:active, .kalistrp a:visited{ color:#5A7E3A; }
+.kalistrp a:hover{ color:#445F2C; }

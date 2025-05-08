@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        #app {
+            width: 800px;
+            margin: 0 auto;
+            background: #EDF2F4;
+            padding: 20px;
+            font-family: Verdana;
+        }
+        #app input[type=text] {
+            width: 60%;
+        }
+        #app h1 {
+            color: #2B2D42;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 4px;
+            border: 1px solid #8D99AE;
+            padding: 5px;
+        }
+        #app h2 {
+            color: #8D99AE;
+            border-bottom: 1px solid #8D99AE;
+            font-family: 'Bebas Neue', sans-serif;
+        }
+        .codefinal {
+            width: 90%;
+            margin: 0 auto;
+            display: block;
+            font-size: 14px;
+            line-height: 18px;
+            background: #CDDDDF;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .fondpre {
+            background: #ffffff;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .inputflex {
+            display: flex;
+        }
+        .inputflex > div {
+            width: 49%;
+        }
+        #app button {
+            font-size: 18px;
+        }
+        :root {
+            --pis-color1: #7d4245;
+            --pis-color2: #b8b8b8;
+            --pis-color3: #74A993;
+        }
+
+        .colcol-grid {  
+            display: grid;  
+            grid-template-columns: repeat(3, 1fr);   
+            grid-gap: 10px; 
+        }
+        .colcol-grid br { display: none; }
+
+        .id-cr-t { 
+            background: var(--span-color-light); 
+            font-size: 30px; 
+            padding: 10px;  
+            display: inline-block; 
+            font-family: var(--font-1); 
+            font-weight: bold; 
+            border-radius: 10px; 
+            outline: 1px solid var(--white); 
+            outline-offset: -3px; 
+        }
+        .id-cr, .id-cr-c {  
+            position: relative; 
+            display: flex; 
+            width: 100%; 
+            align-items: center; 
+            background: #fff; 
+            border-radius: 10px; 
+            padding: 5px;   
+        }
+        .id-cr img, .id-cr-c img { 
+            min-width: 40px; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            max-width: 40px; 
+        }
+
+        .id-cr-c img { 
+            min-width: 70px; 
+            max-width: 70px; 
+            width: 70px; 
+            height: 40px; 
+            margin-right: 5px; 
+        }
+
+        .id-cr span, .id-cr-c span { 
+            font-family: var(--font-2); 
+            font-size: 13px; 
+            margin-left: 5px; 
+            text-align: center;
+        }
+
+        .colcol-grid-f {  
+            display: grid;  
+            grid-template-columns: repeat(3, 1fr);   
+            grid-gap: 10px; 
+        }
+        .id-cr-f { 
+            position: relative; 
+            display: flex; 
+            width: 100%; 
+            align-items: center; 
+            background: #fff; 
+            border-radius: 20px; 
+            padding: 5px; 
+            white-space: normal;  
+        }
+        .id-cr-f img { 
+            min-width: 100px; 
+            max-width: 100px; 
+            width: 100px; 
+            height: 100px; 
+            margin-right: 5px; 
+            border-radius: 50px; 
+        }
+        .id-cr-f span { 
+            font-family: var(--font-2); 
+            font-size: 13px; 
+            margin-left: 5px; 
+            text-align: center; 
+            padding: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Remplir les boite à idée</h1>
+        <h3>Inputs</h3>
+
+        <label>Image :</label> 
+        <input type="text" v-model="imageimage"><br>
+        <label>Ce que c'est :</label> 
+        <input type="text" v-model="imagedescr">
+
+        <br><br>
+        <button @click="ajouterGrosAjout">Ajouter</button> 
+        <button @click="supprimerGrosAjout">Supprimer le dernier</button>
+
+        <h3>Résultats</h3>
+        <div class="colcol-grid">
+            <div v-for="(grosAjout, index) in grosAjouts" :key="index">
+                <span class="id-cr">
+                    <img :src="grosAjout.imageimage"><span>{{ grosAjout.imagedescr }}</span>
+                </span>
+            </div>
+        </div>
+        <div v-for="(grosAjout, index) in grosAjouts" :key="index" class="fondpre">
+            &lt;span class="id-cr"&gt;
+                &lt;img src="{{grosAjout.imageimage}}" /&gt;&lt;span&gt;{{ grosAjout.imagedescr }}&lt;/span&gt;
+            &lt;/span&gt;
+        </div>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    imageimage: "https://i.pinimg.com/736x/81/da/95/81da956afab25490019d134368011a6e.jpg",
+                    imagedescr: 'Faites court pas zaper fandom',
+                    grosAjouts: [],
+                }
+            },
+            methods: {
+                ajouterGrosAjout() {
+                    this.grosAjouts.push({
+                        imageimage: this.imageimage,
+                        imagedescr: this.imagedescr,
+                    });
+                    this.reinitialiserGrosAjout();
+                },
+                supprimerGrosAjout() {
+                    this.grosAjouts.pop();
+                },
+                reinitialiserGrosAjout() {
+                    this.imageimage = 'https://i.pinimg.com/736x/81/da/95/81da956afab25490019d134368011a6e.jpg';
+                    this.imagedescr = 'Faites court pas zaper fandom';
+                },
+            },
+        });
+        app.mount("#app");
+    </script>
+</body>
+</html>

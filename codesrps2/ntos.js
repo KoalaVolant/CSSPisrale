@@ -1,0 +1,1 @@
+document.getElementById("testnavig").innerHTML=document.getElementById("fa_search").innerHTML;

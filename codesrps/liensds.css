@@ -1,0 +1,202 @@
+/* Fiche RP des PPK */
+
+
+.list-ppk{
+  width:550px;  margin:0 auto;
+  background-color:#dedede;  padding:10px;
+}
+
+
+.dispo{
+  background-color:#fff;  border-radius:10px;
+  font-size:12px;  color:#454545;
+  line-height:18px;  font-weight:bold;
+  text-align:center;  width:300px;
+  margin:0 auto;
+}
+
+
+.list-ppk *, .liens-ppk *{  box-sizing:border-box; }
+
+
+.list-ppk h1{
+  font-size:55px;  line-height:40px;
+  margin-top:-25px;
+  background-color:#454545;  color:#fff;
+  padding:10px;  
+
+}
+
+.list-ppk h1, .blocrp h2, .bloclien h1{ 
+        -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+    font-family: 'Poor Story', cursive;
+      text-align:center;
+
+}
+
+
+.rps-ppk{
+  margin-top:15px;
+  width:550px;
+  display:flex;
+  justify-content:space-evenly;
+  flex-wrap:wrap !important;
+}
+
+
+.blocrp{   width:175px !important; }
+
+
+.blocrp img{
+ width:175px;  height:100px;
+  object-fit:cover;   padding:3px;
+  border:1px solid;
+}
+
+
+.blocrp h2{
+  color:#fff;
+  font-size:25px;
+  padding:3px;
+  width:175px;
+ margin-top:-15px;
+
+}
+
+
+.blocrp div{
+width:175px; margin-top:-25px;
+  height:220px; text-align:left;
+font-size:12px; line-height:18px;
+ font-family:Verdana; background-color:#fff;
+color:#454545; padding:10px;
+padding-top:20px; overflow:auto;
+}
+
+
+.blocrp a:hover{     color:#6F6F6F !important; }
+
+.elchai2, .enosh2, .elchai2 img, .enosh2 img, .elchai2 h2, .enosh2 h2, .enosh2 div, .elchai2 div{ width:250px !important; }
+
+/* Fiche liens des PPK */
+
+
+
+.liens-ppk{
+  box-sizing:border-box;
+  width:550px;   margin:0 auto;
+}
+
+
+.bloclien{  width:550px; }
+
+
+.bloclien h1{
+  font-size:40px;
+  padding:5px;
+  color:#fff;
+  margin-top:-15px;
+}
+
+
+.haut-lien{
+  width:550px;
+  display:flex;
+  justify-content:space-around;
+}
+
+
+.haut-lien img{
+  width:250px;  height:175px;
+  object-fit:cover;
+  padding:5px;
+  border:1px solid;
+}
+
+
+.liens-c{
+  width:550px;
+  padding:15px;
+  display:flex;
+  margin-top:-45px;  padding-top:40px;
+  justify-content:space-around;
+  flex-wrap:wrap;
+  color:#000;
+}
+
+
+.liens-c .c-l{
+  display:flex;
+  width:255px;
+}
+
+.liens-c h2{    color:#454545 !important; }
+
+.liens-c img{
+  width:100px;  height:130px;
+  border:1px solid;
+  padding:3px;  object-fit:cover;
+}
+
+
+.liens-c span{
+  margin-left:5px;
+  background-color:#fff;
+  padding:5px;
+  font-family:Verdana;
+  display:block;
+  height:130px;
+  font-size:11px;  line-height:12px;
+  overflow:auto;
+  text-align:justify;
+  width:150px;
+  color:#454545;
+}
+
+
+/* Couleurs */ 
+
+
+/* Tobias */ 
+
+.tobias2 h2, .tobias h1{ background-color:#978F71; }
+.tobias img, .tobias2 .haut-lien img, .tobias2 .liens-c img{   border-color:#978F71; }
+.tobias a, .tobias a:visited, .tobias a:active{    color:#978F71 !important; }
+
+.tobias .liens-c{  background-color:#C0B8AD !important; }
+
+/* Chase */ 
+
+.chase2 h2, .chase h1{ background-color:#C07547; }
+.chase img, .chase2 .haut-lien img, .chase2 .liens-c img{   border-color:#C07547; }
+.chase a, .chase a:visited, .chase a:active{    color:#C07547 !important; }
+
+.chase .liens-c{  background-color:#98C9DC !important; }
+
+/* Judith */
+
+.judith2 h2, .judith h1{ background-color:#ED3A9C; }
+.judith img, .judith2 .haut-lien img, .judith2 .liens-c img{   border-color:#ED3A9C; }
+.judith a, .judith a:visited, .judith a:active{    color:#ED3A9C !important; }
+
+.judith .liens-c{  background-color:#F48EC7 !important; }
+
+/* Gwenaël */ 
+
+.gwenael2 h2, .gwenael h1{ background-color:#6D8DBE; }
+.gwenael img, .gwenael2 .haut-lien img, .gwenael2 .liens-c img{   border-color:#6D8DBE; }
+.gwenael a, .gwenael a:visited, .gwenael a:active{    color:#6D8DBE !important; }
+
+.gwenael .liens-c{  background-color:#C5C5C5!important; }
+
+/* Orpheus */ 
+
+.orpheus2 h2, .orpheus h1{ background-color:#C44444; }
+.orpheus img, .orpheus2 .haut-lien img, .orpheus2 .liens-c img{   border-color:#C44444; }
+.orpheus a, .orpheus a:visited, .orpheus a:active{    color:#C44444 !important; }
+
+.orpheus .liens-c{  background-color:#B0B7BF !important; }

@@ -1,0 +1,9 @@
+.tobiassign{ width:370px; margin:0 auto; }
+.tobiassign span{ display:flex; justify-content:center; } 
+.tobiassign img{ width:150px; height:80px; object-fit:cover; } 
+.tobiassign .cot1{ clip-path: polygon(25% 0%, 100% 1%, 100% 100%, 25% 100%, 0% 50%); margin-right:5px;}
+.tobiassign .cot2{ clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%); }
+.tobiassign h2{ font-size:11px !important; margin-top:10px; text-align:center; letter-spacing:-1px; font-weight:normal; line-height:11px; font-family:Verdana;}
+.tobiassign h2 strong{ font-size:15px !important; line-height:17px; font-family: 'Walter Turncoat', cursive; background: rgb(0,0,0);
+background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(77,36,36,1) 22%, rgba(13,131,0,1) 81%, rgba(0,0,0,1) 100%);   -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}

@@ -1,0 +1,80 @@
+.rpls_1{
+    width: 530px;
+    margin: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  padding:15px;
+}
+
+
+.rpls_1 .gif{
+  width:500px;
+  display:flex;
+  justify-content:center;
+}
+
+.rpls_1 .gif div{
+    width: 235px;
+  height:150px;
+  position:relative;
+background-size:cover;
+    border:#fff 10px double;
+    padding:3px;
+    -webkit-border-top-left-radius: 50px;
+-webkit-border-bottom-right-radius: 50px;
+-moz-border-radius-topleft: 50px;
+-moz-border-radius-bottomright: 50px;
+border-top-left-radius: 50px;
+border-bottom-right-radius: 50px;
+}
+
+
+.rpls_1 h2{
+  position:absolute;
+  bottom:-10px;
+    left:calc(50% - 40px);
+    color:#fff;
+    font-size:18px;
+  text-align:center;
+    font-family:Century Gothic;
+    text-transform:uppercase;
+  text-shadow:#000 0px 0px 3px;
+}
+
+
+.rpls_1 .gif div+div{
+-webkit-border-radius: 50px;
+-webkit-border-top-left-radius: 1px;
+-webkit-border-bottom-right-radius: 1px;
+-moz-border-radius: 50px;
+-moz-border-radius-topleft: 1px;
+-moz-border-radius-bottomright: 1px;
+border-radius: 50px;
+border-top-left-radius: 1px;
+border-bottom-right-radius: 1px;
+}
+
+
+.rpls_1 h1{
+    font-family: Century Gothic;
+    font-size: 18px;
+    line-height: 20px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  font-weight:normal;
+  text-align:center;
+  padding:15px 0;
+  border-top:#dedede 2px solid;
+    border-bottom:#dedede 2px solid;
+}
+
+koala2{
+  font-size:8px;
+  font-family:century gothic;
+  letter-spacing:4px;
+  text-align:center;
+  display:block;
+  margin-top:-10px;
+  color:#AAAAAA;
+}

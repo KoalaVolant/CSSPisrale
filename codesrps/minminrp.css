@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Ribeye&display=swap');
+@import url('https://coderps.xyz/codesrps/pisraleglobal.css');
+
+.minminrp{
+    width:500px;
+    margin:0 auto;
+}
+
+.minminrp .barre-titre{
+    display:flex; 
+    justify-content:space-between;
+    align-items:center; 
+    background:rgba(255,255,255,0.16);
+    padding:10px;
+    border-radius:10px;
+  margin-bottom:10px; 
+}
+
+.minminrp .barre-titre > img{ 
+width:80px; height:84px; margin:0px 5px; 
+border-radius:50%; }
+
+.minminrp .barre-titre span{
+    padding:10px; 
+}
+
+.minminrp .barre-titre h2{ 
+color:#222;
+    font-family: 'Ribeye', cursive;
+    font-weight:normal; 
+}
+
+.minminrp .barre-titre h3{ 
+background:none; 
+font-size:11px; 
+text-align:right;
+width:100%;
+margin:0px; }
+
+.minminrp .rp-content{ 
+padding:25px; 
+text-align:justify; 
+background:rgba(255,255,255,0.36);
+    border:5px solid; 
+border-top:none; border-bottom: none; 
+border-image-slice:27 27 27 27;
+    border-image-width:0px 5px 0px 5px;border-image-outset:0px 0px 0px 0px;
+    border-image-repeat:stretch stretch;
+border-image-source:url("https://i.servimg.com/u/f30/19/45/51/53/come-b10.jpg");
+  font-size:12px; line-height:1.5em; 
+  font-family:Verdana;
+}

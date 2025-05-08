@@ -1,0 +1,45 @@
+.kykylistrp{
+  width:400px;
+  padding:20px;
+  background-color:#fff;
+  color:#555;
+  font-family:Verdana;
+  font-size:12px;
+  margin:0 auto;
+}
+
+.kykylistrp a, .kykylistrp a:hover, .kykylistrp a:link{
+  color:#316834;
+  text-decoration:none;
+}
+
+.kykylistrp img{
+  width:100%;
+  object-fit:cover;
+  height:200px;
+  -webkit-clip-path: polygon(10% 0, 89% 0, 100% 30%, 100% 70%, 88% 100%, 12% 100%, 0% 70%, 0% 30%);
+clip-path: polygon(10% 0, 89% 0, 100% 30%, 100% 70%, 88% 100%, 12% 100%, 0% 70%, 0% 30%);
+}
+
+.kykylistrp h1{
+  font-size:25px;
+  font-weight:normal;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  font-family: 'Anton', sans-serif;
+  color:#204422;
+  position:relative;
+  padding-left:35px;
+  border-bottom:#ABB1AD 1px solid;
+}
+
+.kykylistrp h1 span{
+  display:block;
+  border-radius:50%;
+  width:30px;
+  height:30px;
+  position:absolute;
+  top:8px;
+  left:0;
+  background-color:#3C7D3F;
+}

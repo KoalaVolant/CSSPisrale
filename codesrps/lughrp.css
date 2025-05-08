@@ -1,0 +1,60 @@
+.lughrp{
+  width:400px;
+  margin:0 auto;
+  font-family:Verdana;
+  font-size:12px;
+  line-height:15px;
+  text-align:justify;
+  border:#D1D1D1 1px solid;
+  border-bottom:5px #000 solid;
+  background-color:#fff;
+  padding:10px 10px 20px 10px;
+  color:#000;
+}
+
+.lughrp h1{
+  font-family: 'Maven Pro', sans-serif;
+  text-transform:uppercase;
+  margin:0px;
+  font-size:19px;
+  line-height:20px;
+  color:#707070;
+}
+
+
+.lughrp *{
+        -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.entlugh{
+  width:400px;
+  margin-left:5px;
+}
+
+.arab{
+  width:300px;
+  display:block;
+  margin:0 auto;
+}
+
+.entlugh img{
+  width:195px;
+  height:150px;
+    border-top:#000 5px solid;
+    border-bottom:#000 5px solid;
+  object-fit:cover;
+  
+}
+
+.entlugh .unl{
+  -webkit-clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+}
+
+.entlugh .deuxl{
+  -webkit-clip-path: polygon(20% 100%, 80% 100%, 100% 0, 0 0);
+clip-path: polygon(20% 100%, 80% 100%, 100% 0, 0 0);
+  margin-right:10px;
+}

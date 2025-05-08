@@ -1,0 +1,46 @@
+.ls{
+  width:450px;
+  margin:0 auto;
+}
+
+.ls .ls_left{
+  background-image:url('https://67.media.tumblr.com/48243434f144ab608325eb1c79771f40/tumblr_obxsd7GnSK1sqwd3yo2_250.gif');
+  background-position:50% 45%;
+  background-size:100px 145px;
+  width:100px;
+  position:relative;
+  z-index:50;
+  height:100px;
+  -webkit-border-radius: 60px;
+-moz-border-radius: 60px;
+border-radius: 60px;
+  border:#000 double 5px;
+  float:left;
+}
+
+.ls .ls_right{
+  float:left;
+  width:330px;
+}
+
+.ls h1{
+  text-transform:uppercase;
+  color:#000;
+  font-size:20px;
+  letter-spacing:3px;
+  font-family: 'Fjalla One', sans-serif;
+  margin-left:10px;
+}
+
+.ls h2{
+  background-image:url('https://thumbs.dreamstime.com/t/fire-flame-isolated-15747342.jpg');
+  color:#fff;
+  position:relative;
+  z-index:25;
+    font-family: 'Fjalla One', sans-serif;
+  font-size:13px;
+  padding:10px 10px 10px 20px;
+  font-weight:normal;
+  margin-left:-17px;
+  margin-top:-10px;
+}

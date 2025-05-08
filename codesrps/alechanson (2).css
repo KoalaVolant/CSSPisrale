@@ -1,0 +1,39 @@
+/* Code rp Alec */
+
+.alechanson{
+  width:500px;
+  margin:0 auto;
+  background-color:#373737;
+}
+
+.alechanson h1{
+  padding:4px;
+  font-size:22px;
+  font-family: 'Source Sans Pro', sans-serif;
+  line-height:24px;
+  text-transform:uppercase;
+  text-align:center;
+  width:491px;
+  font-weight:normal;
+  border-bottom:#fff dotted 2px;
+  background-color:#000;
+  color:#fff;
+  margin-bottom:-20px;
+}
+
+.alechanson img{
+  width:500px;
+    border-bottom:3px #000 double;
+}
+
+.alechanson p{
+  background-color:#E8E8E8;
+  text-align:justify;
+  width:400px;
+  padding:35px 25px 25px 25px;
+  border-bottom:2px #000 dotted;
+  border-left:25px #000 solid;
+  border-right:25px #000 solid;
+  margin-top:-15px;
+  color:#0C0C0C;
+}

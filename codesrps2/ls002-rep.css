@@ -1,0 +1,48 @@
+/** LS 002 **/ 
+
+.wrals002{
+  width:500px;
+  padding:15px;
+margin:0 auto;
+}
+
+.wrals002, .wrals002 *{ box-sizing:border-box; }
+
+.ls002{
+  width:400px;
+  height:200px;
+  margin:0 auto;
+  background-size:cover;
+border:#fff solid 2px;
+}
+
+.wrals002 h1{
+  padding:10px;
+  font-size:24px;
+  font-family: 'Oswald', sans-serif;
+  text-align:center;
+  margin:0 auto;
+  background-color:#fff;
+  color:#1D1D1D;
+  padding:5px;
+  width:400px;
+  line-height:26px;
+  text-transform:uppercase;
+  transition:300ms;
+}
+
+.wrals002 h1:hover{
+  color:#6F6F6F;
+ transition:300ms;
+}
+
+.wrals002 p{
+  width:400px;
+  margin:0 auto;
+  padding:20px;
+  font-size:14px;
+  line-height:18px;
+  text-align:justify;
+}
+
+.ls002-k.koala{ display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

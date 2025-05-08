@@ -1,0 +1,65 @@
+[class*="bridgliens"], [class*="bridgliens"] *{ box-sizing:border-box; }
+[class*="bridgliens"]{ margin:0 auto; width:500px; font-family: "Old Standard TT", serif; }
+[class*="bridgliens"] br{ display:none; }
+[class*="bridgliens"] img{ object-fit:cover; }
+
+
+.bridgliens1, .bridgliens2 {
+  padding: 5px;
+  border: 1px solid #d3d3d3;
+  background: #fff;
+  position: relative; padding-bottom:15px; 
+  font-family: "Old Standard TT", serif;
+}
+.bridgliens1 .bridglnom1{ display:flex; justify-content:space-between; }
+.bridgliens1 .bridglnom1 span{ color:#222; font-size:20px; 
+width:42%; font-weight:bold; margin-top:5px;}
+.bridgliens1 .bridglnom1 span:nth-child(2){ text-align:right; }
+.bridgliens1 .bridglnom1 .bridglfnd1{ width:50px; height:60px; 
+	position:absolute; top:-25px;display:block; left:50%; transform:translateX(-50%); 
+	background:url('https://i.goopics.net/5lwqp6.png'); background-size:100%; }
+
+.bridgliens1 .bridglavatxt{ margin-left:10px; margin-right:10px; 
+	display:flex; margin-top:20px; justify-content:space-between; }
+.bridgliens1 .bridglavatxt img{ width:150px; padding:2px; height:240px;
+	border:1px solid #d3d3d3; }
+.bridgliens1 .bridglavatxt .bridgltxtinfos1{ border-left:1px solid #222;
+	width:80%; margin-left:10px; padding-left:10px; height:240px; overflow:auto; 
+	padding-right:10px;}
+
+
+.bridgliens1 .bridglavatxt .bridgltxtinfos1 br, .bridglseajout > div div br{ content:none; display:inline-block; }
+
+.bridgliens1 .bridglavatxt .bridgltxtinfos1 strong{ text-transform:uppercase; }
+
+.bridglseajout{ display:flex; justify-content:space-between; margin:20px 10px 0 10px; }
+.bridglseajout > div{ width:49%; height:200px; }
+
+.bridglseajout .bridgltitle1 { text-transform:uppercase; text-align:center; display:block;
+font-weight:bold; font-size:16px;}
+
+.bridglsearch{ border-right:1px solid #222; }
+
+/* LIENS */ 
+
+.bridgliens2 .bridglifnd{ width:50px; height:60px; 
+	position:absolute; top:-25px;display:block; left:50%; transform:translateX(-50%); 
+	background:url('https://i.goopics.net/5lwqp6.png'); background-size:100%; }
+.bridgliens2 .bridglititle2{ display:block; font-size:18px; letter-spacing:3px; 
+text-decoration:underline; text-align:center; margin-top:40px; font-weight:bold; }
+.bridgliens2 .bridgliflex{ margin:10px 10px 0 10px;  display:flex; flex-wrap:wrap; 
+	justify-content:center }
+.bridgliens2 .bridgliflex .bridglilien{ margin-bottom:10px;  width:33.3%; position:relative; height:220px; }
+.bridgliens2 .bridgliflex .bridglilien img{ padding:3px; height:220px;
+	border:1px solid #d3d3d3; position:relative;
+z-index:2; }
+.bridgliens2 .bridgliflex .bridglilien div{ position:absolute; top:0; left:0; width:100%;
+height:100%; overflow:hidden;  z-index:5; padding:10px;  }
+.bridgliens2 .bridgliflex .bridglilien span{ position:relative; left:-100%; z-index:6; 
+	background:#fff; display:block; margin-bottom:5px;
+padding:3px; width:90%; transition:500ms; }
+.bridgliens2 .bridgliflex .bridglilien:hover span{ left:0; transition:800ms; }
+.bridgliens2 .bridgliflex .bridglilien span:nth-child(1){ text-align:center; font-weight:bold;
+	font-size:16px; color:#792121; max-height:40px; }
+.bridgliens2 .bridgliflex .bridglilien .bridgliltxt{ text-align:justify; overflow:auto;
+	height:155px; padding:5px; font-size:12px; line-height:1.5em; color:#222; }

@@ -1,0 +1,14 @@
+/* Signature Orpheus */ 
+
+.orphisign{ width:250px; margin:0 auto; height:100px; padding:10px 25px; position:relative; }
+.orphisign *{ box-sizing:border-box; }
+.orphifond{ width:250px; height:60px; -moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);
+    background-size:cover;}
+.orphisign img{ width:60%; display:block; height:78px; position:relative; top:-87px; left:50%; transform:translateX(-50%);  object-fit:cover; border:4px double #BCBABA;} 
+.orphisign h1{ position: absolute;    background-color: #fff;    font-family: 'Abril Fatface', cursive;
+    color: #8C4F2B;    text-align: center;    font-weight: normal;    font-size: 11px;    line-height: 13px;
+    padding: 5px;    top: 49px;    width: 253px;  }

@@ -1,0 +1,52 @@
+.wrappdan{
+background-color:#355E5C; 
+width:500px; 
+padding:20px; 
+-webkit-border-radius: 20px; 
+-moz-border-radius: 20px; 
+border-radius: 20px;
+}
+
+.reladan{
+padding:10px; 
+width:450px;
+height:110px;
+}
+
+.pndan{
+font-family: 'PT Sans', sans-serif;
+text-transform:uppercase;
+font-size:11px;
+}
+
+.floaat{
+float:left;
+}
+
+.floaat img{
+-webkit-border-radius:50%; 
+-moz-border-radius: 50%; 
+border-radius: 50%; 
+width:100px;
+}
+
+.descridan{
+margin-left:15px; 
+padding:10px; 
+background-color:#24403F; 
+-webkit-border-top-left-radius: 40px;
+-webkit-border-bottom-right-radius: 40px;
+-moz-border-radius-topleft: 40px;
+-moz-border-radius-bottomright: 40px;
+border-top-left-radius: 40px;
+border-bottom-right-radius: 40px;
+height:100px;
+width:310px;
+overflow:auto;
+color:#fff;
+}
+
+overflow:auto; 
+height:100px; 
+width:300px;
+}

@@ -1,0 +1,73 @@
+.sterp{
+  width:500px;
+  margin:0 auto;
+  padding:0 0 15px 0;
+        -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  overflow:hidden;
+  font-family:Verdana;
+  background-image:url('https://i.pinimg.com/564x/96/62/fb/9662fb737bbe5163feb0e4f2bd4d5d45.jpg');
+}
+
+.sterp img{
+  width:500px;
+  height:200px;
+  object-fit:cover;
+    border-top:#fff dotted 2px;
+      border-bottom:#fff dotted 4px;
+  margin-bottom:20px;
+  transition:900ms;
+}
+
+.sterp:hover img{
+  -webkit-filter: brightness(1.5);
+filter: brightness(1.5);
+}
+  
+
+.sterp h1{
+  font-size:20px;
+  line-height:23px;
+  text-align:center;
+  color:#fff;
+  font-weight:normal;
+  text-shadow:0px 0px 3px #fff;
+  font-family: 'Fredericka the Great', cursive;
+  transition:900ms;
+}
+
+.sterp:hover h1{
+  text-shadow:0px 0px 10px #fff;
+}
+
+.sterp span{
+  background-color:#dedede;
+  display:block;
+  margin:0 auto;
+  width:400px;
+  text-align:justify;
+  -webkit-box-shadow: 0px 0px 22px 10px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 0px 22px 10px rgba(0,0,0,0.75);
+box-shadow: 0px 0px 22px 10px rgba(0,0,0,0.75);
+  padding:25px;
+  color:#000;
+  -webkit-border-radius: 20px;
+-moz-border-radius: 20px;
+border-radius: 20px;
+          -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  font-size:12px;
+  line-height:14px;
+-webkit-box-shadow: inset -7px -47px 171px 40px rgba(4,12,51,1);
+-moz-box-shadow: inset -7px -47px 171px 40px rgba(4,12,51,1);
+box-shadow: inset -7px -47px 171px 40px rgba(4,12,51,1);
+  transition:900ms;
+}
+
+.sterp:hover span{
+  -webkit-box-shadow: inset -7px -47px 162px -28px rgba(4,12,51,1);
+-moz-box-shadow: inset -7px -47px 162px -28px rgba(4,12,51,1);
+box-shadow: inset -7px -47px 162px -28px rgba(4,12,51,1);
+}

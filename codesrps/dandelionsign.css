@@ -1,0 +1,39 @@
+.dandelionsign{
+  width:400px;
+  margin:0 auto;
+  display:flex;
+  border-top:#000 3px solid;
+    border-bottom:#000 3px solid;
+  padding-top:5px;
+  padding-bottom:5px;
+}
+
+.dandelionsign img{
+  width:90px;
+  height:100px;
+  object-fit:cover;
+}
+
+.dandelionsign h1{
+font-family: 'Domine', serif;
+  text-transform:uppercase;
+  font-size:20px;
+  line-height:22px;
+  margin:0;
+  text-align:center;
+  color:#EF4F01;
+  margin-top:5px;
+
+}
+
+.dandelionsign h2{
+font-family: 'Domine', serif;
+  text-align:justify;
+  width:200px;
+  font-weight:normal;
+  font-size:10px;
+  line-height:12px;
+  margin:0;
+  margin-top:-5px;
+  padding:10px;
+}

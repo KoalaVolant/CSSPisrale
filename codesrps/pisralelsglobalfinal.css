@@ -1,0 +1,62 @@
+.pisrals-global, .pisrals-global *{ box-sizing:border-box; margin:0; }
+    .koalapis{ display:block; text-align:center; font-size:8px; letter-spacing:5px; } 
+    
+    .pisrals-global img{ object-fit:cover; } 
+    
+    .pisrals1{ width:450px; margin:0 auto; } 
+    
+    .pisrals1-titre{ color:#444; border:1px solid #123456; color:#dedede; text-align:center; margin:0 auto; padding:5px; text-transform:uppercase; font-size:16px; line-height:15px; }
+    
+    .pisrals1-img{ border-radius:50px 50px 0px 0px; height:40px; display:flex; justify-content:center; background-color:#dedede; margin: 37px 0px 5px 0px;} 
+    .pisrals1-img img{ border-radius:50%; width:70px; height:70px; border:3px solid var(--pis-white); position:relative; top:-32px; margin:0px 2px;  }
+    .pisrals1-content{ padding:10px; border:1px solid #dedede; background:var(--pis-whitec); color:var(--pis-grey); font-family:var(--pis-fontv); font-size:12px; line-height:1.6em; width:100%; text-align:justify; }
+    
+    /* Shun Fiche RP */
+    
+    .grShRP{ width:500px; margin:0 auto !important; display:flex; } 
+
+.grShRP .grImgLeft{ width:80px; height:120px; }
+
+.grShRP .grTitre{ display:flex; align-items:flex-end; }
+.grShRP .grTitre img{ width:85px; height:85px; } 
+.grShRP .grFndTitre{ padding:10px; background:url('https://i.servimg.com/u/f30/19/45/51/53/f13fd810.jpg'); background: font-family:Prompt; color:#222; font-size:12px; line-height:12px; border-top-right-radius: 30px;
+border-bottom-right-radius: 30px; height:55px; }
+
+.grShRP .grConteneur{ padding:15px; font-size:12px; line-height:1.6em; font-family:Inter; border:1px solid #dedede; text-align:justify; } 
+
+.grShRP .grSsTitre{ background:#dedede; padding:5px; color:turquoise; font-family:Prompt; border-bottom-left-radius: 30px; width:40%; } 
+
+.grShSign{ width:500px; margin:0 auto !important; position:relative;} 
+
+.grShSign .grsiLeft{ display:flex; gap:10px; }
+.grShSign .grsiLeft img{ z-index:100; }
+.grShSign .grsiLeft img:nth-child(1){ width:100px; height:100px; position:relative; top:-10px; }
+.grShSign .grsiLeft img:nth-child(2){ width:80px; height:100px; }
+.grShSign .grsiTitre{ font-family:Prompt; font-size:15px; color:turquoise; text-transform:uppercase; } 
+
+.grShSign .grsiCitation{     position: absolute;
+    z-index: 2;
+    top:21px; 
+    left: 0px;
+    background: url(https://i.servimg.com/u/f30/19/45/51/53/76fc7110.jpg);
+    font-family: Prompt;
+    color: #222;
+    font-size: 10px;
+    padding: 6px;
+    max-height: 68px;
+    padding-right: 18px;
+    padding-left: 198px;
+    line-height: 9px;
+    text-align: justify;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;    min-height: 51px;
+    display: flex;
+    align-items: center; }
+
+.pisrals2{ width:600px; margin:0 auto !important; } 
+.pisrals2-conteneur{ position:relative; width:100%; padding-bottom:10px; border-bottom:10px solid #dedede; }
+.pisrals2-conteneur img{ width:50%; min-height:150px; filter: opacity(36%);}  
+.pisrals2-conteneur > div{ position:absolute; text-align:right; right:0px; width:70%; top:50%; transform: translate(0px, -50%);}
+.pisrals2 .pisrals2-h1{font-family: 'Playfair Display', serif; font-size:30px; line-height:21px; font-weight:bolder; color:#B9373B; }
+.pisrals2 .pisrals2-h2{ margin-top:5px; font-size:11px; line-height:12px; } 
+.pisrals2 .pisrals2-content{ text-align:justify; padding:15px; font-size:14px; line-height:1.6em; }

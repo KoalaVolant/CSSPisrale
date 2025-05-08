@@ -1,0 +1,54 @@
+.rubsign{
+  width:410px;
+  margin:0 auto;
+}
+
+.rubsign:hover .rubimg, .rubimg, .lign, .rubsign:hover .lign{
+  -webkit-transition: all 600ms linear;
+-moz-transition: all 600ms linear;
+-ms-transition: all 600ms linear;
+-o-transition: all 600ms linear;
+transition: all 600ms linear;
+}
+
+.rubimg{
+  width:200px;
+  height:100px;
+  background-size:200px 120px;
+  float:left;
+  background-image:url('http://33.media.tumblr.com/tumblr_m1cse4RoEk1r99f4t.gif');
+}
+
+.rubsign:hover .rubimg{
+  background-image:url('http://33.media.tumblr.com/tumblr_m1csckbShP1r99f4t.gif');
+}
+
+.rubtxt{
+  font-size:9px;
+  line-height:10px;
+  text-align:justify;
+  width:200px;
+  height:100px;
+  float:left;
+  margin-left:10px;
+  color:#F0D9D9;
+}
+
+.rubtxt i{
+  color:#F0D9D9 !important;
+}
+
+.lign{
+    background-color:#808080;
+  color:#808080;
+  height:10px;
+  width:420px;
+  margin-top:90px;
+  clear:both;
+  text-align:center;
+}
+
+.rubsign:hover .lign{
+  background-color:#B64949;
+  color:#B64949
+}

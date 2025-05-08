@@ -1,0 +1,54 @@
+.alek3{
+width:500px;
+margin:0 auto;
+}
+
+.alek3 img{
+  width:230px; 
+  float:left;
+  margin-right:20px;
+  border:#BFBFBF solid 1px;
+  -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+}
+.alek3 h1{
+font-size:18px;
+line-height:20px;
+    font-family: 'Special Elite', cursive;
+background-color:#25768D;
+}
+
+.alek3 h2{
+font-size:12px;
+line-height:14px;
+  font-family: 'Antic', sans-serif;
+background-color:#46646C;
+  text-align:right;
+  margin-top:-10px;
+}
+
+.alek3 h1, .alek3 h2{
+width:230px;
+padding:5px;
+  margin-top:-10px;
+  margin-left:-20px;
+  float:left;
+  display:block;
+color:#fff;
+}
+
+.alek3content{
+  width:400px;
+margin:0 auto;
+  padding:15px;
+border:#7AA35C 1px dotted;
+padding:20px;
+  text-align:justify;
+  background-color:#fff;
+  color:#272727;
+  font-size:12px;
+  line-height:14px;
+}

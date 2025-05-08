@@ -1,0 +1,9 @@
+.sarahsign{ width:190px; margin:0 auto; }
+
+.sarahsign div{ display:flex; justify-content:center; }
+.sarahsign img{ width:80px; height:80px; object-fit:cover; padding:4px; border:3px double #9DC0CC; background-color:#dedede; border-radius:50%; }
+.sarahsign img+img{ margin-left:10px; }
+
+.sarahsign h1{ text-align:justify; font-size:9px; line-height:10px; font-weight:normal; padding-top:5px; border-top:1px dotted #9dc0cc; font-family:Verdana;} 
+
+.koala{width:100%;font-size:7px; display:flex; justify-content:center; letter-spacing:3px; }

@@ -1,0 +1,66 @@
+/* Fiche RP Lucy */
+
+.lucy{
+  width:450px;
+  padding:20px;
+  -webkit-border-top-left-radius: 90px;
+-webkit-border-top-right-radius: 90px;
+-webkit-border-bottom-right-radius: 9px;
+-moz-border-radius-topleft: 90px;
+-moz-border-radius-topright: 90px;
+-moz-border-radius-bottomright: 9px;
+border-top-left-radius: 90px;
+  margin:0 auto;
+border-top-right-radius: 90px;
+border-bottom-right-radius: 9px;
+  background-image:url('http://img13.deviantart.net/173f/i/2016/185/9/d/celestial_crocodile_by_somadjinn-d48295t.jpg');
+  border-top:#fff 12px double;
+  backgroung-size:cover;
+  border-bottom:#fff 10px double;
+}
+
+.lucy .texte{
+  background-color:#fff;
+opacity: 0.27;
+filter: alpha(opacity =27);
+  width:350px;
+  height:75px;
+  position:relative;
+  z-index:2;
+    margin-left:50px;
+  margin-top:15px;
+}
+
+.lucy h1, .lucy h2{
+  position:relative;
+  z-index:7;
+  margin-top:10px;
+}
+
+.lucy h1{
+  font-family: 'Satisfy', cursive;
+  text-align:center;
+  font-size:32px;
+  font-weight:normal;
+  margin-top:-55px;
+}
+
+.lucy h2{
+text-align:right;
+font-family:Times New Roman;
+padding:0px;
+  margin-right:75px;
+ font-size:11px;
+    margin-top:-40px;
+}
+
+.content{
+  padding:25px;
+  background-color:#fff;
+    font-size:13px;
+    line-height:15px;
+    font-family:Arial;
+    color:#2F565B;
+  margin-top:15px;
+    text-align:justify;
+  }

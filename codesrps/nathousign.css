@@ -1,0 +1,8 @@
+/* Signature Nathaniel */
+
+.nathousign{ width:220px; margin:0 auto; position:relative; }
+.nathousign, .nathousign *{ box-sizing:border-box; }
+
+.nathousign h1{ position:absolute; z-index:999;font-family: 'Comforter Brush', cursive; font-size:35px; -moz-transform: rotate(-5deg);-webkit-transform: rotate(-5deg);transform: rotate(-5deg); color:#222; text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;}
+.nathousign img{ width:100%; clip-path: polygon(0% 26%, 100% 0%, 100% 100%, 0% 100%); border-bottom:10px solid;   border-image: linear-gradient(90deg, rgba(138,124,108,1), rgb(102,0,255,1)) 1; margin-bottom:5px;}
+  .nathousign span{ font-family: 'Montagu Slab', serif; font-size:11px; line-height:11px; text-align:justify; }

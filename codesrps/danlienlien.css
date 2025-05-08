@@ -1,0 +1,57 @@
+/* Dan dan rp*/
+
+
+.danlien{
+  width:470px;
+  height:500px;
+  margin:0 auto;
+  background-color:#fff;
+  padding:10px;
+  color:#264B75;
+  font-size:12px;
+  line-height:15px;
+  -webkit-border-top-left-radius: 60px;
+-webkit-border-top-right-radius: 60px;
+-moz-border-radius-topleft: 60px;
+-moz-border-radius-topright: 60px;
+border-top-left-radius: 60px;
+border-top-right-radius: 60px;
+  font-family:Verdana;
+  border:#7EA8D6 1px dashed;
+}
+
+.danlien b, .danlien strong{
+  font-size:14px;
+  color:#32649A;
+text-transform:underline;
+  text-transform:uppercase;
+    font-family: 'Poppins', sans-serif;
+}
+
+.danlien .lr{
+  font-size:16px;
+}
+
+.danlien img{
+  width:250px;
+  -webkit-border-radius: 20px;
+-moz-border-radius: 20px;
+border-radius: 20px;
+  margin-bottom:25px;
+  padding:5px;
+  border:#264B75 1px solid;
+  }
+  
+  .wrapoupou{
+    width:470px;
+    margin:0 auto;
+  }
+  
+  .wrapoupou div{
+    width:200px;
+  text-align:justify;
+    padding:15px;
+    height:260px;
+    overflow:auto;
+    float:left;
+  }

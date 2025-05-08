@@ -1,0 +1,908 @@
+        .postbody {
+        text-align:justify;
+        padding-left:25px;
+        padding-right:25px;
+        }  
+
+/* Logo */ 
+
+.bodyline{
+  margin-top:0px;
+}
+
+/* body{
+  background-image:url('http://img15.hostingpics.net/pics/192188HeaderFinal.png');
+  background-repeat:no-repeat;
+  background-position: top center;
+} */
+
+/* Cadre du fo */ 
+
+ /**PROFILE**/
+@font-face {
+font-family: 'Satisfy', cursive;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.pseudoprofil {
+  text-align:center;
+  font-size:20px;
+font-family: 'Satisfy', cursive;
+}
+
+.contour {
+padding: 20px;
+  border: 2px solid #F8D5B1;
+   box-shadow: inset #F8D5B1 1px 1px 50px;
+  border-radius: 10px 10px 10px 10px;
+  text-align: justify;
+  background-color: #fff;
+}
+
+.RPG {
+background-color: #fff;
+text-align: justify;
+  padding: 5px;
+border-radius: 10px 10px 10px 10px;
+  margin-top: -20px;
+}
+
+    .poster-profile img {max-width: 200px;}
+
+/**FIN**/
+  
+/*------------------------MESSAGE Et ANNONCES----------------*/
+
+.fond_sujet{
+background-color:#A69D95;
+color: #000000;
+padding: 20px;
+margin: 15px;
+width: 500px;
+text-align: justify;
+}
+
+.fond_sujetbas{
+background-color:#A69D95;
+color: #000000;
+ width: 500px;
+ height: 340px;
+padding: 10px;
+margin: 10px;
+overflow: auto;
+box-shadow: 8px 8px 12px #000000;
+text-align: justify;
+}
+
+.titres_message{
+color: #C61815;
+font-size :45px;
+font-family: 'Satisfy', cursive;
+text-align:center;
+text-transform: none;
+text-shadow:#000000 0px 0px 0px;
+letter-spacing:0px;
+word-spacing: 2px;
+margin-bottom: 4px;
+line-height: 50px;
+border-bottom:#C61815 4px solid;
+}
+
+.soustitres{
+color: #50322e
+font-size : 27px ;
+font-family: 'Dosis', sans-serif;
+text-transform: none;
+text-shadow: #000000 1px 1px 1px;
+margin-bottom: -6px;}
+
+.citation_message {
+color:#000000;
+font-family: 'Dosis', sans-serif;
+text-shadow: #000000 0px 0px 0px;
+font-style: italic;:
+font-size: 25px;
+text-align:center;
+letter-spacing : -3px;
+margin-bottom: -3px;
+word-spacing: 3px;
+}
+
+/*-----------Bloc pour l'image annonce-------------------*/
+  .bloc2{
+ background: url("http://i.imgur.com/zzxxoYr.png");
+ width: 400px;
+ height: 200px;
+ margin: auto; 
+ border: 1px solid #3B0F17; 
+ overflow: hidden;
+ border-radius: 10px;;box-shadow: 8px 8px 12px #000000}
+
+/*-----------Fiche presa + prédef---------------*/
+
+ .blocimage{
+ background-color: #000000;
+ width: 200px;
+ height: 320px;
+ margin: 5px;  
+ overflow: hidden;
+ border-radius: 5px;;box-shadow: 5px 5px 6px #000000}
+
+.blocicone{
+ background-color: #000000;
+ width: 150px;
+ height: 150px;
+ margin: auto;  
+ overflow: hidden;
+ border-radius: 10px;;box-shadow: 8px 8px 12px #000000}
+ 
+.titrepredef{
+  color: #50322e;
+font-size : 30px;
+font-family: 'Nothing You Could Do', cursive;
+text-align:center;
+text-transform:none;
+text-shadow: #000000 2px 2px 2px;
+border-bottom:#D60024 0px solid;
+letter-spacing:-3px;
+margin-bottom: -6px;
+}
+
+.blocpredef{
+background-color:#A69D95;
+color: #000000;
+text-align: justify;
+ width: 270px;
+ height: 300px;
+ padding: 10px;
+margin: 5px;
+overflow: auto;
+border-radius: 10px;;box-shadow: 6px 6px 10px #000000}
+
+.bloclien{
+background-color:#A69D95;
+color: #000000;
+text-align: justify;
+ width: 472px;
+ height: 290px;
+ padding: 15px;
+margin: 10px;
+overflow: auto;
+border-radius: 10px;
+box-shadow: 6px 6px 10px #000000;}
+
+.blocpresa{
+background-color:#A69D95;
+color: #000000;
+text-align: justify;
+ width: 220px;
+ height: 250px;
+ padding: 10px;
+margin: auto;
+overflow:auto;
+border-radius: 10px;;box-shadow: 8px 8px 12px #000000}
+
+.blocfinal{
+background-color:#A69D95;
+color: #000000;
+text-align: justify;
+ width: 330px;
+ height: 190px;
+ padding: 10px;
+margin: auto;
+overflow: auto;
+border-radius: 10px;;box-shadow: 8px 8px 12px #000000}
+
+.blocrelation{
+  background-color:#A69D95;
+color: #000000;
+text-align: justify;
+ width: 300px;
+ height: 150px;
+ padding: 10px;
+margin: auto;
+overflow: auto;
+border-radius: 10px;;box-shadow: 8px 8px 12px #000000}
+
+.fond_predef{
+background-color:#A69D95;
+color: #50322e;
+padding: 5px;
+margin: auto;
+width: 525px;
+text-align: justify;}
+
+a { text-decoration: none; }
+  
+/***Categorie***/
+
+th {
+  background-color:#E29E4C;
+  color:#fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+    font-size: 15px;
+  padding:5px;
+    font-weight: 400!important;
+}
+
+td.cat,td.catHead,td.catSides,td.catLeft,td.catRight,td.catBottom {
+	background-image: url('http://img4.hostingpics.net/pics/359782EssaiCategorie.png');
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+	 height: 28px;
+  font-size:25px !important;
+  color:#fff;
+	}
+
+td.catBottom, td.catBottom a, td.catBottom a:link{
+    font-size:15px !important;
+  color:#fff;
+    font-family: 'Satisfy', cursive;
+}
+
+.cattitle, .cattitle a, .cattitle a:link{
+color:#fff;
+font-size: 27px;
+line-height:29px;
+font-family: 'Satisfy', cursive;
+}
+
+ .newpost, .descriptions {
+   font-family: Verdana;
+  font-size:11px;
+}
+
+.newpost .gensmall, .descriptions .gensmall {
+   font-size: 12px !important;
+}
+
+.forumlink {
+font-family: 'Dosis', sans-serif;
+  font-size: 24px;
+  font-weight: 400 !important;
+}
+
+.forumlink a {
+   width: 100%;
+   border-bottom: 1px solid #363A3D;
+   padding: 0 50px 6px 0;
+}
+
+.newpost, .descriptions, .sousforums_container {
+   background-color: #fff;
+    display: inline-block;
+}
+
+.newpost {
+    width: 250px;
+}
+
+.descriptions {
+   width: 373px;
+   margin: 0 8px;
+    height: 122px;
+    overflow: hidden;
+}
+
+.description {
+   height: 70px;
+   margin-top: 10px;
+   padding: 0 10px 0 0;
+   text-align: justify;
+   overflow: auto;
+}
+
+.infopost {
+   float: left;
+}
+
+.lastpost-avatar-container {
+   height: 120px;
+   width: 72px;
+}
+
+.lastpost-avatar img {
+   height: 120px;
+   width: 72px;
+   border-radius: 0;
+}
+
+.clickinfopost {
+   margin-top: 5px;
+}
+
+.clickinfopost .gensmall {
+   letter-spacing: -.5px;
+   font-size: 11px !important;
+}
+
+.imgnewpost{
+  width:170px;
+  margin-top:-5px;
+}
+
+.infonewpost {
+   width: 170px;
+   height: 120px;
+   margin: 2px 5px 0 0;
+  padding-top:5px;
+color::#fff;
+   background-color:#A69D95;
+}
+
+.infonewpost a, .forumlink .gensmall, .sousforums_details a {
+   text-transform: uppercase;
+   font-family: Georgia;
+  color:#fff;;
+}
+
+.infonewpost a {
+   font-size: 11px;
+  color:#fff;
+}
+
+.forumlink .gensmall {
+   margin-top: -4px;
+   display: block;
+  color:#000;
+   font-size: 9px !important;
+}
+
+.sousforums_container {
+   width: 113px;
+   height: 120px;
+   overflow: auto;
+}
+
+.sousforums_details a {
+   display: block;
+   margin: 2px;
+   padding: 2px;
+   background-color: #E3A051;
+  color:#fff;
+   font-size: 9px !important;
+}
+
+.sousforums_details a:hover{
+  color:#282828 !important;
+}
+
+.secondarytitle {
+    color: #fff;
+    margin: 30px 0 0 0;
+    padding: 10px;
+  background-image:url('http://img4.hostingpics.net/pics/359782EssaiCategorie.png');
+  background-position:top;
+  background-size:120%;
+    /* background-color: #651B16; */
+font-family: 'Satisfy', cursive;
+    font-size: 39px;
+    font-weight: 400!important;
+}
+
+.secondarytitle h2{
+font-family: 'Satisfy', cursive;
+    font-size: 39px;
+    font-weight: 400!important;
+text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+}
+
+.clearfix:after {
+      visibility: hidden;
+      display: block;
+      font-size: 0;
+      content: " ";
+      clear: both;
+      height: 0;
+    }
+        
+    /* -------------------------------- QEEL -------------------------------- */
+
+            /*** MISE EN FORME LIENS AU SURVOL ***/
+            a:hover {
+              text-decoration: none !important;
+            }
+
+            /*** MISE EN FORME FONT DU QEEL ***/
+            .fond_qeel {
+              width: 780px;
+              border-radius: 0px 0px 25px 25px;
+              background-color: #fff;
+              margin: auto;
+              height: 620px;
+              position: relative;
+            }
+
+            /*** MISE EN FORME TITRE PRINCIPAL ***/
+            .titre_principal {
+              color: #DD452E;
+font-family: 'Satisfy', cursive;
+              font-size: 28;
+              letter-spacing: 2px;
+              text-align: center;
+            }
+
+            /*** MISE EN FORME SOUS-TITRE "Et à qui se fier ?" ***/
+            .titre_secondaire {
+              color: #DD452E;
+font-family: 'Satisfy', cursive;
+              font-size: 14px;
+              text-align: center;
+            }
+
+            /*** MISE EN FORME BLOC STATISTIQUES ***/
+            .bloc_stat {
+              background-color: #C9C4BE;
+              padding: 15px;
+              width: 200px;
+              height: 150px;
+              overflow: auto;
+              font-size: 11px;
+              text-align: justify;
+              color: #2E2E2E;
+              position: absolute;
+              left: 3em;
+              z-index: 1;
+            }
+
+            /*** MISE EN FORME BLOC DES GROUPES ***/
+            .bloc_groupes {
+              background-color: #C9C4BE;
+              padding: 15px;
+              width: 420px;
+              height: 50px;
+              overflow: auto;
+              font-size: 15px;
+              text-align: center;
+font-family: 'Dosis', sans-serif;
+              position: absolute;
+              left: 18em;
+  margin-left:20px;
+              z-index: 1;
+            }
+
+            /*** MISE EN FORME BLOC DES CONNECTES LES 24H ***/
+            .bloc_connectes {
+              background-color: #C9C4BE;
+              padding: 15px;
+              width: 420px;
+              height: 50px;
+              overflow: auto;
+              font-size: 20px;
+              text-align: center;
+font-family: 'Dosis', sans-serif;
+              position: absolute;
+              left: 14.5em;
+              z-index: 1;
+            }
+
+            /*** COULEUR ET TRANSPARENCE DU FOND DES 24H ***/
+            #kaboum .row1 {
+              background-color : transparent;
+            }
+
+            #kaboum span.gensmall {
+              color: #a3a3a3;
+            }
+
+            /*** MISE EN FORME DES TITRES (simple + survol) ***/
+            .titre_bloc {
+font-family: 'Dosis', sans-serif;
+              font-size: 20px;
+              font-weight: bold;
+              color: #73291A;
+              z-index: 2;
+  position:absolute;
+  left:50px;
+              margin-top: -18px;
+            }
+
+            .titre_bloc:hover {
+              color: #F59D44;
+            }
+
+            /*** GROUPES A ONGLETS ***/
+            /* Mise en forme des noms de groupe */
+            .groupe_onglet {
+              display: inline-block;
+              padding: 10px;
+            }
+
+            /* Mise en forme du bloc en transparence de description */
+            .contenu_groupe_onglet {
+              padding: 15px;
+              display: none;
+              width: 315px;
+              height: 115px;
+              overflow: auto;
+              font-size: 11px;
+              color: #2C2C2C;
+              text-align: justify;
+              background-color: #fff;
+              position: absolute;
+              top: 17em;
+              left: 35em;
+            }
+
+            /* Mise en forme des liens */
+            .contenu_groupe_onglet a{
+              text-decoration: none !important;
+            }
+
+            /*** MISE EN FORME DES CREDITS ***/
+            .credits {
+              text-align: right;
+              margin-right: 10px;
+              font-size: 9px;
+              margin-top: 10px;
+            }
+
+            .credits a{
+              color:#50322e;
+            }
+
+            /* -------------------------------- FIN QEEL -------------------------------- */
+
+
+    /** PARTENAIRE Footer**/
+    .partenaire_footer {
+    background-color:#3B0F17;
+    width: 620px;
+    height: 50px;
+    border:2px solid #3B0F17;
+    overflow: auto;
+    }
+
+    .titre_footer {
+    width: 620px;
+    height: 25px;
+    background-color:#3B0F17;
+    border: #3B0F17 2px solid ;
+    color: #000000 !important;
+    display: block;
+    font-family: Times New Roman !important;
+    font-size: 20px;
+    text-align: center;}
+
+    /** FIN PARTENAIRE FOOTER **/
+
+         /************************************************** Début Page d'accueil **************************************************/
+
+
+        /*Bloc de la page d'accueil*/
+        #pa {
+          position: relative;
+          width: 776px;
+          height: 376px;
+          margin: auto;
+          background-image: url('http://img4.hostingpics.net/pics/90016072PA.png');
+          text-align: left;
+          padding-top: 24px;
+          padding-left: 8px;
+          color: #333333;
+          font-family: verdana;
+          font-size: 10px;
+        }
+
+	#pa h1{
+  font-family: 'Dosis', sans-serif;
+  color:#8B1919;
+  margin:0;
+  text-align:center;
+  font-size:14px;
+  margin-bottom:-10px;
+}
+        /*Bloc du concept*/
+        #concept {
+          float: left;
+          position: relative;
+          width: 175px;
+          height: 222px;
+          overflow: hidden;
+  background-color:#fff;
+        }
+        /*Texte du concept*/
+        #concept_text {
+          width: 163px;
+          height: 210px;
+          margin: 1px;
+          padding: 5px;
+          text-align: justify;
+          overflow: auto;
+        }
+        /*Image du concept*/
+        #concept_img {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          width: 175px;
+          height: 222px;
+          transition: 0.5s;
+          -webkit-transition: 0.5s;
+        }
+        /*Glissement de l'image du concept*/
+        #concept:hover #concept_img {
+          left: 200px;
+        }
+
+
+        /*Bloc du staff*/
+        #staff {
+          float: left;
+          position: relative;
+          width: 313px;
+          height: 133px;
+          margin-left: 12px;
+    background-color:#fff;
+        }
+        /*Bloc de chaque staffien*/
+        .staff_infobulles {
+          float: left;
+          width: 67px;
+          height: 50px;
+          margin-top: 6px;
+          margin-left: 9px;
+        }
+        /*Images du staff*/
+        .staff_img {
+          width: 67px;
+          height: 50px;
+        }
+        /*Infobulles du staff*/
+        .staff_infobulle {
+          position: absolute;
+          bottom: 11px;
+          left: 9px;
+          width: 294px;
+          height: 66px;
+          transform: scale(0);
+          -webkit-transform: scale(0);
+          -ms-transform: scale(0);
+          transition: 0.5s;
+          -webkit-transition: 0.5s;
+        }
+        /*Apparition de l'infobulle du staff*/
+        .staff_infobulles:hover .staff_infobulle {
+          transform: scale(1);
+          -webkit-transform: scale(1);
+          -ms-transform: scale(1);
+        }
+        /*Information du staff*/
+        .staff_info {
+          float: left;
+          width: 130px;
+          height: 51px;
+          margin-top: 7px;
+          padding: 4px;
+        }
+        /*Petit texte du staff*/
+        .staff_text {
+          float: left;
+          width: 132px;
+          height: 39px;
+          margin-top: 12px;
+          margin-left: 8px;
+          padding: 4px;
+          text-align: justify;
+          border: 1px solid #353535;
+          overflow: auto;
+        }
+        /*Message de bienvenue du staff*/
+        #mess_accueil {
+          position: absolute;
+          bottom: 12px;
+          left: 10px;
+          width: 285px;
+          height: 49px;
+          padding: 4px;
+          text-align: justify;
+          overflow: auto;
+          transform: scale(1);
+          -webkit-transform: scale(1);
+          -ms-transform: scale(1);
+          transition: 0.5s;
+          -webkit-transition: 0.5s;
+    background-color:#fff;
+        }
+        /*Disparition du message du staff*/
+        .staff_infobulles:hover ~ #mess_accueil {
+          transform: scale(0);
+          -webkit-transform: scale(0);
+          -ms-transform: scale(0);
+        }
+
+
+        /*Bloc de l'event*/
+        #event {
+          float: left;
+          position: relative;
+          width: 312px;
+          height: 69px;
+          margin-top: 18px;
+          margin-left: 14px;
+          overflow: hidden;
+    background-color:#fff;
+        }
+        /*Texte de l'event*/
+        #event_text {
+          width: 300px;
+          height: 57px;
+          padding: 5px;
+          margin: 1px;
+          text-align: justify;
+          overflow: auto;
+        }
+        /*Image de l'event*/
+        #event_img {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          width: 312px;
+          height: 69px;
+          transition: 0.5s;
+          -webkit-transition: 0.5s;
+        }
+        /*Glissement de l'image de l'event*/
+        #event:hover #event_img {
+          left: 337px;
+        }
+
+        /*Bloc de la navigation*/
+        #navig_pa {
+          float: left;
+          width: 120px;
+          height: 212px;
+          margin-top: -132px;
+          margin-left: 14px;
+          padding: 5px;
+          text-align: left;
+    background-color:#fff;
+        }
+        #navig_pa a, #navig_pa a:link {
+          display: inline-block;
+          margin-top: 12px;
+            font-size: 10px;
+  line-height:10px !important;
+        }
+
+
+        /*Bloc des top-sites*/
+        #top_sites {
+          float: left;
+          width: 103px;
+          height: 83px;
+          margin-top: -130px;
+          margin-left: 11px;
+          padding: 5px;
+          text-align: center;
+    background-color:#fff;
+        }
+        /*Images des top-sites*/
+        #top_sites img {
+          width: 45px;
+          height: 30px;
+          margin: 3px;
+          margin-top: 6px;
+          margin-bottom: 0px;
+          opacity: 0.8;
+        }
+        /*Images des top-sites survolés*/
+        #top_sites img:hover {
+          opacity: 1;
+        }
+
+
+        /*Bloc des crédits*/
+        #credits {
+          float: left;
+          width: 103px;
+          height: 104px;
+          margin-top: -27px;
+          margin-left: 12px;
+          padding: 5px;
+    background-color:#fff;
+        }
+
+
+        /*Bloc des membres du mois*/
+        #membres_mois {
+          float: left;
+          width: 175px;
+          height: 113px;
+          margin-top: 23px;
+          margin-left: -1px;
+          text-align: center;
+        }
+        /*Images des membres du mois*/
+        #membres_mois img {
+          width: 67px;
+          height: 50px;
+          margin: 8px;
+        }
+        /*Infos des membres du mois*/
+        #membres_mois_info {
+          width: 142px;
+          height: 36px;
+          margin: auto;
+          margin-top: -2px;
+          padding: 4px;
+          text-align: center;
+    background-color:#fff;
+        }
+
+
+        /*Bloc des partenaires*/
+        #partenaires {
+          float: left;
+          width: 301px;
+          height: 102px;
+          margin-top: 23px;
+          margin-left: 15px;
+          padding: 5px;
+          text-align: center;
+    background-color:#fff;
+        }
+        /*Images des partenaires*/
+        #partenaires img {
+          width: 88px;
+          height: 31px;
+          margin: -5px 3px 7px 3px;
+          opacity: 0.8;
+        }
+        /*Images des partenaires survolés*/
+        #partenaires img:hover {
+          opacity: 1;
+        }
+
+
+        /*Bloc des pvs*/
+        #pvs {
+          float: left;
+          width: 246px;
+          height: 103px;
+          margin-top: 22px;
+          margin-left: 14px;
+          padding: 5px;
+          padding-top: 3px;
+          text-align: center;
+        }
+        /*Bloc de chaque pv*/
+        .pvs_infobulles {
+          position: relative;
+          display: inline-block;
+          width: 67px;
+          height: 50px;
+          margin: 1px;
+          margin-left: 1px;
+          margin-right: 2px;
+        }
+        /*Images des pvs*/
+        #pvs img {
+          width: 67px;
+          height: 50px;
+        }
+        /*Infobulles des pvs*/
+        .pv_infobulle {
+          position: absolute;
+          z-index: 1;
+          bottom: 50px;
+          left: -10px;
+          width: 79px;
+          height: auto;
+          padding: 3px;
+          background-color: #fff;
+          border-radius: 3px;
+          transform: scale(0);
+          -webkit-transform: scale(0);
+          -ms-transform: scale(0);
+          transition: 0.2s;
+          -webkit-transition: 0.2s;
+        }
+        /*Apparition de l'infobulle des pvs*/
+        .pvs_infobulles:hover .pv_infobulle {
+          transform: scale(1);
+          -webkit-transform: scale(1);
+          -ms-transform: scale(1);
+        }
+
+        /************************************************** Fin Page d'accueil **************************************************/

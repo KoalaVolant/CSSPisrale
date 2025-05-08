@@ -1,0 +1,57 @@
+/* sign ans */ 
+
+.ans{
+  width:490px;
+margin:0 auto;
+-webkit-border-radius: 60px;
+-moz-border-radius: 60px;
+border-radius: 60px;
+}
+
+.ans img{
+  width:240px;
+  height:100px;
+    margin-top:-40px;
+}
+
+.ans h1{
+  background-color:#336D1F;
+  padding:10px;
+  width:465px;
+  text-align:right;
+  font-weight:bolder;
+  color:#fff;
+  font-size:45px;
+-webkit-border-top-left-radius: 70px;
+-webkit-border-top-right-radius: 70px;
+-moz-border-radius-topleft: 70px;
+-moz-border-radius-topright: 70px;
+border-top-left-radius: 70px;
+border-top-right-radius: 70px;
+  font-family: 'Amatica SC', cursive;
+text-shadow: 1px 1px 4px rgba(150, 150, 150, 1);
+}
+
+.ans h2{
+  font-size:11px;
+  line-height:12px;
+  background-color:#fff;
+  padding:5px;
+  text-align:center;
+  color:#454D40;
+  width:470px;
+  -webkit-border-bottom-right-radius: 70px;
+-webkit-border-bottom-left-radius: 70px;
+-moz-border-radius-bottomright: 70px;
+-moz-border-radius-bottomleft: 70px;
+border-bottom-right-radius: 70px;
+border-bottom-left-radius: 70px;
+  font-weight:lighter;
+  letter-spacing;2px;
+margin-top:0px;
+-moz-box-shadow: 0px 0px 5px 0px #cfcfcf;
+-webkit-box-shadow: 0px 0px 5px 0px #cfcfcf;
+-o-box-shadow: 0px 0px 5px 0px #cfcfcf;
+box-shadow: 0px 0px 5px 0px #cfcfcf;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#cfcfcf, Direction=NaN, Strength=5);
+}

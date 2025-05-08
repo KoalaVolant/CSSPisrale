@@ -1,0 +1,77 @@
+.sul, .fi:hover .sul, .nn, .fi:hover .nn{
+            -webkit-transition: 600ms ease;
+-moz-transition: 600ms ease;
+-ms-transition: 600ms ease;
+-o-transition: 600ms ease;
+transition: 600ms ease;
+}
+
+
+.fi{
+width:470px;
+  height:150px;
+  background-color:#fff;
+  }
+  
+.sul{
+border-left:#FF6600; 
+  border-right:#00FF00;
+  border-top:#00CCFF;
+  border-bottom:#FF0000;
+  border-style:dotted;
+  border-width:5px;
+  padding:15px 10px 15px 10px;
+}
+
+.fi:hover .sul{
+  border-left:#FF0000;
+border-right:#FF6600;
+  border-top:#00FF00;
+  border-bottom:#00CCFF;
+    border-style:dotted;
+  border-width:5px;
+}
+  
+
+.nn{
+  background-image:url('http://24.media.tumblr.com/31256634b28343fca4914b566d19cbb0/tumblr_muduf3PxCE1qk1vdto8_250.gif');
+  width:200px;
+  height:150px;
+  float:left;
+  background-position:bottom;
+}
+
+.fi:hover .nn{
+  background-image:url('http://media.giphy.com/media/MvEfTUayUDTLW/giphy.gif');
+  background-position:center center;
+  background-size:190%;
+}
+
+.sul{ 
+  float:left;
+  width:220px;
+  margin-left:15px;
+  margin-top:10px;
+} 
+
+.sul h1{
+  font-family: 'Alegreya Sans SC', sans-serif;
+  background: #ffee05; /* Old browsers */
+background: -moz-linear-gradient(left, #ffee05 0%, #9e0000 18%, #1e8402 48%, #c40394 80%, #00e887 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left, #ffee05 0%,#9e0000 18%,#1e8402 48%,#c40394 80%,#00e887 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right, #ffee05 0%,#9e0000 18%,#1e8402 48%,#c40394 80%,#00e887 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffee05', endColorstr='#00e887',GradientType=1 ); /* IE6-9 */
+  padding:5px;
+  color:#fff;
+  font-size:25px;
+  margin-bottom:-5px;
+  margin-top:-5px;
+  text-align:center;
+}
+
+.sul p{
+  text-align:justify;
+  color:#000;
+  font-size:11px;
+  line-height:12px;
+}

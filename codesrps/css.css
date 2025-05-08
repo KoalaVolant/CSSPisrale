@@ -1,0 +1,878 @@
+/* Sign Alek */
+
+#al{
+  width:400px;
+  height:200px;
+}
+
+#ek{
+  background-image:url('http://38.media.tumblr.com/d4206635d35faebe962a0f907cf6d1ec/tumblr_mij8beTjPd1rfwaebo2_500.gif');
+  width:400px;
+  height:140px;
+  background-size:cover;
+  transition:200ms;
+}
+
+#ek:hover{
+  background-image:url('http://31.media.tumblr.com/tumblr_ma2cgyx3jN1qbysf3o3_500.gif');
+  transition:200ms;
+}
+
+#al h1{
+  font-size:20px;
+  color:#8DADC0;
+  background-color:#314A59;
+  font-family: 'Coming Soon', cursive;
+  margin-top:-15px;
+  text-align:center;
+}
+
+.one, .two{
+  font-size:12px;
+  margin-top:-15px;
+  color:#fff;
+  text-align:center;
+  letter-spacing:2px;
+  background-color:#314A59;
+  text-transform:uppercase;
+}
+
+.two{
+  display:none;
+  transition:200ms;
+  font-weight:bolder;
+}
+
+#al:hover .one{
+  display:none;
+  transition:200ms;
+}
+
+#al:hover .two{
+  display:block;
+  transition:200ms;
+}
+
+/* sign Elias */
+
+#el{
+  width:450px;
+  margin:0 auto;
+  height:150px;
+  background-image:url('http://cdn.mysitemyway.com/etc-mysitemyway/webtreats/assets/posts/973/full/tileable-dark-wood-textures-5.jpg');
+    border-left:solid 5px #C3C3C3;
+    border-right:solid 5px #C3C3C3;
+}
+
+#el img{
+  height:150px; 
+  float:left;
+}
+
+#ias{
+  float:left;
+  margin-left:15px;
+  margin-top:5px;
+}
+
+#ias p{
+background-color:#DFDFDF;
+  width:180px;
+  font-size:10px;
+  line-height:12px;
+  color:#414141;
+  text-align:justify;
+  margin-top:-15px;
+  padding:10px 20px 10px 20px;
+  -webkit-border-top-left-radius: 50px;
+-webkit-border-bottom-right-radius: 50px;
+-moz-border-radius-topleft: 50px;
+-moz-border-radius-bottomright: 50px;
+border-top-left-radius: 50px;
+border-bottom-right-radius: 50px;
+  
+}
+
+#ias h1{
+  padding:5px;
+  color:#A7A7A7;
+  font-size:25px;
+  margin-left:30px;
+  text-shadow:#000 0px 0px 5px;
+  font-family: 'Slabo 27px', serif;
+  
+}
+  
+/* Fiche Klaus */ 
+
+.bleu{
+  width:480px;
+  -webkit-border-top-left-radius: 80px;
+-webkit-border-top-right-radius: 80px;
+-moz-border-radius-topleft: 80px;
+-moz-border-radius-topright: 80px;
+border-top-left-radius: 80px;
+border-top-right-radius: 80px;
+  border-top:15px #233C61 solid; 
+}
+
+.klaus{
+  width:400px;
+  padding:25px;
+  font-size:12px;
+  line-height:13px;
+  margin-top:-5px;
+  text-align:justify;
+  border-left:15px #233C61 double;
+  border-right:15px #233C61 double;
+  border-bottom:5px #233C61 solid;
+  background-color:#142236;
+  color:#D3D3D3;
+}
+/* Fiche Lien */ 
+
+.wratza{
+  width:520px;
+  margin:0 auto;
+}
+
+.wratza strong{
+  display:block;
+  width:150px;
+  background-size:cover;
+  height:200px;
+}
+
+.wratza strong, .wratza p{
+  float:left;
+}
+
+.wratza p{
+  width:200px;
+  height:200px;
+  background-color:#555555;
+  padding:10px;
+  margin-top:-10px;
+}
+
+.wratza p b, .lienr b, .vroum b{
+  font-size:38px;
+  color:#fff;
+  font-family: 'Exo', sans-serif;
+  text-shadow:#fff 0px 0px 5px;
+  letter-spacing:2px;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.lienr b{
+  font-size:20px !important;
+}
+
+.wratza p i{
+  font-size:10px;
+  line-height:11px;
+  margin-top:5px;
+  text-align:justify;
+  text-decoration:none;
+  color:#dedede;
+}
+
+.lienr{
+  width:500px;
+  clear:both;
+  background-color:#414141;
+  margin:0 auto;
+  padding:10px;
+
+}
+
+.lienr p{
+  color:#B7B7B7;
+}
+
+.wralin{
+  width:500px;
+}
+
+.vroum{
+  width:375px;
+  background-color:#373737;
+  padding:10px;
+  height:80px;
+  color:#dedede;
+  font-size:11px;
+  line-height:12px;
+  overflow:auto;
+  margin-left:120px;
+  
+}
+
+.vroum b{
+  font-size:14px !important;
+}
+  
+.wralin img{
+  height:100px;
+  display:block;
+}
+
+.vroum p, .wralin img{
+  float:left;
+}
+
+.wralin{
+  position:relative;
+}
+  
+ .smoke{
+    float:none;
+  display:block;
+position:absolute;
+  left:75px;
+  }
+/* Fiche tableau de chasse */
+
+.wrap_chase{
+  background-image:url('http://img11.hostingpics.net/pics/182615fondtableau.png');
+  width:550px;
+}
+
+.titre_chase{
+  width:500px;
+  height:45px;
+  margin:0 auto;
+  position:relative;
+  background-color:#0F0F0F;
+}
+
+.titre_chase img{
+  display:block;
+  position:absolute;
+  left:40%;
+  top:-10px;
+  z-index:4;
+}
+
+.titre_chase h1{
+  font-size:30px;
+  color:#909090;
+  position:relative;
+  font-weight:normal;
+  z-index:15;
+  padding-top:10px;
+  text-align:center;
+  font-family: 'Bree Serif', serif;
+}
+
+.bloc_chase{
+  width:530px;
+  margin:0 auto;
+}
+
+.bloc_chase img{
+  width:250px;
+  float:left;
+}
+
+.txt_chase img{
+  float:left;
+  width:250px;
+  margin-right:10px;
+}
+
+.txt_chase b, .txt_chase strong{
+  background-color:#0F0F0F;
+  padding:10px;
+}
+
+.txt_chase b{
+    font-family: 'Bree Serif', serif;
+      font-size:12px;
+  line-height:14px;
+    color:#F52C31;
+    margin-left:10px !important;
+}
+
+.txt_chase strong{
+    color:#B0B0B0;
+  height:50px;
+  overflow:auto;
+  display:block;
+      font-size:10px;
+  line-height:12px;
+margin-top:15px;
+  margin-left:260px;
+  width:235px;
+  font-weight:normal;
+}
+
+/* RP ROCKET */ 
+
+.wrappro{
+  width:500px;
+  margin:0 auto;
+}
+
+.wrappro div {
+    background-image:url('http://mtv.mtvnimages.com/uri/mgid:file:http:shared:mtv.com/news/wp-content/uploads/2014/12/rocket4-1419776758.gif');
+  background-size:cover;
+  border:solid 5px white;
+  width:450px;
+  height:200px;
+}
+
+.wrappro h1{
+  font-size:20px;
+  margin-top:-25px;
+  width:440px;
+  letter-spacing:1px;
+  line-height:22px;
+  font-family: 'Slabo 27px', serif;
+  background-color:#FF6804;
+  color:#fff;
+  padding:10px;
+}
+
+.contro{
+  background-color:#F89807;
+  padding:25px;
+  width:390px;
+  font-size:12px;
+  line-height:16px;
+  margin-top:-31px;
+  color:#fff;
+  text-align:justify;
+  border-left:10px solid #fff;
+    border-right:10px solid #fff;
+  border-bottom:2px dotted #fff;
+  display:block;
+}
+/* Fin RP ROCKET */
+
+.texterp1{
+z-index:12;
+text-transform:uppercase;
+font-family:Verdana;
+width:450px;
+margin-top:-10px;
+font-size:20px;
+text-shadow: 0px -1px 7px rgba(150, 150, 150, 1);
+transition:500ms;
+}
+
+.texterp1:hover{
+color:#FF5555;
+transition:500ms;
+text-shadow:  0px 0px 3px #000;
+}
+
+.ficherprp1::first-letter{
+font-size:20px;
+color:#FF5555;
+font-weight:bolder;
+}
+
+.imgrp1{
+width:455px;
+display:block;
+}
+
+.ficherp1{
+width:395px;
+z-index:25;
+margin-top:-15px;
+padding:35px 25px 25px 25px;
+text-align:justify;
+font-family:Verdana;
+font-size:12px;
+line-height:13px;
+border-left:5px #D6E0D7 solid;
+border-right:5px #D6E0D7 solid;
+} 
+
+.ficherp1:hover{
+border-left:5px #B01115 solid;
+border-right:5px #B01115 solid;
+transition:500ms;
+}
+
+/* Code Léonidas RP */
+
+.texteleonidas{
+z-index:12;
+text-transform:uppercase;
+font-family:Verdana;
+width:450px;
+color:#FFF;
+margin-top:-10px;
+font-size:20px;
+text-shadow: 0px -1px 7px rgba(150, 150, 150, 1);
+transition:500ms;
+}
+
+.texteleonidas:hover{
+color:#FF5555;
+transition:500ms;
+text-shadow:  0px 0px 3px #000;
+}
+
+.ficherpleonidas::first-letter{
+font-size:20px;
+color:#FF5555;
+font-weight:bolder;
+}
+
+.imgleonidas{
+width:455px;
+display:block;
+}
+
+.ficherpleonidas{
+width:395px;
+z-index:25;
+margin-top:-15px;
+padding:35px 25px 25px 25px;
+text-align:justify;
+font-family:Verdana;
+font-size:12px;
+line-height:13px;
+background-color:#3A3A3A;
+color:#BFBFBF;
+border-left:5px #D6E0D7 solid;
+border-right:5px #D6E0D7 solid;
+} 
+
+.ficherpleonidas:hover{
+border-left:5px #B01115 solid;
+border-right:5px #B01115 solid;
+transition:500ms;
+}
+
+.forumline{
+	 background-color:#C4B9A4;
+-webkit-border-top-left-radius: 5px;
+-webkit-border-top-right-radius: 30px;
+-webkit-border-bottom-right-radius: 10px;
+-webkit-border-bottom-left-radius: 25px;
+-moz-border-radius-topleft: 5px;
+-moz-border-radius-topright: 30px;
+-moz-border-radius-bottomright: 10px;
+-moz-border-radius-bottomleft: 25px;
+border-top-left-radius: 5px;
+border-top-right-radius: 30px;
+border-bottom-right-radius: 10px;
+border-bottom-left-radius: 25px;
+  padding:15px;
+  margin-bottom:25px;
+	 }
+
+td.row1,td.row3.over:hover, td.row3{
+  margin:10px;
+	 }
+
+td.row3{
+  padding:10px;
+}
+
+.pika{
+  padding:10px;
+}
+
+.bodyline{
+-moz-box-shadow: 5px 10px 25px 4px #656565;
+-webkit-box-shadow: 5px 10px 25px 4px #656565;
+-o-box-shadow: 5px 10px 25px 4px #656565;
+box-shadow: 5px 10px 25px 4px #656565;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=153, Strength=25);
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+  background-color:#a59981;
+}
+
+body{
+  /*background-image:url('http://img15.hostingpics.net/pics/120721fondfixed.jpg');*/
+  background-image:url('http://img15.hostingpics.net/pics/173652fondvariantefixed.jpg');
+  background-attachment:fixed;
+  background-size:cover;
+}
+
+/* Broum */
+
+/* Les couleurs à modifier (pour que ça soit plus rapide) */
+
+.formulaire1, .predef{ /* Couleur de fond du conteneur général et des descriptions des relations */
+    background-color:#fff !important;
+}
+
+.formulaire2{ /* Couleur de fond & de texte des contenus comme "relations" "caractère" "histoire" "identité" */
+    background-color:#E0E0E0;
+  color:#373737;
+}
+
+.prenom_nom, .nomprenom{ /* Couleur texte de prénom nom feat que ça soit général ou relation */
+  color:#fff;
+}
+
+.formulaire1, .formulaire2, .formulaire1 img{
+  border-color:#A5CBD1;
+}
+
+.formulaire1 span, .formulaire2 b{ /* Couleur de texte des titres et des textes mis en gras 
+  				(attention pas ceux [b]...[/b] mais bien ceux ... */
+  color:#226284;
+}
+
+.nomprenom{ /* Couleur de fond du contenant de "prénom nom feat" de relations Normalement c'est la même couleur que border-color*/
+  background-color:#A5CBD1;
+}
+
+/* Structure générale */
+
+.formulaire1{
+background-color:#0E2800; 
+  width:500px; 
+  border-width:4px;
+  /* Top Right Bottom Left */
+  border-style:solid double solid double;
+  font-family:verdana;
+}
+
+/* Titre prénom nom */
+.prenom_nom{
+  width:460px;
+  height:30px; 
+  font-size:25px;  
+  padding-top:-10px; 
+  text-align: center; 
+  margin-top: -10px; 
+  height: 30px; 
+  text-transform:uppercase; 
+  text-shadow:#000 0px 0px 5px;
+}
+
+/* Feat */
+.prenom_nom i{
+font-size:12px;
+}
+
+
+.float{
+float:left;
+}
+
+/* Contenu texte de Histoire, caractère et relation */
+.formulaire2{
+  border-width:6px;
+  border-style:double;
+  overflow:auto; 
+  padding:15px; 
+}
+
+/* Petites images de relation */
+.imgs{
+-webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+  width:100px;
+  position:relative;
+  z-index:42;
+  margin-left:10px;
+  margin-right:25px;
+}
+
+/* Images du formulaire */
+.formulaire1 img{
+  border-style:solid;
+  border-width:5px;
+}
+
+/* Avatar 200*320 */
+.auimgs{
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+  margin:3px;
+  width:200px;
+  height:320px;
+}
+
+/* Texte de l'identité */ 
+
+.ptit{
+  padding:10px; 
+}
+
+/* Tout texte se trouvant dans le formulaire, et n'ayant pas pour classe "jus" se verront justifié */
+.formulaire1 :not(.jus) {
+    text-align:justify;
+}
+
+/* Texte de l'histoire */
+.txtptit{
+width:400px;
+  padding:10px; 
+  font-size:12px;
+}
+
+
+/* Titres */
+.formulaire1 span{
+  margin-top:-4px; 
+  font-size:28px;
+font-family: 'Nunito', sans-serif;
+}
+
+/* Description relations */
+.predef{
+  width:275px;
+  height:95px;
+  overflow:auto;
+  padding:15px;
+  z-index:950; 
+  font-size:11px;
+  margin:5px;
+  line-height:13px;
+}
+
+/* Règle un bug pour les défauts */ 
+.def{
+margin-top:10px;
+}
+
+/* Bloc de l'image des relations */
+.img{
+position:relative;
+  margin-right:25px;
+  margin-top:10px;
+}
+
+/* Bloc nom prénom feat de relations */
+.nomprenom{
+padding:5px;
+font-size:10px;
+width:90px;
+position:absolute;
+z-index:56;
+top:35px;
+  text-align:left !important;
+  line-height:12px;
+left:5px;
+-moz-opacity: 0.34;
+-khtml-opacity: 0.34;
+opacity: 0.34;
+-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=34);
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=34);
+filter:alpha(opacity=34);
+}
+
+/* Rassemblement des transitions */
+.nomprenom, .img:hover .nomprenom{
+  transition:All 0.4023s ease;
+-webkit-transition:All 0.4023s ease;
+-moz-transition:All 0.4023s ease;
+-o-transition:All 0.4023s ease;
+}
+
+/* Au survol, apparition du bloc de nom prénom feat */
+.img:hover .nomprenom{
+-moz-opacity: 1;
+-khtml-opacity: 1;
+opacity: 1;
+-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=100);
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+filter:alpha(opacity=100);
+
+}
+
+.koalavolantfich{
+  margin-top:-25px;
+  display:block;
+  font-size:9px;
+}
+
+/* Formu presa */
+
+.margesimg{
+  z-index:4; 
+  margin:0px; 
+  padding:0px;
+  width:500px;
+  height:200px;
+  background-size:cover;
+}
+
+/* Code officiel */
+
+.wr_fi_of{
+  width:525px;
+  /* Top right bottom left */
+  padding:20px 20px 0px 20px;
+  background-color:#84A2B7;
+  border: 5px solid #fff;
+  color:#000;
+  font-size:12px;
+  line-height:14px;
+  margin-top:-20px;
+}
+
+.back_gif{
+  width:545px;
+  height:200px;
+  background-size:cover;
+  -webkit-border-top-left-radius: 90px;
+-webkit-border-top-right-radius: 90px;
+-moz-border-radius-topleft: 90px;
+-moz-border-radius-topright: 90px;
+border-top-left-radius: 90px;
+border-top-right-radius: 90px;
+    border: 2px dotted #fff;
+}
+
+.wr_fi_of h2{
+  font-size:25px;
+  color:#344958;
+  background-color:#fff;
+  padding:12px 5px 12px 5px;
+  margin-top:-55px;
+}
+
+.wr_fi_of p{
+  text-align:justify;
+  background-color:#fff;
+  padding:15px;
+  width:450px;
+  margin-top:-40px;
+}
+
+/* Fiche présa */
+
+.titre-pres {
+  position: relative;
+  top: 15px;
+  width: 500px;
+  height: 20px;
+  background-color: #512D31;
+  font-family: calligraffitti;
+  font-size: 30px;
+  color: #C9AAA5;
+  border-radius: 5px 5px 0px 0px;
+}
+
+.fond-pres {
+  background-color: #1e1313;
+  width: 500px;
+  height: auto;
+  padding-top: 10px;
+  border-radius: 5px;
+}
+
+.feat-pres {
+  position: relative;
+  top: -15px;
+  width: 500px;
+  height: 20px;
+  background-color: #512D31;
+  font-family: courier new;
+  font-size: 12px;
+  color: #C9AAA5;
+  letter-spacing: 10px;
+}
+   
+.info-pres {
+  position: relative;
+  top: -15px;
+  width: 500px;
+  height: 20px;
+  background-color: #211618;
+  font-family: times new roman;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #C9AAA5;
+  letter-spacing: 0px;
+}
+
+.subtitle-pres {
+  position: relative;
+  top: 30px;
+  font-family: calligraffitti;
+  font-size: 30px;
+  color: #C9AAA5;
+}
+
+.subtitle-pres2 {
+  position: relative;
+  top: 15px;
+  font-family: calligraffitti;
+  font-size: 30px;
+  color: #C9AAA5;
+}
+
+.physique {
+  width: 425px;
+  height: 125px;
+  margin-right: 30px;
+  overflow: auto;
+  padding: 20px;
+  background-color: #211618;
+  border-radius: 5px 20px 20px 5px;
+  color: #51373A;
+  font-family: times new roman;
+  font-size: 14px; text-align: justify;
+}
+
+.caractère {
+  width: 425px;
+  height: 125px;
+  margin-left: 30px;
+  overflow: auto;
+  border-radius: 20px 5px 5px 20px;
+  background-color: #211618;
+  padding: 20px; 
+  color: #51373A;
+  font-family: times new roman;
+  font-size: 14px;
+  text-align: justify;
+}
+
+.histoire {
+  width: 425px;
+  height: 175px;
+  overflow: auto;
+  border-radius: 20px 20px 20px 20px;
+  background-color: #211618;
+  padding: 20px;
+  color: #51373A;
+  font-family: times new roman;
+  font-size: 14px;
+  text-align: justify;
+}
+
+.info-supp {
+  width: 425px;
+  height: auto;
+  overflow: auto;
+  border-radius: 20px 20px 5px 5px;
+  background-color: #211618;
+  padding: 20px;
+  color: #51373A;
+  font-family: times new roman;
+  font-size: 14px;
+  text-align: justify;
+}
+
+.info {
+  font-style: normal;
+  font-family: times new roman; 
+  font-size: 14px;
+  font-weight: bold;
+  color: antiquewhite;
+}
+
+.credit {
+  font-family: courier new;
+  font-size: 8px;
+  color: #51373A;
+  text-align: center;
+}

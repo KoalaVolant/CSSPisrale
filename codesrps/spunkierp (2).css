@@ -1,0 +1,75 @@
+.spunkie{
+  width:600px;
+  margin:0 auto;
+}
+
+.spunkie .will{
+  border-left:5px #C5170E solid;
+  border-right:5px #C5170E solid;
+  border-top:5px #C5170E solid;
+}
+
+.spunkie img{
+  width:230px;
+  height:200px;
+  float:left;
+}
+
+.spunkie .sully{
+  width:500px;
+  margin:0 auto;
+}
+ 
+.spunkie .will+.will{
+    margin-left:10px;
+  border-color:#0E60C5;
+  }
+
+.spunkie h1{
+  margin:0 auto;
+ /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#0e60c5+0,c5170e+100 */
+background: #0e60c5; /* Old browsers */
+/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMGU2MGM1IiBzdG9wLW9wYWNpdHk9IjEiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2M1MTcwZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
+background: -moz-linear-gradient(-45deg, #0e60c5 0%, #c5170e 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#0e60c5), color-stop(100%,#c5170e)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(-45deg, #0e60c5 0%,#c5170e 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(-45deg, #0e60c5 0%,#c5170e 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(-45deg, #0e60c5 0%,#c5170e 100%); /* IE10+ */
+background: linear-gradient(135deg, #0e60c5 0%,#c5170e 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0e60c5', endColorstr='#c5170e',GradientType=1 ); /* IE6-8 fallback on horizontal gradient */
+  clear:both;
+color:#fff;
+font-size:25px;
+padding:15px;
+font-family: 'Josefin Sans', sans-serif;
+text-align:center;
+width:550px;
+line-height:27px;} 
+
+.spunkie p{
+  width:530px;
+  margin:0 auto;
+  background-color:#fff;
+  border-left:#0E60C5 5px double;
+  border-right:#c5170e 5px double;
+  transition:500ms;
+  margin-top:-20px;
+  padding:20px;
+  font-size:12px;
+  line-height:14px;
+  color:#5B5C5E;
+  border-bottom:#9D9FA2 6px solid;
+}
+
+.spunkie p:hover{
+  border-right:#0E60C5 5px double;
+  border-left:#c5170e 5px double;
+  transition:500ms;
+  color:#323334;
+}
+
+.spunkie h1 i{
+  font-size:14px;
+  line-height:16px;
+}

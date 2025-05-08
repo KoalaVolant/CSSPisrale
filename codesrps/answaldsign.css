@@ -1,0 +1,23 @@
+.signanswald{
+width:405px;
+background-color:#fff;
+/* Top right bottom left */
+padding:10px 10px 17px 10px;
+color:#000;
+}
+
+.signanswald img{
+width:200px;
+height:160px;
+}
+
+.signanswald b{
+font-family: 'Slabo 27px', serif;
+font-size:24px;         
+}
+
+.signanswald i{
+text-align:justify !important;
+font-size:10px;
+line-height:12px;
+}

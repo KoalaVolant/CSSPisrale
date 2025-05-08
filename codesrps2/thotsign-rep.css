@@ -1,0 +1,45 @@
+.thotfond{
+  width:420px; margin:0 auto; background:url('https://i.servimg.com/u/f30/19/45/51/53/espace12.jpg');
+  background-position:top;
+  transition:2s;
+  padding:5px;
+  display:flex; align-items:center;
+  border:#DFDFDF 4px solid; position:relative; 
+}
+
+.thotfond, .thotfond *{ box-sizing:border-box; }
+
+.thotfond:before{ content:' '; position:absolute; top:0; left:0; width:412px; height:110px; z-index:1; background:rgba(255,255,255,0.5); }
+
+.thotfond:hover{
+  background-position:bottom;
+}
+
+.thotfond img{
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  object-fit:cover; position:relative; z-index:5; 
+  border:3px solid #fff;
+}
+
+.thotfond div{
+  margin-left:10px; position:relative; z-index:4;
+}
+
+.thotfond h1{
+  text-align:center;
+  margin:5px;
+  font-family: 'Caveat', cursive;
+  font-size:34px;
+  color:#fff;
+  text-shadow:#6E6E6E 0px 0px 5px;
+}
+
+.thotfond span{ 
+  font-size:12px; display:block;
+  line-height:11px; text-align:center;
+  color:#ffff;
+    background:rgba(0,0,0,0.2); padding:5px; border-radius:30px;
+  font-family:Verdana;
+}

@@ -1,0 +1,45 @@
+/* Edriss */ 
+
+.drisign{
+  width:298px;
+  margin:0 auto;
+}
+
+.drisign img{
+  width:140px;
+  height:100px;
+}
+
+.drisign img+img{
+  margin-left:5px;
+}
+
+.drisign div{
+    padding:5px;
+  border:#174F1C 1px solid;
+}
+
+.drisign div+div{
+  width:300px;
+  padding:0px;
+  border:none;
+}
+
+.drisign h1{
+  font-family: 'Kaushan Script', cursive;
+  text-align:center;
+  font-size:22px;
+  color:#174F1C;
+  background-color:#fff;
+  margin-top:0px;
+}
+
+.drisign p{
+  font-size:11px;
+  line-height:12px;
+  text-align:center;
+  margin-top:-10px;
+  color:#404040;
+  text-transform:uppercase;
+  font-weight:lighter;
+}

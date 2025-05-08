@@ -1,0 +1,21 @@
+/* Fiche rp Eglantine */ 
+
+.glantrp{ width:450px; margin:0 auto; }
+.glantrp *{ box-sizing:border-box; } 
+.glantrp .glantimg{ display:flex; justify-content:center; align-items:center; } 
+.glantimg img{ width:150px; height:150px; border:3px solid #fff;  border-radius:50%; padding:4px;   background: rgba(255,76,177,1);
+background: -webkit-gradient(left top, right top, color-stop(0%, rgba(255,76,177,1)), color-stop(100%, rgba(255,146,10,1)));
+background: -webkit-linear-gradient(left, rgba(255,76,177,1) 0%, rgba(255,146,10,1) 100%);
+background: linear-gradient(to right, rgba(255,76,177,1) 0%, rgba(255,146,10,1) 100%); object-fit:cover;}
+.glantimg .glantmil{ width:90px; height:90px; background:none; }
+.glantrp h1{ background: rgba(255,76,177,1);
+background: -webkit-gradient(left top, right top, color-stop(0%, rgba(255,76,177,1)), color-stop(100%, rgba(255,146,10,1)));
+background: -webkit-linear-gradient(left, rgba(255,76,177,1) 0%, rgba(255,146,10,1) 100%);
+  background: linear-gradient(to right, rgba(255,76,177,1) 0%, rgba(255,146,10,1) 100%); color:#fff; margin:0; font-family: 'Parisienne', cursive; font-size:20px; line-height:22px; 
+  padding:5px; text-align:center;border-left:#fff 12px double; }
+.glantrp .glantxt{ padding:20px; font-size:12px; line-height:18px; font-family:Verdana; color:#555; background-color:#fff; border-top:4px solid rgba(255,146,10,1); 
+border-bottom:4px solid rgba(255,76,177,1); }
+
+.glantrp .dessgl{ display:flex; justify-content:space-between; align-items:center; width:100%; } 
+.glantrp .dessgl img{ width:100px; height:100px; object-fit:cover; margin-right:5px; } 
+.glantrp .dessgl div{ width:297px; }

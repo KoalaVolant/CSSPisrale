@@ -1,0 +1,20 @@
+/* Les ménages à trois de Chase */ 
+
+.chase3{ width:470px; margin:0 auto; display:flex; justify-content:space-around; text-align:justify; font-family:Verdana; color:#222; font-size:12px; line-height:16px; }
+.chase3 *{box-sizing:border-box; } 
+
+.chase3 h1, .chase3 h2{ font-family: 'Libre Caslon Display', serif; margin:0; }
+.chase3 h1{ background-color:#3E738C; color:#fff; text-align:center; padding:10px; font-size:20px; line-height:22px; text-transform:uppercase; margin-top:8px; }
+.chase3 h2{ background-color:#5A6770; color:#fff;   text-align:center; padding:10px; font-size:14px; line-height:16px; font-weight:normal; }
+
+.chase3 .gifrp{ width:100px; }
+.chase3 .gifrp img{ width:100px; height:200px; object-fit:cover; margin:5px 0px; 
+  border:3px solid; 
+  border-image: 
+    linear-gradient(
+      to bottom, 
+#3E738C,
+#5A6770
+    ) 0 100%;} 
+.chase3 .contentrp{ width:370px; padding:0 15px; }
+.chase3 .contentrp span{ display:block; height:480px; overflow:auto; padding-right:10px; }

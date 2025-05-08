@@ -1,0 +1,44 @@
+.bridglistrp, .bridglistrp *{ box-sizing:border-box; }
+.bridglistrp{ margin:0 auto; width:500px; font-family: "Old Standard TT", serif; 
+  padding: 5px;
+  border: 1px solid #d3d3d3;
+  background: #fff;
+  position: relative; padding-bottom:15px; }
+.bridglistrp br{ display:none; }
+.bridglistrp img{ object-fit:cover; }
+
+.bridglistrp .bridglnom2{ display:flex; justify-content:space-between; }
+.bridglistrp .bridglnom2 span{ color:#222; font-size:20px; 
+width:42%; font-weight:bold; margin-top:5px;}
+.bridglistrp .bridglnom2 span:nth-child(2){ text-align:right; }
+.bridglistrp .bridglnom2 .bridglfnd2{ width:50px; height:60px; 
+	position:absolute; top:-25px;display:block; left:50%; transform:translateX(-50%); 
+	background:url('https://i.goopics.net/5lwqp6.png'); background-size:100%; }
+
+.bridglistrp .bridglrpfl1{ display:flex; justify-content:space-between; margin-top:30px;}
+
+.bridglistrp .bridglrpa1{  overflow:hidden; position:relative; width:180px; height:288px; margin-right:10px; }
+.bridglistrp .bridglrpa1 img{ width:180px; padding:2px; height:288px;
+	border:1px solid #d3d3d3; position:relative; z-index:2; }
+.bridglistrp .bridglrpa1 .bridglrpinfo{ position:absolute; top:0; left:-100%; 
+	width:100%; height:100%; z-index:5; padding:10px;
+ transition:800ms;}
+.bridglistrp .bridglrpa1:hover .bridglrpinfo{ left:0; transition:800ms; }
+.bridglistrp .bridglrpa1 .bridglrpinfo .bridglrpn{ text-align:center; font-weight:bold;
+	font-size:16px; color:#792121; padding:3px; line-height:18px;
+	background:#fff; display:block; margin-bottom:5px; }
+.bridglistrp .bridglrpa1 .bridglrpinfo .bridglrptxt{ background:#fff; display:block;
+padding:10px; height:240px; overflow:auto; }
+
+.bridglistrp .bridglrpa1 .bridglrpinfo .bridglrptxt br, 
+.bridglistrp .bridglrp11 span:nth-child(3) br{ display:inline-block; content:none; }
+
+.bridglistrp .bridglrprp{ width:310px; border-left:1px solid #222; padding-left:10px;   }
+
+.bridglistrp .bridglrp11 .bridglrptit{ font-weight:bold; display:block; text-transform:uppercase;
+	font-size:16px; }
+.bridglistrp .bridglrp11:nth-child(2){ margin-bottom:10px; border-bottom:1px solid #222;
+padding-bottom:10px; }
+
+.bridglistrp .bridglrp11 span:nth-child(3){ padding:5px 0; display:block; height:105px; 
+overflow:auto; }

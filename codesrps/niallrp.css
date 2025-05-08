@@ -1,0 +1,11 @@
+.niallrp, .niallrp *{ box-sizing:border-box; margin:0; }
+.niallrp{ width:450px; margin:0 auto; padding-bottom:5px; border-bottom:#607744 4px solid !important;} 
+.nialltitle{ display:flex; } 
+.nialltitle span{ display:block; } 
+.nialltitle span, .nialltitle h2{ height:30px; margin:0px 2px; }
+.nialltitle .n1{ width:10px; background-color:#607744; margin-left:0px; } 
+.nialltitle .n2{ width:15px; background-color:#34623F;  }
+.nialltitle .n3{ width:20px; background-color:#304B37; }
+.nialltitle h2{ width:462px; height:auto !important; padding:5px !important; background-color:#304B37; color:#f0f0f0; font-family: 'Playfair Display', serif; font-size:13px; margin:0; margin-left:2px !important; } 
+.niallcontent{ padding:15px; text-align:justify; font-size:13px; line-height:1.5em;   }
+.niallrp h3{ background:#fff !important; color:#222; padding:5px !important; width:100%; font-weight:normal !important; text-align:left !important; font-family: 'Playfair Display', serif !important; font-size:11px !important; line-height:13px !important; } 

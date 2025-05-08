@@ -1,0 +1,6 @@
+.magsign{ width:350px; margin:0 auto; display:flex; justify-content:center; flex-wrap:wrap;}
+.magsign img{ width:150px; height:80px; object-fit:cover;  padding:5px; margin:3px; background-size:100%; background-position:center center;}
+.magsign .mag1{ background-image:url('https://i.pinimg.com/originals/fc/74/f1/fc74f1697af809279f80590fa82f25e3.gif');  }
+.magsign .mag2{ background-image:url('https://i.pinimg.com/originals/2a/99/ac/2a99ac8f3a99ae991d3331bb3198adb6.gif'); }
+.magsign h1{ font-family: 'Crete Round', serif; color:#222; letter-spacing:3px; font-size:11px; text-align:center; margin:3px 0px 5px 0px; padding-bottom:5px; border-bottom:1px solid #000; 
+  border-image: url('https://i.pinimg.com/originals/7e/a1/15/7ea1154c4755db1166c4da2c5b3504f8.gif') 1 round;} 

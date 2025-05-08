@@ -1,0 +1,26 @@
+.lor, .lorp{ width:450px; margin:0 auto; }
+.lor *, .lorp *{ box-sizing:border-box; }
+
+.lor h1{ font-family: 'Oleo Script', cursive; font-size:45px; line-height:48px; color:#222; background: rgb(142,126,39);
+background: -webkit-linear-gradient(180deg, rgba(142,126,39,1) 0%, rgba(201,179,122,1) 48%, rgba(209,166,64,1) 100%);
+background: linear-gradient(180deg, rgba(142,126,39,1) 0%, rgba(201,179,122,1) 48%, rgba(209,166,64,1) 100%);  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; text-align:center; margin:10px 0px 20px 0px;  }
+
+.loradmins{ display:flex; justify-content:space-between; } 
+.loradmins div{ width:47%; }
+.loradmins img{ width:100%; height:130px; object-fit:cover; }
+.loradmins h2{ margin-top:5px !important; line-height:26px !important; background-color:#C2AD6E; color:#fff; font-size:30px !important; height:30px; text-align:center; font-family: 'Oleo Script', cursive; }
+
+.lortxt{ background-color:#F5F5F5; padding:10px; margin:10px 0px; color:#222; font-family: 'Montserrat', sans-serif; text-align:justify; border:1px solid #c2ad6e; 
+  font-size:14px; line-height:19px; }
+.lortxt em{ font-weight:bold; color:#B3994A; }
+.lorimg{ height:60px; object-fit:cover; width:100%; }
+
+.lorp{ display:flex; justify-content:space-between; }
+.lorpimg{ display:block; width:100px; height:160px; border:1px solid #b3994a; padding:2px; object-fit:cover; }
+.lorp div{ width:340px; } 
+.lorp h2{ line-height:20px !important; background-color:#C2AD6E; color:#fff; font-size:20px !important; height:20px; text-align:center; 
+  font-family: 'Oleo Script', cursive; width:50%; margin:0px; float:right;}
+.lorp span{ display:block; clear:both;  background-color:#F5F5F5; padding:10px; margin:10px 0px; color:#222; font-family: 'Montserrat', sans-serif; text-align:justify; border:1px solid #c2ad6e; 
+  font-size:12px; line-height:17px; height:140px; overflow:auto; }
+.lorhr{ width:450px; margin:10px auto 20px auto; background-position:center; height:10px !important; background-image:url('https://i.servimg.com/u/f30/19/45/51/53/4bd84310.jpg') !important; }

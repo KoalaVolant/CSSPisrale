@@ -1,0 +1,32 @@
+.ls240, .ls240 *{ box-sizing:border-box; }
+.ls240{ margin:0 auto; width:550px; font-family: "Kulim Park", sans-serif; }
+.ls240 br{ display:none; }
+.ls240 img{ object-fit:cover; }
+
+.ls240 .ls240-haut{ display:flex; align-items:flex-end; }
+.ls240-perso{ margin-bottom:20px;}
+.ls240-haut .ls240-img{ width:20%; }
+.ls240-haut img{ height:110px; border-radius: 20px;
+border-bottom-right-radius: 0; }
+.ls240-haut .ls240-nomrp{ width:80%; text-transform:uppercase; }
+.ls240-haut .ls240-nomrp .ls240-nom{ background:#000; color:#fff; 
+	padding:5px; font-weight:800; font-size:22px; 
+border-top-right-radius: 10px;
+border-bottom-right-radius: 10px;}
+.ls240-haut .ls240-nomrp .ls240-nombr{ background:#fff; color:#000; display:inline-block; padding:3px; 
+letter-spacing:5px; font-size:10px; line-height:10px; font-weight:300;
+border-top-right-radius: 10px;
+border-bottom-right-radius: 10px;}
+
+.ls240-persorp{ display:flex; margin-top:15px; justify-content:space-between;}
+.ls240-persorp .ls240-rp{ width:32%; height}
+.ls240 .ls240-title{ background:#fff; color:#000; text-transform:uppercase; display:inline-block;
+letter-spacing:1px; font-size:14px; padding:0 5px; border-top-right-radius: 10px;
+border-bottom-right-radius: 10px;font-weight:600; }
+.ls240 .ls240-txt br{ content:none; display:inline-block; }
+.ls240 .ls240-txt{ padding:5px; background:#fff;border-top-right-radius: 10px;
+border-bottom-right-radius: 10px; height:200px; overflow:auto;}
+.ls240 .ls240-txt a{ font-weight:700; color:#666 !important; }
+.ls240 .ls240-txt em{ font-weight:300; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

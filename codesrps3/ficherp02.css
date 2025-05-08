@@ -1,0 +1,24 @@
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+:root{
+	--fichrp02fnd:url('https://i62.servimg.com/u/f62/20/49/83/54/3ecd6a10.jpg');
+	--fichrp02-border:#F08C7C;
+	--fichrp02-font:"Chewy", serif;
+}
+
+.ficherp02, .ficherp02 *{ box-sizing:border-box; }
+.ficherp02{ margin:0 auto; width:450px; background:var(--fichrp02fnd); padding:35px;
+outline:4px double #fff; outline-offset:-8px;}
+.ficherp02 br{ display:none; }
+.ficherp02 .rp02txt br{ display:inline-block; content:none; }
+.ficherp02 img{ object-fit:cover; }
+
+.ficherp02 img:nth-child(2){ border:10px solid #fff; width:100%;
+border-radius: 50px;
+border-bottom-right-radius: 0;}
+.ficherp02 .rp02title{ background:#fff; color:var(--fichrp02-border); 
+font-family:var(--fichrp02-font); padding:10px; font-size:20px; margin-left:40px;
+	width:90%; text-align:right;}
+.ficherp02 .rp02txt{ background:#fff; margin-top:20px; 
+	border:10px solid var(--fichrp02-border); padding:20px; 
+color:#222; text-align:justify;}

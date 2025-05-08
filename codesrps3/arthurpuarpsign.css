@@ -1,0 +1,50 @@
+.arthurpuarp1, .arthurpuarp1 *{ box-sizing:border-box; }
+.arthurpuarp1 img{ object-fit:cover; }
+.arthurpuarp1 br{ display:none; }
+.arthurpuarp1 .arthurptxt br{ content:none; display:inline-block;}
+.arthurpuarp1{ width:500px; margin:0 auto;position:relative; }
+
+:root{ 
+    --apr-fonttitle:"Krona One", sans-serif;
+    --apr-fonttxt:"Lato", sans-serif;
+    --aps-fonttitle:"Krona One", sans-serif;
+    --aps-fonttxt:"Lato", sans-serif;
+    
+    --apr-color1:#088A8E; 
+    --aps-color1:#088A8E;
+    --apr-deg1:linear-gradient(180deg, rgba(158,201,203,0.5) 0%, rgba(255,242,226,0.5) 35%);
+    --aps-deg1:linear-gradient(180deg, rgba(158,201,203,0.5) 0%, rgba(255,242,226,0.5) 35%);
+}
+
+
+/* Fiche rp */
+.arthurpuarp1 .arthurptitle{ font-family:var(--apr-fonttitle); font-size:28px; line-height:25px; 
+position:relative; z-index:8; padding-bottom:25px; border-bottom:var(--apr-color1) 3px solid;}
+.arthurpuarp1 .arthurptitle span{ color:var(--apr-color1); }
+.arthurpuarp1 .arthurpfond{ position:absolute; top:25px; left:55px; 
+height:350px; width:80%; background:var(--apr-deg1); z-index:1; }
+.arthurpuarp1 .arthurpimg{ position:absolute; right:-30px; bottom:-50px; width:120px; height:120px;
+clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);}
+.arthurpuarp1 .arthurptxt{ position:relative; z-index:88; padding:20px; 
+font-family:var(--apr-fonttxt); text-align:justify; font-size:14px; line-height:1.5em; 
+    padding-right:60px;}
+
+
+/* Sign */
+.arthurpsign, .arthurpsign *{ box-sizing:border-box; }
+.arthurpsign img{ object-fit:cover; }
+.arthurpsign br{ display:none; }
+.arthurpsign{ width:400px; margin:0 auto;position:relative; }
+
+.arthurpsign .arthurptitle{ font-family:var(--aps-fonttitle); font-size:28px; line-height:25px; 
+position:relative; z-index:8; width:75%;}
+.arthurpsign .arthurptitle span{ color:var(--aps-color1); }
+.arthurpsign .arthurpfond{ position:absolute; top:25px; left:10%; 
+height:100px; width:80%; background:var(--aps-deg1); z-index:1; }
+.arthurpsign .arthurpimgs{ position:relative; top:-40px; z-index:50; display:flex; align-items:flex-end; height:120px;}
+.arthurpsign .arthurpimgs img{ margin-right:5px; width:80px; height:80px;
+clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);}
+ .arthurpsign .arthurpimgs img:nth-child(4) { width:120px; height:120px;
+  }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

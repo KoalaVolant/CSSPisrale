@@ -1,0 +1,76 @@
+.rediosign4{
+  width:420px;
+  margin:0 auto;
+}
+
+.rediosign4 .rd{
+  width:200px;
+  float:left;
+}
+
+.rediosign4 .rd+.rd{
+  margin-left:10px;
+}
+
+.rediosign4 .rd img{
+  width:200px;
+  height:120px;
+  -webkit-filter: saturate(1);
+filter: saturate(1);
+  z-index:1
+    position:relative;
+}
+
+.rediosign4 .rd h1{
+  font-size:22px;
+  text-transform:uppercase;
+  margin-top:-65px;
+  text-align:center;
+  color:#fff;
+  opacity: 0.00;
+  z-index:17;
+  position:relative;
+filter: alpha(opacity =0);
+  text-shadow:#000 1px 0px 5px;
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+.rediosign4 .rd:hover h1{
+opacity: 1;
+filter: alpha(opacity =100);
+}
+
+.rediosign4 .rd:hover img{
+  -webkit-filter: saturate(0.1);
+filter: saturate(0.1);
+}
+
+.rediosign4 .rd img, .rediosign4 .rd:hover img, .rediosign4 .rd h1, .rediosign4 .rd:hover h1{
+  -webkit-transition: all 900ms ease;
+-moz-transition: all 900ms ease;
+-ms-transition: all 900ms ease;
+-o-transition: all 900ms ease;
+transition: all 900ms ease;
+}
+
+.rediosign4 h2{
+  text-align:justify;
+  clear:both;
+  display:block;
+  margin-top:110px;
+  font-weight:normal;
+  width:410px;
+  font-size:11px;
+  line-height:12px;
+    font-family: 'Josefin Sans', sans-serif;
+}
+  
+koala2{
+  font-size:8px;
+  font-family:century gothic;
+  letter-spacing:4px;
+  text-align:center;
+  display:block;
+  margin-top:-10px;
+  color:#AAAAAA;
+}

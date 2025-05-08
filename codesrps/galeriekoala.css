@@ -1,0 +1,29 @@
+.galeriekoala{
+  width:500px;
+  background-color:#fff;
+  color:#313131;
+  font-size:14px;
+  line-height:15px;
+  padding:15px;
+  margin:0 auto;
+}
+
+.galeriekoala h1{
+  background-image:url('https://i.pinimg.com/564x/ad/88/d6/ad88d6f6e289df9b85aa79ec4bff1e35.jpg');
+  color:#fff;
+  text-shadow:#fff 0px 0px 5px;
+  padding:10px;
+  margin:0px;
+  text-align:center;
+  font-size:26px;
+  font-family:Century Gothic;
+  text-transform:uppercase;
+}
+
+.galeriekoala img{
+  width:100px;
+  height:130px;
+  border:#C0C0C0 3px solid;
+  margin-left:5px;
+  margin-right:5px;
+}

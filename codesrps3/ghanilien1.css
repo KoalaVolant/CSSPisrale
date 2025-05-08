@@ -1,0 +1,82 @@
+:root{
+--ghctitre1: #4E5166;
+--ghctitre2: #7C90A0;
+--ghctitrewhite: #fff;
+--ghcborder1:#E4EFF9;
+--bdradius1: 10px 0px;
+--ghborder1: 1px solid var(--ghctitre2);
+
+--fonttitre: 'Paytone One', sans-serif;
+--fonttxt: 'Petrona', serif;}
+
+/* RESET */
+
+.ghLinkE, .ghLinkE *{ box-sizing:border-box;  }
+.ghLinkE{ margin:0 auto; width:650px; font-family:var(--fonttxt); }
+.ghLinkE br{ display:none; }
+.ghLinkE img{ object-fit:cover; }
+.ghLinkE .ghContent br, .ghLinkE2 .ghBlocF div br{
+  content: " ";
+  display:  inline-block;
+  line-height:11px !important; }
+
+/* Avatars et icons */
+
+.ghImgP img, .ghImgLast{ border-radius: 10px 0px; }
+.ghImgP img, .ghImgLast, .ghLinkE .ghIcons3 img{ padding:3px; border:2px solid var(--ghctitre2);  }
+.ghLinkE .ghIcons3 img{ border-radius:50%; }
+/* Titres */
+
+.ghTitre1{ border-bottom:0.5px solid var(--ghctitre2); font-family:var(--fonttitre); color:var(--ghctitre1); text-transform:uppercase; display:block; position:relative;}
+.ghTitre2, .ghLinkE2 .ghBlocF div span{ font-family:var(--fonttxt); background:var(--ghctitre2); padding:5px; font-size:14px;
+color:var(--ghctitrewhite); display:block; width:100%; letter-spacing:1px;  }
+
+/* Flex 1 */
+
+.ghFlexflex{ display:flex; flex-wrap:wrap; }
+.ghImgP{ width:26%; position:relative; }
+.ghImgP span{ transform: rotate(-90deg);  position: absolute;  top:90px;  left: -90px;
+  height: 20px;  width: 208px;  display: block; font-size:13px; border:none; }
+.ghImgP img{ width:130px; height:208px;
+  display:block; margin-left:25px;  }
+.ghFlexflex .ghFlex{ width:74%; display:flex; flex-wrap:wrap; justify-content:space-between; }
+.ghFlex .ghTitre2{ width:100%; }
+.ghFlex .ghPouvoirs, .ghFlex, .ghCara{ width:48%; }
+.ghLinkE .ghContent{ display:block; text-align:justify; padding-top:5px;
+font-size:13px; line-height:18px; height:200px; overflow: auto; padding-right:10px;}
+.ghFlex .ghTitre2{ margin-bottom:10px; }
+
+.ghFlexflex .ghBio{ width:85%; margin-top:20px; }
+.ghFlexflex .ghImgLast{ width:15%; margin-top:25px; height:150px;}
+
+/* Flex 2 */
+
+.ghLinkE .ghIcons3{ display:flex; justify-content:center; }
+.ghLinkE .ghIcons3 img{ width:100px; height:100px; margin:0 5px; }
+.ghLinkE2 .ghBlocF div{ margin-top:10px; padding:10px; border:1px solid var(--ghcborder1); }
+.ghLinkE2 .ghBlocF div span{ font-size:11px; padding:0px 5px; display:inline-block; width:auto; margin:5px 0; }
+
+/* Flex 3 */
+
+.ghLinks .ghTGC{ font-size:20px; padding-bottom:10px; text-align:center; margin-bottom:10px;
+}
+
+.ghLinks .ghIcons3{ margin-bottom:40px; }
+.ghLinksLine{ margin:10px 0; display:flex; justify-content:space-between; }
+.ghLinksLine .ghLink{ width:49%; display:flex; }
+.ghLinksLine .ghLink .ghImgP{ width:36%; }
+.ghLinksLine .ghLink .ghImgP span{ top:70px; font-size:12px;  }
+
+.ghLinksLine .ghLink .ghLinkInfos{ width:63%; margin-left:30px; }
+.ghLinksLine .ghLink.ghLinkReverse .ghImgP span{ right:-100px; left:auto;  }
+.ghLinksLine .ghLink.ghLinkReverse{ flex-direction:row-reverse;}
+.ghLinksLine .ghLink.ghLinkReverse .ghLinkInfos{ margin-left:0; }
+.ghLinksLine .ghLink .ghImgP img{ width:100px; height:190px; }
+.ghLinksLine .ghLink.ghLinkReverse .ghLinkInfos{ margin-left:0; margin-right:5px; }
+.ghLinksLine .ghLink.ghLinkReverse .ghImgP img{ margin-left:0px;  margin-right:25px; 
+	width:100px; height:190px; }
+
+/* Texte */
+.ghLinksLine .ghLink .ghLinkInfos div{ padding:5px; padding-right:10px; text-align:justify;height:160px; overflow:auto; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

@@ -1,0 +1,43 @@
+.judith{
+  margin:0 auto;
+  width:400px;
+}
+
+.judith img{
+  width:390px;
+  border:7px solid #fff;
+  -moz-box-shadow: 0px 2px 5px 0px #cfcfcf;
+-webkit-box-shadow: 0px 2px 5px 0px #cfcfcf;
+-o-box-shadow: 0px 2px 5px 0px #cfcfcf;
+box-shadow: 0px 2px 5px 0px #cfcfcf;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#cfcfcf, Direction=180, Strength=5);
+}
+
+.judith h1{
+  background-color:#60112F;
+  padding:5px;
+  width:390px;
+  font-size:25px;
+  line-height:27px;
+  text-align:center;
+  color:#fff;
+  font-weight:normal;
+  font-family: 'Luckiest Guy', cursive;
+}
+
+.judith p{
+  width:350px;
+  background-color:#fff;
+  margin-top:-20px;
+  font-size:12px;
+  text-align:justify;
+  color:#60112F;
+  line-height:14px;
+  font-family:arial;
+  padding:25px;
+  -moz-box-shadow: 0px 2px 5px 0px #cfcfcf;
+-webkit-box-shadow: 0px 2px 5px 0px #cfcfcf;
+-o-box-shadow: 0px 2px 5px 0px #cfcfcf;
+box-shadow: 0px 2px 5px 0px #cfcfcf;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#cfcfcf, Direction=180, Strength=5);
+}

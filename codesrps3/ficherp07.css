@@ -1,0 +1,55 @@
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.ficherp07, .ficherp07 *{ box-sizing:border-box; }
+.ficherp07{ margin:0 auto; width:400px; height:770px;}
+.ficherp07 br{ display:none; }
+.ficherp07 img{ object-fit:cover; }
+
+.ficherp07{ background:url('https://i.postimg.cc/fL7cMg9d/FOND.png'); background-size:100%; }
+
+.ficherp07title{ margin:0 auto; margin-bottom:0px; font-size:25px; line-height:25px; width:60%; 
+	text-align:center; font-family:'UnifrakturCook'; position:relative; height:90px; }
+.ficherp07title span{ position:absolute; top:46%; left:0; transform:translateY(-50%);     
+	background-image: url('https://i64.servimg.com/u/f64/11/66/37/71/broum10.jpg'); /* Remplace par ton image */
+    background-size: cover; /* Ajuste la taille de l’image */
+    background-position: center;
+    
+    -webkit-background-clip: text; /* Important pour Webkit (Chrome, Safari) */
+    background-clip: text;
+    color: transparent; /* Rend le texte invisible pour voir l’image */}
+
+.ficherp07title:before{ content:" "; position:absolute; top:0px; left:-70px;
+	background:url("https://i64.servimg.com/u/f64/11/66/37/71/2113f710.png"); background-size:100%; 
+	width:80px; height:90px; z-index:15; }
+.ficherp07title:after{ content:" "; position:absolute; top:0px; right:-70px;
+	background:url("https://i64.servimg.com/u/f64/11/66/37/71/2113f710.png"); background-size:100%; transform: scaleX(-1);
+	width:80px; height:90px; z-index:15; }
+.ficherp07content{ padding:0 30px; text-align:justify; color:#000; font-family:verdana; 
+height:510px; overflow:auto; 
+	text-shadow: -1px -1px 1px rgba(255,255,255,.1), 1px 1px 1px rgba(255,255,255,1), 2px 2px 2px rgba(255,255,255,0);
+text-shadow: #FFF 0px 0px 5px, #FFF 0px 0px 10px, #F3EDE0 0px 0px 15px, #F3EDE0 0px 0px 20px, #F3EDE0 0px 0px 30px, 2px 2px 2px rgba(255,255,255,0);}
+.ficherp07content br{ display:inline-block; content:none; }
+
+/* Pour Chrome, Edge et Safari */
+.ficherp07::-webkit-scrollbar {
+    width: 10px; /* Largeur de la scrollbar */
+}
+
+.ficherp07::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Couleur du fond */
+}
+
+.ficherp07::-webkit-scrollbar-thumb {
+    background: #ffffff; /* Couleur du curseur */
+    border-radius: 5px; /* Coins arrondis */
+}
+
+.ficherp07::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Couleur au survol */
+}
+
+/* Pour Firefox */
+.ficherp07 * {
+    scrollbar-width: 20px; /* "auto" ou "thin" */
+    scrollbar-color: #ffffff #081021; /* (curseur, fond) */
+}

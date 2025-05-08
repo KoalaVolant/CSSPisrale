@@ -1,0 +1,19 @@
+.hermisign, .hermisign *{ box-sizing:border-box;  }
+.hermisign{ margin:0 auto; width:450px;  }
+.hermisign br{ display:none; }
+.hermisign img{ object-fit:cover; }
+
+.hermisign{ position:relative; }
+.hermisign .hermfond{ position:absolute; z-index:1; 
+	left:20px; width:350px; top:-10px; height:70px; }
+
+.hermisign .hermflex{ display:flex; justify-content:space-between; min-height:75px; position:relative; z-index:12; }
+.hermisign .hermflex img{ width:18%; }
+.hermisign .hermflex span{ display:block; 
+	background:white; padding:8px; width:60%; 
+	position:relative; font-size:11px; line-height:13px; 
+	z-index:4; display:flex; 
+	align-items:center; font-family: 'Montserrat', sans-serif; 
+	color:#222; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

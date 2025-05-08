@@ -1,0 +1,35 @@
+.wapirps{
+  width:500px;
+  margin:0 auto;
+}
+
+.wapirps img{
+  width:400px;
+  height:200px;
+ /* -webkit-border-radius: 50px;
+-moz-border-radius: 50px;
+border-radius: 50px; */
+  padding:4px;
+  margin-bottom:15px;
+  border:#D1A316 3px solid;
+}
+
+.contenurpwapi{
+  margin:0 auto;
+  width:400px;
+  padding-left:35px;
+  background-position:center;
+  background-image:url('https://img00.deviantart.net/5c3f/i/2009/192/4/7/apple_texture_by_oceanous.jpg');
+}
+
+.contenurpwapi div{
+  background-color:#fff;
+  padding:20px;
+  font-size:12px;
+ line-height:14px;
+  font-family:Verdana !important;
+  color:#372626;
+  -webkit-box-shadow: 2px 3px 5px 0px rgba(0,0,0,0.23);
+-moz-box-shadow: 2px 3px 5px 0px rgba(0,0,0,0.23);
+box-shadow: 2px 3px 5px 0px rgba(0,0,0,0.23);
+}

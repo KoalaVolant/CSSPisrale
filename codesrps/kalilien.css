@@ -1,0 +1,24 @@
+/* Fiche de lien Kalina */ 
+
+.kalilien{ width:490px; display:flex; flex-wrap:wrap; margin:0 auto; font-family:Verdana; color:#444;}
+.kalilien *{ box-sizing:border-box; } 
+
+.kalilien div{ width:230px; margin:5px;} 
+.kalilien img{ width:230px; height:180px; object-fit:cover; padding:4px; background-image:url('https://i.servimg.com/u/f30/19/45/51/53/7c1b6110.jpg'); background-size:50%; background-position:center;}
+.kalilien div:nth-of-type(1), .kalilien div:nth-of-type(4), .kalilien div:nth-of-type(5) { padding:15px; background-color:#fff; height:180px; overflow:auto; font-size:11px; line-height:13px; text-align:justify; }
+.kalilien div:nth-of-type(1)::first-letter{ font-size:18px; font-family: 'Glegoo', serif; color:#2EACA8; font-weight:bold; }
+.kalilien h1{ font-family: 'Prata', serif; font-size:24px; margin:0; color:#0C8F72; text-align:center; border-bottom:2px solid #0C8F72; padding:5px; }
+.kalilien h2{ font-size:15px; font-family: 'Glegoo', serif; font-weight:normal; color:#087563; }
+.kalilien libre{ color:#529B26; font-weight:bold; }
+.kalilien pris{ color:#9B2626; font-weight:bold; }
+  
+
+.liensdekal{ width:500px; display:flex; flex-wrap:wrap; margin:0 auto; font-family:Verdana; }
+.liensdekal *{ box-sizing:border-box; } 
+
+.kalien{ margin:5px; }
+.kalien div{ width:240px; height:160px; padding:5px; background-image:url('https://i.servimg.com/u/f30/19/45/51/53/7c1b6110.jpg'); background-size:60%; background-position:center; position:relative; overflow:hidden;} 
+.kalien div img{ width:230px; height:160px; object-fit:cover; } 
+.kalien div span{  width:240px; height:160px; background-color:#fff; position:absolute; top:0; left:-240px; padding:10px; text-align:justify; font-size:11px, line-height:13px; overflow:auto; transition:500ms; } 
+.kalien div:hover span{ left:0; }
+.kalien h1{ width:100%; background-image:url('https://i.servimg.com/u/f30/19/45/51/53/d40fbf10.jpg'); margin:0px; background-size:50%; background-position:center; font-size:17px; text-align:center; font-family: 'Glegoo', serif; color:#fff; padding:10px; }

@@ -1,0 +1,21 @@
+:root {
+  --pandocndcs1: hsl(60,8%,90%);
+  --pandocndcstxt: #1C2135;
+}
+
+.pandoracndsign1, .pandoracndsign1 *{ box-sizing:border-box; }
+.pandoracndsign1{ margin:0 auto; width:200px; }
+.pandoracndsign1 br{ display:none; }
+.pandoracndsign1 img{ object-fit:cover; }
+
+.pandoracndsign1 img{ width:48%; height:70px; margin-right:3px; border-radius:10px;}
+.pandoracndsign1 .pandoracndtxtsign{ font-size:11px; line-height:11px; 
+font-family: "Raleway", sans-serif; margin-top:5px; text-align:justify; background: var(--pandocndcs1);
+position:relative; color:var(--pandocndcstxt); }
+
+.koala {
+  display: flex;
+  justify-content: center;
+  font-size: 8px;
+  letter-spacing: 5px;
+}

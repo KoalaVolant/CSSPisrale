@@ -1,0 +1,41 @@
+.mail{
+  width:400px;
+  background-color:#fff;
+  margin:0 auto;
+  padding:10px;
+  box-shadow:#666 0px 0px 5px;
+}
+
+.mail h3, .mail h4{
+  color:#606060;
+  font-size:12px;
+  font-family:Arial;
+  padding-left:10px;
+  font-weight:normal;
+}
+
+.mail i{
+  color:#414141;
+  margin-left:10px;
+}
+
+.mail h4{
+  border-bottom:#606060 1px solid;
+  border-top:#606060 1px solid;
+  padding:10px 0px 10px 0px; 
+}
+
+.mail .contenu{
+  text-align:justify;
+  padding:15px;
+  font-size:12px;
+  line-height:14px;
+  font-family:Arial;
+  color:#282828;
+  margin-top:-15px;
+}
+
+.mail .contenu b{
+  text-align:right;
+  color:#959595;
+}

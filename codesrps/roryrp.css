@@ -1,0 +1,13 @@
+.roryrp{ width:450px; margin:0 auto; }
+.roryrp *{ box-sizing:border-box; }
+    
+    .roryrp .roryflex{ display:flex; justify-content:center; align-items:center; width:100%; } 
+.roryflex img{ width:200px; height:150px; object-fit:cover; padding:10px;
+border:1px solid #000;  border-image-slice: 1;  border-width:5px;    border-image-source: linear-gradient(to left, #3D5B59, #B5E5CF, #FCB5AC, #B99095); } 
+.roryflex span{ display:block; color:#CC8524; font-size:40px; letter-spacing:-5px;  background: -webkit-linear-gradient(90deg, rgba(61,91,89,1) 0%, rgba(181,229,207,1) 0%, rgba(252,181,172,1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}
+  .roryrp div:nth-of-type(2){ background-color:#fff; color:#3D5B59; width:100%; padding:15px; font-size:12px; line-height:18px; font-family:Verdana; border:1px solid #B99095;} 
+.roryrp h1{ background: rgb(61,91,89);
+background: linear-gradient(90deg, rgba(61,91,89,1) 0%, rgba(122,175,150,1) 33%, rgba(212,147,138,1) 75%, rgba(185,144,149,1) 100%);
+  color:#fff; padding:5px; text-align:justify; margin:5px 0px; font-family: 'PT Serif', serif; font-weight:normal; font-size:11px; line-height:14px; } 

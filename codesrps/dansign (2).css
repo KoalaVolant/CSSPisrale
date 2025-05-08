@@ -1,0 +1,61 @@
+#daniel{
+  width:500px;
+  margin:0 auto;
+}
+
+#daniel img{
+  width:200px;
+  margin-right:5px;
+}
+
+#daniel img, #daniel .carv, #daniel .ver, #daniel .piloulou{
+  float:left;
+}
+
+#daniel .carv, #daniel .piloulou{
+  width:20px;
+  height:120px;
+  background-color:#584763;
+}
+
+  #daniel .carv{
+  -webkit-border-top-left-radius: 80px;
+-webkit-border-bottom-left-radius: 80px;
+-moz-border-radius-topleft: 80px;
+-moz-border-radius-bottomleft: 80px;
+border-top-left-radius: 80px;
+border-bottom-left-radius: 80px;
+}
+
+#daniel .piloulou{
+  -webkit-border-top-right-radius: 80px;
+-webkit-border-bottom-right-radius: 80px;
+-moz-border-radius-topright: 80px;
+-moz-border-radius-bottomright: 80px;
+border-top-right-radius: 80px;
+border-bottom-right-radius: 80px;
+}
+
+
+#daniel .ver{
+  width:190px;
+  padding:10px;
+  height:100px;
+  background-color:#1F1823;
+}
+
+.ver h1{
+  font-size:25px;
+  font-family: 'Parisienne', cursive;
+  color:#fff;
+  text-align:center;
+text-shadow: 1px 3px 3px #B5A6BF;
+}
+
+.ver p{
+  height:50px;
+  color:#B5A6BF;
+  font-size:10px;
+  line-height:11px;
+  text-transform:uppercase;
+}

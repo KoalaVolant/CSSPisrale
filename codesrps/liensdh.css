@@ -1,0 +1,202 @@
+/* Fiche RP des PPK */
+
+
+.list-ppk{
+  width:550px;  margin:0 auto;
+  background-color:#dedede;  padding:10px;
+}
+
+
+.dispo{
+  background-color:#fff;  border-radius:10px;
+  font-size:12px;  color:#454545;
+  line-height:18px;  font-weight:bold;
+  text-align:center;  width:300px;
+  margin:0 auto;
+}
+
+
+.list-ppk *, .liens-ppk *{  box-sizing:border-box; }
+
+
+.list-ppk h1{
+  font-size:55px;  line-height:40px;
+  margin-top:-25px;
+  background-color:#454545;  color:#fff;
+  padding:10px;  
+
+}
+
+.list-ppk h1, .blocrp h2, .bloclien h1{ 
+        -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+    font-family: 'Poor Story', cursive;
+      text-align:center;
+
+}
+
+
+.rps-ppk{
+  margin-top:15px;
+  width:550px;
+  display:flex;
+  justify-content:space-evenly;
+  flex-wrap:wrap !important;
+}
+
+
+.blocrp{   width:175px !important; }
+
+
+.blocrp img{
+ width:175px;  height:100px;
+  object-fit:cover;   padding:3px;
+  border:1px solid;
+}
+
+
+.blocrp h2{
+  color:#fff;
+  font-size:25px;
+  padding:3px;
+  width:175px;
+ margin-top:-15px;
+
+}
+
+
+.blocrp div{
+width:175px; margin-top:-25px;
+  height:220px; text-align:left;
+font-size:12px; line-height:18px;
+ font-family:Verdana; background-color:#fff;
+color:#454545; padding:10px;
+padding-top:20px; overflow:auto;
+}
+
+
+.blocrp a:hover{     color:#6F6F6F !important; }
+
+.elchai2, .enosh2, .elchai2 img, .enosh2 img, .elchai2 h2, .enosh2 h2, .enosh2 div, .elchai2 div{ width:250px !important; }
+
+/* Fiche liens des PPK */
+
+
+
+.liens-ppk{
+  box-sizing:border-box;
+  width:550px;   margin:0 auto;
+}
+
+
+.bloclien{  width:550px; }
+
+
+.bloclien h1{
+  font-size:40px;
+  padding:5px;
+  color:#fff;
+  margin-top:-15px;
+}
+
+
+.haut-lien{
+  width:550px;
+  display:flex;
+  justify-content:space-around;
+}
+
+
+.haut-lien img{
+  width:250px;  height:175px;
+  object-fit:cover;
+  padding:5px;
+  border:1px solid;
+}
+
+
+.liens-c{
+  width:550px;
+  padding:15px;
+  display:flex;
+  margin-top:-45px;  padding-top:40px;
+  justify-content:space-around;
+  flex-wrap:wrap;
+  color:#000;
+}
+
+
+.liens-c .c-l{
+  display:flex;
+  width:255px;
+}
+
+.liens-c h2{    color:#454545 !important; }
+
+.liens-c img{
+  width:100px;  height:130px;
+  border:1px solid;
+  padding:3px;  object-fit:cover;
+}
+
+
+.liens-c span{
+  margin-left:5px;
+  background-color:#fff;
+  padding:5px;
+  font-family:Verdana;
+  display:block;
+  height:130px;
+  font-size:11px;  line-height:12px;
+  overflow:auto;
+  text-align:justify;
+  width:150px;
+  color:#454545;
+}
+
+
+/* Couleurs */ 
+
+
+/* Hermès */ 
+
+.hermes2 h2, .hermes h1{ background-color:#738E95; }
+.hermes img, .hermes2 .haut-lien img, .hermes2 .liens-c img{   border-color:#738E95; }
+.hermes a, .hermes a:visited, .hermes a:active{    color:#738E95 !important; }
+
+.hermes .liens-c{  background-color:#ADBCC0 !important; }
+
+/* Leonard */ 
+
+.leonard2 h2, .leonard h1{ background-color:#B94F52; }
+.leonard img, .leonard2 .haut-lien img, .leonard2 .liens-c img{   border-color:#B94F52; }
+.leonard a, .leonard a:visited, .leonard a:active{    color:#B94F52 !important; }
+
+.leonard .liens-c{  background-color:#FB7376 !important; }
+
+/* Benedict */
+
+.benedict2 h2, .benedict h1{ background-color:#D6A532; }
+.benedict img, .benedict2 .haut-lien img, .benedict2 .liens-c img{   border-color:#D6A532; }
+.benedict a, .benedict a:visited, .benedict a:active{    color:#D6A532 !important; }
+
+.benedict .liens-c{  background-color:#ECCAE7 !important; }
+
+/* Enosh */ 
+
+.enosh2 h2, .enosh h1{ background-color:#9A746D; }
+.enosh img, .enosh2 .haut-lien img, .enosh2 .liens-c img{   border-color:#9A746D; }
+.enosh a, .enosh a:visited, .enosh a:active{    color:#9A746D !important; }
+
+.enosh .liens-c{  background-color:#CECAFF!important; }
+
+/* Elchai */ 
+
+.elchai2 h2, .elchai h1{ background-color:#65A368; }
+.elchai img, .elchai2 .haut-lien img, .elchai2 .liens-c img{   border-color:#65A368; }
+.elchai a, .elchai a:visited, .elchai a:active{    color:#65A368 !important; }
+
+.elchai .liens-c{  background-color:#B6BBB3 !important; }

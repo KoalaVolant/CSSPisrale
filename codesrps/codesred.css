@@ -1,0 +1,170 @@
+  /* Ascenseur */
+  
+  ::-webkit-scrollbar {height:12px; width:5px; background:none; margin-right:5px;}
+::-webkit-scrollbar-thumb {background:#A3171A; height:30px; border-radius:30px;}
+::-webkit-scrollbar-corner {background:none;}
+.cate-descr span, .redpres *{     scrollbar-color: #A3171A #fff;
+  scrollbar-width: thin; }
+
+/* A mettre dans un même fichier */ 
+
+.content h2, .panel h2{border:none; }
+
+/***** SIGNATURE PAR KOALAVOLANT *****/ 
+
+.redsign{ width:200px; margin:0 auto; }
+.redsign *{ box-sizing:border-box; }
+.redsigng{ width:191px; height:80px; object-fit:cover; }
+.redsign h1{ font-family:'Kaushan Script', cursive; font-size:19px; color:#fff; 
+  text-align:center; margin:0px; background:url('https://i.servimg.com/u/f30/19/45/51/53/fondbi10.jpg'); background-position:center; background-size:cover; clip-path: polygon(0% 0%, 96% 0%, 100% 50%, 96% 100%, 0% 100%); 
+  display:flex; flex-wrap:wrap; position:relative; z-index:99; font-family:'Kaushan Script', cursive; padding:5px; } 
+.redsign h1:after{ position: absolute; content: ''; z-index:7;display: block; top: 0; left: 0; height: 100%; width: 100%;  background: #A3171A;  
+  mix-blend-mode: hard-light; }
+.redsign h1 strong{ font-weight:normal; text-align:center; position:relative; z-index:99; }
+.redsign span{ display:block; padding:5px; font-size:11px; font-family:'Lato', sans-serif; line-height:12px; background-color:#dedede; width:191px;} 
+/***** FICHE DE RP PAR KOALAVOLANT *****/
+
+.redrprp{ width:450px; margin:0 auto; display:flex; justify-content:space-between;}
+.redrprp *{ box-sizing:border-box; } 
+
+.redrptxt{ width:70%; background-color:#dedede; padding:20px; text-align:justify; color:#444; font-family:'Lato', sans-serif; } 
+.redrptxt h1{ margin: 0px auto; background-color: #f0f0f0;    padding: 5px;    font-family: 'Anton', sans-serif;
+  font-weight: normal;    letter-spacing: 1px;    font-size: 15px;    text-transform: uppercase;    color: #444; }
+  .redrpimg{ width:30%; background:url('https://i.servimg.com/u/f30/19/45/51/53/fondbi10.jpg'); background-position:center; background-size:cover;clip-path: polygon(0% 0%, 100% 0%, 100% 86%, 50% 100%, 0% 86%); 
+  display:flex; flex-wrap:wrap; position:relative; padding:10px; height:270px; }
+  .redrpimg:after{ position: absolute; content: ''; z-index:7;display: block; top: 0; left: 0; height: 100%; width: 100%;  background: #A3171A;  
+    mix-blend-mode: hard-light; padding:10px; }
+.redrpimg img{ position:relative;z-index:99; width:100%; height:190px; object-fit:cover; } 
+/***** NOUVEAUTES DE PARTENARIAT PAR KOALAVOLANT *****/ 
+
+  .partwrap{ width:430px; font-family:'Lato', sans-serif; color:(--black); font-size:13px; } 
+  .partwrap *{ box-sizing:border-box; } 
+  
+  .partwrap header{ position:relative; width:430px; height:200px; } 
+  .partwrap header img{ width:430px; height:200px; object-fit:cover; }
+  .partwrap header h1{ position:absolute; bottom:-17px; width:430px; font-size:25px; background-color:#A3171A; font-family:'Kaushan Script', cursive; 
+  text-align:center; padding:15px; color:#fff; clip-path: polygon(6% 0%, 94% 0%, 100% 100%, 0% 100%); } 
+
+.partwrap .partnews{ background-color:#dedede; padding:20px; }
+.partwrap h2{ color:#A3171A; text-align:center; font-family:'Kaushan Script', cursive; font-size:22px; margin:0px; }
+
+      .partscencen{ background:url('https://i.servimg.com/u/f30/19/45/51/53/fondbi10.jpg'); background-position:center; background-size:cover;clip-path: polygon(0% 0%, 96% 0%, 100% 50%, 96% 100%, 0% 100%); 
+  position:relative; display: flex;justify-content: center;flex-wrap: wrap; padding:10px; }
+.partscencen:after{ position: absolute; content: ''; z-index:7;display: block; top: 0; left: 0; height: 100%; width: 100%;  background: #444;  
+  mix-blend-mode: hard-light;}
+   .partscencen a{ display:block; width:70px; height:70px; position:relative; overflow:hidden; margin:0px 5px;}
+  .partscencen a:hover img{ padding:6px; border-width:4px; transition:600ms;  }
+  .partscencen a img{ width:70px; height:70px; object-fit:cover; position:relative; z-index:99; padding:4px; border:2px solid #fff;  border-radius:50%;}
+  .partscencen a span{ display:block; background-color:#fff; z-index:100; position:absolute; top:50%; transform:translateY(-50%); left:0px; width:70px; padding:5px; 
+  font-family:'Lato', sans-serif; color:#444; font-size:11px; text-align:center; font-weight:bold; left:-71px; transition:800ms; }
+  .partscencen a:hover span{ left:0px; } 
+    .partscencen a strong{ color:#A3171A; font-family:'Anton', sans-serif; font-weight:normal;  }
+  
+/***** FICHE DE LISTE RP PAR KOALAVOLANT ********/ 
+
+.redlistrp{ width:100% margin:0 auto; }
+.redlistrp *{ box-sizing:border-box; } 
+
+.redlistimg{ width:96%; height:180px; object-fit:cover; }
+.redlistrp h1{ font-family:'Kaushan Script', cursive; font-size:20px; color:#fff; 
+  text-align:center; padding:14px; margin:0px; background:url('https://i.servimg.com/u/f30/19/45/51/53/fondbi10.jpg'); background-position:center; background-size:cover; clip-path: polygon(0% 0%, 96% 0%, 100% 50%, 96% 100%, 0% 100%); 
+  display:flex; flex-wrap:wrap; position:relative; z-index:99; font-family:'Kaushan Script', cursive; font-size:22px; line-height:24px; padding:10px; } 
+.redlistrp h1:after{ position: absolute; content: ''; z-index:7;display: block; top: 0; left: 0; height: 100%; width: 100%;  background: #A3171A;  
+  mix-blend-mode: hard-light; }
+.redlistrp h1 strong{ font-weight:normal; text-align:center; position:relative; z-index:99; }
+
+.listred{ width:96%; display:flex; justify-content:space-between; } 
+.listred span{ width:80%; display:block; padding:25px; font-family:'Lato', sans-serif; font-size:13px; line-height:17px; background-color:#dedede; } 
+.listred span a{ color:#A3171A; font-weight:bold; letter-spacing:2px; text-decoration:none; } 
+.listred div{ width:20%; background:url('https://i.servimg.com/u/f30/19/45/51/53/fondbi10.jpg'); background-position:center; background-size:cover;clip-path: polygon(0% 0%, 100% 0%, 100% 86%, 50% 100%, 0% 86%); 
+  position:relative; } 
+.listred div:after{ position: absolute; content: ''; z-index:7;display: block; top: 0; left: 0; height: 100%; width: 100%;  background: #444;  
+  mix-blend-mode: hard-light;}
+.listred h2, .listreverse h2{ position:relative; z-index:99; color:#fff; font-family:'Anton', sans-serif; font-size:15px; text-align:center; font-weight:normal; padding:30px 5px;
+margin:0px;}
+.listreverse{ flex-direction:row-reverse; margin:10px 0px;}
+  
+/***** FICHE DE PRESENTATION PAR KOALAVOLANT *************/ 
+
+.redpres{ width:100%; margin:0 auto; }
+.redpres *{ box-sizing:border-box; } 
+
+/* Identité avec Caractère et Informations */ 
+
+.redflex1{ display:flex; justify-content:space-between;  } 
+.rediden{ background:url('https://i.servimg.com/u/f30/19/45/51/53/fondbi10.jpg'); background-position:center; background-size:cover;clip-path: polygon(0% 0%, 100% 0%, 100% 86%, 50% 100%, 0% 86%); 
+  display:flex; flex-wrap:wrap; position:relative; width:40%; height:378px; }
+.rediden:after{ position: absolute; content: ''; z-index:7;display: block; top: 0; left: 0; height: 100%; width: 100%;  background: #dedede;  
+  mix-blend-mode: hard-light;}
+.rediden span{ display:block; height:305px; overflow:auto; position:relative; z-index:99; color:var(--black;); padding:10px; }
+.rediden span strong{ color:#A3171A; font-family:'Anton', sans-serif; font-weight:normal; letter-spacing:1px; }
+
+.redireste{ width:60%; }
+.redireste > img{ width:100%; height:150px; object-fit:cover; }
+.redireste h1, .redjoueur h1{ background-color:#A3171A; font-family:'Kaushan Script', cursive; font-size:20px; color:#fff; 
+  text-align:center; padding:14px; margin:0px;}
+
+.redbloc{     width: 100%;    padding: 10px;    background-color: #f0f0f0; color:#444; }
+.redbloc span{ overflow:auto; display:block; padding:6px; }
+.redbloc h2{ margin: 5px auto;    width: 90%;    background-color: #dedede;    padding: 5px;    font-family: 'Anton', sans-serif;
+  font-weight: normal;    letter-spacing: 1px;    font-size: 15px;    text-transform: uppercase;    color: #444; }
+
+.redcara span, .redinfo span{ height: 180px; }
+
+.redinfo{ background-color:#dedede; }
+.redinfo h2{ background-color:#f0f0f0; }
+
+.redflex2{ display:flex; justify-content:space-between; }
+.redhis{ width:70%; }
+.redhis span{ height:380px; }
+.redhimg{ width:30%; }
+.redhimg img{ width:100%; height:320px; object-fit:cover; clip-path: polygon(0% 0%, 100% 0%, 100% 86%, 50% 100%, 0% 86%);}
+
+/* Scénarios */ 
+
+.redscenario .redhis{ background-color:#dedede; } 
+.redscenario .redhis span{ height:114px; }
+.redscenario .redhis h2{ background-color:#f0f0f0; }
+.redscenario .redhis h2 strong{ font-weight:normal; color:#A3171A; }
+
+.redscenario .redhimg img{ height:170px; } 
+.redscenario .redflex2.redverse{ flex-direction:row-reverse; }
+
+/* fiche de liens */
+
+.redscenario .redliens strong{ font-weight:normal; color:#A3171A; font-family:'Anton', sans-serif; }
+
+/****** FICHE GENERALE PAR KOALAVOLANT *****/ 
+
+.genred{ width:100%; }
+.genred *{ box-sizing:border-box; } 
+
+  /* Pour le fond en image */ 
+  
+  .genred h1, .staffimg{ background:url('https://i.servimg.com/u/f30/19/45/51/53/fondbi10.jpg'); background-position:center; background-size:cover; clip-path: polygon(0% 0%, 96% 0%, 100% 50%, 96% 100%, 0% 100%); 
+  display:flex; flex-wrap:wrap; position:relative; z-index:99; font-family:'Kaushan Script', cursive; font-size:22px; line-height:24px; padding:10px; margin:5px 0px; }
+.genred h1 b{ font-weight:normal; z-index:99; position:relative; display:inline-block; color:#fff;  } 
+  .genred h1:after, .staffimg:after{ position: absolute; content: ''; z-index:7;display: block; top: 0; left: 0; height: 100%; width: 100%;  background: #A3171A;  
+    mix-blend-mode: hard-light; }
+
+.genred .genimg{     width: 180px;    height: 122px;    object-fit: cover;    float: left;    position: relative;    left: -10px;
+ border: 3px solid #444; }
+.genred .genimg2{ width:64%; height:150px; object-fit:cover; margin:0 auto; padding:3px; border:2px solid #970000; display:block; }
+.genred span{ text-align:justify; }
+.genred h2{     font-family: 'Anton', sans-serif;    letter-spacing: 2px;    font-size: 16px;    line-height: 18px;    border-bottom: 1px solid #444;
+    color: #444; margin:0px; }
+.genred .basred{ width:100%; height:20px; background-color:#dedede; clip-path: polygon(4% 0%, 100% 0%, 100% 100%, 4% 100%, 0% 50%); margin-top:10px; }
+
+/* Staff */ 
+
+.staffcont{ display:flex; justify-content:space-between; } 
+.staffimg{ padding:5px; clip-path: polygon(0% 0%, 100% 0%, 100% 86%, 50% 100%, 0% 86%); }
+.staffimg img{ width:100px; height:160px; object-fit:cover; position:relative; z-index:99; } 
+.stafftxt{ padding:10px; background-color:#f0f0f0; font-family:'Lato', sans-serif; font-size:13px; line-height:17px; height:98px; overflow:auto; margin-top:5px;}
+.stafftitle{ text-align:right; font-family:'Kaushan Script', cursive; color:#A3171A;}
+.stafftitle h3{ margin:5px 0px 0px 0px; font-size:19px;}
+.stafftitle h4{ color:#444; letter-spacing:2px; font-style:italic; font-size:10px; line-height:13px; margin:0; font-family:'Anton', sans-serif; font-weight:normal; } 
+
+/* Bottin */ 
+
+.bottinred em{ color:#A3171A; }

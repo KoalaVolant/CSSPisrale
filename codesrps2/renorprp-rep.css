@@ -1,0 +1,23 @@
+/* Fiche RP Reno */ 
+:root{ 
+--reno-deg:linear-gradient(90deg, #51344D, #A78682) 1; 
+--reno-title:#51344D; 
+--reno-noir:#e6e6e6;
+--reno-blanc:#474747;
+--reno-gris:#ffffff;
+--reno-gris2:#A78682;}
+.renorp{ width:450px; margin:0 auto; margin-top:50px; position:relative; background-color:var(--reno-noir); border:3px solid; border-image: var(--reno-deg); padding:0px 10px; padding-top:90px; }
+.renorp, .renorp *{ box-sizing:border-box; }
+  .renorp .renoimg{ width:200px; height:120px; object-fit:cover; position:absolute; top:-50px; left:20px; border:4px solid; border-image:var(--reno-deg);
+-moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);}
+
+.renorp h1{ position:absolute;     font-size: 11px; color:var(--reno-gris2); top:10px;  width: 200px;    line-height: 15px;  right:10px; font-family: Times New Roman !important; background:var(--reno-gris); padding:5px; }
+.renorp h2{ color:var(--reno-title); font-family:Times New Roman; font-size:22px !important; line-height:22px; letter-spacing:-1px; margin:0px; }
+.renorp h3{ background:none; color:var(--reno-gris2); font-family:Times New Roman;  text-align:right; font-size:11px; line-height:11px; margin:0px; width:100%; font-weight:normal;}
+.renorp div{ background-color:var(--reno-gris); font-family:Verdana; font-size:12px; line-height:1.6rem; text-align:justify; color:var(--reno-blanc); padding:15px; margin:10px 0px;} 
+
+.koalareno{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

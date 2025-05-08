@@ -1,0 +1,97 @@
+/* Fiche lien */ 
+
+.leolien{
+  width:500px;
+  height:550px;
+  margin:0 auto;
+      -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  -webkit-border-radius: 20px;
+  text-align:justify;
+  position:relative;
+-moz-border-radius: 20px;
+border-radius: 20px;
+  background-image:url('https://orig00.deviantart.net/34a8/f/2012/133/8/0/texture_45_by_xnienke-d4zl6ps.jpg');
+}
+
+.leolien h1{
+  font-family:Times New Roman;
+  letter-spacing:-1px;
+  color:#EBB094;
+  font-weight:normal;
+  margin:5px;
+  margin-top:15px;
+
+  text-align:center;
+  font-size:34px;
+  text-shadow:#000 0px 5px 5px;
+}
+
+.leolien h2{
+  font-family:Times New Roman; 
+  letter-spacing:0px;
+  text-align:center;
+  font-weight:normal;
+  color:#dedede;
+  font-size:13px;
+  line-height:13px;
+  margin:0;
+  margin-top:-15px;
+  margin-bottom:-5px;
+}
+
+.leolien img{
+display:block;
+  position:absolute;
+}
+
+.leolien .render1{
+  width:400px;
+    height:650px;
+  object-fit:cover;
+  left:-60px;
+  transition:200ms;
+}
+
+.leolien .render2{
+  display:none;
+  transition:500ms;
+}
+
+.leolien:hover .render2{
+  display:block;
+    width:400px;
+  object-fit:cover;
+    height:950px;
+  top:40px;
+}
+
+.leolien:hover .render1{
+  display:none;
+}
+
+.leolien div{
+  width:260px !important;
+  padding:15px;
+  height:550px;
+  position:absolute;
+  right:10px;
+  top:-10px;
+}
+
+.leolien span{
+  padding:10px;
+  font-family:Verdana;
+
+  font-size:11px;
+  line-height:14px;
+  display:block;
+  height:190px;
+  overflow:auto;
+  color:#dedede;
+  background-color:#411B1B;
+  -webkit-box-shadow: inset 0px 0px 30px 18px rgba(0,0,0,0.75);
+-moz-box-shadow: inset 0px 0px 30px 18px rgba(0,0,0,0.75);
+box-shadow: inset 0px 0px 30px 18px rgba(0,0,0,0.75);
+}

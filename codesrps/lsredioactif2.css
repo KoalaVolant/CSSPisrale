@@ -1,0 +1,52 @@
+.rpredio2{
+  width:500px;
+  margin:0 auto;
+  padding:20px;
+  background-color:#fff;
+  text-align:justify;
+  color:#1D3849;
+}
+
+.rpredio2 h1, .rpredio2 h2{
+  font-family: 'Josefin Slab', serif;
+}
+
+.rpredio2 h1{
+  font-size:22px;
+  text-transform:uppercase;
+  text-align:center;
+  color:#4E92BA;
+  padding-bottom:5px;
+  margin:0px;
+  border-bottom:#3D5F85 2px dotted;
+}
+
+.rpredio2 h2{
+  font-size:18px;
+  text-align:center;
+  color:#606060;
+  padding-top:5px;
+  font-weight:normal;
+  border-top:#3D5F85 2px dotted;
+}
+
+.rpredio2 img{
+  width:230px;
+  height:150px;
+  padding:5px;
+  border:#4E92BA 2px solid;
+}
+
+.rpredio2 img+img{
+  margin-left:10px;
+}
+
+koala2{
+  font-size:8px;
+  font-family:century gothic;
+  letter-spacing:4px;
+  text-align:center;
+  display:block;
+  margin-top:-10px;
+  color:#AAAAAA;
+}

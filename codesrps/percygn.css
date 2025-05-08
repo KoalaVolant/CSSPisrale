@@ -1,0 +1,80 @@
+.percygn{
+background-image:url('http://img15.hostingpics.net/pics/771362SkullDarkRed.png');
+  background-size:90%;
+  padding:20px;
+  width:450px;
+  margin:0 auto;
+  -webkit-border-radius: 80px;
+-moz-border-radius: 80px;
+border-radius: 80px;
+}
+
+.percygn iframe{
+  width:400px;
+  margin:0 auto;
+  display:block;
+}
+
+.percygn:hover img{
+  -moz-transform: rotate(4deg);
+-webkit-transform: rotate(4deg);
+-o-transform: rotate(4deg);
+-ms-transform: rotate(4deg);
+transform: rotate(4deg);
+}
+
+.percygn:hover img+img{
+  -moz-transform: rotate(-4deg);
+-webkit-transform: rotate(-4deg);
+-o-transform: rotate(-4deg);
+-ms-transform: rotate(-4deg);
+transform: rotate(-4deg);
+}
+
+.percygn img, .percygn:hover img, .percygn:hover img+img, .percygn img+img{
+  -webkit-transition: all 800ms ease-in;
+-moz-transition: all 800ms ease-in;
+-ms-transition: all 800ms ease-in;
+-o-transition: all 800ms ease-in;
+transition: all 800ms ease-in;
+}
+
+.percygn img{
+  width:215px;
+  height:150px;
+  -webkit-border-radius: 40px;
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-bottomright: 0;
+border-radius: 40px;
+border-bottom-right-radius: 0;
+  border-left:#710404 dotted 3px;
+  position:relative;
+  z-index:7;
+  margin-top:-20px;
+}
+
+.percygn img+img{
+  margin-left:10px;
+  -webkit-border-radius: 40px;
+-webkit-border-bottom-left-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-bottomleft: 0;
+border-radius: 40px;
+border-bottom-left-radius: 0;
+  border-left:none;
+  border-right:#710404 solid 3px;
+}
+
+.percygn h1{
+  font-family: 'Scheherazade', serif;
+  color:#fff;
+  text-align:center;
+  font-size:18px;
+  line-height:14px;
+  font-weight:normal;
+  margin-bottom:-5px;
+  margin-top:-5px;
+  position:relative;
+  z-index:13;
+}

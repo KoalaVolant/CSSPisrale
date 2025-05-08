@@ -1,0 +1,334 @@
+/* Fiche de présentation new robots par KoalaVolant */ 
+
+.newrpres{ width:550px; margin:0 auto; font-family:Verdana; font-size:12px; color:#222; line-height:16px;  }
+.newrpres *{ box-sizing:border-box; }
+
+/* Gif de la fiche */
+.newrgif{ width:100%; height:200px; object-fit:cover; margin: 5px auto;    display: block; 
+border-top:8px solid #4D2B50; border-bottom:8px solid #4D2B50; padding:5px; }
+
+/* Identité */ 
+.newr1{ width:550px; display:flex; justify-content:space-between; margin-bottom:10px; } 
+.newr1 img{width:170px; height:272px; object-fit:cover; border:2px solid #4d2b50; padding:1px; }
+.newr1 div{ width:183px; padding:10px; height:272px; overflow:auto; background-color:#fff; }
+.newrpres b{ font-family: 'Lato', sans-serif; color:#4d2b50; text-transform:uppercase; font-size:14px; }
+
+/* Caractere et histoire */
+.newr2{ text-align:justify; margin:25px 0px;  } 
+.newr2 h3{ margin:0; padding:10px; text-align:left; width:50%; font-family: 'Lato', sans-serif; 
+  background:#67406B; font-size:20px; text-transform:uppercase; color:#fff; letter-spacing:4px; } 
+.newr2 div{ background-color:#fff; padding:15px; border:7px solid #4d2b50; border-top:none; border-bottom:none; margin:5px 0px; }
+
+/* Hors jeu */ 
+.newr3{ width:550px; display:flex; justify-content:space-between; align-items:center; } 
+.newr3 img{ width:100px; height:100px; object-fit:cover; margin-right:10px;  border:2px solid #4d2b50; padding:1px;  } 
+.newr3 div{ width:440px; height:120px; padding:15px; overflow:auto; background-color:#fff; border:1px solid #67406b; }
+/**********  COULEURS ***************/ 
+
+:root{ 
+  --main-color:#36A4D8;
+  --main-color-v:url('https://i.servimg.com/u/f30/19/45/51/53/pisral41.jpg');
+  --snd-color:#153D95;
+  --gris1:#222;
+  --gris2:#555; 
+  --gris3:#fff;
+  --gris5:#BFBFBF; 
+  --gris4:#dedede;
+  --four-color:#457B93;
+  --five-color:#83B7CF;
+  --six-color:#4568A0;
+  --black:#000; 
+  --white:#fff; 
+  --white-v:#606060;
+    --orange:orange;
+  --green:green;
+  
+    --font2:'Questrial', sans-serif;
+  --font1:'Viga', sans-serif;
+} 
+
+.orange{ color:orange; }
+.green{ color:green; } 
+
+.premade{ max-width:100%; }
+
+.postbody{   padding: 20px 20px 40px; text-align:justify; }
+.postdetails{ color:var(--gris2) !important; }
+.bodyline{border:none !important;}
+a:hover, a, a:visited{   text-decoration:none !important;}
+#i_post, #i_reply{ margin-right:10px; }
+
+.selectCode { float:right; text-transform: uppercase; cursor:pointer; }
+div.cont_code { clear: right; }
+.panneaupisrale{ margin-top:10px; }
+/* .navbar .mainmenu{ display:none; } */
+.forumline{ width:800px; } 
+#page-body{ min-width:700px; }
+
+.rava2{ font-size:30px; font-family:var(--font2); }
+.rava img{ width:200px; min-width:200px; height:320px; object-fit:cover; }
+
+.gen.row1 span span{ color:#000 !important; }
+
+.parow{ background-color:var(--five-color) !important; }
+.colorpagination{ background-color:#dedede !important; }
+/* Fond de dégradé */ 
+
+body{ 
+ background: rgb(32,100,160);
+background: -moz-linear-gradient(180deg, rgba(32,100,160,1) 0%, rgba(53,194,220,1) 100%);
+background: -webkit-linear-gradient(180deg, rgba(32,100,160,1) 0%, rgba(53,194,220,1) 100%);
+background: linear-gradient(180deg, rgba(32,100,160,1) 0%, rgba(53,194,220,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#2064a0",endColorstr="#35c2dc",GradientType=1); 
+  background-attachment:fixed;
+}
+
+/* Fiche général */ 
+
+.gengen{ width:80%; background-color:var(--white); margin:0 auto;}
+.gengen *{ box-sizing:border-box; }
+.gengen a{ color:var(--snd-color) !important;}
+.gengen a:hover{ color:var(--gris2) !important; }
+.gengen h1{ margin:0px; width:100%; color:var(--gris4); font-size:20px; letter-spacing:4px; text-transform:uppercase; 
+  background-image:var(--main-color-v); padding:15px; font-family:var(--font1); text-align:center; }
+.gengen h2{ font-family:var(--font2); font-size:11px; letter-spacing:6px; color:var(--gris2); text-align:center; padding:3px; border-bottom:1px solid var(--gris2);}
+h3{ width:80%; margin:0 auto; color:var(--white); font-size:16px; letter-spacing:1px; font-weight:normal;
+  background:var(--main-color-v); padding:5px; font-family:var(--font2); text-align:center; }
+.gengen div{ padding:15px; text-align:justify; }
+
+.partgen{ display:flex; justify-content:space-around; flex-wrap:wrap;  }
+.partgen div{    width: 285px;    margin: 0px 5px;}
+.partgen span{ display:block;  border: 1px solid var(--gris1); padding:15px;  height: 300px;  overflow: auto; text-align:left;}
+
+.colcol{ column-count:3; display:block; }
+
+a.nav{ color:var(--gris1); }
+.nav.navmessage a{ color:var(--gris1); }
+
+/* Equipe */ 
+
+.flexquipe{ display:flex; width:100%; justify-content:center; flex-wrap:wrap; } 
+.equipe{ display:block; width:200px; text-align:center; margin:5px; }
+.equipe img{ width:100px; height:100px; object-fit:cover; margin:3px; padding:3px; border:1px solid var(--snd-color); }
+.equipe b{ color:var(--main-color); font-family:var(--font1); font-size:15px; margin:5px 0px; }
+.equipe blockquote{ margin:0; }
+
+/* Footer */ 
+
+.parten-bottom{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; margin:15px 0px; } 
+.pa-spec{ width:100%; }
+.parten-bottom img{ width:40px; height:40px; object-fit:cover; } 
+.parten-bottom a{ margin:3px; }
+
+/* Repertoires */
+
+.margneg{ margin-top: -94px;
+    position: relative;
+}
+
+.repert{ width:100%; margin:0 auto; }
+.repert *{ box-sizing:border-box; }
+
+.repert-rang{ display:flex; flex-wrap:wrap; justify-content:center; }
+.repert-rang h3{ width:100%; }
+.repert-rang a{ display:block; width:85px; margin:5px; } 
+.repert-rang a img{ width:85px; height:100px; object-fit:cover; }
+.repert-rang a span{ display:flex; align-items:center; min-height:46px; line-height:14px; 
+  justify-content:center; width:85px; background-color:var(--main-color); font-family:var(--font2); font-size:13px; color:var(--white); padding:2px; text-align:center; font-weight:bold;}
+.repert-rang a:hover span{ background:var(--main-color-v); background-size:cover; color:var(--white); } 
+
+.code-r{ display:flex; justify-content:center; flex-wrap:wrap; }
+.code-r img{ width:200px; height:180px; }
+.code-r.sign-r img{ height:120px; object-fit:cover;}
+.code-r.lien-r img{ width:150px; height:220px; object-fit:cover; }
+.code-r img:hover{ width:200px; height:auto; -moz-transform: scale(1.5);
+-webkit-transform: scale(1.5);
+-o-transform: scale(1.5);
+-ms-transform: scale(1.5);
+  transform: scale(1.5);
+border:5px solid var(--four-color);}
+
+.code-r.templates{ align-items:center; }
+.code-r.templates img{ width:300px; height:auto; margin:5px; }
+.code-r.pageaccueil img{ height:auto; margin:5px; }
+.code-r.pageaccueil img:hover{ width:300px; }
+.code-r.pageaccueil.fichefiche img:hover{ width:200px; }
+
+.codage-commande{ display:flex; justify-content:space-around; }
+.codage-commande div{ width:165px; padding:5px; margin:5px; background-color:var(--white); border:1px solid var(--six-color); text-align:left;}
+.codage-commande strong, .codage-commande b{ display:block; width:100%; font-weight:normal; color:var(--white); background-color:var(--main-color); font-family:var(--font1); letter-spacing:2px; 
+  font-size:15px; text-align:center; padding:4px; }
+
+/************************** Catégories par Koala Volant ********************************************/
+
+/* Structure du bloc */
+.forum-encart{ width:800px; display:flex; justify-content:space-between; margin:0px;  background-color:var(--white); padding:10px 5px; color:var(--four-color !important);} 
+.forum-encart *{ box-sizing:border-box; }
+
+/* Categorie title */
+.cate-title{ width:800px; } 
+.cate-title h2{ padding:15px; font-size:25px; line-height:28px; text-align:center; font-family:var(--font2); background-image:var(--main-color-v); color:var(--white); 
+text-transform:uppercase; letter-spacing:4px; }
+/* No New Lock */ 
+.btnimg, .btnimg img{ width:35px; height:160px; object-fit:cover; margin-left:2px;  } 
+
+/* Gros Titre */ 
+
+.tit-desc{ width:500px; height:160px; margin:0px 10px; border:1px solid var(--four-color);  padding:10px; } 
+.tit-desc .forumlink{ font-family:var(--font1); font-size:22px; text-align:center; line-height:28px; color:var(--snd-color); letter-spacing:3px; text-transform:uppercase; } 
+a.forumlink:link{ color:var(--snd-color); }
+
+/* Sous forums */ 
+
+.ssfo{     display: flex;    justify-content: space-between;    flex-wrap: wrap;    margin-top: 15px;    max-height: 100px;    overflow: auto; }
+.ssfo a{     display:flex; justify-content:center; align-items:center;   color:var(--white); background-color: var(--main-color);  max-width:137px;  width: 137px;     
+  margin:5px 0px;   min-height: 29px;    padding: 5px; font-size:15px; line-height:17px; 
+    text-align: center;  font-family: var(--font2); transition:500ms; }
+.ssfo a:hover{ background-color:var(--gris2); color:var(--white); }
+/* Description */
+
+.descr-cate{ width:170px; }
+.forum-desc{ border:1px solid var(--four-color); color:var(--gris1); text-align:justify; padding:5px; height:136px; overflow:auto; font-size:11px; line-height:14px; }
+.nmbr-sm{ font-family:var(--font1); padding:3px; font-size:10px; text-transform:uppercase; text-align:center; 
+  background-image:var(--main-color-v); background-size:cover;margin:5px 0px; color:var(--white); }
+/* Partie des derniers messages  */ 
+
+.stat-mess{ width:120px; margin-left:10px; } 
+.stat-mess .cat-avatar img{ width:110px; height:50px; object-fit:cover; padding:3px; border:1px solid var(--snd-color); }
+
+.dern-mess{ border:1px solid var(--four-color); height:103px; margin-top:5px;  }
+.dern-mess span, .dern-mess a{ font-family:var(--font2); letter-spacing:1px; text-align:center; }
+.dern-mess span{ font-size:9px; display:block; margin-top:10px; color:var(--gris1);}
+.dern-mess a{ text-transform:uppercase; font-size:12px;  }
+
+/************************************************** Fin mise en forme catégorie **************************************************/
+
+/********************** LISTE DE SUJETS PAR KOALAVOLANT ************************/ 
+
+.subj-body{ display:flex; justify-content:space-between; margin:10px 0px; background-color:var(--gris4); padding:10px; } 
+
+/* Image sur le coté */ 
+
+.img-subj{ width:30px; }
+.img-subj img{ width: 30px;height: 65px;  object-fit: cover;}
+
+/* Titre & Description */ 
+
+.subj-tit-descr{ width:53%; }
+.subj-tit-descr a.topictitle{ margin:0; background:var(--four-color); padding:5px; color:var(--white); font-family:var(--font1); 
+  font-weight:normal; font-size:15px; text-transform:uppercase; transition:500ms; }
+.subj-tit-descr a:hover{ background:var(--gris1); }
+.subj-tit-descr .gensmall{ font-family: var(--font2); font-size: 12px; color: var(--gris2); }
+
+/* Vue Reponse et Auteur */ 
+
+.author-vuerep{ width:15%; }
+.vues-mess{ font-family:var(--font1); font-size:11px; text-align:center; background:var(--main-color-v); color:var(--white); padding:5px 0px; }
+.auth-naiss{ font-family:var(--font2); font-size:17px; text-align:center; color:var(--gris4); margin-top:5px; }
+.auth-naiss a{ display:block; margin-top:5px; }
+.auth-naiss a span{ text-align:center; }
+
+/* Date et Image */ 
+
+.subj-dern{ width:27%; margin-top:6px; }
+.subj-dern .lastpost-avatar{ position:relative; z-index:14; }
+.subj-dern .lastpost-avatar img{ border-radius: 50%;    border: 3px solid var(--four-color);     height: 38px;    width: 38px; object-fit:cover; }
+.subj-dern .dern-rep{ background-color:var(--four-color); padding:5px; margin-left: -14px;  padding-left: 31px;position: relative;z-index: 5; 
+  margin-top: 2px; display: inline-block; font-size:13px; color:#fff; }
+.subj-dern .dern-rep strong{ color:var(--white) !important; }
+
+.author-mess{ font-size:8px; }
+
+/*********************** FIN DES LISTES DES SUJETS PAR KOALAVOLANT *****************/ 
+
+
+/* PA */ 
+
+.pa-wrap{ display:flex; justify-content:space-around; padding:10px; } 
+.pa-wro{ width:40%; }
+.pa-wro strong{ font-family:var(--font1); color:var(--main-color); }
+.pa-wro span{ min-height:200px; max-height:200px; overflow:auto; } 
+  .pa-wrap h3{ background:var(--main-color-v); }
+.pa-wrou{ width:49%; }
+.pa-wrou img{ width:80px; }
+
+/* Annonces */
+
+#fa_ticker_block{ position:relative;
+  /*  top: 290px; */
+    min-height: 172px;
+  z-index: 999; }
+
+.annonce-pa{ display:flex; width:100%; min-height:172px !important; flex-wrap:wrap; justify-content:space-between; align-items:center;} 
+.ann-graph, .ann-code{ width:49%; }
+.ann-1{ background:var(--main-color-v);  font-family:var(--font2);  padding:5px; color:var(--white-v); font-size:18px; margin:2px 0px; } 
+.ann-1 a, .ann-1 a:visited, .ann-1 a:link, .ann-1 a:active{ color:var(--white) !important; } .ann-1 a:hover{ color:#222 !important; } 
+.ann-2{ background-color:var(--white);  font-family:var(--font1); padding:5px; color:var(--gris2); font-size:15px; letter-spacing:2px; margin:1px 0px; transition:500ms: } 
+.ann-2:hover{ background-color:#F7ECCC; }
+.ann-part{ width:100%; margin-top:5px;} 
+.ann-part .ann-1{ width:100%; }
+.part-flex{ display:flex; width:100%; justify-content:space-between;}
+ .part-flex .ann-2{ width:377px;  }
+
+/* Liste des sujets */ 
+
+.topic_list{ font-size:16px;  font-family:var(--font2); background:var(--four-color); width:488px; }
+a.topictitle{ font-size:16px; text-align:center; margin:10px; background-color:var(--main-color); padding:5px; display:block; } 
+.fond-turq{ background-color:var(--white); padding:5px; font-family:var(--font2); width:170px; }
+.vue-rep { width:100px !important; background:var(--main-color-v); background-size:cover; !important; color:var(--white-v) !important; font-size:17px; font-family:var(--font1);}
+.vue-rep .postdetails{ color:var(--white-v); font-size:17px; }
+.forumline.list-subjects tr{ margin:8px !important; display:block; }
+
+.affichage-forum td.catBottom{ background-image:none !important; background-color:var(--white) !important;}
+
+/* Profil */
+
+.nav.navmessage, .nav.navmessage a, .nav.nav, .nav.nav a{ font-size:15px;  font-family:var(--font1);letter-spacing:2px;  } 
+
+
+.pseudoprofil{ background-color:var(--main-color); font-size:18px; 
+    font-size: 14px;
+    color: var(--white-v) !important;
+    display: block;
+    text-align: right !important;
+        font-family:var(--font2);
+    padding: 10px;
+    position: relative;
+    top: -13px; left:-8px;
+    width: 200px; letter-spacing:4px;  }
+
+.pseudoprofil span, .pseudoprofil span strong{ color:var(--white) !important; }
+.post .postdetails{ position: relative;
+    left: 234px;
+    top: 19px;
+  font-family:var(--font1);
+}
+
+.avatarprofil{
+  position: relative;
+    width: 0px;
+    height: 0px;
+    top: -69px;
+    left: -41px;
+}
+
+.avatarprofil img{ border-radius:50%;
+  padding:3px; border:1px solid var(--main-color);
+  width:80px; height:80px; object-fit:cover; 
+  -moz-transform: rotate(-4deg);
+-webkit-transform: rotate(-4deg);
+-o-transform: rotate(-4deg);
+-ms-transform: rotate(-4deg);
+transform: rotate(-4deg);
+}
+
+.cattitle {
+    color: var(--white);
+    font-size: 25px;
+    line-height: 30px;
+  /* text-shadow: 2px 2px 0 var(--main-color), 2px -2px 0 var(--main-color), -2px 2px 0 var(--main-color), -2px -2px 0 var(--main-color), 2px 0px 0 var(--main-color), 0px 2px 0 var(--main-color), -2px 0px 0 var(--main-color), 0px -2px 0 var(--main-color), 2px 2px 2px rgba(89,38,24,0);*/
+        font-family:var(--font2);
+}
+
+.t-title{ padding:20px; }
+

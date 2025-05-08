@@ -1,0 +1,110 @@
+.koala{
+  width:570px;
+  margin:0 auto;
+}
+
+.koala .t1, .koala .t2, .koala .t3{
+  float:left;
+}
+
+.koala .t2{
+    width:180px;
+  background-color:#fff;
+  padding:10px 10px 15px 10px;
+  margin-left:-10px;
+  margin-right:10px;
+  margin-top:5px;
+  font-size:11px;
+  color:#6F6F6F;
+  line-height:12px;
+  -webkit-border-radius: 40px;
+-moz-border-radius: 40px;
+border-radius: 40px;
+  border:#F7BC4F 1px solid;
+  }
+
+.koala .t2 span{
+  margin-top:10px;
+  padding:5px;
+  font-size:10px;
+  line-height:11px;
+  display:block;
+}
+
+.koala .t2 i, .koala .t2 em{
+  text-align:right;
+  color:#9C7C41;
+}
+
+.koala .t2 h1, .koala .t2 h2{
+font-family: 'Luckiest Guy', cursive;
+  font-weight:normal;
+  text-align:center;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  font-size:24px;
+  color:#D28C0B;
+}
+
+.koala .t2 h2{
+  font-size:13px;
+  margin-top:-7px;
+  color:#F7BC4F;
+}
+  
+  .koala .i{
+    width:150px;
+    height:110px;
+    background-size:cover;
+  margin-bottom:5px;
+  }
+
+.koala .t1 .i{
+background-image:url('http://tinyurl.com/gpxup2p');
+    -webkit-border-radius: 40px;
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-bottomright: 0;
+border-radius: 40px;
+border-bottom-right-radius: 0;
+}
+
+.koala .t1 .i+.i{
+background-image:url('http://tinyurl.com/hoa29k5');
+  -webkit-border-radius: 40px;
+-webkit-border-top-right-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-topright: 0;
+border-radius: 40px;
+border-top-right-radius: 0;
+}
+
+.koala .t3 .i+.i{
+-webkit-border-radius: 40px;
+-webkit-border-top-left-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-topleft: 0;
+border-radius: 40px;
+border-top-left-radius: 0;
+background-image:url('https://tinyurl.com/z78phpb');
+}
+
+.koala .t3 .i{
+-webkit-border-radius: 40px;
+-webkit-border-bottom-left-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-bottomleft: 0;
+border-radius: 40px;
+border-bottom-left-radius: 0;
+background-image:url('http://tinyurl.com/zufok39');
+}
+  
+  .koala .t1, .koala .t3{
+    width:170px;
+  }
+
+.koala .bton{
+  clear:both;
+  width:570px;
+  margin:0 auto;
+}

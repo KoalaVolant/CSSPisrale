@@ -1,0 +1,43 @@
+.dandlistrp{
+  width:450px;
+  margin:0 auto;
+  font-family:Verdana;
+  color:#6F6F6F;
+  background-color:#fff;
+}
+
+.dandlistrp div{
+  padding:20px;
+  box-sizing:border-box;
+  background-image:url('https://i.pinimg.com/564x/4b/df/d5/4bdfd52a4f0907ca49fb4e15406811da.jpg');
+  margin-bottom:-20px;
+}
+
+.dandlistrp img{
+  width:400px;
+  padding:5px;
+  border:#fff 2px solid;
+  display:block;
+  margin:0 auto;
+}
+
+.dandlistrp h1{
+  margin:0;
+  background-image:url('https://i.pinimg.com/564x/1d/5c/43/1d5c4310ef3c2f41e0894682e7513ea6.jpg');
+  font-family: 'Playfair Display SC', serif;
+  font-size:24px;
+  padding:10px;
+  text-align:right;
+  color:#494949;
+}
+
+.dandlistrp span{
+  padding:15px;
+  display:block;
+}
+
+.dandlistrp a, .dandlistrp a:link, .dandlistrp a:hover, .dandlistrp a:visited{
+  color:#1F7449;
+  font-family:Verdana;
+  text-decoration:none;
+}

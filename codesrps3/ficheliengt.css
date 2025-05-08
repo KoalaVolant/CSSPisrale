@@ -1,0 +1,46 @@
+:root{
+    --fond-deg-gt:linear-gradient(90deg, var(--dark-gt) 32.29%, var(--light-gt) 89.86%);
+    --fond-img-gt:url('https://www.zupimages.net/up/22/45/f0t6.png');
+    --fond-img2-gt:url('https://www.zupimages.net/up/22/45/f0t6.png');
+    --fond-bodyline-gt:#4d4d4d;
+    --dark-gt:#531b37;
+    --light-gt:#88263C;
+    
+    --black-gt:#FDE8ED;
+    --white-gt:#dedede;
+  --whitef-gt:#363636;
+    
+    --text-shadow-gt:0px 0px 0px #757575;
+    --font-text-gt:'Inter', sans-serif;
+    --font-title-gt:'GothamPro', sans-serif;
+}
+
+.byllinksperso, .byllinksperso *{ box-sizing:border-box; }
+.byllinksperso{ width:500px; margin:0 auto; }
+.byllinksperso img{ object-fit:cover; }
+.byllinksperso br{ display:none; }
+.byllinksperso .byllinkscont br, .byllinksperso .bylpresbloc br,
+.byllinksperso .bylliens span div{ content:none; display:inline-block; }
+.byllinksperso .bylidentite{ display:flex; align-items:center; justify-content: space-between; }
+.byllinksperso .bylidentite img{ width:200px; height:320px; }
+.byllinksperso .bylidentite > div{ width:290px;}
+.byllinksperso .bylidentite .byltitlepres{ background:var(--fond-deg-gt); padding:5px; font-family:var(--font-title-gt); 
+color:var(--white-gt); font-size:18px; font-weight:200; text-transform:uppercase; letter-spacing:2px; }
+
+.byllinksperso .byllinkscont{ background:var(--fond-bodyline-gt); padding:10px; font-family:var(--font-text-gt); 
+    height:293px; overflow:auto; color:var(--white-gt); text-align:justify;  }
+
+.byllinksperso .byltitlepres2{ background:var(--fond-img-gt); color:var(--white-gt); 
+font-family:var(--font-title-gt); padding:10px; font-size:18px; }
+
+.byllinksperso .bylpresbloc{ color:var(--white-gt); padding:10px; background:var(--fond-bodyline-gt); margin-bottom:15px; }
+/* SCENARIOS */
+
+.byllinksperso .byltitlepres em{ display:block; font-size:11px; margin-top:5px;}
+
+.byllinksperso .bylliens{ height:auto; }
+.byllinksperso .bylliens span{ display:flex; justify-content:space-between; }
+.byllinksperso .bylliens span img{ width:80px; height:80px; outline:1px solid var(--white-gt); outline-offset:-3px; }
+.byllinksperso .bylliens span div{ color:var(--white-gt); text-align:justify; display:block; margin-left:10px; height:100px; overflow:auto; padding:5px; }
+.byllinksperso .bylliens span cad1{ display:block; width:auto;  background:var(--fond-deg-gt); padding:5px; 
+font-family:var(--font-title-gt); }

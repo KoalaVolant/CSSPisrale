@@ -1,0 +1,63 @@
+.wraplek{
+  width:500px;
+  margin:0 auto;
+}
+
+.ilek{
+  float:left;
+  width:247px;
+  height:120px;
+  background-size:cover;
+}
+
+.x{
+  height:18px;
+  width:500px;
+  clear:both;
+  text-align:center;
+  padding-top:-2px;
+  color:#fff;
+  font-family:Courier New;
+  font-size:10px;
+ /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#174c91+1,116042+100 */
+}
+
+.x1, .ilek:hover .x2{
+  background-color:#174C8F;
+}
+
+.ilek:hover .x1, .x2{
+  background-color:#125E4B;
+}
+
+.wraplek h1{
+  width:474px;
+  font-size:25px;
+  clear:both;
+  padding:13px;
+  line-height:22px;
+  margin-top:-20px;
+  background-color:#202020;
+  font-family: 'Neuton', serif;
+  color:#fff;
+  text-align:center;
+  border-bottom:#535353 2px solid;
+}
+
+.wraplek p{
+  margin-top:-35px;
+  padding:20px;
+  width:460px;
+  color:#fff;
+  font-size:12px;
+  line-height:14px;
+  text-align:justify;
+  background-color:#2C2C2C;
+  transition:400ms;
+}
+
+.x3{
+    background-color:#535353;
+  height:10px;
+  margin-top:-30px;
+}

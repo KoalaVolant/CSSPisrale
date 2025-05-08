@@ -1,0 +1,33 @@
+:root{ 
+--solocolorgav:#CC2059; 
+}
+
+.liensblocBlanc, .liensblocBlanc *{ box-sizing:border-box;  }
+.liensblocBlanc{ margin:0 auto; width:560px;  }
+.liensblocBlanc br{ display:none; }
+.liensblocBlanc img{ object-fit:cover; }
+
+.liensblocBlanc{ border-radius: 10px; background:#fff; 
+padding:15px; font-family: 'Poppins', sans-serif; }
+
+.gavFlex{ display:flex; justify-content: space-between; }
+.liensblocBlanc .liensbloc{ width:29%;}
+.liensblocBlanc .gavInfos{ width: 69%; margin-top:10px; }
+.liensblocBlanc .gavTitle{ color:var(--solocolorgav); 
+	text-transform:uppercase; font-weight:900; display:block; font-size:35px; }
+.liensblocBlanc .gavInfosContent{ max-height:200px; overflow:auto; display:block; 
+margin-top:15px; text-align:justify; font-size:13px; line-height:1.5em; padding-right:10px;  }
+.liensblocBlanc .gavInfosContent br, .liensblocBlanc .gavFlex2 .gavLienContent .gavBlabla br{ content: "";
+  margin: 1em;
+  display: block;
+  font-size: 24%; } 
+
+.liensblocBlanc .gavFlex2{ display:flex; margin-top:20px; flex-wrap:wrap; }
+.liensblocBlanc .gavFlex2 .gavLien{ margin:10px; width:46%; display:flex; justify-content:space-between;}
+.liensblocBlanc .gavFlex2 .gavLien img{ width:70px; height:70px; }
+.liensblocBlanc .gavFlex2 .gavLienContent{ width:68%;  }
+.liensblocBlanc .gavFlex2 .gavLienContent .gavTitle2{ color:var(--solocolorgav); font-weight:600;  }
+.liensblocBlanc .gavFlex2 .gavLienContent .gavBlabla{ height:150px; display:block;
+overflow:auto; text-align:justify; font-size:12px; line-height:15px; }
+.koala{display:flex; justify-content:center; 
+	font-size:8px; letter-spacing:5px; }

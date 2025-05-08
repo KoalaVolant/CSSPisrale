@@ -1,0 +1,54 @@
+.freddy{
+  width:550px;
+  margin:0 auto;
+  background-color:#000;
+  border-left:#A57103 5px double;
+    border-right:#A57103 5px double;
+  padding-bottom:15px;
+}
+
+.freddy img{
+  width:550px;
+  height:250px;
+  padding-bottom:5px;
+  border-bottom:#A57103 2px dotted;
+}
+
+.freddy h1{
+  font-family: 'Copse', serif;
+  text-align:center;
+  font-weight:normal;
+  font-size:22px;
+  color:#285FFF;
+  text-shadow:0px 0px 5px #285FFF;
+  line-height:23px;
+  text-transform:uppercase;
+}
+
+.freddy h2{
+  font-family:Times New Roman;
+  letter-spacing:-2px;
+  color:#919191; 
+  margin-top:-15px;
+  font-size:15px;
+  text-align:center;
+}
+
+.freddy div{
+  background-color:#000515;
+  color:#7598FF;
+  margin-left:25px;
+  margin-right:25px;
+  margin-bottom:25px;
+  padding:15px;
+  font-size:11px;
+  line-height:13px;
+}
+
+.freddy b, .freddy strong{
+  color:#1367E6;
+}
+
+.freddy i, .freddy em{
+  color:#FFFF99;
+}

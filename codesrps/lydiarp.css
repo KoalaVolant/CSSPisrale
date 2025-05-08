@@ -1,0 +1,38 @@
+.lydia{
+  width:495px;
+background: #341045; 
+  -webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+  margin:0 auto;
+  padding:20px;
+}
+
+.lydia img{
+max-width:220px;
+  height:200px;
+  border:#1d1d1d solid 2px;
+  margin-top:-35px;
+}
+
+.lydia h1{
+  background-color:#121212;
+  padding:15px;
+  font-size:25px;
+  line-height:27px;
+  font-weight:normal;
+  font-family: 'Playball', cursive;
+  margin:0px -20px 0px -20px;
+  text-align:center;
+    color:#AA8FAF;
+  font-style:italic;
+}
+
+.lydia .hogan{
+  background-color:#DADADA;
+  margin-top:-20px;
+  padding:25px;
+  font-size:12px;
+  line-height:14px;
+  color:#383838;
+}

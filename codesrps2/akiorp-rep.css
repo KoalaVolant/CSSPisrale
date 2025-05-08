@@ -1,0 +1,61 @@
+:root{ 
+--akio1-color:#ff9e00; }
+
+.akio{
+  width:500px;
+  margin:0 auto;
+  padding:15px;
+  background-color:#fff;
+  -moz-box-shadow: 2px 2px 5px 0px #cfcfcf;
+-webkit-box-shadow: 2px 2px 5px 0px #cfcfcf;
+-o-box-shadow: 2px 2px 5px 0px #cfcfcf;
+box-shadow: 2px 2px 5px 0px #cfcfcf;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#cfcfcf, Direction=134, Strength=5);
+  font-size:11px;
+  line-height:13px;
+  color:#575757;
+  text-align:justify;
+}
+
+.akio, .akio *{ box-sizing:border-box; }
+
+.akioflex{ display:flex; align-items:center; }
+.akio .akioimg{
+    object-fit:cover;
+  padding:3px;
+  border:var(--akio1-color) 1px solid; 
+  width:200px;
+  height:120px;
+}
+
+.akio .akiotitle{
+  width:300px;
+}
+
+.akio h1{
+  font-family: 'Pacifico', cursive;
+  font-size:16px;
+  line-height:18px;
+  font-weight:normal;
+  text-align:right;
+  color:var(--akio1-color);
+}
+
+.akio h2{
+  text-align:right;
+  font-size:11px;
+  line-height:12px;
+  text-transform:uppercase;
+  font-weight:normal;
+  color:#757575;
+  margin-top:-15px;
+  font-family: 'Coming Soon', cursive;
+}
+
+.koalakio{ display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.akio span{
+  display:block;
+  font-size:12px; line-height:1.5em; 
+  padding:0 15px 15px 15px;
+}

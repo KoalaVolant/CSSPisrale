@@ -1,0 +1,86 @@
+.finn{
+  width:500px;
+  margin:0 auto;
+}
+
+.troll, .finn:hover .troll, .finn h1, .finn:hover h1, .finn .sullivan, .finn:hover .sullivan, .sullivan:first-letter, 
+.finn:hover .sullivan:first-letter{
+          -webkit-transition: 400ms ease;
+-moz-transition: 400ms ease;
+-ms-transition: 400ms ease;
+-o-transition: 400ms ease;
+transition: 400ms ease;
+}
+
+.troll {
+  height:30px;
+  background: #cc0202; /* Old browsers */
+background: -moz-linear-gradient(left, #cc0202 0%, #138701 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left, #cc0202 0%,#138701 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right, #cc0202 0%,#138701 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc0202', endColorstr='#138701',GradientType=1 ); /* IE6-9 */
+}
+
+.finn:hover .troll{
+  height:30px;
+background: #145600; /* Old browsers */
+background: -moz-linear-gradient(left, #145600 0%, #0158b5 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left, #145600 0%,#0158b5 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right, #145600 0%,#0158b5 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#145600', endColorstr='#0158b5',GradientType=1 ); /* IE6-9 */
+}
+
+.finn img{
+  width:250px;
+  height:200px;
+}
+
+.finn h1{
+  background: #004aaa; /* Old browsers */
+background: -moz-linear-gradient(left, #004aaa 0%, #c10185 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left, #004aaa 0%,#c10185 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right, #004aaa 0%,#c10185 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#004aaa', endColorstr='#c10185',GradientType=1 );
+color:#fff;
+font-size:30px;
+text-transform:uppercase;
+line-height:32px;
+text-align:center;
+padding:10px;
+font-family: 'PT Sans Narrow', sans-serif;
+margin-top:-0px;}
+
+.finn:hover h1{
+  background: #a80086; /* Old browsers */
+background: -moz-linear-gradient(left, #a80086 0%, #e5ce02 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left, #a80086 0%,#e5ce02 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right, #a80086 0%,#e5ce02 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a80086', endColorstr='#e5ce02',GradientType=1 );
+}
+
+.sullivan{
+  background-color:#fff;
+  color:#2E2E2E;
+  padding:25px;
+  font-size:12px;
+  line-height:14px;
+  width:440px;
+  margin-top:-40px;
+  border-left:#2DA826 5px solid;
+  border-right:#AD2121 5px solid;
+}
+
+.sullivan:first-letter{
+  font-size:25px;
+  font-family:Comic Sans MS;
+  color:#FF8000;
+}
+
+.finn:hover .sullivan:first-letter{
+  color:#2EC9D1;
+}
+
+.finn:hover .sullivan{
+  border-left:#17A7B7 5px solid;
+  border-right:#F426E4 5px solid;
+}

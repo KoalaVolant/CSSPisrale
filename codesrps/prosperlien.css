@@ -1,0 +1,118 @@
+.entprosplien{
+  width:450px;
+  margin:0 auto;
+}
+
+.blablaprosp{
+  display:flex;
+  flex-wrap:wrap;
+  background-color:#fff;
+  padding:15px;
+  box-sizing:border-box;
+  justify-content:space-around;
+  border:#5094C7 3px solid;
+}
+
+.blablaprosp img{
+  width:180px;
+  height:220px;
+  object-fit:cover;
+}
+
+.blablaprosp span{
+  width:200px;
+  height:200px;
+  padding:10px;
+  overflow:auto;
+  color:#444;
+  text-align:justify;
+}
+
+.blablaprosp h1{
+  font-family: 'Crimson Text', serif;
+  color:#5094C7;
+  text-align:center;
+  font-size:22px;
+  margin:0px;
+}
+
+.lienchprosp div{
+  background-color:#fff;
+  width:100%;
+  padding:10px;
+  box-sizing:border-box;
+  color:#444;
+  font-size:12px;
+  line-height:16px;
+  display:block;
+  text-align:justify;
+  margin-top:-17px;
+  transform:scale(0);
+  height:0px;
+  transition:700ms;
+}
+
+.lienchprosp:hover div{
+    transform:scale(1);
+  height:440px;
+}
+
+.lienchprosp h2{
+  width:200px;
+  margin:0 auto;
+  background-color:#5094C7;
+  font-size:18px;
+  text-align:center;
+  padding:5px;
+  color:#fff;
+  font-weight:normal;
+  text-transform:uppercase;
+    font-family: 'Crimson Text', serif;
+}
+
+.prosperlien{
+  width:450px;
+  margin:0 auto;
+    display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+}
+
+.prosperlien div{
+  width:210px;
+    margin-top:10px;
+}
+
+.prosperlien img{
+width:210px;
+height:100px;
+object-fit:cover;
+  box-sizing:border-box;
+  border:#5094C7 2px solid;
+}
+
+.prosperlien h1{
+  margin:0 auto;
+  background-color:#5094C7;
+  font-size:18px;
+  text-align:center;
+  padding:5px;
+  width:180px;
+  color:#fff;
+  font-weight:normal;
+  text-transform:uppercase;
+    font-family: 'Crimson Text', serif;
+}
+
+.prosperlien span{
+  display:block;
+  background-color:#fff;
+  padding:10px;
+  box-sizing:border-box;
+  overflow:auto;
+  width:210px;
+  height:200px;
+  font-size:11px;
+  line-height:14px;
+  color:#444;
+}

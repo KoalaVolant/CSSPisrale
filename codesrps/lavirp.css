@@ -1,0 +1,14 @@
+/* Fiche rp */
+
+.lavirp{ width:450px; margin:0 auto; } 
+.lavirp *, .lavirp{ box-sizing:border-box; }
+
+.lavirp h1{ padding:15px !important; font-family: 'Prata', serif; font-size:18px; color:white !important; margin:0px; 
+background: -moz-linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+background: -webkit-linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+background: linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ce521f",endColorstr="#e48034",GradientType=1); }
+.lavirp h1 em{ font-size:12px; display:block; margin:3px 0px; } 
+
+.lavirp div{ margin-top:-20px; padding:25px; background-color:#fff; font-family:Verdana; font-size:13px; line-height:18px; color:#222; border-bottom:5px solid #ce521f;} 
+.lavirp div h2{ color:#777; border:1px solid #EDAA78; padding:8px; font-size:11px; line-height:12px; } 

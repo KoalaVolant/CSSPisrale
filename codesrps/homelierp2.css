@@ -1,0 +1,51 @@
+  .homelie2{
+  width:500px;
+  margin:0 auto;
+  background-image:url('http://www.designveryeasy.com/images/thumb/Light-Blue-Pattern-119314.jpg');
+  padding:25px;
+}
+
+.homelie2 img{
+  width:245px; 
+  height:150px;
+  -webkit-border-top-left-radius: 70px;
+-moz-border-radius-topleft: 70px;
+border-top-left-radius: 70px;
+  border-color:#0B92F4 5px solid;
+}
+
+.homelie2 img+img{
+    -webkit-border-top-left-radius: 0px;
+-moz-border-radius-topleft: 0px;
+border-top-left-radius: 0px;
+  -webkit-border-top-right-radius: 70px;
+-moz-border-radius-topright: 70px;
+border-top-right-radius: 70px;
+  margin-left:10px;
+    border-color:#0B92F4 5px solid;
+}
+
+.homelie2 div{
+  background-color:#fff;
+  color:#15666C;
+  font-size:12px;
+  line-height:14px;
+  text-align:justify;
+  padding:25px;
+}
+
+.homelie2 h1{
+  text-align:left;
+  color:#24AFBB;
+  font-size:22px;
+  width:450px;
+  margin-top:-5px;
+  line-height:24px;
+font-family: 'Annie Use Your Telescope', cursive;
+  letter-spacing:1px;
+  border-bottom:#1F97A0 dotted 1px;
+}
+
+.homelie2 strong{
+  color:#404040;
+}

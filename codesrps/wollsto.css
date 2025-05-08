@@ -1,0 +1,29 @@
+/* Sign Woll */ 
+
+.signwolls{ width:220px; margin:0 auto; position:relative; height:150px; } 
+.signwolls *{ box-sizing:border-box; } 
+
+.signwolls .masky{    -webkit-mask-image: url("https://i.servimg.com/u/f30/19/45/51/53/youspe10.png");
+  mask-image: url("https://i.servimg.com/u/f30/19/45/51/53/youspe10.png");
+ -webkit-mask-size: 220px 124px;
+  mask-size: 220px 124px;
+ -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position:bottom;
+  width:267px; height:150px;
+  position:absolute; top:-46px; left:-32px; 
+}
+
+.signwolls .horisto{ width:90%; height:45px; 
+background: -moz-linear-gradient(90deg, rgba(15,23,28,1) 0%, rgba(54,82,108,1) 42%, rgba(22,83,96,1) 100%);
+background: -webkit-linear-gradient(90deg, rgba(15,23,28,1) 0%, rgba(54,82,108,1) 42%, rgba(22,83,96,1) 100%);
+background: linear-gradient(90deg, rgba(15,23,28,1) 0%, rgba(54,82,108,1) 42%, rgba(22,83,96,1) 100%);
+-moz-transform: rotate(-10deg);
+-webkit-transform: rotate(-10deg);
+-o-transform: rotate(-10deg);
+-ms-transform: rotate(-10deg);
+transform: rotate(-10deg); position:absolute; top:25px; left:9px; 
+}
+
+.signwolls .gify{    width: 72%;    height: 91px;    object-fit: cover;    position: absolute;    top: 0px;    left: 32px; padding:2px;  border:1px solid #738991; } 
+
+.signwolls h1{ font-size:11px; line-height:11px; position:absolute; bottom:0; width:100%; font-family: 'Rajdhani', sans-serif; background-color:#fff; padding:3px; text-align:justify; }

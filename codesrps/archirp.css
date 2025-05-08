@@ -1,0 +1,63 @@
+/* Archi rep */
+
+.archirp{
+  margin:0 auto; 
+  width:550px;
+}
+
+.archirp h1{
+  font-family:times new roman;
+  font-size:14px;
+  line-height:16px;
+  font-weight:normal;
+    border:#003AAE 1px dashed;
+  padding:15px;
+}
+
+.archicontent{
+  background-image:url('https://img11.hostingpics.net/pics/853692SoulagesPierre.png');
+  background-repeat:repeat;
+  width:400px;
+  margin:0 auto;
+  padding:25px;
+  color:#DDDDDD;
+  text-align:justify;
+  font-size:12px;
+  line-height:13px;
+  text-shadow:#000 0px 0px 5px;
+}
+
+.archirp img, .archirp:hover .p1, .archirp:hover .p2{
+  -webkit-transition: all 400ms ease;
+-moz-transition: all 400ms ease;
+-ms-transition: all 400ms ease;
+-o-transition: all 400ms ease;
+transition: all 400ms ease;
+}
+
+.archirp img{
+  width:250px; 
+  height:150px;
+  -moz-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+transform: rotate(0deg);
+}
+
+.archirp:hover .p2{
+  -moz-transform: rotate(5deg);
+-webkit-transform: rotate(5deg);
+-o-transform: rotate(5deg);
+-ms-transform: rotate(5deg);
+transform: rotate(5deg);
+}
+  
+ 
+  .archirp:hover .p1{
+  -moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);
+  }

@@ -1,0 +1,5 @@
+.haidensign{ width:420px; margin:0 auto; }
+.haidensign .struct2{ display:flex; justify-content:space-between; align-items:center; } 
+.haidensign img{ width:170px; height:110px; object-fit:cover;}
+.haidensign h1{ font-family: 'Inria Serif', serif; font-size:25px; text-transform:uppercase; background-color:#75311b; color:#fff; padding:10px; margin:0px; } 
+.haidensign h2{ margin:0px; font-weight:normal; font-family:Verdana; font-size:11px; line-height:12px; }

@@ -1,0 +1,78 @@
+.wrapper{
+color:#000; 
+width:520px; 
+background-color:#fff; 
+box-shadow:#000 5px 0px 5px; 
+-moz-box-shadow: 5px 5px 5px 2px #ADD3D3; 
+-webkit-box-shadow: 5px 5px 5px 2px #ADD3D3;
+-o-box-shadow: 5px 5px 5px 2px #ADD3D3; 
+box-shadow: 5px 5px 5px 2px #ADD3D3; 
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#ADD3D3, Direction=134, Strength=5); padding:5px;} 
+
+.gif{
+background-color:#D1EDEC; 
+-webkit-border-radius: 10px; 
+-moz-border-radius: 10px; 
+border-radius: 10px; 
+padding:10px;
+} 
+
+.imggif{
+background-image:url('http://media.tumblr.com/tumblr_m1tuy0yDgX1qlpcsqo1_500.gif'); 
+width:500px; 
+height:300px; 
+background-repeat: no-repeat; 
+background-position: center; 
+background-size:cover;
+} 
+
+.titrepersonne i{
+text-align:center; 
+width:500px;
+margin:0 auto;
+padding-top:10px; 
+color:#fff; 
+text-shadow:#000 0px 0px 5px;
+}
+
+.titrepersonne{
+padding:245px 0px 0px 5px; 
+text-transform:uppercase; 
+color:#fff; 
+text-shadow:#A0DCE0 0px 0px 5px; 
+transition:300ms;
+} 
+
+.titrepersonne:hover{
+color:#3C646C; 
+transition:300ms;
+} 
+
+.wrappcara{
+width:450px;
+} 
+
+.wraptxt{
+width:200px; 
+padding:10px; 
+background-color:#E8FAFF;
+} 
+
+.titlle{
+font-family: 'Chivo', sans-serif; 
+font-size:25px;
+} 
+
+.wrapper p{
+overflow:auto; 
+font-size:10px; 
+line-height:12px;
+height:180px; 
+}
+
+.liencherche{
+margin:0 auto; 
+width:450px; 
+padding:10px; 
+background-color:#E8FAFF;
+}

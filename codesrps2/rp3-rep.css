@@ -1,0 +1,78 @@
+.wrap_rpb{
+background-image:url('http://img15.hostingpics.net/pics/7087434512.png');
+width:500px;
+    margin:0 auto;
+padding:25px;
+}
+
+.wrap_rpb, .wrap_rpb *{ box-sizing:border-box; }
+
+.gifrpb{
+width:400px;
+    margin:0 auto;
+}
+
+.gifrpb img{
+width:400px;
+height:200px;
+object-fit:cover;
+-webkit-border-radius: 80px;
+-moz-border-radius: 80px;
+border-radius: 80px;
+padding:5px;
+border:#898989 solid 1px;
+-moz-box-shadow: 3px 3px 5px 0px #656565;
+-webkit-box-shadow: 3px 3px 5px 0px #656565;
+-o-box-shadow: 3px 3px 5px 0px #656565;
+box-shadow: 3px 3px 5px 0px #656565;
+position:relative;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=135, Strength=5);
+background-image:url('http://portfolio.vernier.se/files/2014/03/light-grey-wood-photography-hd-wallpaper-1920x1200-4647.jpg');
+z-index:1;
+}
+
+.titrerpb{
+background-image:url('http://portfolio.vernier.se/files/2014/03/light-grey-wood-photography-hd-wallpaper-1920x1200-4647.jpg');
+margin-top:-25px;
+position:relative;
+z-index:2;
+-webkit-border-radius: 100px;
+-moz-border-radius: 100px;
+border-radius: 100px;
+padding:10px;
+font-size:15px;
+margin-left:10px;
+text-align:center;
+-moz-box-shadow:  0px 0px 10px 0px #656565;
+-webkit-box-shadow:  0px 0px 10px 0px #656565;
+-o-box-shadow: 0px 0px 10px 0px #656565;
+box-shadow: 0px 0px 10px 0px #656565;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=NaN, Strength=10);
+font-family: 'Bitter', serif;
+border-bottom:#fff 1px dotted;
+font-weight:bolder;
+  color:#1F120C;
+}
+
+.wrap_rpb p{
+background-color:#DADADA;
+-webkit-box-shadow: inset 0px 0px 67px -15px rgba(0,0,0,0.75);
+-moz-box-shadow: inset 0px 0px 67px -15px rgba(0,0,0,0.75);
+box-shadow: inset 0px 0px 67px -15px rgba(0,0,0,0.75);
+padding:20px;
+  width:400px;
+  margin:0 auto;
+  color:#000;
+font-size:14px;
+    text-align:justify;
+    font-family:Verdana;
+line-height:1.4em;
+}
+
+.koalavolant{
+text-align:center; width:100%;
+color:#dedede !important;
+display:block;
+font-size:10px;
+margin-top:-10px;
+}

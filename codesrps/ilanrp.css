@@ -1,0 +1,75 @@
+.ilanrp{
+  width:450px;
+  margin:0 auto;
+  background-color:#fff;
+  padding:10px;
+  text-align:justify;
+  font-family: 'Arimo', sans-serif;
+  font-size:15px;
+  line-height:19px;
+  color:#303030;
+}
+
+.ilanrp, .ilanrp *{
+        -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.ilanrp .ara{
+  display:block;
+  width:400px;
+  margin-bottom:-15px;
+  margin-top:-15px;
+  margin-left:15px;
+  opacity:0.5;
+}
+
+.ilanrp h2, .ilanrp h1{
+  margin:0;
+font-family: 'Roboto Slab', serif;
+    font-weight:normal;
+}
+
+.ilanrp b, .ilanrp strong{
+  color:#385265;
+}
+
+.ilanrp h2{
+  text-align:right;
+  font-size:14px;
+  letter-spacing:7px;
+  color:#9B9B9B;
+}
+
+.ilanrp hr{
+  background-image:url('https://i62.servimg.com/u/f62/11/66/37/71/arabes10.png');
+  margin:0 auto;
+}
+
+.ilanimg{
+  width:415px;
+  margin:0 auto;
+}
+
+.ilanimg img{
+  width:200px;
+  height:150px;
+  object-fit:cover;
+  margin:0 auto;
+  padding:3px;
+  border:#B9B9B9 1px solid;
+}
+
+.ilanimg img+img{
+  margin-left:10px;
+}
+
+.ilanrp h1{
+  text-align:left;
+  font-size:20px;
+    line-height:21px;
+  text-transform:uppercase;
+  letter-spacing:-1px;
+color:#5B6F91;
+}

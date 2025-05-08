@@ -1,0 +1,20 @@
+/* Fiche liste rp */ 
+
+.lavititle{ width:100%; display:flex; justify-content:space-between; align-items:center; } 
+.lavititle img{ width:100px; height:100px; object-fit:cover; border:5px solid white; -webkit-border-radius: 50%;-moz-border-radius: 50%;border-radius: 50%; }
+.lavititle h1{ padding:15px; font-family: 'Prata', serif; font-size:18px; color:white !important; margin:0px 0px 0px 5px !important ;    height: 50px;    width: 100%; 
+   }
+
+.lavillrp h1 strong{ font-weight:normal; font-style:italic; }
+
+.lavillrp h2{ color:white; font-family: 'Prata', serif; font-size:15px !important; 
+  padding:5px !important; width: 40%;    margin: 0px !important; 
+background: rgb(206,82,31);
+background: -moz-linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+background: -webkit-linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+background: linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ce521f",endColorstr="#e48034",GradientType=1); }
+
+.lavillrp span{ display:block; padding:20px; color:#222; background-color:#fff; }
+.lavillrp a{ color:#ce521f !important; }
+.laviblocrp-white h2{ background:#222 !important; font-size:19px !important; padding:10px !important; }

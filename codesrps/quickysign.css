@@ -1,0 +1,41 @@
+.quickysign{
+  width:500px;
+  margin:0 auto;
+  font-family:Verdana;
+  display:flex;
+}
+
+.quickysign h1{
+  width:120px;
+  height:55px;
+  text-align:center;
+  text-transform:uppercase;
+  font-family: 'Londrina Solid', cursive;
+  font-size:20px;
+  font-weight:normal;
+  background-color:#2F99C1;
+  color:#fff;
+  padding:5px;
+}
+
+.quickysign img{
+  width:180px;
+  height:160px;
+  object-fit:cover;
+  display:block;
+}
+
+.quickysign h2{
+  height:65px;
+  width:200px;
+  text-align:justify;
+  font-family:Verdana;
+  font-size:11px;
+  line-height:12px;
+  background-color:#fff;
+  font-weight:normal;
+   color:#1A5368;
+  padding:5px;
+  margin-top:65px;
+  font-family: 'Quicksand', sans-serif;
+  }

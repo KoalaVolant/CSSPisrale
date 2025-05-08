@@ -1,0 +1,22 @@
+<style>input[type=checkbox] {
+  display: none;
+}
+
+input[type=checkbox] + label:before {
+  content: "";
+  display: inline-block;
+  width: 120px;
+  height: 120px;
+  background-color: #dddddd;
+  border-radius: 3px;
+}
+input[type=checkbox]:checked + label:before {
+  content: "";
+  color: #ffffff;
+  background-color: #ff0000;
+}
+
+</style>
+
+<input id="id" type="checkbox"/><label for="id"></label>
+<input id="pi" type="checkbox"/><label for="pi"></label>

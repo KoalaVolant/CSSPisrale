@@ -1,0 +1,25 @@
+:root{
+	--rory-rose:#F600DE;
+	--rory-snd:#7C0070;
+}
+
+/* CREDITS */
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+/* Signature */ 
+
+.rorySign1{ display:flex; position:relative; width:400px; 
+align-items:center; margin:0 auto; }
+.rorySign1 img{ background:white; z-index:15; position:relative; display:block;
+width:100px; height:100px; border-radius:50%; padding:5px; border:10px solid var(--rory-rose); }
+.rorySign1:before{ content:' '; position:absolute; top:0px; left:-5px; 
+	width:15px; height:15px; border-radius:50%; background:var(--rory-rose); }
+.rorySign1:after{ content:' '; position:absolute; top:20px; left:-10px; 
+	width:10px; height:10px; border-radius:50%; background:var(--rory-rose); }
+
+.rorySign1 .roryQuote{ color:var(--rory-snd); text-align:right; font-size:10px; display:block; margin-bottom:10px; 
+background:#f5f5f5; padding:10px; position:relative; left:-20px; z-index:10; line-height:11px;  border-top-right-radius: 20px;
+border-bottom-right-radius: 20px;     font-family: 'Montserrat', sans-serif;
+
+}

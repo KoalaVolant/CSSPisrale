@@ -1,0 +1,33 @@
+/* Couleurs */ 
+
+:root{ 
+  --white:#fff; 
+  --grey1:#dedede;
+  --grey2:#555; 
+  --grey3:#999; 
+  --main-color:#53B4AB;
+  --snd-color:#2D6FA3;
+  --four-color:#9DD4C1; 
+  
+  --imagefond1:url('https://i.pinimg.com/564x/24/37/66/243766a01d4aaa046ea3a5d7a6db88e8.jpg');
+}
+
+/* Fiche de Projet & Général par KoalaVolant */ 
+
+.genkind{ width:500px; margin:0 auto; padding:20px; background:var(--imagefond1); }
+.genkind *{ box-sizing:border-box; }
+
+.reverse{ float:right; }
+.genkind0{ background-color:var(--white); padding:15px; color:var(--grey2); font-size:12px; line-height:1.6em; 
+  text-align:justify; border:var(--four-color) 1px solid; } 
+
+.genkind0 img{ display:block; max-width:200px; height:120px; object-fit:cover; float:left; margin:5px 10px; border:var(--grey2) 3px solid;}
+
+.gengenkind h1{ font-family: 'Berkshire Swash', cursive; font-size:24px; letter-spacing:3px; text-align:center; line-height:25px; 
+  margin:5px 0px;padding:5px; font-weight:normal; 
+	background: linear-gradient(var(--main-color), var(--snd-color));
+  color:var(--white);
+}
+
+.gengenkind h2{ text-align:center; color:var(--grey3); letter-spacing:4px
+    font-family: 'Abhaya Libre', serif; font-size:16px; line-height:17px; text-transform:uppercase; font-weight:normal;}

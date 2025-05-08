@@ -1,0 +1,17 @@
+.samtroisrp{ width:450px; margin:0 auto; }
+.samtroisrp *{ box-sizing:border-box; }
+
+.entroisam{ display:flex; justify-content:space-between; } 
+.entroisam img{ clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); width:80px; height:80px; object-fit:cover; margin:0 5px; outline:1px solid #fff; outline-offset:-14px; }
+
+.leftsam{ display:flex; justify-content:space-between; position:relative;      left: -10px; top:10px; } 
+
+.rightsam{ width:338px;     position: relative;    top: 10px; min-height: 95px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;}
+.rightsam h1{ padding:5px; font-size:15px; line-height:16px; margin:0px; font-family: 'Grandstander', cursive; width:200px; 
+  color:#444; font-weight:normal; text-align:right;  }
+
+.contentsamtrois{ background-image:url('https://i.pinimg.com/564x/3c/c1/c8/3cc1c8e4744511ae6935082a2f94606f.jpg'); padding:15px; }
+.contentsamtrois span{ display:block; background-color:#fff; padding:20px; text-align:justify; font-size:13px; line-height:1.5em; font-family:Verdana; }

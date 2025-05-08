@@ -1,0 +1,100 @@
+.wratza{
+  width:520px;
+  margin:0 auto;
+}
+
+.wratza strong{
+  display:block;
+  width:150px;
+  background-size:cover;
+  height:200px;
+}
+
+.wratza strong, .wratza p{
+  float:left;
+}
+
+.wratza p{
+  width:200px;
+  height:200px;
+  background-color:#555555;
+  padding:10px;
+  margin-top:-10px;
+}
+
+.wratza p b, .lienr b, .vroum b, .rpwouaish{
+  font-size:38px;
+  color:#fff;
+  font-family: 'Exo', sans-serif;
+  text-shadow:#fff 0px 0px 5px;
+  letter-spacing:2px;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.lienr b{
+  font-size:20px !important;
+}
+
+.wratza p i{
+  font-size:10px;
+  line-height:11px;
+  margin-top:5px;
+  text-align:justify;
+  text-decoration:none;
+  color:#dedede;
+}
+
+.lienr{
+  width:500px;
+  clear:both;
+  background-color:#414141;
+  margin:0 auto;
+  padding:10px;
+
+}
+
+.lienr p{
+  color:#B7B7B7;
+}
+
+.wralin{
+  width:500px;
+}
+
+.vroum{
+  width:375px;
+  background-color:#373737;
+  padding:10px;
+  height:80px;
+  color:#dedede;
+  font-size:11px;
+  line-height:12px;
+  overflow:auto;
+  margin-left:120px;
+  
+}
+
+.vroum b{
+  font-size:14px !important;
+}
+  
+.wralin img{
+  height:100px;
+  display:block;
+}
+
+.vroum p, .wralin img{
+  float:left;
+}
+
+.wralin{
+  position:relative;
+}
+  
+ .smoke{
+    float:none;
+  display:block;
+position:absolute;
+  left:75px;
+  }

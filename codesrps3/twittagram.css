@@ -1,0 +1,76 @@
+ :root{ --font1:'Encode Sans', sans-serif; --font2:'Fjalla One', sans-serif; --fond:#1c1c1c; --fond2:#666464; --fond3:#2c2c2c; --text: #959494; --text2:#848484; --black:#000; --colorp:#9860b1; --degrade:linear-gradient(90deg, #5e3172 0%, #000 100%); --degrade-hover:linear-gradient( #000,#5e3172); --bg-img:url('https://i.imgur.com/x5JsKHa.png'); --box-shadow:rgba(0,0,0,0.75) }
+
+/* Twittagram */
+
+.twittgram, .twittgram *, .blocblocgram, .blocblocgram *{ font-family:verdana; box-sizing:border-box; }
+.twittgram img, .blocblocgram img{ object-fit:cover;}
+.twittgram br, .blocblocgram br{ display:none; }
+.twittgram, .blocblocgram{ width:500px; margin:0 auto; background:var(--fond3); color:var(--text); }
+
+/* Haut */
+
+.twittgram .imagescouvprofil{ position:relative; width:100%; margin-bottom:60px; }
+.twittgram .coverimg{ width:100%; height:170px; }
+.twittgram .profilimg{ border-radius:50%; position:absolute; width:120px; height:120px;
+bottom:-45px; left:10px;    
+background: var(--degrade) border-box;
+  color: #313149;
+  padding: 0px;
+  border: 3px solid transparent;}
+.twittgram .suivilabel{ position:relative; top:-60px; border:1px solid var(--text); font-weight:bold; font-family:var(--font2); float:right; margin:10px; font-size:15px; padding:5px; }
+
+.twittgram .comptelabel{ margin:0 20px; border-bottom:1px solid var(--text); }
+.twittgram .comptelabel span em{ opacity:0.7; display:block; font-size:11px; padding-bottom:5px; }
+.twittgram .infolabel{ margin: 5px 20px; padding-bottom:5px; font-size:11px; border-bottom:1px solid var(--text); }
+.twittgram .abonnelabel{ display:flex; margin: 0px 20px;  }
+.twittgram .abonnelabel span:nth-child(4){ display:inline-block; border-left:1px solid var(--text); border-right:1px solid var(--text); padding:0 10px; margin:0px 10px; }
+
+.twittgram .storygram{ display:flex; padding:10px;  }
+.twittgram .storygram .plusstory{ width:60px; height:70px;   }
+.twittgram .storygram .plusstory strong{ font-size:30px; display:block; background:var(--degrade); border-radius:50%; padding:20px 0; }
+.twittgram .storygram span{ width:60px; height:50px; margin:0 3px; font-size:10px; text-align:center; }
+.twittgram .storygram img{ background: var(--degrade) border-box;
+  color: #313149;
+  padding: 0px;
+  border: 3px solid transparent; border-radius:50%; width:100%; height:58px; object-fit:cover;}
+
+.twittgram .postgramtitle{ display:flex; justify-content:center; margin:20px 0px 10px 0px; }
+.twittgram .postgramtitle span{ cursor:pointer; font-size:15px; font-weight:600; margin:0 10px;padding:10px; border:1px solid var(--text); font-family:var(--font2); }
+.twittgram .postgramtitle span:hover{ background:var(--text); color:var(--fond); }
+.twittgram .postgramimg .blocpost{ display:none; justify-content:space-between; flex-wrap:wrap; padding:0 10px; }
+.twittgram .postgramimg .blocpost.woosh{ display:flex; }
+.twittgram .postgramimg .blocpost span{ width:32%; margin-bottom:10px; display:block; position:relative; }
+.twittgram .postgramimg .blocpost span img{ width:100%; }
+.twittgram .postgramimg .blocpost span br{ display:block;}
+.twittgram .postgramimg .blocpost span:hover strong{ display:flex; transition:500ms; }
+.twittgram .postgramimg .blocpost span strong{ transition:500ms; display:none; align-items:center; justify-content:center; font-weight:normal; position:absolute;
+top:0%; left:0%; text-align:center;  padding:0 10px; width:100%; height:100%; background:var(--fond); opacity:0.8; font-size:14px; }
+
+
+/* RESTE DES MESSAGES */
+.blocblocgram{ padding:20px; }
+.blocblocgram .blocflexgram{ display:flex; }
+.blocblocgram .blocflexgram img{ width:90px; height:90px; border-radius:50%;
+margin-right:15px; background: var(--degrade) border-box;
+  color: #313149;
+  padding: 0px;
+  border: 3px solid transparent;}
+.blocblocgram img{ max-width:100%; }
+.blocblocgram .blocpostgram { margin:20px 0; }
+.blocblocgram .blocflexgram span br{ display:block; }
+.blocblocgram .blocflexgram span em, .blocgram1 .blocflexgram span strong{ font-style:normal; font-weight:normal; }
+.blocblocgram .blocflexgram span strong{ font-size:11px; font-style:italic; opacity:0.7; }
+.blocblocgram .blocpostgram br{ display:block; }
+.blocblocgram .likesgram{ font-weight:bold; font-size:14px; }
+.blocblocgram .descrgram, .blocblocgram .messgram{ text-align:justify; }
+.blocblocgram .descrgram br, .blocblocgram .messgram br{ display:block; }
+
+.blocgram1 .blocflexgram, .blocgram3 .blocflexgram{ align-items:center; }
+.blocgram1 .blocflexgram span, .blocgram3 .blocflexgram span{ border-bottom:1px solid var(--text);
+   display:block; width:100%; padding-bottom:10px;}
+.blocgram1 .blocpostgram .descgram{ margin-top:10px; display:block; }
+.blocgram3 .flexgram2{ display:flex; justify-content:space-between; }
+.blocgram3 .flexgram2 .descgram{ width:75%; margin-bottom:20px; text-align:left;  }
+.blocgram3 .flexgram2 .likesgram{ width:20%; font-weight:bold; font-size:14px; }
+.blocgram2 .messgram{ width:75%; }
+.blocgram2 .likesgram{ align-self:flex-end; text-align:right; width:20%; }

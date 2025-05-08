@@ -1,0 +1,59 @@
+:root{
+  --fichpart17-fondblc:#fff;
+  
+  --fichpart17-color1:#dcc6c8;
+  --fichpart17-color2:#efdabb;
+  --fichpart17-color3:#400303;
+  
+  --fichpart17-colortxt:#222;
+  
+  --fichpart17-txt:"Besley", serif;
+  --fichpart17-title:"Germania One", system-ui;
+  }
+
+.fichgen17, .fichgen17 *{ box-sizing:border-box; }
+.fichgen17 img{ object-fit:cover; }
+.fichgen17 br{ display:none; }
+.fichgen17{ /* LARGEUR DE LA FICHE CHANGEABLE */ width:520px; 
+	margin:0 auto; font-family:var(--fichpart17-txt); 
+background:var(--fichpart17-fondblc); padding:20px;
+color:var(--fichpart17-colortxt); font-size:13px; line-height:1.5em;}
+
+.fichgen17 .fichgen17-title{ text-align:center; font-family:var(--fichpart17-title); 
+font-size:35px; line-height:35px;
+	text-transform:uppercase; color:var(--fichpart17-color3); }
+.fichgen17 .fichgen17-resume{ background:var(--fichpart17-color2); 
+padding:15px; border-radius:10px; margin:10px 0;}
+
+.fichgen17-cols{ display:flex; justify-content:space-between; }
+.fichgen17-cols [class*="fichgen17-col"]{ width:32%; }
+.fichgen17 [class*="fichgen17-col"] img{ height:120px; border-radius:10px; 
+width:80%; display: block; margin:0 auto; }
+.fichgen17-cols [class*="fichgen17-col"] img{ width:100%; }
+[class*="fichgen17-col"]{ margin:15px 0;} 
+
+.fichgen17-col-color1 div{ padding:10px; text-align:justify; 
+	font-size:12px; background:var(--fichpart17-color1); border-radius:10px; 
+margin-top:5px; line-height:15px;  }
+.fichgen17-col-color2 div{ padding:10px; text-align:justify; 
+	font-size:12px; background:var(--fichpart17-color2); border-radius:10px; 
+margin-top:5px; line-height:15px;  }
+.fichgen17-col-color1 span{ font-family:var(--fichpart17-title); 
+text-align:center; margin-top:5px; display:block; font-size:18px; 
+line-height:19px; color:var(--fichpart17-color3); }
+
+.fichgen17-cols [class*="fichgen17-col"] div{ height:250px; overflow:auto;}
+
+.fichgen17-txtimg div br, [class*="fichgen17-col"] div br{ content:none; display:inline-block; }
+.fichgen17-txtimg{ display:flex; justify-content:space-between; 
+margin:20px 0; }
+.fichgen17-txtimg div{ width:68%; text-align:justify;}
+.fichgen17-txtimg img{ width:29%; }
+
+.fichgen17-lien{ display:block; padding:5px; margin:5px 0; border:1px solid var(--fichpart17-color2); 
+border-radius:10px; color:var(--fichpart17-color3) !important; 
+font-family:var(--fichpart17-title); font-size:15px; line-height:18px;}
+.fichgen17-lien:hover{ background:var(--fichpart17-color2); }
+
+.fichgen17 .fichgen17-p br{ content:none; display:inline-block; }
+.fichgen17 .fichgen17-p{ text-align:justify; }

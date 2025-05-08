@@ -1,0 +1,75 @@
+.cookieleo{
+  background-image:url('http://img11.hostingpics.net/pics/840035linux.png');
+  background-size:50%;
+  width:500px;
+  padding:15px;
+  margin:0 auto;
+}
+
+.merde{
+  width:450px;
+  background-color:#A6A6A6;
+  padding:10px;
+  height:170px;
+  margin:0 auto;
+}
+
+.cookieleo cl, .cookieleo cls{
+  float:left;
+  font-family:courier new;
+  font-size:12px;
+  text-align:center;
+  text-transform:lowercase;
+  color:#fff;
+  width:220px;
+}
+
+cl div, cls div{
+  background-size:cover;
+  width:220px;
+  height:150px;
+}
+
+.cookieleo cl{
+  margin-right:10px;
+  background-color:#338041;
+}
+
+.cookieleo cls{
+  background-color:#5E5E94;
+}
+
+.cookieleo h1{
+  background-color:#353535;
+  color:#c5c5c5;
+  padding:10px;
+  width:430px;
+  margin:0 auto;
+  font-family: 'Exo', sans-serif;
+  font-size:20px;
+  line-height:22px;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.cookieleo p{
+  background-color:#E0E0E0;
+  width:420px;
+  padding:15px;
+  text-align:justify;
+  font-size:12px;
+  margin:0 auto; 
+  line-height:15px;
+  color:#353535;
+}
+
+.cookrp{
+  background-color:#E0E0E0;
+  width:420px;
+  padding:15px;
+  text-align:justify;
+  font-size:12px;
+  margin:0 auto; 
+  line-height:15px;
+  color:#353535;
+}

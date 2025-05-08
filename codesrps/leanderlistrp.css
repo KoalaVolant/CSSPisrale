@@ -1,0 +1,41 @@
+/* Fiche liste rp de Leander */ 
+
+.leandlistrp{ width:450px; margin:0 auto; }
+.leandlistrp *{ box-sizing:border-box; }
+.entllist{ background-color:#fff; font-family: 'Quicksand', sans-serif; font-size:14px; color:#555; padding:15px; text-align:center; border-bottom:5px solid #D6662A;}
+.debutleand{ display:flex; justify-content:center; align-items:center; } 
+.debutleand span{ width:110px; height:20px; background-color:#D6662A; display:block; margin-right:5px; clip-path: polygon(100% 0%, 100% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);} 
+.debutleand img{ width:110px; height:20px; object-fit:cover; } 
+.debutleand h1{ font-family: 'Big Shoulders Stencil Text', cursive; font-size:20px; margin:0; margin-left:5px; width:250px; background-color:#fff; padding:3px; }
+.contleand{ padding:10px; background-color:#fff; margin:5px 0px; font-family: 'Quicksand', sans-serif; font-size:14px; } 
+.contleand a{ color:#e84a1d; font-weight:bold; }
+
+/* Fiche lien de Leander */
+
+.leanderliens{ width:450px; margin:0 auto; display:flex; justify-content:space-between; }
+.leanderliens *, .leandercherche *, .leanderlinks *{ box-sizing:border-box; } 
+.leanderliens img{ width:90px; height:170px; object-fit:cover; }
+.leanderliens span{ background-color:#CBA696; display:block; width:260px; height:170px; color:#fff; clip-path: polygon(0% 0%, 90% 0, 100% 50%, 90% 100%, 0% 100%); }
+.leanderliens h1{ color:#fff; font-size:29px; text-align:center; font-family: 'Big Shoulders Stencil Text', cursive; letter-spacing:-1px; margin:5px 0px; 
+  margin-top:20px; text-transform:uppercase; }
+.leanderliens h2{ margin:0px; margin-top:-15px; text-align:center; padding:12px; font-family: 'Big Shoulders Stencil Text', cursive; font-size:15px; color:#000; }
+.leanderliens div{ width:90%; margin:0 auto; padding:5px; position:relative; top:-12px; height:87px; overflow:auto; color:#222; font-size:12px; 
+  line-height:14px; font-family: 'Quicksand', sans-serif; }
+
+.leandercherche h2{ width:450px; margin:0 auto; background-color:#fff;
+  padding:10px; font-size:14px; font-family: 'Quicksand', sans-serif;  text-align:center; border:2px solid #E94A1D; border-left:none; border-right:none; color:#888; font-weight:normal;}
+.leandercherche h2 a{ color:#222; font-weight:bold; }
+
+.leandc{ position:relative; width:450px; margin:0 auto; padding:10px; background-color:#EA9977; clip-path: polygon(50% 0%, 100% 11%, 100% 100%, 0 100%, 0 12%); } 
+.leandc span{ display:block; padding:20px; color:#222; font-family: 'Quicksand', sans-serif; font-size:14px; } 
+.leandc span strong{ color:#fff; }
+.leandc h3{ font-family: 'Big Shoulders Stencil Text', cursive; font-size:18px; background:#fff !important; text-align:center; margin-top:40px; 
+padding:5px; color:#222; } 
+
+.leanderlinks{ width:450px; margin:0 auto; display:flex; justify-content:space-between; } 
+.leanderlinks div{ width:120px; height:100px; position:relative; order:2; }
+.leanderlinks h1{ position:absolute; bottom:0px; width:120px; padding:5px; letter-spacing:3px; text-align:center;
+  text-transform:uppercase; font-family: 'Quicksand', sans-serif; background-color:#fff; color:#D6662A; font-size:8px; }
+.leanderlinks img{width:120px; height:100px; object-fit:cover; }
+.leanderlinks span{ display:block; font-family: 'Quicksand', sans-serif;  clip-path: polygon(7% 0, 100% 0%, 100% 100%, 7% 100%, 0% 50%); width:320px; height:100px; 
+  padding:10px;  background-color:#fff; overflow:auto; font-size:13px; color:#222; padding-left:25px; order:1; }

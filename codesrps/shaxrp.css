@@ -1,0 +1,71 @@
+
+
+/* **** */
+
+.shaxrp{ 
+  width:500px;
+  background-image:url('https://i.servimg.com/u/f30/19/45/51/53/738c9710.jpg');
+  border: #69712B10px solid;
+ padding:15px;
+  margin:0 auto;
+}
+
+.shaxrp *{
+  box-sizing:border-box;
+}
+
+.shaxrp iframe{
+  margin:0 auto;
+}
+
+.shaxrp img{
+  width:200px; height:200px; border-radius:50%; padding:3px; margin-top:-35px; display:block; border:#E2E7C0 10px dotted; margin-left:30%; filter: blur(2px);
+-webkit-filter: blur(2px);
+-moz-filter: blur(2px);
+  transition:300ms;
+}
+
+.shaxrp:hover img{
+  filter: blur(0px);
+-webkit-filter: blur(0px);
+-moz-filter: blur(0px);
+}
+
+.shaxrp h1{
+  font-family: 'Leckerli One', cursive;
+  font-size:22px;
+  line-height:25px;
+    text-align:center;
+  background-color:#000;
+  color:#fff;
+  font-weight:normal;
+  -moz-transform: rotate(3deg);
+-webkit-transform: rotate(3deg);
+-o-transform: rotate(3deg);
+-ms-transform: rotate(3deg);
+transform: rotate(3deg);
+}
+
+.shaxrp h2{
+  font-size:10px;
+  letter-spacing:3px; 
+  text-align:center;
+  font-family:Times New Roman;
+  margin-top:-15px;
+  background-color:#fff;
+  color:#000;
+  -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+}
+
+.shaxrp div{
+  padding:14px;
+  background-color:#fff;
+  color:#3C4118;
+  font-family:Verdana;
+  width:450px;
+  margin:0 auto;
+}

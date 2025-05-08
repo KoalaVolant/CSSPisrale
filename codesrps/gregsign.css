@@ -1,0 +1,53 @@
+.greg{
+    width:500px;
+  margin:0 auto;
+    background-image:url('https://images7.alphacoders.com/373/373263.jpg');
+  background-size:100%;
+}
+
+.greg img{
+  width:160px;
+  height:130px;
+  float:left;
+  margin-top:-35px;
+  -webkit-filter: grayscale(1);
+filter: grayscale(1);
+}
+
+.greg img:hover{
+    -webkit-filter: grayscale(0);
+filter: grayscale(0);
+}
+
+.greg img, .greg img:hover{
+  -webkit-transition: all 800ms;
+-moz-transition: all 800ms;
+-ms-transition: all 800ms;
+-o-transition: all 800ms;
+transition: all 800ms;
+}
+  
+
+.greg h1{
+  font-family: 'Playfair Display SC', serif;
+  font-size:25px;
+  padding:5px;
+  color:#fff;
+  text-align:center;
+}
+
+.greg h2{
+  color:#fff;
+  font-size:12px;
+  line-height:13px;
+  margin-top:5px;
+  font-family:Times New Roman; 
+  clear:both;
+  padding:10px;
+  font-weight:normal;
+}
+
+.marg{
+  margin-left:10px;
+  margin-right:10px;
+}

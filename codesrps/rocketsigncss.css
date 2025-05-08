@@ -1,0 +1,45 @@
+.rocketsign{
+width:293px;
+margin:0 auto;
+}
+
+.rocketsign img{
+width:293px;
+background-color:#A3161A;
+padding:5px 5px 0px 5px;
+display:block;
+}
+
+.rocktxt{
+background: #a3161a; /* Old browsers */
+background: -moz-linear-gradient(top, #a3161a 0%, #d67c00 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a3161a), color-stop(100%,#d67c00)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #a3161a 0%,#d67c00 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #a3161a 0%,#d67c00 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #a3161a 0%,#d67c00 100%); /* IE10+ */
+background: linear-gradient(to bottom, #a3161a 0%,#d67c00 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3161a', endColorstr='#d67c00',GradientType=0 ); /* IE6-9 */
+margin-top:-28px;
+padding: 5px 10px 10px 10px;
+width:283px;
+-webkit-border-bottom-right-radius: 40px;
+-webkit-border-bottom-left-radius: 40px;
+-moz-border-radius-bottomright: 40px;
+-moz-border-radius-bottomleft: 40px;
+border-bottom-right-radius: 40px;
+border-bottom-left-radius: 40px;
+}
+
+.rocketsign h2{
+font-size:23px;
+text-align:center;
+font-family: 'Lato', sans-serif;
+color:#fff;
+}
+
+.rocketsign p{
+font-size:9px;
+margin-top:-32px;
+line-height:11px;
+padding-left:15px;
+}

@@ -1,0 +1,106 @@
+.entaleclien{
+  width:450px;
+  margin:0 auto;
+}
+
+.entaleclien span{
+  width:450px;
+  height:200px;
+  position:relative;
+}
+
+.entaleclien img{
+  width:450px;
+  height:200px;
+  object-fit:cover;
+  display:block;
+  position:relative;
+  z-index:4;
+}
+
+.entaleclien h1{
+    position:absolute;
+    color:#303346;
+    font-family: 'Sacramento', cursive;
+    top:47px;
+    left:20px;
+    font-size:36px;
+    line-height:38px;
+  font-weight:normal;
+  z-index:17;
+  width:200px;
+  }
+  
+  .entaleclien h2{
+        position:absolute;
+    color:#4B5070;
+    font-family: 'Sacramento', cursive;
+    top:80px;
+    left:40px;
+    font-size:24px;
+  width:200px;
+    font-weight:normal;
+    line-height:26px;
+  z-index:16;
+  }
+  
+  .entaleclien div{
+    width:100%;
+    background-color:#fff;
+    padding:15px;
+    color:#555;
+    text-aligh:center;
+    font-size:12px;
+    line-height:14px;
+  box-sizing:border-box;
+    font-family:Verdana;
+  margin-top:-20px;
+  }
+
+.aleclien{
+  width:450px;
+  margin:0 auto;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-around;
+}
+
+.aleclien div{
+  width:210px;
+  background-color:#2D2A25;
+  margin-top:10px;
+  padding-bottom:5px;
+}
+
+.aleclien img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+}
+
+.aleclien h1{
+  font-family: 'Arvo', serif;
+  font-size:15px;
+  text-align:center;
+  margin:5px;
+  color:#fff;
+}
+
+.aleclien div span{
+  background-color:#fff;
+  width:200px;
+  height:200px;
+  overflow:auto;
+  color:#2D2A25;
+  font-size:11px;
+  line-height:14px;
+  padding:15px;
+  display:block;
+  margin:0 auto;
+  box-sizing:border-box;
+  transition:300ms;
+}
+
+.aleclien div:hover span{
+  height:250px;
+}

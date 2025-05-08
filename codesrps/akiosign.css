@@ -1,0 +1,33 @@
+.akiosign{
+  width:379px;
+  margin:0 auto;
+}
+
+/* .akiosign img, .akiosign h1{
+  float:left;
+} */
+
+.akiosign img{
+  width:100px;
+  height:100px;
+  padding:3px;
+  border:#DC676A double 3px;
+  -webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+  background-color:#fff;
+  margin-top:-75px;
+  margin-left:150px;
+}
+
+.akiosign img+img{
+  margin-left:5px;
+}
+
+.akiosign h1{
+  color:#333333;
+  font-size:30px;
+  border-bottom:5px #DC676A double;
+  font-family: 'Cookie', cursive;
+  padding:3px;
+}

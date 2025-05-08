@@ -1,0 +1,56 @@
+.lucas{
+  width:500px;
+  margin:0 auto;
+  padding:25px;
+  -webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+  background-color:#fff;
+  border:#FEB301 3px dashed;
+}
+
+.lucas img{
+  border:#FFCC00 4px solid;
+  margin-top:-75px;
+  display:block;
+  width:400px;
+}
+
+.lucas h1{
+  color:#FF8000;
+  text-align:center;
+  margin-top:-5px;
+  text-transform:uppercase;
+  font-size:23px;
+  line-height:25px;
+  font-family: 'Arvo', serif;
+}
+
+.lucas:hover h1{
+  letter-spacing:2px;
+}
+
+.lucas h1, .lucas:hover h1{
+  -webkit-transition: all 400ms ease;
+-moz-transition: all 400ms ease;
+-ms-transition: all 400ms ease;
+-o-transition: all 400ms ease;
+transition: all 400ms ease;
+}
+  
+
+.lucas h2{
+  font-family: 'Arvo', serif;
+   color:#FFCC00;
+  margin-top:-25px;
+  text-align:center;
+  font-size:13px;
+  line-height:15px;
+}
+
+.lucas .contenu{
+  color:#371C00;
+  font-size:12px;
+  line-height:14px;
+  text-align:justify;
+}

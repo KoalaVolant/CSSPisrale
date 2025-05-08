@@ -1,0 +1,55 @@
+.tzadkiel{
+  background-color:#353535;
+  width:500px;
+  margin:0 auto;
+  padding:25px;
+  transition:500ms;
+}
+
+.tzadkiel img{
+  width:500px;
+  transition:500ms;
+}
+
+.tzadkiel:hover img{
+  -webkit-border-top-left-radius: 90px;
+-webkit-border-bottom-right-radius: 90px;
+-moz-border-radius-topleft: 90px;
+-moz-border-radius-bottomright: 90px;
+border-top-left-radius: 90px;
+  transition:500ms;
+border-bottom-right-radius: 90px;
+}
+
+.tzadkiel h1{
+  font-size:22px;
+  padding:15px;
+  display:block;
+  margin-top:-45px;
+  text-shadow: -2px -2px 7px rgba(255, 255, 255, 1);
+  font-family: 'Raleway', sans-serif;
+  width:450px;
+  color:#fff;
+  text-shadow:#fff 0px 0px 5px;
+}
+
+.tzadkiel p{
+  background-color:#ADADAD;
+  font-size:13px;
+  line-height:15px;
+  width:460px;
+  padding:20px;
+  margin-top:-35px;
+  color:#242424;
+-webkit-box-shadow: inset 0px 0px 53px 2px rgba(255,255,255,1);
+-moz-box-shadow: inset 0px 0px 53px 2px rgba(255,255,255,1);
+box-shadow: inset 0px 0px 53px 2px rgba(255,255,255,1);
+  transition:500ms;
+}
+
+.tzadkiel p:hover{
+-webkit-box-shadow: inset 0px 0px 300px 37px rgba(255,255,255,1);
+-moz-box-shadow: inset 0px 0px 300px 37px rgba(255,255,255,1);
+box-shadow: inset 0px 0px 300px 37px rgba(255,255,255,1);
+  transition:500ms;
+}

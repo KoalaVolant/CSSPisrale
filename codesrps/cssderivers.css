@@ -1,0 +1,1097 @@
+.menu-tooltool .actif{ display:none; }
+
+/* Toolbar par KoalaVolant et Maquette par Kaerin */ 
+
+#fa_toolbar{ background-color:#1B1C1D; }
+
+/* Enlever ce qui n'est pas nécessaire avec la toolbar */ 
+#fa_left, #fa_share { display:none !important; }
+
+/* Enlever la nav non nécessaire dans la nav en dessous du logo */ 
+.barrenav a{ display:none; }
+.barrenav a:nth-of-type(5), .barrenav a:nth-of-type(6), .barrenav a:nth-of-type(7), .barrenav a:nth-of-type(8){ display:inline-block; }
+
+
+/* Faire les positions absolute des éléments nécessaires */ 
+.rightHeaderLink:first-child{ position:fixed; top:0; left:0; }
+.rightHeaderLink:last-child{ position:fixed; top:0; left:0; }
+#fa_welcome{position:fixed; top:0; left:0; }
+#fa_search{position:fixed; top:0; left:0; }
+#fa_notifications{ position:fixed; top:0; left:0; }
+.divava{ position:fixed; top:0; left:0; }
+.menu-tooltool{ position:fixed; top:0; right:0; }
+
+
+
+/* Structure générale */ 
+  
+  .fichpubspn{
+  width:500px; 
+  margin:0 auto;
+  background-color:#070C1D;
+  padding:15px;
+  -webkit-border-radius: 40px;
+-moz-border-radius: 40px;
+border-radius: 40px;
+  border-top:#1D2434 5px double;
+  }
+  
+  .fichpubspn a:link, .fichpubspn a:visited, .fichpubspn a{
+  color:#B8C2DA;
+  text-decoration:none;
+  }
+  
+  .fichpubspn a:hover{
+  color:#dedede;
+  }
+  
+  .bannpub{
+  width:400px;
+  margin:0 auto;
+  -webkit-border-bottom-right-radius: 30px;
+-webkit-border-bottom-left-radius: 30px;
+-moz-border-radius-bottomright: 30px;
+-moz-border-radius-bottomleft: 30px;
+border-bottom-right-radius: 30px;
+border-bottom-left-radius: 30px;
+  }
+  
+  /* Titre SPN */ 
+  
+  .fichpubspn h1{
+  color:#8D9CC0;
+  font-size:25px;
+  text-align:center;
+  font-family: 'Bree Serif', serif;
+  }
+  
+  /* Blocs séparés */ 
+  
+  .blocpub{
+  width:500px;
+  margin:0 auto; 
+ }
+  
+  .blocpub2{
+  width:400px;
+  margin:0 auto;
+  }
+  
+  .blocpb, .blocpb3{
+  background-color:#1D2434;
+  width:220px;
+  float:left;
+  }
+  
+  .blocpb2{
+    background-color:#1D2434;
+  width:490px;
+  }
+  
+  .staff{
+    margin-top:445px;
+  margin-bottom:10px;
+  }
+  
+  .contextespn, .newspn, .infopub{
+    padding:10px; 
+  color:#9AA8C7;
+  text-align:justify;
+  font-size:12px;
+  line-height:13px;
+  font-family:verdana;
+  }
+  
+  .contextespn p, .newspn p{
+    overflow:auto;
+  height:200px;
+  padding:5px;
+  }
+  
+  .contextespn{
+  margin-right:8px;
+  }
+  
+  
+  .blocpb h2, .blocpb2 h2, .blocpb3 h2{
+  color:#fff;
+  font-size:17px;
+  text-align:center;
+    font-family: 'Bree Serif', serif;
+  background-color:#151B26;
+  padding:3px;
+  }
+  
+  /* Infobulles */ 
+  
+  .staff2{
+  width:320px;
+  margin:0 auto;
+  } 
+  
+  .staffrvl{
+  width:100px; 
+  float:left;
+ }
+  
+  .staffrvl:hover span, .staffrvl img{
+    -webkit-border-radius: 50px;
+-moz-border-radius: 50px;
+border-radius: 50px;
+  }
+  
+  .staffrvl span{
+  display:none;
+  position:relative;
+  }
+  
+  .staffrvl img{
+  width:100px;
+    position:relative;
+  z-index:1;
+  }
+  
+  .staffrvl:hover span{
+  display:block;
+  width:90px;
+  height:70px;
+  font-family:verdana;
+  padding:25px 5px 5px 5px;
+  color:#B8C2DA;
+  background-color:#3A4869;
+  text-align:center;
+  margin-top:-100px;
+  z-index:8;
+  }
+  
+  
+  .staffrvl b{
+  font-size:11px;
+  }
+  
+  .staffrvl em{
+  font-size:10px;
+  }
+  
+  /* Infos */ 
+  
+  .infopub{
+  margin-top:150px;
+  }
+  
+  .boutonpub{
+margin-top:20px;
+  margin-bottom:20px;
+  padding:10px;
+  }
+  
+  .boutonpub img{
+  margin-right:10px;
+  }
+
+
+/***** PA ************/
+.mbdm{
+  width:470px;
+  margin:0 auto;
+}
+
+.blom{
+  background-color:#F2F2F2;
+  padding:5px;
+  margin-left:5px;
+  margin-top:-10px;
+  width:140px;
+  height:110px;
+  float:left;
+-webkit-box-shadow: 0px 3px 5px -1px rgba(191,191,191,1);
+-moz-box-shadow: 0px 3px 5px -1px rgba(191,191,191,1);
+box-shadow: 0px 3px 5px -1px rgba(191,191,191,1);
+}
+
+.blom img{
+  width:140px;
+  height:75px;
+}
+
+.blom span{
+  display:block;
+  width:50px;
+  margin-left:7px;
+}
+
+.blom h1{
+    font-family:Calibri;
+  font-size:12px;
+  color:#845A94;
+  margin-top:-1px;
+  text-transform:uppercase;
+  text-align:center;
+}
+
+.blom h2{
+  font-size:10px;
+  margin-top:-10px;
+  color:#808080;
+  text-align:center;
+}
+
+.mdmois_titre{
+  /* Chelsey, c'est à toua maintenant */ 
+  
+    font-family:'Aguafina Script';
+font-size: 20;
+}
+
+    
+    /* Bandeau titre */
+
+    .bandeau_titre{
+      background-color:#E1E1E1;
+      padding:15px;
+      margin:0 auto;
+      text-align:center;
+    }
+    
+      .bandeau_titre a:link, .blocpa a:link{
+      text-decoration:none;
+      color:#5B5B5B;
+      }
+    
+    .bandeau_titre a:hover, .blocpa a:hover{
+      color:#275B8F;
+      }
+    
+    .bienvenue{
+      color:#003047;
+      font-size:35px;
+    }
+
+    .bienvenue, .liensutiles, .titrepa{
+      font-family: 'Roboto Condensed', sans-serif;
+      text-transform:uppercase;
+    }
+
+    .liensutiles{
+      font-size:12px;
+    }
+
+/* Top site */
+
+.topa{
+  font-size:20px;
+}
+
+    /* Fin Bandeau titre  */
+
+    /* Forme */
+
+    .titrepa{
+      font-size:17px;
+      font-weight:bolder;
+      margin-bottom:5px;
+      color:#fff;
+      text-shadow:#000 0px 0px 5px;
+      text-align:right !important;
+    }
+
+    .pag{
+      width:250px;
+    }
+
+    .pam{
+      width:290px;
+    }
+
+    .pad{
+      width:212px;
+    }
+
+    .pam, .pag, .pad{
+      float:left;
+      padding:15px;
+      height:406px;
+      font-family:verdana;
+    }
+
+
+    /* Conteneur de la Page d'accueil */
+    .wrapper_pa{
+      width:850px;
+      height:426px;
+      background-size:cover;
+    }
+
+.wrapper_pa a, .wrapper_pa a:link, .wrapper_pa a:visited, .wrapper_pa a:hover{
+  text-decoration:none !important;
+}
+
+    .blocpa{
+        background-color:#D2D9DB;
+      padding:15px;
+    }
+
+    .predefs img{
+      width:60px;
+    }
+
+    .staff{
+      margin-bottom:40px;
+      width:300px;
+    }
+    
+      .infospa{
+      font-size:11px;
+      line-height:13px;
+      }
+    /* fin forme */
+
+    /* Contexte */
+
+    .contexte{
+      overflow:auto;
+      height:180px;
+      margin-bottom:25px;
+      text-align:justify;
+    }
+
+    .contexte, .news{
+      border-left: solid 7px #005A7F;
+        font-size:11px;
+      transition:200ms;
+    }
+    
+    .contexte:hover, .news:hover{
+      border-left: solid 7px #4F4F4F;
+      transition:200ms;
+    }
+
+    .topa, .infospa, .partenpa{
+      border-right: solid 7px #005A7F;
+        transition:200ms;
+    }
+
+    .topa:hover, .infospa:hover, .partenpa:hover{
+        border-right: solid 7px #4F4F4F;
+        transition:200ms;
+    }
+
+.news{
+  height:90px;
+  overflow:auto;
+}
+
+    /* Fin contexte */
+
+    /* Staff */
+
+    /*** IMAGES DU STAFF ***/  
+
+    /* Change la hauteur selon le nombre de staff que tu as, le code ne marche pas sans */
+.survl{ 
+  float:left; 
+  width:80px; 
+  height:80px;  
+}
+
+  .survl img{ 
+  width:76px; 
+  height:76px; 
+}  
+
+.survl span{ 
+  display:none; 
+  width:56px; 
+  height:56px; 
+  position:relative;
+z-index:999;}  
+
+.survl:hover img{ 
+  display:none; 
+}  
+
+.survl:hover span{ 
+  display:block;
+  background-color:#5A6361; 
+  color:#fff;
+  width:60px !important;
+  padding:10px; 
+    font-size:11px;
+} 
+
+.survl2{ 
+  float:left; 
+  width:65px; 
+  height:65px;  
+}
+
+  .survl2 img{ 
+  width:61px; 
+  height:61px; 
+}  
+
+.survl2 span{ 
+  display:none; 
+  width:41px; 
+  height:41px; 
+  position:relative;
+z-index:999;}  
+
+.pam a, .pam a:link, .pam a:hover, .pam a:visited{
+  text-decoration:none;
+}
+
+.survl2:hover img{ 
+  display:none; 
+}  
+
+.survl2:hover span{ 
+  display:block;
+  background-color:#5A6361; 
+  color:#fff;
+  width:45px !important;
+  padding:10px; 
+    font-size:9px;
+} 
+
+.centretoi{
+margin-left:40px;
+}
+    /* Fin Staff */
+
+    /* Persos Predefs */
+
+    /* Fin Persos Prédefs */
+
+
+      /**** Fin PA *****/
+
+
+
+
+/* Profil */
+
+/* Empêche que les liens aient un souligné */
+.profilee a:link, .profilee a:hover, .profilee a:visited{
+ text-decoration:none;
+}
+
+/* Structure générale du profil */ 
+.profilee{
+  background-color:#D0D39D;
+  padding:15px;
+  font-family:Verdana; /* Police générale donc des champs de profil */
+}
+
+/* Cadre contenant rank pseudo avatar */ 
+.profilee .cadre1{
+  background-color:#E4E7B8;
+  border:#A31B40 1px solid;
+  padding:10px;
+  width:200px;
+  margin:0 auto;
+}
+
+/* Rang */
+.profilee .rank{
+  text-align:center;
+  color:#E82558;
+  font-size:11px;
+  text-transform:uppercase;
+  font-family:Courier New;
+}
+
+/* Pseudo */
+.profilee .pseudo{
+  font-size:20px;
+  text-align:center;
+  font-family:Comic Sans Ms;
+  margin-top:5px;
+  margin-bottom:-5px;
+}
+  
+
+/* Avatar */
+.profilee .avatar img{
+  width:200px;
+  margin:0 auto;
+  border:#000 solid 1px;
+-webkit-filter: grayscale(0.4);
+filter: grayscale(0.4);
+  margin-top:-5px;
+}
+
+.profilee .avatar img:hover{
+-webkit-filter: grayscale(0.1);
+filter: grayscale(0.1);
+}
+
+.profilee .avatar img, .profilee .avatar img:hover{
+  -webkit-transition: all 400ms;
+-moz-transition: all 400ms;
+-ms-transition: all 400ms;
+-o-transition: all 400ms;
+transition: all 400ms;
+}
+
+/* Les petites images et liens de contact */
+.infosprofil{
+  width:200px;
+  margin-left:-10px;
+  margin-bottom:7px;
+}
+
+.infosprofil img{
+  margin-left:8px;
+  width:33px;
+  margin-top:-20px;
+}
+
+/* Cadre des champs du profil */
+
+.profilee .cadre2{
+  background-color:#E4E7B8;
+    border:#A31B40 1px solid;
+  padding:10px;
+  margin:0 auto;
+  width:200px;
+}
+
+/* Gifs */
+
+.profilee .content img{
+  width:200px;
+}
+
+/* Champs profils */
+
+.profilee .content{
+    color:#111111;
+}
+
+/* Barre horizontale de séparation */
+
+.profilee hr{
+  color:#A31B40;
+}
+
+.colorchamp{
+  color:#fff !important;
+  text-transform:uppercase;
+}
+
+/* Profil */ 
+
+.postdetails.poster-profile a img
+{
+border: 3px solid #fff; /*La bordure*/
+  width:190px;
+-webkit-border-radius: 15px;
+-moz-border-radius: 15px;
+border-radius: 15px;
+}
+
+.vavatar{
+  width:200px;
+  text-align:center;
+  -webkit-border-radius: 15px;
+-moz-border-radius: 15px;
+border-radius: 15px;
+  margin:0 auto;
+}
+
+.name{
+  width:200px;
+  margin:0 auto;
+}
+
+.contenusa{
+  margin-top:10px;
+}
+
+.ranksa{
+  padding:5px;
+  font-size:12px;
+  line-height:14px;
+    background-color:#fff;
+-webkit-border-bottom-right-radius: 15px;
+-webkit-border-bottom-left-radius: 15px;
+-moz-border-radius-bottomright: 15px;
+-moz-border-radius-bottomleft: 15px;
+border-bottom-right-radius: 15px;
+border-bottom-left-radius: 15px;
+  width:170px;
+  margin:0 auto;
+  text-align:center;
+}
+
+.pseudosa {
+  font-size:15px;
+  text-align:center;
+  margin-top:5px;
+  text-shadow:#000 0px 0px 5px; 
+  display:block;
+}
+
+.unpeutout{
+  background-color:#64757D;
+  width:200px;
+  padding:10px;
+}
+
+/****************** Profil fin **************/ 
+
+
+
+.forumline {
+  border-left:none;
+  border-right:none;
+  border-top:#4F4F4F 8px solid;
+  border-bottom:#4F4F4F 8px solid;
+}
+
+td.rowpic {
+  background-color:#478954 !important;
+}
+/*************************************** Mise en forme Catégorie ******************/
+
+.bodyline{
+    padding-left:0px;
+  padding-right:0px;
+  padding-top:0px;
+  border-left:#4F4F4F 8px solid;
+    border-right:#4F4F4F 8px solid;
+}
+
+body{
+  margin-top:0px;
+  margin-bottom:0px;
+  padding-top:0px;
+  padding-bottom:0px;
+}
+
+.cate_bloc {
+  background: #fefdb1;
+  padding: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-align: center;
+  font-size:10px;
+}
+.cate_title{
+}
+
+.cate_title h2 {
+  display: block;
+  padding-top: 30px;
+  height: 37px;
+  margin: 0px 0px 0px 15px;
+font-family: 'Roboto Condensed', sans-serif;
+text-transform:uppercase;
+  font-size: 35px;
+  color: #333333;
+}
+
+
+/*Bloc des catégories*/
+.cate_bloc {
+  background-color: #9C9C9C;
+  width: 800px;
+  margin: auto;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  padding-top: 50px;
+  padding-bottom: 1px;
+  font-family: "abeatbykai", sans-serif;
+  font-size: 12px;
+  color: gray;
+}
+
+
+/*Bloc des forums*/
+.cate_forum {
+  height: 125px;
+  width: 720px;
+  margin-bottom:55px;
+  background-color:#fff;
+  border-left:#626262 10px solid;
+    border-right:#626262 10px solid;
+  transition:200ms;
+}
+
+.cate_forum:hover{
+    border-left:#005A7F 10px solid;
+    border-right:#005A7F 10px solid;
+  transition:200ms;
+}
+
+/*Image Old New Lock*/
+.old_new_lock {
+  float: left;
+  width:78px;
+}
+
+
+/*Bloc gris du mileu*/
+.cate_forum_middle {
+  position: relative;
+  float: left;
+  margin-top: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
+  width: 420px;
+  height: 53px;
+  padding: 10px;
+  padding-top: 17px;
+}
+
+/*Titres des forums*/
+.forumlink {
+  position: absolute; 
+left:-25px;
+  top:-45px;
+  padding:5px;
+  width:100%;
+ background-color:#C2C6C9;
+  z-index: 2;
+  height: 25px;
+  font-size: 20px;
+  color: #003047 !important;
+  font-weight: normal;
+  text-shadow: 1px 2px 0px #FFF;
+-webkit-border-top-left-radius: 10px;
+-webkit-border-top-right-radius: 10px;
+-moz-border-radius-topleft: 10px;
+-moz-border-radius-topright: 10px;
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+}
+
+.forumlin:hoverk a{
+  text-decoration:none !important;
+}
+
+/*Description des forums*/
+.forum_desc {
+  height: 70px;
+  overflow-y: auto;
+  padding-right: 5px;
+  text-align: justify;
+  margin-top:-10px;
+  color:#003047 !important;
+  font-family:Verdana;
+  font-size:11px;
+  margin-bottom:5px;
+}
+
+
+/*Bloc gris des statistiques et du dernier message*/
+.cate_forum_last {
+  position: relative;
+  float: left;
+  margin-top: 10px;
+  width: 160px;
+  height: 70px;
+  padding: 5px;
+  text-align: center;
+}
+/*Statistiques*/
+.forum_last_stats {
+  margin-left: 3px;
+  margin-right: 3px;
+  margin-bottom: 10px;
+  padding-bottom: 3px;
+  font-size: 10px;
+}
+/*Police du dernier message*/
+.forum_last_mess, .forum_last_mess a.gensmall {
+  font-size: 12px;
+}
+/*Couleur des liens du dernier message*/
+.forum_last_mess a {
+  color: #333333;
+}
+
+
+/*Les barres de défilement dans les catégories*/
+.forum_desc::-webkit-scrollbar {height:12px; width:5px; background:none; margin-right:5px;}
+.forum_desc::-webkit-scrollbar-thumb {background:#005A7F; height:30px; border-radius:30px;}
+.forum_desc::-webkit-scrollbar-corner {background:none;}
+
+/************************************************** Fin mise en forme catégorie **************************************************/
+
+/******* Profil & Sujet ***********/
+
+
+
+
+/***** Liste des sujets ***********/
+
+/* MISE EN FORME DES LISTES DE SUJETS */
+
+.bloc_sujets
+{
+  width: 950px;
+  margin: auto;
+  background: #dfdfdf;
+  border: 1px solid #ececec;
+  box-shadow: 0px 0px 3px #868686;
+  -o-box-shadow: 0px 0px 3px #868686;
+  -moz-box-shadow: 0px 0px 3px #868686;
+  -webkit-box-shadow: 0px 0px 3px #868686;
+  -htm-box-shadow: 0px 0px 3px #868686;
+  padding: 5px;
+}
+.sujets
+{
+  background: #ececec;
+  border: 1px dotted #ffffff;
+  padding: 3px;
+}
+.topictitle
+{
+  font-size: 12px;
+}
+.sujets_auteur
+{
+  display: block;
+  width: 200px;
+  font-size: 11px;
+}
+.sujet_last
+{
+  display: block;
+  width: 180px;
+  height: 50px;
+  background: #f4f4f4;
+  border-left: 5px solid #9e9e9e;
+  border-right: 5px solid #9e9e9e;
+  padding-top: 10px;
+  font-size: 11px;
+}
+
+.sujet_last:hover{
+  border-left: 5px solid #005A7F;
+  border-right: 5px solid #005A7F;
+}
+
+.sujets_stats
+{
+  text-align: center;
+  margin-top: 5px;
+}
+.sujets_stats_contenu
+{
+  font-size: 10px;
+  color: #4F4F4F;
+}
+
+/* ------------------------------------------- QEEL ------------------------------------------- */
+
+/*Les barres de défilement du qeel*/
+.qeel_inside::-webkit-scrollbar {width:10px;background: #353535;border-radius:12px;}
+.qeel_inside::-webkit-scrollbar-thumb {background:#000000;border-radius:12px;}
+.qeel_inside::-webkit-scrollbar-corner {background:none;}
+
+
+/* Fond du qeel */
+#qeel {
+  width: 720px;
+  background: #fff;
+  border-left:#4F4F4F 8px solid;
+  border-right:#4F4F4F 8px solid;
+  margin: auto;
+  margin-top: 15px;
+  padding: 10px;
+  padding-bottom: 25px;
+  padding-top: 15px;
+}
+
+#qeel:hover{
+    border-left:#005A7F 8px solid;
+  border-right:#005A7F 8px solid;
+}
+#qeel a {
+  color: #4F4F4F;
+  transition: all .25s;
+  -webkit-transition: all .25s;
+}
+#qeel a:hover {
+  color:#007DB3;
+}
+
+
+/* Titre du qeel */
+.qeel_title {
+  display: block;
+  margin: auto;
+  font-size: 45px;
+  margin-bottom: 10px;
+font-family: 'Roboto Condensed', sans-serif;
+  font-weight: normal;
+  text-align: center;
+    text-decoration: none!important;
+}
+
+.qeel_title:hover{
+      text-decoration: none!important;
+}
+
+
+/*Positionnement des blocs*/
+.qeel_blocs {
+  float: left;
+  margin-left: 15px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+
+/* Blocs du qeel */
+.qeel_bloc {
+  padding: 10px;
+  border-left: 5px solid #005A7F;
+  background-color: #C6C6C6;
+  font-size: 12px;
+  color: #003047;
+  font-family: Verdana;
+  text-align: left;
+  transition: all .25s;
+  -webkit-transition: all .25s;
+}
+
+/*  Blocs du qeel survolés */
+.qeel_bloc:hover {
+  border-left: 5px solid #626262;
+}
+
+
+.qeel_inside {
+  margin-right: -10px;
+  padding-right: 10px;
+  overflow: auto;
+}
+/* Premier bloc - Stats */
+#qeel_bloc1, #qeel_bloc1 .qeel_inside {
+  width: 255px;
+  height: 140px;
+}
+#contenu_qeelonglet_Stats {
+  text-align: center;
+}
+/* Deuxième bloc - Groupes */
+#qeel_bloc2, #qeel_bloc2 .qeel_inside {
+  width: 368px;
+  height: 140px;
+  text-align: justify;
+}
+/* Troisième bloc - Message */
+#qeel_bloc3, #qeel_bloc3 .qeel_inside {
+  width: 200px;
+  height: 120px;
+  text-align: center;
+}
+/* Quatrième bloc - Connectés 24h */
+#qeel_bloc4, #qeel_bloc4 .qeel_inside {
+  width: 200px;
+  height: 120px;
+}
+/* Cinquième bloc - Connectés */
+#qeel_bloc5, #qeel_bloc5 .qeel_inside {
+  width: 170px;
+  height: 120px;
+}
+
+
+/* Espacement des onglets */
+#qeelonglet_Credit, #qeelonglet_Stats, #grouponglet_Groupe2, #grouponglet_Groupe5 {
+  margin-right: 20px;
+  margin-left: 20px;
+}
+/* Onglets du qeel */
+.qeelonglet, .grouponglet {
+  display: inline-block;
+  padding: 4px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-top: 1px solid #9C9C9C;
+  border-bottom: 1px solid #9C9C9C;
+  text-align: center;
+  font-size: 18px;
+  color: #003047;
+font-family: 'Roboto Condensed', sans-serif;
+  transition: all 0.25s;
+  -webkit-transition: all .25s;
+}
+/* Onglets survolés */
+.qeelonglet_0:hover, .grouponglet_0:hover {
+  cursor: pointer;
+  border-top: 1px solid #626262;
+  border-bottom: 1px solid #626262;
+  background-color: #D9DFE1;
+  color: #626262;
+}
+/* Onglet actif */
+.qeelonglet_1, .grouponglet_1 {
+  border-top: 1px solid #626262;
+  border-bottom: 1px solid #626262;
+  background-color: #D9DFE1;
+  color:#626262;
+}
+/* Onglet actif survolé */
+.qeelonglet_1:hover, .grouponglet_1:hover {
+  border-top: 1px solid #005A7F;
+  border-bottom: 1px solid #005A7F;
+  color: #005A7F;
+}
+#qeelonglet_Stats, #qeelonglet_Credits, #grouponglet_Groupe1, #grouponglet_Groupe2, #grouponglet_Groupe3 {
+  border-bottom: none;
+}
+#qeelonglet_Anniversaires, #grouponglet_Groupe4, #grouponglet_Groupe5, #grouponglet_Groupe6 {
+  border-top: none;
+}
+/* Cacher le contenu des onglets non actifs */
+.contenu_qeelonglet, .contenu_grouponglet {
+  display: none;
+}
+
+
+/* Mise en forme pour contrer FA */
+#birthday .gensmall, #totalconn .gensmall {
+  font-size: 14px;
+  font-family: verdana;
+  color: #a3a3a3;
+}
+#birthday .row1, #totalconn  .row1 {
+  background-color: transparent;
+}
+
+.groupes{
+  font-size:15px;
+  height:105px;
+  width:240px;
+  margin:0 auto;
+  font-weight:bolder;
+font-family: 'Roboto Condensed', sans-serif;
+}
+
+.groupes a{
+  text-decoration:none;
+}
+
+.grou_g{
+  float:left;
+    background-color:#fff;
+  padding:15px;
+    height:105px;
+}
+
+.grou_d{
+  float:left;
+    background-color:#fff;
+  padding:15px;
+    height:105px;
+  margin-left:10px;
+}
+
+/* ------------------------------------------- FIN QEEL ------------------------------------------- */

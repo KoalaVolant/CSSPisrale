@@ -1,0 +1,81 @@
+:root {
+    --bilbo-couleur-1: #9F3A1C;
+    --bilbo-couleur-2: #7A7444;
+    --bilbo-couleur-3: #B78025;
+    --bilbo-couleur-4: #50140A;
+    --bilbo-couleur-5: #A9A584;
+}
+
+:root {
+  --bilbo-couleur-1: #9F3A1C;
+  --bilbo-couleur-2: #7A7444;
+  --bilbo-couleur-3: #B78025;
+  --bilbo-couleur-4: #50140A;
+  --bilbo-couleur-5: #A9A584;
+}
+
+.bilbolien, .bilbolien * {box-sizing:border-box;}
+.bilbolien {margin:0 auto;width:550px;font-family:Inria Serif;}
+.bilbolien br {display:none;}
+.bilbolien img {object-fit:cover;}
+.bilbocitation br, .bilbodescr br, .bilbo-quote br{content:" ";display:inline-block;line-height:11px !important;}
+
+.bilbolientete {  position:relative;  height:250px;  margin-bottom:15px;}
+.bilbolientete img {  border-radius:50%;  position:absolute;}
+.bilbolientete img:nth-child(2) {  width:140px;  height:140px;  z-index:9;  transition:800ms;}
+.bilbolientete img:nth-child(4) {  width:250px;  height:250px;  left:52%;  transition:1000ms;
+  transform:translateX(-50%);  z-index:9;}
+.bilbolientete img:nth-child(6) {  width:130px;  height:130px;  transition:1200ms;  bottom:0;
+  right:0;  object-position:bottom;  z-index:9;}
+
+.bilbolientete .bilbotextes {  position:relative;  z-index:11;  transition:500ms;  transform:translateY(-50%);
+  position:absolute;  top:50%;  width:100%;}
+
+.bilbolientete .bilbotitre {  color: var(--bilbo-couleur-4);  font-size: 65px;
+  display:block;  text-align:center;  text-transform: uppercase;
+  text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff, 2px 2px 2px rgba(255,255,255,0);
+}
+
+.bilbolientete .bilbocitation {  font-size:11px;  line-height:16px;  margin-top:25px;  border-radius:20px;
+  background: #fff;  display:block;  text-align:center;
+  color: var(--bilbo-couleur-4);  padding:5px;}
+
+.bilbolientete:hover img {  z-index:12;  transition:800ms;
+}
+
+.bilbomots {  display:flex;  flex-wrap:wrap;
+  justify-content:center;  width:100%;  margin:0 !important;}
+
+.bilbomots li {  list-style-type:none;  font-size:14px;  line-height:15px;  padding:10px;
+  color:#f0f0f0;  background:#000;  margin:5px;}
+
+.bilbomots li:nth-child(5n+1) {  background-color: var(--bilbo-couleur-1); }
+.bilbomots li:nth-child(5n+2) {  background-color: var(--bilbo-couleur-2);}
+.bilbomots li:nth-child(5n+3) {  background-color: var(--bilbo-couleur-3);}
+.bilbomots li:nth-child(5n+4) {  background-color: var(--bilbo-couleur-4);}
+.bilbomots li:nth-child(5n+5) {  background-color: var(--bilbo-couleur-5);}
+
+.bilbodescr-plus{ position:relative;}
+.bilbodescr-plus .bilbodescr{ padding:10px; border:1px solid var(--bilbo-couleur-1); margin:10px 0; 
+text-align:justify; font-size:13px; line-height:1.5em; height:120px; overflow:auto; }
+.bilbodescr-plus:hover .bilbodescr-img{ transform:scale(0); transition:500ms;  }
+.bilbodescr-plus .bilbodescr-img{ border-radius:50%; width:120px; height:120px; transform:scale(1); transition:500ms;
+	position:absolute;  bottom:-30px; right:-10px; }
+.bilbodescr-plus a{ background:var(--bilbo-couleur-2);
+	color:#fff !important; padding:10px; margin-top:5px; display:block; transition:500ms; }
+.bilbodescr-plus a:hover{ background:var(--bilbo-couleur-3); transition:500ms;}
+
+.bilbo-titrelien{ background:var(--bilbo-couleur-3); padding:10px; 
+	border-radius:10px; color:#fff; font-size:15px; margin-bottom:15px; display:block; }
+
+.bilbo-entier{ margin:10px 0px; display:flex; align-items:center; justify-content:space-between; }
+.bilbo-entier .bilbo-img{ position:relative; width:120px; height:120px; overflow:hidden;
+border-radius:50%; }
+.bilbo-entier .bilbo-img span{ position:absolute; z-index:15;  text-transform: uppercase;
+  text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff, 2px 2px 2px rgba(255,255,255,0);
+color:var(--bilbo-couleur-1); top:50%; transform:translate(-50%); left:50%; width:120px; text-align:center; }
+.bilbo-entier .bilbo-img img{ width:120px; height:120px; z-index:1; position:absolute; top:0; left:0;  }
+.bilbo-entier .bilbo-entier-content{ width:75%; }
+.bilbo-entier .bilbo-role{ display:block; color:#fff; font-weight:bold;  }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

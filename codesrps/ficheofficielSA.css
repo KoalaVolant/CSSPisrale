@@ -1,0 +1,35 @@
+.fich1{
+width: 476px;
+padding: 2px; 
+background-color: #575757; 
+border-radius: 25px 25px 25px 25px;
+}
+
+.fich2{
+width: 470px; 
+border-radius: 25px 25px 25px 25px; 
+background-color: #191817; 
+color: #BEBEBE; 
+font-size: 12px; 
+text-align: left;
+}
+
+.fich3{
+font-size: 24px; 
+font-family: Times New Roman; 
+color: #FFFFFF; 
+letter-spacing: 5px;
+}
+
+.fich1 h1{
+font-size: 18px; 
+font-family: Calibri; 
+color: #FFFFFF; 
+letter-spacing: 1px;
+}
+
+.fich4{
+width: 455px; 
+text-align: left; 
+color: #FFFFFF;
+}

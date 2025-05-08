@@ -1,0 +1,35 @@
+/* RP David */
+
+.davidrp{
+  width:500px;
+  margin:0 auto;
+  padding:25px;
+    background-image:url('https://img15.hostingpics.net/pics/476311fond2.png');
+}
+
+.davidrp img{
+  width:210px;
+  height:150px;
+  padding:3px; 
+  border:#000 1px dashed;
+}
+
+.davidrp h1{
+  color:#fff;
+  font-size:22px;
+  line-height:24px;
+  font-family: 'Neucha', cursive;
+  margin-bottom:0px;
+}
+
+.davidrp div{
+  background-image:url('https://img15.hostingpics.net/pics/429150fond1.png');
+  padding:20px;
+  width:450px;
+  margin:0 auto;
+  color:#fff;
+  text-shadow:#000 0px 0px 3px;
+  font-size:12px;
+  line-height:14px;
+  text-align:justify;
+}

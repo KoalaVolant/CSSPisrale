@@ -1,0 +1,60 @@
+.jude{
+  width:550px;
+  margin:0 auto;
+  border-bottom:#840662 5px dotted;
+}
+
+.jude .float{
+  width:550px;
+}
+
+.jude .judeimg{
+  width:100px;
+  height:100px;
+  margin-left:-5px;
+  -webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+  border:#8E0D51 2px dotted;
+  float:left;
+  object-fit:cover;
+}
+  
+.jude img+img{
+  margin-left:10px;
+}
+
+.jude h1{
+  float:left;
+font-family: 'Sue Ellen Francisco', cursive;
+  font-size:20px; 
+  line-height:24px;
+  text-align:left;
+  background-color:#3D032D;
+  padding:10px;
+  color:#fff;
+  width:305px;
+  height:80px;
+  margin-top:0px;
+  text-transform:uppercase;
+  font-weight:normal;
+  margin-left:5px;
+}
+
+.jude span{
+  display:block;
+  padding:25px;
+  background-color:#fff;
+  font-size:12px;
+  line-height:14px;
+  color:#000000;
+  text-align:justify;
+    -webkit-border-top-left-radius: 20px;
+-moz-border-radius-topleft: 20px;
+border-top-left-radius: 20px;
+}
+
+.jude b, .jude strong{
+  color:#840662;
+  font-size:13px;
+}

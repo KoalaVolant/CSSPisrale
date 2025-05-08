@@ -1,0 +1,65 @@
+:root{
+    --lulu1-fond:url('https://upload.wikimedia.org/wikipedia/commons/4/41/Fire.JPG');
+    --lulu1-bordure:#FF8202;
+    --lulu1-titre:#FF8202;
+    --lulu1-fond2:#000;
+    --lulu1-lettre:#FF8202;
+}
+
+.lulu{
+ width:450px;
+  margin:0 auto;
+  padding:35px;
+  background:var(--lulu1-fond);
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position:left;
+}
+
+.lulu .imglulu{
+  width:350px;
+max-height:200px;
+    object-fit:cover; 
+  margin:0 auto; 
+  padding:2px;
+  border:solid 2px; 
+    border-color:var(--lulu1-bordure);
+}
+
+.lulu h1{
+    font-family: 'Fjalla One', sans-serif;
+  font-size:18px;
+  line-height:22px;
+  letter-spacing:2px;
+  padding:10px;
+  text-align:center;
+  text-transform:uppercase;
+  color:var(--lulu1-titre);
+  font-weight:normal;
+  background-color:var(--lulu1-fond2);
+} 
+
+.lulu div{
+  background-color:var(--lulu1-fond2);
+  padding:25px;
+    position:relative; top:-10px;
+  font-size:11px;
+  line-height:12px;
+text-align:justify;
+  color:#BFBFBF;
+    font-family:Verdana;
+  -moz-box-shadow: inset 0px 0px 45px 0px #000000;
+-webkit-box-shadow: inset 0px 0px 45px 0px #000000;
+-o-box-shadow: inset 0px 0px 45px 0px #000000;
+box-shadow: inset 0px 0px 45px 0px #000000;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#000000, Direction=NaN, Strength=45);
+}
+
+.lulu div::first-letter{
+  font-size:23px;
+  font-weight:bolder;
+  color:var(--lulu1-lettre);
+    font-family: 'Trirong', serif;
+}
+
+.lulu .koala{ display:flex; justify-content:center; color:#dedede; letter-spacing:2px; font-size:10px;}

@@ -1,0 +1,42 @@
+.theosign{
+  background-image:url('https://images3.alphacoders.com/719/thumb-1920-71999.jpg');
+  width:410px;
+  height:150px;
+  padding:20px 20px 40px 20px;
+  background-size:100%;
+  margin:0 auto;
+}
+
+.theosign img{
+  width:130px;
+  height:100px;
+  border:#fff solid 5px;
+  margin-top:-20px;
+}
+
+.theosign img+img{
+  margin-left:15px;
+}
+
+.theosign h1{
+text-shadow:#004455 0px 0px 5px;
+  padding:5px;
+  color:#fff;
+  font-family: 'Schoolbell', cursive;
+  font-size:35px;
+  margin-top:0px;
+  text-align:center;
+}
+
+.theosign h2{
+    font-family: 'Raleway', sans-serif;
+  color:#00396E;
+  margin-top:-40px;
+  margin-left:80px;
+  font-size:11px;
+  line-height:11px;
+  font-weight:normal;
+  text-align:center;
+  width:250px;
+  text-shadow:#fff 0px 0px 6px;
+}

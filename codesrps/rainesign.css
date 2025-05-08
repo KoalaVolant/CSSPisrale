@@ -1,0 +1,12 @@
+/* Signature Raine */ 
+
+.rainesign{ width:344px; margin:0 auto;} 
+.rainesign *{ box-sizing:border-box; } 
+
+.rainesign div{ display:flex; justify-content:space-between; align-items:center;} 
+.rainesign strong{ font-size:20px; color:#BAD1CD; }
+.rainesign img{ width:150px; height:110px; object-fit:cover; padding:6px; border:1px solid #000;  border-image-slice: 1;  
+  border-width:6px;    border-image-source: linear-gradient(to left, #8332AC, #462749); } 
+.rainesign img+img{  border-image-source: linear-gradient(to right, #8332AC, #462749); }
+
+.rainesign h1{ font-size: 23px; width: 90%;margin: 5px auto;font-weight: normal;line-height: 23px; text-transform: uppercase; font-family: 'Tulpen One', cursive; }

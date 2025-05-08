@@ -1,0 +1,52 @@
+.noahlist{
+  width:400px;
+  margin:0 auto;
+  -webkit-border-top-left-radius: 100px;
+-webkit-border-top-right-radius: 100px;
+-moz-border-radius-topleft: 100px;
+-moz-border-radius-topright: 100px;
+border-top-left-radius: 100px;
+border-top-right-radius: 100px;
+  background-color:#2F5371;
+  font-family:Verdana;
+  font-size:12px;
+  padding:15px;
+}
+
+.noahlist img{
+  width:430px;
+  height:200px;
+  object-fit:cover;
+    -webkit-border-top-left-radius: 100px;
+-webkit-border-top-right-radius: 100px;
+-moz-border-radius-topleft: 100px;
+-moz-border-radius-topright: 100px;
+border-top-left-radius: 100px;
+border-top-right-radius: 100px;
+  margin-top:-25px;
+  margin-left:-15px;
+  border-bottom:#fff 10px solid;
+}
+
+.noahlist h1{
+  background-color:#C9DBE9;
+  text-align:right;
+  padding:5px;
+  font-family: 'Kirang Haerang', cursive;
+  font-size:20px;
+  font-weight:normal;
+  color:#223D53;
+}
+
+.noahlist div{
+  width:350px;
+  margin:0 auto;
+  background-color:#fff;
+  color:#555;
+  padding:15px;
+}
+
+.noahlist a, .noahlist a:link, .noahlist a:hover, .noahlist a:visited{
+  text-decoration:none;
+  color:#2D516F;
+}

@@ -1,0 +1,101 @@
+.maxrp{
+  width:500px;
+  padding:10px;
+  margin:0 auto;
+  background-image:url('http://static.vecteezy.com/system/resources/previews/000/094/563/original/cute-colorful-dots-pattern-free-vector.png');
+  background-size:150%;
+  -webkit-border-radius: 50px;
+-moz-border-radius: 50px;
+border-radius: 50px;
+  background-color:#fff 5px solid;
+}
+
+.maxrp img{
+  width:230px;
+  height:150px;
+  float:left;
+  border:#fff 3px solid;
+  margin-top:-25px;
+}
+
+.maxrp h1{
+  background-color:#fff; 
+  -webkit-border-radius: 40px;
+-moz-border-radius: 40px;
+border-radius: 40px;
+  padding:10px;
+  text-align:center;
+  font-size:25px;
+  font-weight:normal;
+  line-height:27px;
+  color:#E97A0C;
+  font-family: Comic Sans MS;
+}
+
+.maxrp h2{
+   -webkit-border-radius: 40px;
+-moz-border-radius: 40px;
+border-radius: 40px;
+  padding:5px;
+  text-align:center;
+  font-size:15px;
+  color:#E7B00E;
+    background-color:#fff; 
+  font-weight:normal;
+  font-family: Comic Sans MS;
+  clear:both;
+  margin-top:10px;
+}
+
+.maxrp h3{
+   -webkit-border-radius: 40px;
+-moz-border-radius: 40px;
+border-radius: 40px;
+  padding:5px;
+  text-align:center;
+    background-color:#fff; 
+  font-size:12px;
+  color:#E80D0D;
+  font-weight:normal;
+    font-family: 'Chewy', cursive;
+}
+
+.maxrp .contenu{
+  width:430px; 
+  text-align:justify;
+ -webkit-border-radius: 70px;
+-webkit-border-bottom-right-radius: 60px;
+-moz-border-radius: 70px;
+-moz-border-radius-bottomright: 60px;
+border-radius: 70px;
+border-bottom-right-radius: 60px;
+    padding:30px;
+  font-size:12px;
+  margin-left:5px;
+  line-height:14px;
+  background-color:#fff;
+  color:#2C2C2C;
+}
+
+
+/* Et puiiis... */ 
+
+.maxrp:hover{
+  background-image:url('http://orig02.deviantart.net/ccf7/f/2010/128/2/a/manga_swirl_pattern_shock1_by_ryunoohi.jpg');
+}
+
+.maxrp:hover img{
+  border-color:black;
+}
+
+.maxrp:hover h1, .maxrp:hover h2, .maxrp:hover h3{
+  background-color:#000;
+}
+
+.maxrp:hover, .maxrp, .maxrp:hover img, .maxrp img, .maxrp:hover h1, .maxrp:hover h2, .maxrp:hover h3, .maxrp h1, .maxrp h2, .maxrp h3{
+  -webkit-transition: all 800ms;
+-moz-transition: all 800ms;
+-ms-transition: all 800ms;
+-o-transition: all 800ms;
+transition: all 800ms;
+}

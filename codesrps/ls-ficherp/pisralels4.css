@@ -1,0 +1,59 @@
+@import url('https://coderps.xyz/codesrps/pisraleglobal.css');
+
+.pisralels4{ 
+width:500px; margin:0 auto; margin-top:50px;}
+
+.pisralels4 .images-ls4 {
+    height:40px; 
+    position:relative;
+    display:flex; justify-content:center; 
+    width:100%; 
+    background:linear-gradient(90deg, #94D2B1 14.49%, #CDE7CC 106.86%);
+}
+
+.pisralels4 .images-ls4 img{ 
+    width:160px; height:80px; position:absolute;
+bottom:-10px; z-index:10;}
+.pisralels4 .images-ls4 img:nth-child(1){
+    left:17%;
+    transform: rotate(-1.7deg);
+}
+.pisralels4 .images-ls4 img:nth-child(2){
+    right:17%;
+    transform: rotate(1.7deg);
+}
+
+.pisralels4 .rpcontent-ls4{
+    width:100%;
+    overflow:hidden;
+    background:linear-gradient(180deg, rgba(50, 172, 130, 0.6) 0%, rgba(88, 182, 87, 0.46875) 21.88%, rgba(217, 217, 217, 0) 100%);
+}
+
+.pisralels4 .rpcontent-ls4 span{ 
+height:40px; 
+display:block;
+background:url('https://i30.servimg.com/u/f30/19/45/51/53/357410.png');
+background-size:cover;
+width:105%;
+position:relative;}
+
+.pisralels4 .rpcontent-ls4 h3 {
+    background:rgba(255,255,255,0.76) !important;
+    width:auto;
+    font-size:12px; 
+    line-height:14px;
+    position:absolute;
+    padding:5px !important; 
+    margin:0 auto;
+    left:50%; top:30%;
+    transform:translateX(-50%);
+}
+
+.pisralels4 .rpcontent-ls4 div{
+    padding:25px; 
+    color:#222; 
+    text-align:justify; 
+    font-size:13px;
+    line-height:1.6em;
+    font-family:Verdana;
+}

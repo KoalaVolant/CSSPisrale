@@ -1,0 +1,142 @@
+/* Jefferson Lien */ 
+
+.jeflien{
+  width:450px;
+  margin:0 auto;
+  position:relative;
+}
+
+.jeflien img{
+  width:450px;
+  height:220px;
+  object-fit:cover;
+}
+
+.jef-entlien{ 
+  background-color:#fff;
+  padding-left:60px;
+-webkit-box-shadow: 4px 3px 5px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 4px 3px 5px 0px rgba(0,0,0,0.75);
+box-shadow: 4px 3px 5px 0px rgba(0,0,0,0.75);
+  padding-right:20px;
+  padding-bottom:20px;
+padding-top:20px;
+}
+
+.jef-entlien h1{
+  font-family: 'IM Fell DW Pica SC', serif;
+  font-size:35px;
+  padding-bottom:7px;
+  border-bottom:#616161 2px solid; 
+  color:#436958; 
+  text-transform:uppercase;
+  text-align:center;
+}
+
+.jef-entlien h2{
+  font-family: 'IM Fell DW Pica SC', serif;
+  text-align:center;
+  font-size:17px;
+  line-height:20px;
+  margin-bottom:-15px;
+  margin-bottom:-10px;
+  color:#666666;
+}
+
+.jef-trait{
+  width:30px;
+    height:820px;
+  position:absolute; 
+  top:0px;
+  left:13px;
+  background: rgba(61,65,63,1);
+background: -moz-linear-gradient(left, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+background: -webkit-gradient(left top, right top, color-stop(0%, rgba(61,65,63,1)), color-stop(100%, rgba(45,112,83,1)));
+background: -webkit-linear-gradient(left, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+background: -o-linear-gradient(left, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+background: -ms-linear-gradient(left, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+background: linear-gradient(to right, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3d413f', endColorstr='#2d7053', GradientType=1 );
+}
+
+.jef-entlien p{
+  height:400px;
+  overflow:auto;
+  color:#484848;
+  text-align:justify;
+
+}
+
+/* Jefferson liens */ 
+
+.jefflink{
+  width:500px;
+  height:200px;
+  overflow:hidden;
+  margin:0 auto;
+  display:flex;
+  position:relative;
+  -webkit-box-shadow: 4px 3px 5px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 4px 3px 5px 0px rgba(0,0,0,0.75);
+box-shadow: 4px 3px 5px 0px rgba(0,0,0,0.75);
+}
+
+.jefflink *{
+  box-sizing:border-box;
+}
+
+.jefflink img{
+  width:200px;
+  object-fit:cover;
+  height:100%;
+  
+}
+
+.jefflink .jefftrait{
+    width:30px;
+  height:100%;
+  display:block;
+  background: rgba(61,65,63,1);
+background: -moz-linear-gradient(left, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+background: -webkit-gradient(left top, right top, color-stop(0%, rgba(61,65,63,1)), color-stop(100%, rgba(45,112,83,1)));
+background: -webkit-linear-gradient(left, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+background: -o-linear-gradient(left, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+background: -ms-linear-gradient(left, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+background: linear-gradient(to right, rgba(61,65,63,1) 0%, rgba(45,112,83,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3d413f', endColorstr='#2d7053', GradientType=1 );
+}
+
+.jeffdescr{
+  width:270px;
+  background-color:#fff;
+  padding:10px;
+}
+
+.jefflink h1{
+  font-size:20px;
+  text-transform:uppercase;
+    border-bottom:#616161 2px solid; 
+  color:#436958; 
+  margin-top:0px;
+}
+
+.jefflink h2{
+  margin-top:-15px;
+  font-size:14px;
+  font-style:oblique;
+}
+
+.jefflink h1, .jefflink h2{   font-family: 'IM Fell DW Pica SC', serif; text-align:center; }
+
+.jefflink span{
+    padding: 6px;
+    font-size: 11px;
+    line-height: 15px;
+    height: 149px;
+    overflow: auto;
+    text-align: justify;
+    display: block;
+    font-family: Verdana;
+	color:#000;
+    margin-top: -15px;
+}

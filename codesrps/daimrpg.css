@@ -1,0 +1,89 @@
+.daim{
+  width:500px;
+  margin: auto;
+  background-image:url('https://tse2.mm.bing.net/th?id=OIP.h3_sUnRO9aZH368QCjAkFQEcEs&pid=15.1');
+  padding:23px;
+}
+
+.daim img{
+  width:400px;
+  height:175px;
+  border:#8D8890 solid 1px;
+  padding:5px;
+}
+
+.daim:hover img{
+  -moz-transform: rotate(-8deg);
+-webkit-transform: rotate(-8deg);
+-o-transform: rotate(-8deg);
+-ms-transform: rotate(-8deg);
+transform: rotate(-8deg);
+}
+
+.daim img, .daim:hover img{
+  -webkit-transition: all 500ms ease;
+-moz-transition: all 500ms ease;
+-ms-transition: all 500ms ease;
+-o-transition: all 500ms ease;
+transition: all 500ms ease;
+}
+
+.daim h1{
+  font-family: 'Anton', sans-serif;
+    font-size:24px;
+    line-height:25px;
+  font-weight:normal;
+    color:#fff;
+    text-align:center;
+  text-transform:uppercase;
+}
+  
+.daim h2{
+    font-family: 'Patrick Hand', cursive;
+    font-size:14px;
+    line-height:15px;
+    color:#C8BAD0;
+    text-align:center;
+  margin-top:-30px;
+  }
+
+  .daim h3{
+    font-size:12px;
+    line-height:13px;
+    color:#dedede;
+    text-align:center;
+    font-family: 'Anton', sans-serif;
+  font-weight:normal;
+  letter-spacing:2px;
+  margin-top:-25px
+  }
+  
+  .daim .content{
+    padding:15px;
+    font-size:12px;
+    line-height:13px;
+    background-color:#000;
+    color:#F8F8F9;
+  border:#5F3C73 1px dashed;
+  width:450px;
+  margin:0 auto;
+  text-align:justify;
+  }
+
+.daim .content b, .daim .content strong{
+  color:#ff0000;
+}
+
+.daim:hover .content b, .daim:hover .content strong{
+ text-shadow: 0px 0px 7px
+}
+
+koala{
+  text-align:center;
+  font-size:9px;
+  letter-spacing:4px;
+  color:#dedede;
+  margin:0 auto;
+  display:block;
+  font-family:Century Gothic;
+}

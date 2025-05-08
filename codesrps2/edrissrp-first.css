@@ -1,0 +1,14 @@
+:root{ 
+--edris-title:#9AA0A8; 
+--edris-border:#5F656D;}
+
+.edrisrp{ width:500px; margin:0 auto; }
+.edrisrp .edrisimg img{ width:230px; height:125px; padding:3px; outline:white 1px solid; outline-offset:-5px;}
+.edrisrp .edrisimg img:nth-child(2){ margin-left:10px; }
+
+.edrisrp .edristitle{ width:500px; margin:-10px auto; text-align:center; font-weight:bolder; color:var(--edris-border); font-family: 'Kameron', serif; font-size:25px;}
+.edrisrp .edristitle em{ font-size:12px; color:var(--edris-title); font-family:Times New Roman; }
+
+.edrisrp .edristxt{ width:500px; margin:0 auto; text-align:justify; font-size:12px; line-height:12px; border-top:var(--edris-title) 3px solid; padding-top:10px; padding-bottom:10px; border-bottom:var(--edris-title) 3px solid;}
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

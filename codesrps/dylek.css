@@ -1,0 +1,22 @@
+/* Alek Sign */ 
+
+.dylek{ width:250px; margin:0 auto; display:flex; justify-content:space-around; position:relative; } 
+.dylek *{ box-sizing:border-box; } 
+
+.dylek .firework{ 
+   -webkit-mask-image: url("https://i.servimg.com/u/f30/19/45/51/53/firewo10.png");
+  mask-image: url(https://i.servimg.com/u/f30/19/45/51/53/firewo10.png"");
+ -webkit-mask-size: 120px 120px;
+  mask-size: 120px 120px;
+ -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position:bottom;
+  width:120px; height:120px;
+}
+.dylek .signimg{ width: 120px;
+    height: 76px;
+    object-fit: cover;
+    position: relative;
+    left: -70px;
+    top: 20px;} 
+.dylek h1{ font-family: 'Anton', sans-serif; font-size:15px; background-color:#000; color:#fff; text-align:center; text-transform:uppercase;
+  letter-spacing:-1; position:absolute; bottom:0; right:72px; padding:5px; font-weight:normal;}

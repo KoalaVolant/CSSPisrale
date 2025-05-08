@@ -1,0 +1,13 @@
+/* Rodrick RP */ 
+
+.rorp{ width:500px; margin:0 auto; display:flex; justify-content:space-around;}
+.rorp *{ box-sizing:border-box; } 
+
+.roleft{ width:80px;  } 
+.roright{ width:370px; }
+
+.roleft img{ width:80px; height:80px; object-fit:cover; clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);}
+.roleft h2{ font-family: 'Dancing Script', cursive; font-size:19px; line-height:24px; text-align:center; color:#555; background-color:#fff; border:1px solid #888; padding:5px;   }
+
+.roright h1{ font-family: 'Lancelot', cursive; text-transform:uppercase; font-size:20px; line-height:22px; letter-spacing:1px; text-transform:uppercase; color:#444; margin:5px 0px;}
+.roright div{ position:relative; top:-15px; border:2px solid #B4C9CD; border-top-width:6px; border-bottom-width:6px; padding:15px; font-size:12px; font-family:Verdana; line-height:16px; color:#222; background-color:#fff; text-align:justify;}

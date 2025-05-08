@@ -1,0 +1,81 @@
+.gasu{
+  width:550px;
+  margin:0 auto;
+  background-image:url('http://www.emoticonswallpapers.com/background/cute/cute-backgound-pattern-139.jpg');
+}
+
+.gasu img{
+  width:100px;
+  -webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+  border:#fff 5px solid;
+-moz-transition-duration:1s;
+-moz-transition-timing-function:linear;
+-webkit-transition-duration:1s;
+-webkit-transition-timing-function:linear;
+transition-duration:1s;
+transition-timing-function:linear;
+}
+
+.gasu:hover img{
+-moz-transform:rotate(360deg);
+-webkit-transform:rotate(360deg);
+transform:rotate(360deg);
+}
+
+
+.rond{
+width:300px;
+  margin:0 auto;
+}
+
+.rond img{
+width:100px;
+}
+
+
+.gasu h6, .gasu h1{
+      font-family: 'Roboto Slab', serif;
+}
+
+.gasu h6, .gasu h1, .gasu p{
+  background-color:#DFDFDF;
+}
+
+.gasu h6{
+  color:#0B5C66;
+  padding:5px;
+  font-size:10px;
+  text-align:center;
+  margin-top:-10px;
+  width:150px;
+  margin-left:50px;
+}
+
+.gasu h1{
+  color:#052F32;
+  width:250px;
+  font-size:18px;
+  line-height:20px;
+  display:block;
+  padding:10px;
+
+}
+
+.gasu p{
+  margin-top:-25px;
+  width:400px;
+  margin:0 auto;
+  padding:25px;
+  text-align:justify;
+  color:#042326;
+  border-top:15px solid #FE6C99;
+  border-bottom:15px solid #FE6C99;
+  transition:600ms;
+}
+
+.gasu p:hover{
+  border-top:10px dashed #FDD661;
+  border-bottom:10px dashed #FDD661;
+}

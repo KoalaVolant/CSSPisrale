@@ -1,0 +1,43 @@
+.thotfond{
+  width:420px;
+  background-image:url('https://i.servimg.com/u/f30/19/45/51/53/espace12.jpg');
+  background-position:top;
+  transition:2s;
+  padding:15px;
+  display:flex;
+  border:#DFDFDF 4px solid;
+}
+
+.thotfond:hover{
+  background-position:bottom;
+}
+
+.thotfond img{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  border:5px solid #fff;
+}
+
+.thotfond div{
+  margin-left:10px;
+}
+
+.thotfond h1{
+  text-align:center;
+  margin:5px;
+  margin-top:15px;
+  font-family: 'Caveat', cursive;
+  font-size:34px;
+  color:#fff;
+  text-shadow:#6E6E6E 0px 0px 5px;
+}
+
+.thotfond span{
+  padding:10px;
+  font-size:13px;
+  line-height:15px;
+  color:#2D2D2D;
+  font-family:Verdana;
+}

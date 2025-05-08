@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>#app{ width:800px; margin:0 auto; background:#EDF2F4; padding:20px; font-family:Verdana; }
+    #app input[type=text]{ width:60%;}
+        #app h1{ color:#2B2D42; font-family: 'Bebas Neue', sans-serif; letter-spacing:4px; border:1px solid #8D99AE;padding:5px; }
+        #app h2{ color:#8D99AE; border-bottom:1px solid #8D99AE; font-family: 'Bebas Neue', sans-serif;}
+        .codefinal{ width:90%; margin:0 auto; display:block; font-size:14px; line-height:18px; background:#CDDDDF; padding:15px; font-family:'Courier New', Courier, monospace; }
+        .fondpre{ background:#ffffff; padding:15px; font-family:'Courier New', Courier, monospace;} 
+        .inputflex{ display:flex; }
+        .inputflex > div{ width:49%; }
+        #app button{ font-size:18px; }
+        
+        :root{
+	--pis-color1:#7d4245;
+	--pis-color2:#b8b8b8;
+	--pis-color3:#74A993;
+}
+
+        .s-new1{ width:480px; margin:0 auto; background:#e4e4e4; display:block; padding:5px; margin:5px 0; border-radius:5px;  font-family:Verdana; }
+.s-new1 a{ display:block; background:var(--pis-color1); text-decoration:none;  font-family:Verdana;
+	padding:5px; margin:5px 0; color:var(--pis-color2) !important;  border-radius:5px;}
+.s-new1 a:hover{ background:var(--pis-color3); color:#222 !important; }
+
+.s-graph-code{ margin:0 auto; width:480px; display:flex; flex-wrap:wrap; justify-content:center; }
+.s-graph-code div{ border-radius:10px; width:23%; height:120px; position:relative; margin:3px; overflow:hidden; }
+.s-graph-code img{ width:100%; height:100%; object-fit:cover; position:relative; z-index:2; }
+
+.s-graph-code a span{ background:rgba(0,0,0,0.6); 
+	position:absolute; top:0; left:-100%; color:#fff; display:flex;padding:5px; font-size:11px; line-height:13px; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; z-index:4;
+text-align:center; transition:800ms; }
+.s-graph-code a:hover span{ left:0; transition:800ms; }
+.s-graph-code strong{ background:rgba(255,255,255,0.7); font-family: 'Playfair Display', serif;
+font-size:15px; line-height:15px; padding:3px; margin-bottom:5px; color:#222;}</style>
+</head>
+<body>
+    <div id="app">
+        <div class="wrap-new">
+            <h1>Remplir les news générales</h1>
+            <h3>Inputs</h3>
+
+            <div class="inputflex">
+            <div>
+                <label>Information :</label> <br><textarea v-model="newinfo" cols="30" rows="5"></textarea>
+            </div>
+            <div>
+            <label>Y a-t-il besoin d'un lien ?</label> <input type="checkbox" v-model="lien">
+            <div v-if="lien">
+            <label>Bouton lien : </label> <input v-model="newlien" type="text" name="" id=""><br>
+            <label>Bouton titre : </label> <input v-model="newtitre" type="text" name="" id="">
+            </div>
+            </div>
+
+            
+        </div><br><br><button @click="ajouterNews">Ajouter</button> <button @click="supprimerNews">Supprimer le dernier</button></div>
+
+            <h3>Résultats</h3>
+
+            <div v-for="(gnew, index) in gnews" :key="index">
+                <span class="s-new1">{{gnew.newinfo}}
+                    <span v-if="gnew.lien"><a :href="gnew.newlien">{{gnew.newtitre}}</a></span>
+                </span>
+            </div>
+            <div v-for="(gnew, index) in gnews" :key="index">
+                <div v-if="gnew.lien" class="fondpre">
+                    &lt;span class="s-new1"&gt;{{gnew.newinfo}}
+                    <span v-if="gnew.lien">&lt;a href="{{gnew.newlien}}"&gt;{{gnew.newtitre}}&lt;/a&gt;</span>&lt;/span&gt;
+                </div>
+                <div v-else class="fondpre">
+                    &lt;span class="s-new1"&gt;{{gnew.newinfo}}&lt;/span&gt;
+                </div>
+            </div>
+            
+
+            <h1>Remplir les gros ajouts</h1>
+            <h3>Inputs</h3>
+
+            <label>Lien vers le sujet :</label> <input v-model="imagelien" type="text"><br>
+            <label>Image :</label> <input type="text" v-model="imageimage"><br>
+            <label>Besoin d'un nombre ?</label> <input type="checkbox" v-model="nombre"><br>
+            <div v-if="nombre">
+                <label>Nombre :</label> <input v-model="imagenombre" type="text">
+            </div>
+            <label>Ce que c'est :</label> <input type="text" v-model="imagedescr">
+
+            <br><br><button @click="ajouterGrosAjout">Ajouter</button> <button @click="supprimerGrosAjout">Supprimer le dernier</button>
+
+            <h3>Résultats</h3>
+     <!-- Utilisez v-for pour itérer sur la liste des gros ajouts -->
+     <div class="s-graph-code">
+        <div v-for="(grosAjout, index) in grosAjouts" :key="index">
+            <a target="_blank" :href="grosAjout.imagelien"><img :src="grosAjout.imageimage">
+                <span><strong v-if="grosAjout.nombre">{{grosAjout.imagenombre}}</strong> {{grosAjout.imagedescr}}</span></a>
+        </div>
+    </div>
+    <div v-for="(grosAjout, index) in grosAjouts" :key="index">
+        <!-- Utilisez v-if pour conditionnellement afficher la partie avec le code -->
+        <div class="fondpre" v-if="grosAjout.nombre">
+            &lt;a target="_blank" href="{{grosAjout.imagelien}}"&gt;&lt;img src="{{grosAjout.imageimage}}"&gt;
+            &lt;span&gt;<span v-if="grosAjout.nombre">&lt;strong&gt;{{grosAjout.imagenombre}}&lt;/strong&gt;</span> {{grosAjout.imagedescr}}&lt;/span&gt;&lt;/a&gt;
+        </div>
+        <div class="fondpre" v-else>
+            &lt;a target="_blank" :href="{{grosAjout.imagelien}}"&gt;&lt;img :src="{{grosAjout.imageimage}}"&gt;
+            &lt;span&gt;{{grosAjout.imagedescr}}&lt;/span&gt;&lt;/a&gt;
+        </div>
+    </div>
+
+            </div>
+    </div>
+    <script>
+        app = Vue.createApp({
+            data(){
+                return{
+                    lien: false,
+                    newinfo:'Mettre les infos ici',
+                    newlien:'Lien du bouton',
+                    newtitre:'Intitulé du bouton',
+                    nombre: true,
+                    imagenombre: '124',
+                    imagelien: 'Mettre le lien ici',
+                    imageimage: "https://i.pinimg.com/736x/81/da/95/81da956afab25490019d134368011a6e.jpg",
+                    imagedescr: 'Faites court pas zaper fandom',
+                    grosAjouts: [],
+                    gnews: [],
+                }
+            },
+            methods: {
+                ajouterGrosAjout() {
+                this.grosAjouts.push({
+                    imagelien: this.imagelien,
+                    imageimage: this.imageimage,
+                    nombre: this.nombre,
+                    imagenombre: this.imagenombre,
+                    imagedescr: this.imagedescr,
+                });
+                this.reinitialiserGrosAjout();
+            },
+            ajouterNews() {
+                this.gnews.push({
+                    newinfo: this.newinfo,
+                    newlien: this.newlien,
+                    lien: this.lien,
+                    newtitre: this.newtitre,
+                });
+                this.reinitialiserNews();
+            },
+            supprimerGrosAjout() {
+                this.grosAjouts.splice(-1, 1);
+            },
+            supprimerNews() {
+                this.gnews.splice(-1, 1);
+            },
+            reinitialiserGrosAjout() {
+                this.imagelien = 'Mettre le lien ici';
+                this.imageimage = 'https://i.pinimg.com/736x/81/da/95/81da956afab25490019d134368011a6e.jpg';
+                this.nombre = true;
+                this.imagenombre = '124';
+                this.imagedescr = 'Faites court pas zaper fandom';
+            },
+            reinitialiserNews() {
+                this.newinfo = 'Mettre les infos ici';
+                this.newlien = 'Lien du bouton';
+                this.lien = false;
+                this.newtitre = 'Intitulé du bouton';
+            },
+        },
+    });
+        app.mount("#app");
+    </script>
+</body>
+</html>

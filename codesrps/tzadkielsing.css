@@ -1,0 +1,79 @@
+#tz{
+  width:500px;
+  height:140px;
+  margin:0 auto;
+}
+
+#tz #adk, #tz #iel{
+  width:230px;
+  height:120px;
+  float:left;
+  position:relative;
+  background-size:230px 140px;
+}
+
+#tz #adk{
+  background-image:url('https://68.media.tumblr.com/6c75959b4928ba2e6e4ef8e3f79f4a3e/tumblr_ns55jt8ceP1sial0xo1_500.gif');
+  -webkit-border-top-left-radius: 70px;
+-webkit-border-bottom-left-radius: 70px;
+-moz-border-radius-topleft: 70px;
+-moz-border-radius-bottomleft: 70px;
+border-top-left-radius: 70px;
+border-bottom-left-radius: 70px;
+  margin-right:10px;
+}
+  
+
+#tz #iel{
+  background-position:left;
+    background-image:url('https://img15.hostingpics.net/pics/720457thomi.gif');
+  -webkit-border-top-right-radius: 70px;
+-webkit-border-bottom-right-radius: 70px;
+-moz-border-radius-topright: 70px;
+-moz-border-radius-bottomright: 70px;
+border-top-right-radius: 70px;
+border-bottom-right-radius: 70px;
+}
+
+#adk h1, #iel h1{
+  font-size:24px;
+  font-family: 'Signika', sans-serif;
+  padding:5px;
+}
+
+#adk h2, #iel h2{
+  color:#fff;
+  text-shadow:#000 0px 0px 5px;
+}
+
+#adk h1, #iel h1, #adk h2, #iel h2{
+    position:absolute;
+}
+
+#adk h1{
+  top:30px;
+  left:25px;
+  background-color:#5A82C8;
+  color:#000;
+  text-shadow:#000 0px 0px 5px;
+}
+
+#iel h1{
+
+      color:#fff;
+  text-shadow:#fff 0px 0px 5px;
+  top:30px;
+  left:125px;
+  background-color:#CD8118;
+  font-size:20px;
+}
+
+#adk h2{
+  top:65px;
+  left:25px;
+}
+
+#iel h2{
+  top:65px;
+  left:115px;
+}

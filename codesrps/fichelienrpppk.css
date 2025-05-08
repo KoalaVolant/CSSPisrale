@@ -1,0 +1,294 @@
+/* Fiche RP des PPK */
+
+.list-ppk{
+  width:550px;
+  margin:0 auto;
+  background-color:#dedede;
+  padding:10px;
+}
+
+.dispo{
+  background-color:#fff;
+  border-radius:10px;
+  font-size:12px;
+  color:#454545;
+  line-height:18px;
+  font-weight:bold;
+  text-align:center;
+  width:300px;
+  margin:0 auto;
+}
+
+
+.list-ppk *{
+  box-sizing:border-box;
+}
+
+.list-ppk h1{
+  font-family: 'Poor Story', cursive;
+  font-size:55px;
+  line-height:40px;
+  margin-top:-25px;
+  background-color:#454545;
+  color:#fff;
+  padding:10px;
+  text-align:center;
+    -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+}
+
+.rps-ppk{
+  margin-top:15px;
+  width:550px;
+  display:flex;
+  justify-content:space-around;  flex-wrap:wrap !important;
+}
+
+.blocrp{
+  width:175px;
+}
+
+.blocrp img{
+  width:175px;
+  height:100px;
+  object-fit:cover;
+  padding:3px;
+  border:1px solid;
+}
+
+.blocrp h2{
+  color:#fff;
+  font-size:25px;
+  text-align:center;
+    font-family: 'Poor Story', cursive;
+  padding:3px;
+    -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+  width:175px;
+  margin-top:-15px;
+}
+
+.blocrp div{
+  width:175px;
+  margin-top:-25px;
+  height:220px;
+  text-align:left;
+  font-size:12px;
+  line-height:18px;
+  font-family:Verdana;
+  background-color:#fff;
+  color:#454545;
+  padding:10px;
+  padding-top:20px;
+  overflow:auto;
+}
+
+.blocrp a:hover{
+    color:#6F6F6F !important;
+}
+
+/* Couleurs */ 
+
+/* Peter Maximoff */ 
+
+.petermq h2{
+    background-color:#738E95;
+  }
+
+.petermq img{
+  border-color:#738E95;
+}
+
+.petermq a, .petermq a:visited, .petermq a:active{
+    color:#738E95 !important;
+}
+
+/* Peter Parker */
+
+.peterpa h2{
+    background-color:#C93F3F;
+  }
+
+.peterpa img{
+  border-color:#C93F3F;
+}
+
+.peterpa a, .peterpa a:visited, .peterpa a:active{
+    color:#C93F3F !important;
+}
+
+/* Kyoko Mogami */
+
+.kyokomo h2{
+    background-color:#EC4AA7;
+  }
+
+.kyokomo img{
+  border-color:#EC4AA7;
+}
+
+.kyokomo a, .kyokomo a:visited, .kyokomo a:active{
+    color:#EC4AA7 !important;
+}
+
+/* Tate Langdon */
+
+.tatela h2{
+    background-color:#4E45F1;
+  }
+
+.tatela img{
+  border-color:#4E45F1;
+}
+
+.tatela a, .tatela a:visited, .tatela a:active{
+    color:#4E45F1; !important;
+}
+
+/* Fiche liens des PPK */
+
+.liens-ppk{
+  box-sizing:border-box;
+  width:550px;
+  margin:0 auto;
+}
+
+.liens-ppk *{
+    box-sizing:border-box;
+}
+
+.bloclien{
+  width:550px;
+}
+
+.bloclien h1{
+  font-family: 'Poor Story', cursive;
+  font-size:40px;
+  text-align:center;
+  padding:5px;
+  color:#fff;
+  -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+  margin-top:-15px;
+}
+
+.haut-lien{
+  width:550px;
+  display:flex;
+  justify-content:space-around;
+}
+
+.haut-lien img{
+  width:250px;
+  height:175px;
+  object-fit:cover;
+  padding:5px;
+  border:1px solid;
+}
+
+.liens-c{
+  width:550px;
+  padding:15px;
+  display:flex;
+  margin-top:-45px;
+  padding-top:40px;
+  justify-content:space-around;
+}
+
+.liens-c .c-l{
+  display:flex;
+  width:255px;
+}
+
+.liens-c h2{
+    color:#454545 !important;
+}
+
+.liens-c img{
+  width:100px;
+  height:130px;
+  border:1px solid;
+  padding:3px;
+  object-fit:cover;
+}
+
+.liens-c span{
+  margin-left:5px;
+  background-color:#fff;
+  padding:5px;
+  font-family:Verdana;
+  display:block;
+  height:130px;
+  font-size:11px;
+  line-height:12px;
+  overflow:auto;
+  text-align:justify;
+  width:150px;
+  color:#454545;
+}
+  
+
+
+/* Peter Maximoff */ 
+
+.peterm .haut-lien img, .peterm .liens-c img{
+  border-color:#738E95;
+}
+
+.peterm h1{
+  background-color:#738E95;
+}
+
+.peterm .liens-c{
+  background-color:#ADBCC0;
+}
+/* Peter Parker */ 
+
+.peterp .haut-lien img, .peterp .liens-c img{
+  border-color:#C93F3F;
+}
+
+.peterp h1{
+  background-color:#C93F3F;
+}
+
+.peterp .liens-c{
+  background-color:#E39B9B;
+}
+
+/* Kyoko Mogami */
+
+.kyokochan .haut-lien img, .kyokochan .liens-c img{
+  border-color:#EC4AA7;
+}
+
+.kyokochan h1{
+  background-color:#EC4AA7;
+}
+
+.kyokochan .liens-c{
+  background-color:#F49FD0;
+}
+
+/* Tate Langdon */
+
+.tatel .haut-lien img, .tatel .liens-c img{
+  border-color:#4E45F1;
+}
+
+.tatel h1{
+  background-color:#4E45F1;
+}
+
+.tatel .liens-c{
+  background-color:#B79FF4;
+}

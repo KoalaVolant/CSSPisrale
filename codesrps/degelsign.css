@@ -1,0 +1,15 @@
+/* Signature Noyel */
+
+.signdegel{ width:400px; height:100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;} 
+.signdegel *, .signdegel{ box-sizing:border-box; } 
+.signdegel img{ width:30%; height:100px; object-fit:cover; padding-right:3px;
+  border-right:10px solid;
+  border-image: 
+    linear-gradient(
+      to bottom, 
+      #3AA786, 
+      #8C8C8C
+    ) 1 100%;
+}
+.signdegel h1{ width:69%; font-family: 'Licorice', cursive; font-size:40px; margin:0; line-height:26px; } 
+.signdegel strong{ font-size:70px; color:#47A387;}

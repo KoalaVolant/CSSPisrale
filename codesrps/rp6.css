@@ -1,0 +1,46 @@
+#wrapkv{
+width:500px;
+margin:0 auto;
+}
+
+#wrapkv p{
+border-top: 3px solid;
+border-bottom: 3px solid;
+padding:13px;
+font-family:Verdana;
+margin-top:-20px;
+font-size:11px;
+line-height:12px;
+text-align:justify;
+}
+
+#wrapkv img{
+float:right;
+width:200px;
+margin-left:10px;
+margin-bottom:2px;
+}
+
+#wrapkv h1{
+font-family: 'Josefin Sans', sans-serif;
+font-size:25px;
+line-height:27px;
+text-transform:uppercase;
+text-align:center;
+}
+
+#wrapkv strong{
+font-size:8px;
+font-family:Trebuchet MS;
+display:block;
+margin-top:-13px;
+}
+
+.txt{
+padding:5px;
+width:250px;
+font-size:12px;
+margin-bottom:5px;
+text-align:center;
+display:block;
+}

@@ -1,0 +1,138 @@
+.linkredio{
+  width:600px;
+  margin:0 auto;
+}
+
+.lredio{
+  width:270px;
+  height:200px;
+  overflow:hidden;
+  border:#fff 6px solid;
+-webkit-box-shadow: 1px 1px 4px 2px #C9C9C9;
+box-shadow: 1px 1px 4px 2px #C9C9C9;
+  float:left;
+  margin-left:10px;
+  margin-bottom:10px;
+}
+
+.lredio img{
+  width:270px;
+  height:200px;
+  z-index:13;
+  position:relative;
+}
+
+.lredio span{
+    background-color:#fff;
+    width:250px;
+    height:170px;
+    display:block;
+    overflow:auto;
+    padding:20px;
+  margin-top:-200px;
+  font-size:11px;
+  line-height:12px;
+  z-index:7;
+  position:relative;
+  }
+
+.lredio h1{
+  font-size:22px;
+  z-index:17;
+  margin:0;
+  position:relative;
+  text-align:center;
+  color:#000;
+}
+
+.lredio:hover img{
+  margin-left:-270px;
+}
+
+.lredio img, .lredio:hover img{
+  -webkit-transition: all 800ms ease;
+-moz-transition: all 800ms ease;
+-ms-transition: all 800ms ease;
+-o-transition: all 800ms ease;
+transition: all 800ms ease;
+}
+
+.lredio:hover span h1{
+  z-index:800;
+}
+  
+/* entête */
+
+.lienredio{
+  width:500px;
+  margin:0 auto;
+  padding:20px;
+  border:2px dotted #757575;
+  background-color:#C7C7C7;
+}
+
+.lienredio h1, .lienredio h2, .linkredio h1{
+  font-family: 'Lobster', cursive;
+}
+
+.lienredio h1{
+  text-align:center;
+  font-size:30px;
+  margin:0;
+  color:#9C1F1F;
+}
+
+.lienredio img{
+  width:200px;
+  height:150px;
+  padding:5px;
+  border:#000 1px solid;
+}
+
+.lienredio img+img{
+  margin-left:10px;
+}
+
+.lienredio .content{
+  background-color:#fff;
+  padding:15px;
+  height:175px;
+  overflow:auto;
+  border:#5D5D5D 1px dotted;
+  color:#5B5B5B;
+  font-size:12px;
+  line-height:13px;
+}
+
+.lienredio .lienscherches{
+  margin-top:15px;
+  background-color:#fff;
+  height:200px;
+  overflow:auto;
+  padding:15px;
+  color:#757575;
+    border:#5D5D5D 1px dotted;
+}
+
+.lienredio .lienscherches h2{
+  text-align:center;
+  color:#7C7C7C;
+  font-size:18px;
+  font-weight:normal;
+  margin:0;
+}
+
+.lienscherches strong, .lienscherches b{
+  color:#2E2E2E;
+}
+
+
+koala2{
+  font-size:8px;
+  font-family:century gothic;
+  letter-spacing:4px;
+  text-align:center;
+  display:block;
+  margin-top:-10px;
+  color:#AAAAAA;
+}

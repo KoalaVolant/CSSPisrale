@@ -1,0 +1,61 @@
+/* Structure générale */ 
+
+.structure{
+  width:550px;
+  margin:0 auto;
+}
+
+.linkgeneral{
+  width:230px;
+  float:left;
+}
+
+.linkgeneral h1{
+  width:220px;
+  padding:10px 5px 10px 5px;
+  font-size:16px;
+  font-family: 'Satisfy', cursive;
+  margin:0 auto !important;
+  display:block;
+  text-align:center;
+}
+
+.chips img{
+  width:260px;
+  height:180px;
+  display:block;
+}
+
+.chips{
+  height:180px;
+  margin-top:-25px;
+}
+
+.chips span, .chips:hover img{
+  display:none;
+}
+
+.chips span, .chips:hover span, .chips:hover img, .chips img{
+-webkit-transition: all 700ms linear;
+-moz-transition: all 700ms linear;
+-ms-transition: all 700ms linear;
+-o-transition: all 700ms linear;
+transition: all 700ms linear;
+}
+
+.chips:hover span{
+  display:block; 
+  width:230px;
+  height:150px;
+  padding:15px;
+  overflow:auto;
+  font-size:11px;
+  line-height:12px;
+  text-align:justify;
+}
+
+.chips h2{
+  text-transform:uppercase;
+  margin:0;
+  text-align:center;
+}

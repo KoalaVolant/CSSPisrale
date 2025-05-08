@@ -1,0 +1,39 @@
+.wr_chel{
+  width:438px;
+  margin:0 auto;
+  height:180px;
+  border-left:#8BBCC9 5px solid;
+   border-right:#8BBCC9 5px solid;
+}
+
+.wr_chel .one, .wr_chel .two, .wr_chel .tree{
+  float:left;
+}
+ 
+.wr_chel .one img, .wr_chel .tree img{
+  height:170px;
+  height:180px;
+}
+
+.wr_chel .two{
+  width:130px;
+}
+
+.wr_chel .two img{
+  width:160px;
+  height:90px;
+}
+
+.phr{
+  width:430px;
+  margin:0 auto;
+  clear:both;
+  padding:10px;
+  text-align:center;
+  font-weight:normal;
+  color:#527C87;
+  font-size:12px;
+  background-color:#fff;
+  display:block;
+}
+

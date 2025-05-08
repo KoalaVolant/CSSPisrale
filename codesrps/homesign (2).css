@@ -1,0 +1,45 @@
+.homesign{
+  margin:0 auto;
+  width:250px;
+}
+
+.homesign img{
+  width:250px;
+  border:#81B0E0 2px solid;
+  background-color:#fff;
+  -webkit-border-radius: 60px;
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius: 60px;
+-moz-border-radius-bottomright: 0;
+border-radius: 60px;
+border-bottom-right-radius: 0;
+  padding:4px;
+}
+
+.homesign h1{
+  background-color:#81B0E0;
+  color:#fff;
+  padding:5px;
+  font-size:20px;
+  letter-spacing:1px;
+  width:198px;
+  font-family: 'Grand Hotel', cursive;
+  text-align:right;
+  font-weight:normal;
+  margin-left:54px;
+  margin-top:0px;
+}
+
+.homesign h2{
+  background-color:#fff;
+  color:#81B0E0;
+  font-size:11px;
+  line-height:12px;
+  font-family: 'Hind', sans-serif;
+  font-weight:normal;
+  padding:5px;
+  text-align:justify;
+    width:198px;
+    margin-left:54px;
+  margin-top:-15px;
+}

@@ -1,0 +1,43 @@
+.wrapmielson{
+  width:500px;
+  margin:0 auto;
+}
+
+.wrapmielson img{
+  border-bottom:#C0871D 10px solid;
+}
+
+.wrapmielson h1{
+  background-color:#664811;
+  color:#fff;
+  padding:3px;
+  width:250px;
+  font-family: 'Dancing Script', cursive;
+  font-size:25px;
+  line-height:27px;
+  clear:both;
+  font-weight:normal;
+}
+
+.wrapmielson h2{
+  background-color:#fff;
+  color:#664811;
+  margin-top:-25px;
+  font-size:12px;
+  line-height:14px;
+  width:250px;
+  padding:5px;
+  font-weight:normal;
+  float:right;
+  text-align:right;
+}
+
+.klaussou{
+  width:450px;
+  background-color:#EDCD92;
+  color:#302207;
+  font-size:12px;
+  line-height:13px;
+  text-align:justify;
+  padding:25px;
+}

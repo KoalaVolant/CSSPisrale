@@ -1,0 +1,55 @@
+﻿#premier{
+  width:400px;
+  height:150px;
+  margin:0 auto;
+}
+
+#deuxieme{
+  background-image:url('http://img11.hostingpics.net/pics/733196Photo0823.jpg');
+  width:400px;
+  height:110px;
+  background-position:top;
+  background-size:cover;
+  transition:200ms;
+}
+
+#deuxieme:hover{
+  background-image:url('http://img11.hostingpics.net/pics/334578Photo0533.jpg');
+  background-size:none;
+  transition:200ms;
+}
+
+#premier h1{
+  font-size:20px;
+  color:#8DADC0;
+  background-color:#314A59;
+  font-family: 'Coming Soon', cursive;
+  margin-top:-15px;
+  text-premierign:center;
+}
+
+.one, .two{
+  font-size:12px;
+  margin-top:-15px;
+  color:#fff;
+  text-premierign:center;
+  letter-spacing:2px;
+  background-color:#314A59;
+  text-transform:uppercase;
+}
+
+.two{
+  display:none;
+  transition:200ms;
+  font-weight:bolder;
+}
+
+#premier:hover .one{
+  display:none;
+  transition:200ms;
+}
+
+#premier:hover .two{
+  display:block;
+  transition:200ms;
+}

@@ -1,0 +1,55 @@
+.jujudsign{ 
+width: 450px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.jujudsign *{
+  box-sizing:border-box;
+}
+
+.jujudsign span{
+    background-color: #e224a9;
+    height: 84px;
+    width: 450px;
+    position: absolute;
+    top: 54px;
+    padding-left: 137px;
+    padding-right: 10px;
+    padding-top: 6px;
+    z-index: 7;
+  display:block;
+  margin:3px 0px;
+outline: 1px solid #e224a9;
+  outline-offset:2px;
+}
+
+.jujudsign h1{
+color: #ffd2e8;
+    text-align: center;
+    font-size: 25px;
+    line-height: 30px;
+    margin: 0px;
+    font-family: 'Bowlby One SC', cursive;
+}
+
+.jujudsign p{
+  font-family: 'Lexend Deca', sans-serif;
+    color: #f9f9f9;
+    font-size: 9px;
+    line-height: 10px;
+    font-weight: 600;
+    text-align: left;
+    margin: 0px;
+    display: block;
+    text-transform: uppercase;
+}
+
+.jujudsign img{
+  clip-path: polygon(50% 0%, 100% 50%, 75% 50%, 75% 100%, 25% 100%, 25% 50%, 0 50%);
+      position: relative;
+    z-index: 13;
+  width:160px; height:160px; object-fit:cover;
+}

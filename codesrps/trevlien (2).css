@@ -1,0 +1,50 @@
+/* Fiche Trevor */ 
+
+.trevl{
+  width:600px;
+  margin:0 auto;
+}
+
+.trevl .content{
+  background-color:#F4F4F4;
+  padding:10px;
+  color:#292929;
+-webkit-box-shadow: 0px 0px 5px 0px rgba(186, 186, 186, 0.75);
+-moz-box-shadow:    0px 0px 5px 0px rgba(186, 186, 186, 0.75);
+box-shadow:         0px 0px 5px 0px rgba(186, 186, 186, 0.75);
+}
+
+.trevl h1, .trevl h2{
+text-transform:inherit;
+  font-size:40px;
+  text-align:center;
+  color:#8CC1A8;
+  font-family: 'Rokkitt', serif;
+  margin-top:0px;
+}
+
+.trevl h2{
+  font-size:35px;
+}
+
+.trevl p{
+  height:100px;
+  overflow:auto;
+  text-align:justify;
+  margin-top:-15px;
+}
+
+.mg{
+  width:600px;
+  margin:0 auto;
+}
+
+.mg img{
+  width:295px;
+  height:150px;
+  margin:-5px 0px -5px 0px;
+}
+
+trev{
+  color:#4A8A6C;
+}

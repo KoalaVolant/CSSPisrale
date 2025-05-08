@@ -1,0 +1,57 @@
+/* Tzadkiel */ 
+
+.tza{
+  width:500px; 
+  margin:0 auto; 
+} 
+
+.tza img{
+  width:130px;
+  -moz-transform: rotate(-10deg);
+-webkit-transform: rotate(-10deg);
+-o-transform: rotate(-10deg);
+-ms-transform: rotate(-10deg);
+transform: rotate(-10deg);
+  float:left;
+  -webkit-border-radius: 5px;
+-moz-border-radius: 5px;
+border-radius: 5px;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(255,255,255,1);
+-moz-box-shadow: 0px 0px 5px 0px rgba(255,255,255,1);
+box-shadow: 0px 0px 5px 0px rgba(255,255,255,1);
+}
+
+.tza div{
+  width:300px;
+  background-color:#fff;
+  padding:10px;
+  float:left;
+  color:#6F6F6F;
+  font-size:10px;
+  line-height:11px;
+  text-align:justify;
+  margin-left:15px;
+  margin-top:5px;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(255,255,255,1);
+-moz-box-shadow: 0px 0px 5px 0px rgba(255,255,255,1);
+box-shadow: 0px 0px 5px 0px rgba(255,255,255,1);
+border:#BBBBBB 1px dotted;
+}
+
+.tza h1{
+  text-transform:uppercase;
+  color:#8A5151;
+  font-size:22px;
+  margin-top:0px;
+  text-align:center;
+  font-family: 'Abril Fatface', cursive;
+}
+
+.tza h2{
+  font-size:14px;
+  letter-spacing:1px;
+  color:#C09494;
+  font-family: 'Lobster Two', cursive;
+  text-align:center;
+  margin-top:-10px;
+}

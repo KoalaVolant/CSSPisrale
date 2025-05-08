@@ -1,0 +1,45 @@
+.peterlistrp{
+  width:450px;
+  margin:0 auto;
+  background-color:#fff;
+  color:#666;
+  border-top:#3493B1 5px solid;
+  border-bottom:#3493B1 5px solid;
+  padding:15px;
+  font-family:Verdana;
+  position:relative;
+}
+
+.peterlistrp img{
+  border-radius:50%;
+  object-fit:cover;
+  width:150px;
+  height:150px;
+  position:absolute;
+  right:40px;
+  top:-25px;
+}
+
+.peterlistrp h1{
+  font-family: 'Londrina Solid', cursive;
+  font-size:20px;
+  line-height:22px;
+  padding:10px;
+  font-weight:normal;
+  background-color:#3493B1;
+  color:#fff;
+  text-transform:uppercase;
+}
+
+.peterlistrp h2{
+  font-family: 'Quicksand', sans-serif;
+  font-size:17px;
+  color:#225F73;
+  border-bottom:#3493B1 2px solid;
+  padding-bottom:3px;
+}
+
+.peterlistrp a, .peterlistrp a:hover, .peterlistrp a:visited, .peterlistrp a:link{
+  text-decoration:none;
+  color:#3189A6;
+}

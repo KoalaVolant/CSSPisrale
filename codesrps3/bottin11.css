@@ -1,0 +1,31 @@
+:root{ 
+--botava-degrade1:linear-gradient(60deg, rgba(169,169,169,1) 0%, rgba(248,248,248,1) 100%);
+--botava-degrade2:linear-gradient(260deg, rgba(169,169,169,1) 0%, rgba(248,248,248,1) 100%);
+--botava-font:"Cuprum", serif;
+}
+
+.bottin11, .bottin11 *{ box-sizing:border-box; }
+.bottin11{ margin:0 auto; width:650px; font-family:var(--botava-font); }
+.bottin11 br{ display:none; }
+.bottin11 img{ object-fit:cover; }
+
+/*** Code ****/ 
+
+.bottin11 .bottin11title{ width:100%; font-size:30px; text-align:center; 
+display:flex; justify-content:center; align-items:center; margin-bottom:15px; }
+.bottin11 .bottin11title div{ border-bottom:1px dashed; width:36%; position:relative; }
+.bottin11 .bottin11title div:before{ content:'◄'; position:absolute; left:0; top:50%; 
+transform:translateY(-50%); font-size:15px;}
+.bottin11 .bottin11title div:after{ content:'►'; position:absolute; right:0; top:50%; 
+transform:translateY(-50%); font-size:15px;}
+.bottin11 .bottin11title div:nth-child(3){ border:none; width:28%;}
+.bottin11 .bottin11title div:nth-child(3):before{ content:none; }
+.bottin11 .bottin11title div:nth-child(3):after{ content:none; }
+
+.bottin11persos{ display:flex; justify-content:center; flex-wrap:wrap; }
+.bottin11leperso{ width:17%; margin:10px 5px; text-transform:uppercase; }
+.bottin11leperso img{ width:100%; height:100px;}
+.bottin11leperso span{ padding:5px; text-align:center; display:block; background:var(--botava-degrade1); }
+.bottin11leperso span:last-child{background:var(--botava-degrade2); }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

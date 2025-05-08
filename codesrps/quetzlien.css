@@ -1,0 +1,177 @@
+/* Fiche lien Quetzal */
+
+.quetzl{
+  width:600px; 
+  margin:0 auto;
+}
+
+.quetzl div{
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#2d0404+0,002103+100 */
+background: #2d0404; /* Old browsers */
+background: -moz-linear-gradient(left,  #2d0404 0%, #002103 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left,  #2d0404 0%,#002103 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right,  #2d0404 0%,#002103 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2d0404', endColorstr='#002103',GradientType=1 ); /* IE6-9 */
+
+  padding:10px;
+  width:230px;
+  float:left;
+  margin-bottom:10px;
+  margin-right:10px;
+}
+
+.quetzl img{
+  width:90px;
+  height:90px;
+  margin-top:-15px;
+  padding:3px;
+  border:#fff solid 1px;
+  -moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);
+}
+
+.quetzl span{
+  background-color:#000;
+  height:150px;
+  overflow:auto;
+  padding:15px;
+  font-size:11px;
+  line-height:13px;
+  color:#fff;
+  margin-top:-15px;
+  display:block;
+}
+
+.quetzl h1{
+      font-family: 'Neucha', cursive;
+  font-size:19px;
+  margin-top:-15px;
+  text-align:center;
+  color:#fff;
+}
+
+.quetzl h2{
+  font-size:10px; 
+  line-height:11px;
+  font-family: 'Scada', sans-serif;
+  margin-top:-30px;
+  text-align:center;
+  color:#3FA725;
+}
+  
+/* Entête lien */
+
+.quetzlien{
+  width:480px; 
+  margin:0 auto;
+  background-color:#dedede;
+}
+
+.qleft, .qright{
+  float:left;
+  margin:0;
+}
+
+.qleft{
+ margin-right:-45px;
+  width:210px;
+}
+
+.qright{
+  width:260px;
+background-color:#000;
+  padding:25px;
+  text-align:justify;
+  color:#fff;
+  font-size:11px;
+  margin-top:30px;
+  line-height:12px;
+    height:200px;
+  overflow:auto;
+  -moz-box-shadow: inset 0px 0px 200px 0px #000000;
+-webkit-box-shadow: inset 0px 0px 200px 0px #000000;
+-o-box-shadow: inset 0px 0px 200px 0px #000000;
+box-shadow: inset 0px 0px 200px 0px #000000;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#000000, Direction=NaN, Strength=200);
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#19331b+0,542a2a+50,104477+100 */
+background: #19331b; /* Old browsers */
+background: -moz-linear-gradient(left,  #19331b 0%, #542a2a 50%, #104477 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left,  #19331b 0%,#542a2a 50%,#104477 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right,  #19331b 0%,#542a2a 50%,#104477 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#19331b', endColorstr='#104477',GradientType=1 ); /* IE6-9 */
+
+}
+
+.qright:hover{
+  background-color:#000;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+50,000000+100 */
+background: #000000; /* Old browsers */
+background: -moz-linear-gradient(left,  #000000 0%, #000000 50%, #000000 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left,  #000000 0%,#000000 50%,#000000 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right,  #000000 0%,#000000 50%,#000000 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#000000',GradientType=1 ); /* IE6-9 */
+
+}
+
+.qleft span{
+  width:150px;
+  height:90px;
+  background-size:100%;
+  display:block;
+}
+
+.qleft h1{
+  font-family: 'Neucha', cursive;
+  color:#fff;
+  font-size:22px;
+  line-height:27px;
+text-shadow: 2px 2px 1px rgba(0, 0, 0, 1);
+  text-align:center;
+padding-top:35px;
+  opacity: 0.50;
+filter: alpha(opacity =50);
+}
+
+.qleft span:hover h1{
+  opacity: 1;
+filter: alpha(opacity =100);
+}
+
+.qleft h1, .qleft span:hover h1, qright, qright:hover{
+  -webkit-transition: all 500ms ease;
+-moz-transition: all 500ms ease;
+-ms-transition: all 500ms ease;
+-o-transition: all 500ms ease;
+transition: all 500ms ease;
+}
+
+.linkch h1{
+    font-family: 'Neucha', cursive;
+  font-size:22px;
+  line-height:28px;
+  color:#dedede;
+  border-bottom:#409C30 dotted 1px;
+  padding:3px;
+  margin-bottom:-15px;
+}
+
+.linkch{
+  clear:both;
+  margin-top:315px;
+  color:#fff;
+  text-align:justify;
+  background-color:#000;
+  padding:10px;
+}
+
+.linkch b {
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.linkch b{
+    color:#D7A328;
+}

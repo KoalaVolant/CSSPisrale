@@ -1,0 +1,38 @@
+:root{
+    --chase4-border:linear-gradient(to left, #9C9CBE, #c9b7d5);
+    --chase4-fond:url('https://i.servimg.com/u/f30/19/45/51/53/eberha11.jpg');
+}
+
+.chaserp4 {
+  width: 450px;
+  margin: 0 auto; position:relative;
+font-family: 'Lato', sans-serif;
+}
+.chaserp4 br{ display:none; }
+.chaserp4 .chaseContent br, .chaserp4 .chaseTitre br{ display:block; }
+.chaserp4, .chaserp4 *{
+  box-sizing: border-box; }
+
+  .chaserp4 .chaseTitre {
+    padding: 5px; font-size:18px; text-align:right;  text-transform:uppercase; font-weight:lighter; 
+    width: 100%;
+ border:2px solid; 
+          border-image-source: var(--chase4-border);
+  border-image-slice: 1 1;
+margin-bottom:10px;}
+
+.chaserp4 .chaseImg{ position:absolute; left:-10px; width:70px; top:-40px; }
+
+  .chaserp4 .chaseImg img {
+    object-fit: cover;
+    width: 70px;
+    height: 70px;  border-radius:50%; border:2px solid white; filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.10));}
+
+  .chaserp4 .chaseContent { position:relative;
+    padding: 20px 20px 20px 70px; 
+    background: #fff; text-align:justify; font-size:14px; line-height:1.5em; 
+     border:20px solid; 
+          border-image-source: var(--chase4-fond);
+  border-image-slice: 1 1; 
+border-left:none; border-right:none;
+box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);}

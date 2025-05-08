@@ -1,0 +1,25 @@
+:root{ 
+    --aarisi:#123456; 
+}
+
+.aariciaSign, .aariciaSign *{ box-sizing:border-box;  }
+.aariciaSign{ margin:0 auto; width:230px;  }
+.aariciaSign br{ display:none; }
+.aariciaSign img{ object-fit:cover; }
+
+.aariciaSign > img{ display:block; width:100%; height:90px; padding:3px; border:1px solid #999; }
+.aariciaSign .aariciaTxt{ position:relative; display:block; margin-top:10px;}
+.aariciaSign .aariciaTxt span:nth-child(1){
+   position:absolute; top:-18px; left:0; z-index:1; background:url('https://i.imgur.com/KyzDFqF.png');
+   width:100%; height:30px; background-size:50%;
+   background-repeat:no-repeat; opacity:0.4;
+   background-position:center; display:block;
+}
+
+.aariciaSign .aariciaTxt span:nth-child(2){ font-size:25px; line-height:25px; display:block;
+   text-align:center; font-family: 'Fleur De Leah', cursive;
+position:relative; z-index:8; color:var(--aarisi); }
+.aariciaSign .aariciaTxt span:nth-child(3){ font-family: 'Montaga', serif;
+font-size:10px; line-height:10px; text-align:justify; display:block; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

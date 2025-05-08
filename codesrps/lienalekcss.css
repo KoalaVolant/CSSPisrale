@@ -1,0 +1,65 @@
+.wrapper2{
+width:650px; 
+margin:0 auto;
+background-color:#000;
+}
+
+.alink{
+width:500px;
+  height:150px;
+  margin:0 auto;
+background: #232d42; 
+  background: -moz-linear-gradient(top, #232d42 0%, #090b11 100%); 
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#232d42), color-stop(100%,#090b11)); 
+  background: -webkit-linear-gradient(top, #232d42 0%,#090b11 100%); 
+  background: -o-linear-gradient(top, #232d42 0%,#090b11 100%); 
+  background: -ms-linear-gradient(top, #232d42 0%,#090b11 100%); /* IE10+ */ 
+  background: linear-gradient(to bottom, #232d42 0%,#090b11 100%); 
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#232d42', endColorstr='#090b11',GradientType=0 ); 
+}
+
+.alink img{
+width:100px;
+  display:block;
+  margin-top:25px;
+  margin-left:-15px;
+float:left;
+-moz-transform: rotate(45deg); 
+-webkit-transform: rotate(45deg); 
+-o-transform: rotate(45deg); 
+-ms-transform: rotate(45deg); 
+transform: rotate(45deg);
+  transition:500ms;
+}
+
+.alink:hover img{
+-moz-transform: rotate(0deg); 
+-webkit-transform: rotate(0deg); 
+-o-transform: rotate(0deg); 
+-ms-transform: rotate(0deg); 
+transform: rotate(0deg);
+  transition:500ms;
+}
+
+.alink h1{
+font-family: 'Bree Serif', serif; 
+text-transform:uppercase; 
+text-align:center; 
+font-size:16px; 
+  color:#9D9EAA;
+  text-shadow:#000 0px 0px 2px;
+}
+
+.alink p{
+width:360px; 
+height:110px; 
+overflow:auto; 
+padding:10px; 
+float:left;
+  margin-top:-15px;
+  margin-left:10px;
+background-color:#0B0C0F; 
+color:#A0A2AD; 
+font-size:11px; 
+line-height:13px;
+}

@@ -1,0 +1,25 @@
+.alecsign{
+  width:190px;
+  margin:0 auto;
+}
+
+.alecsign img{
+  width:190px;
+  height:100px;
+  object-fit:cover;
+  padding-bottom:6px;
+  padding-top:3px;
+  border-top:#7E6674 5px solid;
+  border-bottom:#7E6674 1px dotted;
+}
+
+.alecsign h1{
+  font-weight:normal;
+  margin-top:5px;
+  font-size:9px;
+  font-family:Verdana;
+  text-transform:uppercase;
+  line-height:10px;
+  text-align:justify;
+  width:190px;
+}

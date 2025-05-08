@@ -1,0 +1,61 @@
+/* Raph Lien */
+
+.raphlink{
+  width:450px;
+  margin:0 auto;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  font-family:Verdana;
+}
+
+.raphlink img{
+  width:120px;
+  height:120px;
+  display:block;
+  margin:0 auto;
+  padding:5px;
+  border:#3C94C4 5px solid;
+  -webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+}
+
+.blink{
+  background-color:#fff;
+  width:450px;
+  padding:15px;
+  -webkit-box-shadow: 0px 3px 5px 0px rgba(163,163,163,1);
+-moz-box-shadow: 0px 3px 5px 0px rgba(163,163,163,1);
+box-shadow: 0px 3px 5px 0px rgba(163,163,163,1);
+}
+  
+.bloc1{
+  height:200px;
+}
+
+.bloc2{
+  margin-top:25px;
+  height:250px;
+  overflow:auto;
+}
+
+.raphlink h1{
+  font-family: 'Risque', cursive;
+  font-size:35px;
+  text-align:center;
+  color:#3C94C4;
+}
+
+.raphlink h2{
+  text-align:right;
+  font-weight:normal;
+  margin:0;
+  color:#7F7F7F;
+}
+
+.bloc2 h1{
+  font-size:25px;
+  color:#276B7E;
+  letter-spacing:0px;
+}

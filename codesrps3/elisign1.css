@@ -1,0 +1,17 @@
+.kamskign1, .kamskign1 *{ box-sizing:border-box; }
+.kamskign1{ margin:0 auto; width:300px; overflow:hidden; position:relative; 
+	display:flex; flex-wrap:wrap; justify-content:center; padding:5px; }
+.kamskign1 br{ display:none; }
+.kamskign1 img{ object-fit:cover; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.kamskign1 .kamskifond11 { position:absolute; z-index:5; opacity:0.5;}
+.kamskign1 .kamskifond11 svg{ width:320%; }
+.kamskign1 .kamskifond11 svg path{ fill:var(--fondsk) !important; }
+
+.kamskign1 img{ width:46%; position:relative; top:-10px; z-index:15; margin:5px 0; margin-right:5px; border:1px solid white;}
+.kamskign1 img+img{ margin-right:0; }
+
+.kamskign1 span{ display:block; margin:0 10px; font-size:10px; line-height:10px; position:relative;
+z-index:16; background:var(--fondssk); padding:5px; color:#555; text-align:justify;font-family:Arima; top:-10px;}

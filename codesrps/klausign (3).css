@@ -1,0 +1,56 @@
+.klausign{
+  margin:0 auto;
+  width:500px;
+}
+
+.mikal img{
+  margin-right:5px;
+  margin-left:35px;
+  width:200px; 
+}
+
+.mikal img+img{
+  margin-left:0px;
+}
+
+.klausign h1{
+  font-size:35px;
+    font-family: 'Euphoria Script', cursive;
+    font-weight:bolder;
+  width:200px;
+  color:#B40E2F;
+  margin:0 auto;
+  text-align:center;
+  border-top:#666 1px solid;
+  border-bottom:#666 1px solid;
+  padding:10px 0px 10px 0px;
+  }
+  
+
+.blkm{
+  width:500px;
+  height:150px;
+  margin-top:-20px;
+}
+
+.blkm img, .blkm .laus{
+  float:left;
+  height:120px;
+}
+
+
+
+.blkm .laus{
+  width:405px;
+  height:120px;
+  display:block;
+  background-color:#F2F2F2;
+}
+
+.laus p{
+  padding:10px;
+  font-size:10px;
+  line-height:12px;
+  margin-top:5px;
+  color:#606060;
+}

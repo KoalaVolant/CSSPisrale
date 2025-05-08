@@ -1,0 +1,137 @@
+/* Pai sign */ 
+
+.paisign{
+  width:330px;
+  margin:0 auto;
+  background-image:url('http://img11.hostingpics.net/pics/442419darkbluewallpaper3.jpg');
+  background-position:left;
+  background-size:100%;
+  padding:10px;
+}
+
+.paisign img{
+      border:#1A3148 1px solid;
+    width:150px;
+    height:80px;
+  margin-top:-15px;
+  }
+
+.paisign img+img{
+  margin-left:10px;
+}
+  
+  .paisign h1{
+      text-shadow:1px 1px 4px #000;
+  text-align:center;
+  font-family: 'Suranna', serif;
+  text-transform:uppercase;
+  font-size:11px;
+  color:#94B6D8;
+      background-color:#112131;
+    padding:5px;
+  line-height:12px;
+  margin-top:0px;
+  }
+    
+
+.paisign h1 b, .paisign h1 strong{
+  font-size:20px;
+  letter-spacing:3px;
+  color:#fff;
+  margin-top:4px;
+  margin-bottom:-3px;
+  display:block;
+}
+/* Pai RP */
+
+.paipai{
+  width:500px;
+  margin:0 auto;
+  background-image:url('http://img11.hostingpics.net/pics/442419darkbluewallpaper3.jpg');
+  background-position:left;
+  background-size:100%;
+  padding:20px;
+  -webkit-border-top-left-radius: 80px;
+-webkit-border-top-right-radius: 80px;
+-moz-border-radius-topleft: 80px;
+-moz-border-radius-topright: 80px;
+border-top-left-radius: 80px;
+border-top-right-radius: 80px;
+}
+
+.paipai div{
+  padding:10px;
+  -webkit-border-top-left-radius: 20px;
+-webkit-border-top-right-radius: 20px;
+-moz-border-radius-topleft: 20px;
+-moz-border-radius-topright: 20px;
+border-top-left-radius: 20px;
+border-top-right-radius: 20px;
+  background-color:#203D59;
+  color:#fff;
+}
+
+.paipai h1{
+  text-shadow:1px 1px 4px #000;
+  text-align:center;
+  font-family: 'Suranna', serif;
+  text-transform:uppercase;
+  font-size:24px;
+  color:#fff;
+  line-height:25px;
+}
+
+.paipai h2{
+  font-size:11px;
+  color:#dedede;
+  text-align:center;
+  margin-top:-15px;
+  letter-spacing:2px;
+  font-weight:normal;
+  font-family:Times New Roman;
+}
+
+.paipai img{
+  width:500px;
+  height:200px;
+  margin-bottom:-10px;
+  position:relative;
+  z-index:7;
+  border:#1A3148 1px solid;
+}
+
+.paipai h3{
+  background-color:#315B86;
+    text-shadow:1px 1px 4px #000;
+  color:#B8CEE4;
+  font-size:14px;
+  line-height:14px;
+  padding:10px;
+  width:400px;
+  margin:0 auto;
+  display:block;
+  text-align:center;
+  font-family: 'Suranna', serif;
+  position:relative;
+  z-index:13;
+}
+
+.paipai span{
+  background-color:#112131;
+
+  display:block;
+  width:400px;
+  padding:25px;
+  text-align:justify;
+  color:#D1E0EF;
+  margin:0 auto;
+  font-size:12px;
+  line-height:14px;
+  
+}
+
+.paipai span::first-letter{
+  font-size:35px;
+    font-family: 'Suranna', serif;
+  color:#4380BC;
+}

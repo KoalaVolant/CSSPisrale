@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        #app {
+            width: 800px;
+            margin: 0 auto;
+            background: #EDF2F4;
+            padding: 20px;
+            font-family: Verdana;
+        }
+        #app input[type=text] {
+            width: 60%;
+        }
+        #app h1 {
+            color: #2B2D42;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 4px;
+            border: 1px solid #8D99AE;
+            padding: 5px;
+        }
+        #app h2 {
+            color: #8D99AE;
+            border-bottom: 1px solid #8D99AE;
+            font-family: 'Bebas Neue', sans-serif;
+        }
+        .codefinal {
+            width: 90%;
+            margin: 0 auto;
+            display: block;
+            font-size: 14px;
+            line-height: 18px;
+            background: #CDDDDF;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .fondpre {
+            background: #ffffff;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .inputflex {
+            display: flex;
+        }
+        .inputflex > div {
+            width: 49%;
+        }
+        #app button {
+            font-size: 18px;
+        }
+        :root {
+            --pis-color1: #7d4245;
+            --pis-color2: #b8b8b8;
+            --pis-color3: #74A993;
+        }
+
+         .titre1{ background:var(--color-deg); font-family:var(--font-1); font-size:35px; line-height:35px;
+letter-spacing:6px; color:var(--white); min-width:50%; text-transform:uppercase; font-weight:bold;
+    border-radius:10px; padding:0 5px; display:inline-block;}
+ .createurices1{ color:#626262; font-size:13px;}
+ .ajt-gr,  .ajt-cd{ display:flex; align-items:center;  background:#fff; border:1px solid #c4c4c4;
+border-radius:5px; margin-top:-10px; transition:500ms;}
+ .ajt-gr:hover,  .ajt-cd:hover{ background:#f0f0f0; transition:500ms;}
+ .ajt-gr img{ margin-right:5px; min-width:15%; max-width:20%; height:50px;}
+ .ajt-gr .nbr{ border-radius:50%; padding:5px; width:40px; height:40px; 
+    background:#f0f0f0; margin:5px 0; margin-right:10px; display:flex; align-items:center; justify-content:center; color:#222; }
+ .ajt-gr .descr,  .ajt-cd .descr{ font-family:var(--font-2); color:#222; }
+ .ajt-gr.ajt-new{ border-color:rgb(236,157,157); }
+ .ajt-gr.ajt-new .nbr{ background:rgb(236,157,157);}
+ .ajt-cd img{ margin-right:5px; min-width:10%; max-width:15%; height:50px;}
+ .ajt-gr .descr,  .ajt-cd .descr{ margin-left:10px; flex-direction:column; display:flex;  justify-content:center; font-size:14px; line-height:14px;}
+ .ajt-gr .descr em,  .ajt-cd .descr em{ display:block; font-size:11px; font-weight:normal; line-height:11px;  }
+
+ .ajt-flex{ display:flex; justify-content:space-between; flex-wrap:wrap; width:100%;}
+ .ajt-flex br{ display:none; }
+ .ajt-flex .ajt-gr{ width:49%; height:50px; margin-bottom:15px; color:#222; text-decoration:none;}
+
+ pre{ width: 752px;
+  word-wrap: break-word;
+  white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Remplir les news</h1>
+        <h3>Inputs sans nombre</h3>
+
+        <label>Lien :</label> 
+        <input type="text" v-model="lien1"><br>
+        <label>Image 1 :</label> 
+        <input type="text" v-model="image1"><br>
+        <label>Nombre ?</label> 
+        <input type="checkbox" v-model="ifnombre">
+        <span v-if="ifnombre">
+            <input v-model="nombre1" type="text">
+        </span><br>
+        <label>Est-ce que c'est nouveau ?</label> 
+        <input type="checkbox" v-model="classe1"><br>
+        <label>Info en plus ?</label> 
+        <input type="checkbox" v-model="infoplus">
+        <span v-if="infoplus">
+            <input v-model="newinfo" type="text">
+        </span><br>
+        <label>Info principale :</label> 
+        <input type="text" v-model="infop"><br>
+
+        <br><br>
+        <button @click="ajouterGrosAjout">Ajouter</button> 
+        <button @click="supprimerGrosAjout">Supprimer le dernier</button>
+
+        <h3>Résultats</h3>
+
+        <div class="ajt-flex"> 
+            <a v-for="(grosAjout, index) in grosAjouts" :key="index" :href="grosAjout.lien1" target="_blank" :class="['ajt-gr', {'ajt-new': grosAjout.classe1}]">
+                <img :src="grosAjout.image1" style="object-position:top;">
+                <span v-if="grosAjout.nombre1" class="nbr">{{ grosAjout.nombre1 }}</span>
+                <span class="descr">
+                    <em v-if="grosAjout.newinfo">{{ grosAjout.newinfo }}</em>
+                    <span>{{ grosAjout.infop }}</span>
+                </span>
+            </a>
+        </div>
+        
+        <!-- Section pour afficher le code HTML comme texte -->
+        <div class="ajt-flex"> 
+            <pre v-html="escapedHtml"></pre>
+        </div>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    lien1: "url du sujet",
+                    image1: "https://i.pinimg.com/736x/81/da/95/81da956afab25490019d134368011a6e.jpg",
+                    ifnombre: false,
+                    nombre1: "",
+                    infoplus: false,
+                    newinfo: "Faites court pas zaper fandom",
+                    infop: "",
+                    classe1: false,
+                    grosAjouts: [],
+                    escapedHtml: ''
+                };
+            },
+            methods: {
+                ajouterGrosAjout() {
+                    this.grosAjouts.push({
+                        lien1: this.lien1,
+                        image1: this.image1,
+                        nombre1: this.nombre1,
+                        infop: this.infop,
+                        newinfo: this.infoplus ? this.newinfo : '',
+                        classe1: this.classe1
+                    });
+                    this.updateEscapedHtml();
+                    this.reinitialiserGrosAjout();
+                },
+                supprimerGrosAjout() {
+                    this.grosAjouts.pop();
+                    this.updateEscapedHtml();
+                },
+                reinitialiserGrosAjout() {
+                    this.lien1 = "url du sujet";
+                    this.image1 = "https://i.pinimg.com/736x/81/da/95/81da956afab25490019d134368011a6e.jpg";
+                    this.ifnombre = false;
+                    this.nombre1 = "";
+                    this.infoplus = false;
+                    this.newinfo = "Faites court pas zaper fandom";
+                    this.infop = "";
+                    this.classe1 = false;
+                },
+                escapeHtml(html) {
+                    return html
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                },
+                updateEscapedHtml() {
+                    let resultHtml = `<div class="ajt-flex">`;
+                    this.grosAjouts.forEach(grosAjout => {
+                        resultHtml += `
+<a href="${grosAjout.lien1}" target="_blank" class="ajt-gr ${grosAjout.classe1 ? 'ajt-new' : ''}">
+    <img src="${grosAjout.image1}" style="object-position:top;"> ${grosAjout.nombre1 ? `<span class="nbr">${grosAjout.nombre1}</span>` : ''}    <span class="descr"> ${grosAjout.newinfo ? `<em>${grosAjout.newinfo}</em>` : ''} <span>${grosAjout.infop}</span></span>
+</a>`;
+                    });
+                    resultHtml += `</div>`;
+                    this.escapedHtml = this.escapeHtml(resultHtml);
+                }
+            },
+            mounted() {
+                this.updateEscapedHtml();
+            }
+        });
+        app.mount("#app");
+    </script>
+</body>
+
+</html>

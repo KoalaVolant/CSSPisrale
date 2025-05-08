@@ -1,0 +1,61 @@
+.henryrp{
+  width:450px;
+  margin:0 auto;
+  text-align:justify;
+  font-size:12px;
+  line-height:14px;
+  font-family:Verdana;
+  padding:20px;
+  color:#000;
+  text-align:justify;
+  background-image:url('https://i62.servimg.com/u/f62/11/66/37/71/textur13.jpg');
+  -webkit-border-top-right-radius: 60px;
+-moz-border-radius-topright: 60px;
+border-top-right-radius: 60px;
+  -webkit-box-shadow: 4px 4px 5px 0px rgba(107,107,107,1);
+-moz-box-shadow: 4px 4px 5px 0px rgba(107,107,107,1);
+box-shadow: 4px 4px 5px 0px rgba(107,107,107,1);
+  border-left:#696969 4px solid;
+}
+
+.henryrp *, .henryrp{
+        -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.enthenry{
+  float:left;
+  margin:0 20px 20px 0;
+}
+
+.henryrp span h1{
+    font-family: 'Slabo 27px', serif;
+  font-size:20px;
+  line-height:21px;
+  text-shadow:#000 0px 0px 3px; 
+  text-transform:uppercase;
+  margin:0;
+}
+
+.enthenry div, .enthenry img{
+  width:170px;
+  height:90px;
+}
+
+.enthenry img{
+    z-index:7;
+  position:relative;
+  object-fit:cover;
+  border:#fff 3px solid;
+-webkit-box-shadow: 0px 0px 3px 3px rgba(199,199,199,1);
+-moz-box-shadow: 0px 0px 3px 3px rgba(199,199,199,1);
+box-shadow: 0px 0px 3px 3px rgba(199,199,199,1);
+}
+
+.enthenry h1{
+  font-family: 'Slabo 27px', serif;
+  font-size:15px;
+  text-align:center;
+  letter-spacing:4px;
+}

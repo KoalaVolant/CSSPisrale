@@ -1,0 +1,6 @@
+.joleenrp{ width:500px; margin:0 auto; border-bottom:4px solid #DC1F23;} 
+.joleenrp *{ box-sizing:border-box; } 
+.joleenrp .struct1{ display:flex; justify-content:space-around; align-items:center; padding-bottom:10px; border-bottom:4px double #DC1F23;} 
+.joleenrp img{ width:120px; height:100px; object-fit:cover; border:1px solid #C51B1F; padding:5px; }
+.joleenrp h1{ font-family: 'Bebas Neue', cursive; font-size:23px; line-height:25px; color:#A8171B; text-align:center; padding:0px 10px; }
+.joleenrp div{ text-align:justify; font-size:13px; line-height:1.4em;  padding-bottom:10px; max-height:350px; overflow:auto;  }

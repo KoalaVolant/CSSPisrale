@@ -1,0 +1,48 @@
+.alekign{
+  width:450px;
+  margin:0 auto;
+}
+
+.alekign img{
+  width:210px;
+  height:150px;
+  float:left;
+}
+
+.alekign div{
+  width:230px;
+  float:left;
+  height:150px;
+margin-top:10px;
+}
+
+.alekign h1{
+  background-color:#000;
+  padding:5px;
+  float:left;
+  font-family: 'IM Fell DW Pica', serif;
+  text-transform:uppercase;
+  font-size:15px;
+  line-height:17px;
+  color:#4F8DA2;
+  text-align:left;
+}
+
+.alekign h2{
+  background-color:#101B23;
+  color:#E3ECF2;
+  font-size:10px;
+  line-height:11px;
+  text-transform:uppercase;
+  font-weight:normal;
+  padding:5px;
+  text-align:right;
+  letter-spacing:1px;
+  font-family: 'News Cycle', sans-serif;
+}
+
+.alekign h2 b, .alekign h2 strong{
+  color:#fff;
+  letter-spacing:2px;
+}
+  

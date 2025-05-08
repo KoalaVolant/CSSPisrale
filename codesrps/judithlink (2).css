@@ -1,0 +1,121 @@
+.wrapjude{
+  width:550px;
+  margin:0 auto;
+}
+
+.judelien{
+  width:235px;
+  margin-right:15px;
+  margin-bottom:15px;
+  margin-top:0px;
+  float:left;
+}
+
+.judelien img{
+  width:235px;
+}
+
+.judelien h1{
+    color:#fff;
+  letter-spacing:1px;
+  text-shadow: 1px 1px 2px #757575;
+    font-family: 'Luckiest Guy', cursive;
+  font-size:20px;
+  text-align:center;
+}
+
+.judelien h2{
+  color:#fff;
+  text-transform:uppercase;
+  text-align:center;
+  margin-top:-35px;
+}
+
+.judeliendesc{
+  width:225px;
+  padding:100px 5px 5px 5px;
+  margin-top:-120px;
+  font-size:11px;
+  line-height:12px;
+  text-align:justify;
+  background-color:#451D3A;
+  color:#DDDDDD;
+}
+
+.judeliendesc span{
+height:200px;
+    overflow:auto;
+  display:block;
+  padding:10px;
+}
+
+.judeliench{
+  width:335px;
+  margin:0 auto;
+  background-color:#2E051D;
+  color:#EFEFEF;
+  padding:10px;
+  font-size:11px;
+  line-height:12px;
+ 
+}
+
+  .judeliench span{
+  overflow:auto;
+    height:200px;
+  display:block;
+  padding:10px;
+}
+
+.judeliench .l{
+  color:#BEF3A7;
+  text-transform:uppercase;
+}
+
+.judeliench .p{
+  color:#F5A5A7;
+  text-transform:uppercase;
+}
+
+.judentete{
+  width:350px;
+  margin:0 auto;
+}
+
+.judentete img{
+  width:350px;
+-webkit-border-top-left-radius: 10px;
+-webkit-border-top-right-radius: 10px;
+-moz-border-radius-topleft: 10px;
+-moz-border-radius-topright: 10px;
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+}
+
+.judentete h1, .judeliench h1{
+  color:#fff;
+  text-shadow: 1px 1px 2px #757575;
+    font-family: 'Luckiest Guy', cursive;
+  font-size:23px;
+  text-align:center;
+}
+
+.judentete h2{
+  text-transform:uppercase;
+  color:#fff;
+  text-align:center;
+  margin-top:-35px;
+  font-size:12px;
+  line-height:13px;
+  padding:10px;
+}
+
+.judithdes{
+  background-color:#712042;
+  color:#D4D4D4;
+  margin-top:-115px;
+  font-size:11px;
+  line-height:12px;
+  padding:100px 10px 10px 10px;
+  text-align:justify;
+}

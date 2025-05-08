@@ -1,0 +1,10 @@
+/* Signature Alec */
+
+.alecsign14{ width:351px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; } 
+.alecsign14 *{ box-sizing:border-box; } 
+.alecsign14 .alectxt1, .alecsign14 .alectxt2{ width:155px; font-weight:bold; text-transform:uppercase; font-family: 'Yanone Kaffeesatz', sans-serif; padding:10px; 
+  font-size:16px; color:#49768B; text-align:justify;} 
+.alecsign14 .alecimg1{ width:200px; }
+.alecsign14 .alecig1{ width:97px; height:80px; object-fit:cover; }
+.alecsign14 .alecig1:first-child{  margin-right:5px; }
+.alecsign14 .alecig2{ width:200px; margin-top:5px; height:60px; object-fit:cover; } 

@@ -1,0 +1,54 @@
+.dandrp{
+  width:450px;
+  margin:0 auto;
+  background-color:#A56541;
+  border-bottom:#5D3D26 solid 5px;
+}
+
+.dandrp *{
+        -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.dandrp img{
+  width:450px;
+  height:170px;
+  object-fit:cover;
+  border-top:#fff 6px double;
+}
+
+.dandrp h1{
+  text-align:center;
+  font-size:22px;
+  line-height:23px;
+  font-family: 'Anton', sans-serif;
+  font-weight:normal;
+  padding:10px;
+  color:#fff;
+  margin:0;
+  text-shadow:0px 0px 2px #000;
+  background-image:url('https://i62.servimg.com/u/f62/19/45/51/53/14110.jpg');
+}
+
+.dandrp div{
+  background-color:#fff;
+  width:400px;
+  margin:0 auto;
+  padding:25px;
+  text-align:justify;
+  font-family:Verdana;
+  font-size:12px;
+  line-height:14px;
+  color:#353535;
+}
+
+.dandrp div::first-letter{
+  font-size:22px;
+  color:#A85C2B;
+  font-family:Times New Roman;
+}
+
+.dandrp b, .dandrp strong{
+  color:#274822;
+}

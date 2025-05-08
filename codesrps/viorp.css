@@ -1,0 +1,32 @@
+.viorp{ width:450px; margin:0 auto; padding-bottom:12px; border-bottom:5px solid;  border-image-slice: 1;
+  border-width: 5px;   border-image-source: linear-gradient(to left, #442D4D, #772E0C); }
+.viorp *{box-sizing:border-box; }
+
+.viorp h1{ padding:10px; margin:0px; text-transform:uppercase; text-align:center; letter-spacing:1px; border:1px solid;   border-image-slice: 1;
+  border-width: 1px; font-family: 'Peddana', serif; font-size:20px; line-height:21px; 
+  border-image-source: linear-gradient(to left, #442D4D, #772E0C);} 
+
+.viorimg{ display:flex; justify-content:space-between; align-items:center;  width:450px; padding-top:8px; padding-bottom:8px; border-top:3px double #772e0c; border-bottom:3px double #772E0C; }
+.viorimg img{ width:175px; height:80px; object-fit:cover; border:1px solid #76518C; }
+.viorp .viorimg div{ width:85px; height:20px; background: rgb(64,45,82); position:relative; top:0px; font-size:12px; 
+background: -moz-linear-gradient(90deg, rgba(64,45,82,1) 0%, rgba(121,46,9,1) 100%, rgba(0,212,255,1) 100%);
+background: -webkit-linear-gradient(90deg, rgba(64,45,82,1) 0%, rgba(121,46,9,1) 100%, rgba(0,212,255,1) 100%);
+background: linear-gradient(90deg, rgba(64,45,82,1) 0%, rgba(121,46,9,1) 100%, rgba(0,212,255,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#402d52",endColorstr="#00d4ff",GradientType=1);
+-moz-transform: rotate(145deg);
+-webkit-transform: rotate(145deg);
+-o-transform: rotate(145deg);
+-ms-transform: rotate(145deg);
+transform: rotate(145deg);
+-webkit-transition: all 500ms ease-in;
+-moz-transition: all 500ms ease-in;
+-ms-transition: all 500ms ease-in;
+-o-transition: all 500ms ease-in;
+transition: all 500ms ease-in;}
+.viorp:hover .viorimg div{ -moz-transform: rotate(45deg);
+-webkit-transform: rotate(45deg);
+-o-transform: rotate(45deg);
+-ms-transform: rotate(45deg);
+  transform: rotate(45deg); }
+
+.viorcontent{ text-align:justify; font-size:12px; line-height:16px; font-family:Verdana; } 

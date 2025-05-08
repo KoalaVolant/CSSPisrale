@@ -1,0 +1,51 @@
+.hermsign{
+  width:350px;
+  height:150px;
+  margin:0 auto;
+  border-left:#549EC7 5px solid;
+    border-right:#549EC7 5px solid;
+  position:relative;
+}
+
+.hermsign *{
+  box-sizing:border-box;
+}
+
+.hermsign img{
+width:350px;
+  height:150px;
+  object-fit:cover;
+}
+
+.hermsign div{
+  padding:3px;
+  background-color:#fff;
+  width:300px;
+  position:absolute;
+  bottom:15px;
+  left:1.5vw;
+}
+
+.hermsign h1{
+  font-family: 'Caesar Dressing', cursive;
+   color:#549EC7;
+    font-size:24px;
+    padding-bottom:4px;
+    border-bottom:#549EC7 3px solid; 
+  font-weight:normal;
+  text-align:center;
+  margin:0;
+}
+  
+  .hermsign h1 span{
+    color:#dedede;
+    font-style:italic;
+  }
+  
+  .hermsign h2{
+    font-size:8px;
+    line-height:8px;
+    font-family:Times New Roman;
+    color:#B6B6B6;
+  text-align:center;
+  }

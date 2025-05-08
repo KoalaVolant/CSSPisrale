@@ -1,0 +1,44 @@
+/* Lien Shun */ 
+
+.shunlien{ width:450px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
+.shunlien, .shunlien *{ box-sizing:border-box; }
+
+.shunlleft, .shunlright{ width:50%; }
+
+.shunlien h1{ font-size:30px; font-weight:bold; text-align:center; font-family: 'Inspiration', cursive; color:#308CA7 !important; margin:0px; }
+.shunlleft span{ display:inline-block; text-align:justify; height:170px; overflow:auto; padding:5px; font-family:Verdana; font-size:11px; line-height:15px; } 
+
+.shunlright{ margin-left:10px; display:flex; justify-content:space-between; flex-wrap:wrap; }
+.shunlright img{ width:78%; height:100px; object-fit:cover; }
+.shunlright a{ display:block; background-color:#308CA7; padding:5px; font-size:14px; text-transform:uppercase; font-family: 'Ramaraja', serif;  line-height:90px; text-align:center; color:#f0f0f0; } 
+.shunlright a:hover{ background-color:#72C6DE; transition:500ms; }
+.shunlright img:nth-child(3){ margin-top:5px; width:100%; padding-left:5px; border-left:10px solid #72C6DE; }
+
+/* Sign Shun */ 
+
+.shunsign{ width:360px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; } 
+.shunleft{ width:40%; display:flex; flex-wrap:wrap; }
+.shunright{ width:59%; }
+.shunleft img{ height:80px; border-left:2px solid #A3C2E2; padding-left:3px; object-fit:cover; } 
+.shunleft img:nth-child(1){ width:35%; }
+.shunleft img:nth-child(2){ width:60%; margin-left:3px; }
+.shunright h1{ font-size:30px; font-weight:bold; text-align:center; font-family: 'Inspiration', cursive; color:#308CA7 !important; margin:0px; width:100%; }
+.shunright{ text-align:justify; font-family:Verdana; font-size:11px; line-height:11px; } 
+
+/* Fiche RP Shun */ 
+
+.shunrp{ width:450px; margin:0 auto; }
+.shunrp, .shunrp *{ box-sizing:border-box; } 
+
+.shunimg{ width:100%; display:flex; justify-content:space-between; margin-bottom:5px; } 
+.shunimg img{ width:49%; height:150px; object-fit:cover; border:6px solid #A3C2E2; }
+.shunimg img:nth-child(1){ border-bottom:none; border-right:none; } 
+.shunimg img:nth-child(2){ border-top:none; border-left:none; } 
+
+.shuntxt{ width:100%; padding:15px; border:1px solid #A3C2E2;}
+.shuntxt h1{ font-family: 'Inspiration', cursive; font-size:34px; color:#266F84 !important; line-height:36px; text-align:justify; margin:0px; }
+.shuntxt h2{ display:flex; font-family: 'Ramaraja', serif; font-size:13px; color:#555; margin:0px; }
+.shuntxt h2 strong{ width:49%; color:#A2C1E1; }
+.shuntxt h2 strong:nth-child(1){ align-items:flex-start; } 
+.shuntxt h2 strong:nth-child(2){ align-items:flex-end; text-align:right; } 
+.shuntxt span{ text-align:justify; font-family:Verdana; font-size:13px; line-height:19px; display:block; margin-top:10px;}

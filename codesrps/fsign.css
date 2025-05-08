@@ -1,0 +1,106 @@
+.fsign{
+  width:310px;
+  height:200px;
+  position:relative;
+  z-index:15;
+  margin:0 auto;
+}
+
+.fsign .one, .fsign:hover .two{
+  background-image:none;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#a5a5a5+0,cecece+43,666666+100 */
+background: #a5a5a5; /* Old browsers */
+background: -moz-linear-gradient(left, #a5a5a5 0%, #cecece 43%, #666666 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left, #a5a5a5 0%,#cecece 43%,#666666 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right, #a5a5a5 0%,#cecece 43%,#666666 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a5a5a5', endColorstr='#666666',GradientType=1 ); /* IE6-9 */
+box-shadow: -1px 2px 5px 1px rgba(0, 0, 0, 0.7),
+            -1px 2px 20px rgba(255, 255, 255, 0.6) inset; 
+}
+
+.fsign .one, .fsign .two{
+  width:250px; 
+  height:110px;
+  margin:0 auto;
+    position:relative;
+-webkit-border-radius: 30px;
+-moz-border-radius: 30px;
+border-radius: 30px;
+}
+
+.fsign .one{
+  z-index:20;
+}
+
+.fsign .two{
+    z-index:25;
+  background-image:url('https://33.media.tumblr.com/710f2862a594bcd41516f4c230cf4eeb/tumblr_ntrg95Q8qP1ttko1so3_500.gif');
+  margin-top:-65px;
+-moz-transform: rotate(9deg);
+-webkit-transform: rotate(9deg);
+-o-transform: rotate(9deg);
+-ms-transform: rotate(9deg);
+transform: rotate(9deg);
+  margin-left:25px;
+}
+
+.fsign:hover .two{
+  z-index:23;
+}
+
+.fsign:hover .one{
+  background-image:url('http://pixel.nymag.com/imgs/daily/vulture/2015/gifs/cumberbatch-star-trek-007.nocrop.w529.h238.gif');
+    z-index:30;
+  box-shadow:none;
+}
+
+.fsign .two, .fsign:hover .one{
+    background-size:250px 110px;
+}
+
+.fsign .one h1{
+padding-left:25px;
+  text-transform:uppercase;
+  font-size:27px;
+  padding-top:20px;
+  width:270px;
+display:inline-block;
+}
+
+.fsign:hover .one h1{
+  display:none;
+}
+
+.fsign .one h1, .fsign h2{
+  color:#2E2E2E;
+  text-shadow: 0px 0px 2px #2E2E2E;
+    font-family: 'Teko', sans-serif;
+}
+
+.fsign h2{
+  margin-top:-55px;
+  width:200px;
+  text-align:center;
+  z-index:24;
+  font-weight:normal;
+  font-size:14px;
+  line-height:15px;
+  margin-left:55px;
+  position:relative;
+  text-transform:uppercase;
+}
+  .fsign .one, .fsign:hover .one, .fsign .two, .fsign:hover .two{
+-webkit-transition: background 500ms linear;
+-moz-transition: background 500ms linear;
+-ms-transition: background 500ms linear;
+-o-transition: background 500ms linear;
+transition: background 500ms linear;
+}
+
+.fsign .two{
+  background-position:bottom;
+}
+
+.fsign:hover .one{
+  background-position:top;
+}

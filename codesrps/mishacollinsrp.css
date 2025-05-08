@@ -1,0 +1,31 @@
+.wrapmisha{
+border:#fff double 3px; 
+padding:15px; 
+width:530px;
+}
+
+.wrapmisha img{
+border: #fff 12px solid; 
+width:500px;  
+-webkit-border-radius: 100px 100px 0 100px; 
+border-radius: 100px 100px 0 100px;
+}
+
+.titremisha{
+background-color:#fff; 
+width:400px; 
+margin-bottom:10px; 
+font-weight:bolder; 
+text-align:right; 
+padding:10px; 
+margin-left:104px; 
+font-family: 'Vibur', cursive;
+}
+
+.textmisha{
+background-color:#fff; 
+width:450px; 
+margin-left:15px; 
+text-align:justify;
+padding:20px;
+}

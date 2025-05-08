@@ -1,0 +1,13 @@
+/* Signature Andy */ 
+
+.andysign{ width:350px; margin:0 auto; }
+.andysign *{ box-sizing:border-box; } 
+
+.andysign img{ width:172px; height:60px; object-fit:cover; border:2px solid white; } 
+.and1, .and2{ width:350px; display:flex; justify-content:space-between; } 
+.and1{ margin-bottom:5px; }
+.andysign h2{ font-family: 'Lato', sans-serif; text-transform:uppercase; font-style:italic; font-size:10px; width:172px; height:60px; 
+  display:flex; align-items:center; text-align:center; padding:10px; margin:0px; letter-spacing:4px; line-height:11px; }
+.and1 h2{ background-color:black; color:white; }
+.and2 h2{ background-color:white; color:black;  } 
+.and2 img{ border-color:black; }

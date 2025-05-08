@@ -1,0 +1,111 @@
+.wapilien{
+  width:500px;
+  height:770px;
+  margin:0 auto;
+  padding:15px;
+  font-family:Verdana;
+  background-size:cover;
+  background-image:url('https://i.pinimg.com/564x/ea/b2/8b/eab28b32b17888cc4917f416b4e8abfd.jpg');
+}
+
+.wapilien img{
+    border:#fff 5px solid;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(16, 18, 28, 0.55);
+-moz-box-shadow:    0px 0px 5px 0px rgba(16, 18, 28, 0.55);
+box-shadow:         0px 0px 5px 0px rgba(16, 18, 28, 0.55);
+  width:230px;
+  height:150px;
+}
+
+.wapivatar{
+  background-image:url('https://img4.hostingpics.net/pics/657297Sterennnnn.png');
+  width:200px;
+  height:320px;
+  margin-right:20px;
+  border:#fff 5px solid;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(16, 18, 28, 0.55);
+-moz-box-shadow:    0px 0px 5px 0px rgba(16, 18, 28, 0.55);
+box-shadow:         0px 0px 5px 0px rgba(16, 18, 28, 0.55);
+  float:left;
+}
+
+.wapifloat{
+  width:500px;
+  padding:10px;
+}
+
+.wapidescri{
+  width:230px;
+  margin-top:45px;
+  height:210px;
+  padding:15px;
+  background-color:#fff;
+  float:left;
+  color:#000;
+  font-size:11px;
+  line-height:12px;
+  text-align:justify;
+  overflow:auto;
+}
+
+.wapidescri h1{
+  font-family: 'Monoton', cursive;
+  font-size:22px;
+  line-height:24px;
+  text-align:center;
+font-weight:normal;
+  margin-top:10px;
+  color:#216D96;
+  text-shadow: 0px 0px 8px #216D96;
+}
+
+.wapidescri h2{
+  margin-top:-15px;
+  color:#5B4644;
+  font-size:15px;
+  font-family:Times Nexw Roman;
+  text-align:center;
+    font-weight:normal;
+  margin-bottom:0px;
+}
+.wapilien:hover .wapidescri h1{
+    color:#0A202C;
+  text-shadow: 0px 0px 8px #0A202C;
+}
+
+.wapicherche{
+  clear:both;
+  width:470px;
+  padding:15px;
+  background-color:#fff;
+  margin-top:320px;
+  font-size:11px;
+  color:#525252 !important;
+  overflow:auto;
+  height:215px;
+}
+
+.wapicherche h1{
+  font-family: 'Monoton', cursive;
+  font-size:23px;
+  text-align:center;
+font-weight:normal;
+  margin-top:10px;
+  margin-bottom:-15px;
+  color:#216D96;
+  text-shadow: 0px 0px 8px #216D96;
+}
+
+.wapicherche l{
+  color:#357629 !important;
+  font-weight:bold !important;
+  font-size:12px !important;
+    font-family:Verdana !important;
+}
+
+.wapicherche p{
+  color:#7E2121 !important;
+  font-weight:bold !important;
+    font-size:12px !important;
+      font-family:Verdana !important;
+}

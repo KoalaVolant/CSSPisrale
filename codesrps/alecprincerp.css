@@ -1,0 +1,71 @@
+.alecrp{
+  width:450px;
+  margin:0 auto;
+  background-color:#2A2723;
+  padding-bottom:20px;
+}
+
+.alecrp .fondalec{
+  background-image:url('http://www.commeaucinema.com/images/news_insert/undefined_ab620e6f7dbd0396b65b1cf457367d3a.jpg');
+  width:100%;
+  height:250px;
+  background-size:150%;
+  background-position:right;
+  position:relative;
+  margin-bottom:-20px;
+}
+
+.alecrp .fondalec img{
+  width:210px;
+  height:160px;
+  object-fit:cover;
+  position:absolute;
+  top:50px;
+  right:40px;
+}
+
+.alecrp .contentalec strong, .alecrp .contentalec b{
+  color:#484D68;
+}
+
+.alecrp .contentalec{
+  width:370px;
+  margin:0 auto;
+  padding:20px;
+  color:#444444;
+  text-align:justify;
+  border-box:box-sizing;
+  background-color:#fff;
+}
+
+.alecrp span, .alecrp span h2, .alecrp span h3{
+  color:#91736F;
+  font-size:11px;
+  line-height:12px;
+  text-align:center;
+  font-weight:normal;
+  margin-top:-5px;
+}
+
+.alecrp span h2:before{
+  content:"«";
+}
+
+.alecrp span h2:after{
+  content:"»"
+}
+
+.alecrp span h2{
+  font-family: 'Josefin Slab', serif;
+
+    font-size:15px;
+  line-height:17px;
+  color:#594744;
+}
+
+.alecrp span h3{
+  margin-top:-10px;
+  padding-bottom:10px;
+  border-bottom:1px solid #514242;
+  
+}

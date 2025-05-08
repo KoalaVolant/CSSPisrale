@@ -1,0 +1,7 @@
+.chasesign{ width:370px; margin:0 auto; }
+.chasesign h1{ font-family: 'Cinzel', serif; margin:5px 0px ; padding-bottom:3px; border-bottom:solid 1px #A42E15; font-size:19px; letter-spacing:-1px; 
+text-align:center; color:#A42E15;} 
+.chasesign img{ width:120px; height:60px; object-fit:cover; }
+.chasesign .chasemil{ margin:0px 5px; }
+.chasesign h2{ text-align:justify; font-size:10px; line-height:10px; font-weight:normal; margin:5px 0px; padding-top:3px; border-top:solid 1px #A42E15; }
+.chasesign h2 strong{ color:#A42E15; font-family: 'Cinzel', serif; }

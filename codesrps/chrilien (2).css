@@ -1,0 +1,171 @@
+.chrilink{
+  width:500px;
+  margin:0 auto;
+}
+
+.link{
+  width:500px;
+  height:170px;
+  overflow:hidden;
+  background-color:#666;
+}
+
+.link .test{
+  position:relative;
+  z-index:999;
+  width:500px;
+  height:170px;
+}
+
+.link h1{
+  z-index:999;
+  position:relative;
+  color:#fff;
+  font-family: 'Sue Ellen Francisco', cursive;
+  font-size:26px;
+  padding-right:10px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 1);
+  text-align:right;
+  margin-bottom:10px;
+}
+
+.link div{
+  margin-top:-170px;
+  z-index:45;
+  background-color:#3E3E3E;
+}
+
+.link div img{
+    width:100px;
+  height:100px;
+  border:#fff 1px solid;
+  padding:3px;
+  position:relative;
+  margin-left:10px;
+  margin-top:5px;
+  z-index:5;
+}
+
+.link div img, .link span{
+  float:left;
+}
+
+.link span{
+  width:350px;
+  display:block;
+  margin-top:-10px;
+  height:100px;
+  padding:15px;
+  overflow:auto;
+  font-size:11px;
+  line-height:13px;
+  color:#B6B6B6;
+  text-align:justify;
+}
+
+.link span h2{
+  margin:0;
+  margin-bottom:-10px;
+  font-size:17px;
+  text-transform:uppercase;
+    font-family: 'Sue Ellen Francisco', cursive;
+  color:#dedede;
+}
+
+/* Animations */
+
+.link:hover .test{
+  margin-left:500px;
+}
+
+.link:hover .test, .link .test{
+-webkit-transition: all 1300ms ease;
+-moz-transition: all 1300ms ease;
+-ms-transition: all 1300ms ease;
+-o-transition: all 1300ms ease;
+transition: all 1300ms ease;
+}
+
+
+
+/* Entête lien Chrichri */
+
+.chriwrap{
+  width:500px;
+  margin:0 auto;
+}
+
+.cleft, .cright{
+  float:left;
+}
+
+.cleft, .cleft img{
+  width:200px;
+}
+
+.cleft img{
+  height:180px;
+}
+
+.cleft{
+  margin-top:15px;
+}
+
+.cleft img+img{
+  margin-top:10px;
+}
+
+.cright{
+width:270px;
+  margin-left:5px;
+}
+
+hr{
+  margin-top:5px;
+  color:#B4B4B4 !important;
+    background-color:#B4B4B4 !important;
+}
+
+.cright h1{
+  background-color:#fff;
+  border-right:#666 solid 5px;
+  -moz-box-shadow: 2px 2px 5px 0px #9b9b9b;
+-webkit-box-shadow: 2px 2px 5px 0px #9b9b9b;
+-o-box-shadow: 2px 2px 5px 0px #9b9b9b;
+box-shadow: 2px 2px 5px 0px #9b9b9b;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#9b9b9b, Direction=134, Strength=5);
+  font-size:20px;
+  padding:10px;
+  text-align:center;
+  color:#666;
+}
+
+.cright span{
+  background-color:#666;
+  color:#dedede;
+  padding:15px;
+  font-size:11px;
+  line-height:13px;
+  text-align:justify;
+  display:block;
+  height:290px;
+  overflow:auto;
+}
+
+.cright h1, .cright h2{
+  font-family: 'Sue Ellen Francisco', cursive;
+  text-transform:uppercase;
+}
+
+.cright h2{
+  color:#fff;
+  font-size:16px;
+  margin-bottom:-10px;
+}
+
+.cright span b, .cright span strong{
+  letter-spacing:2px;
+  color:#D6D6D6;
+}

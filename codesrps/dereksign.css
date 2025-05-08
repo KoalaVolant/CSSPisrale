@@ -1,0 +1,66 @@
+.signderek{
+  width:430px;
+  height:130px;
+  padding:10px;
+  margin:0 auto; 
+  background-image:url('http://img11.hostingpics.net/pics/551061DerekSign.png');
+  background-size:100%;
+  -webkit-filter: grayscale(1);
+filter: grayscale(1);
+}
+
+.signderek img{
+  width:130px;
+  height:125px;
+  border:#fff 2px solid;
+}
+
+.imggauche{
+    -moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);
+}
+
+.imgdroite{
+  margin-left:160px;
+  -moz-transform: rotate(5deg);
+-webkit-transform: rotate(5deg);
+-o-transform: rotate(5deg);
+-ms-transform: rotate(5deg);
+transform: rotate(5deg);
+    -webkit-filter: grayscale(1);
+filter: grayscale(1);
+}
+
+.derektitre{
+  font-size:14px; 
+  font-family: 'Playfair Display', serif;
+  line-height:15px;
+  background-color:#000;
+    color:#0C9CF3;
+    padding:5px;
+  width:440px;
+  text-align:center;
+  letter-spacing:1px;
+margin:0 auto;
+  display:block;
+}
+
+.derektitre:hover{
+  color:#A41E1E;
+}
+
+.derektitre, .derektitre:hover, .signderek, .signderek:hover{
+  -webkit-transition: all 600ms ease;
+-moz-transition: all 600ms ease;
+-ms-transition: all 600ms ease;
+-o-transition: all 600ms ease;
+transition: all 600ms ease;
+}
+
+.signderek:hover {
+-webkit-filter: grayscale(0.2);
+filter: grayscale(0.2);
+}

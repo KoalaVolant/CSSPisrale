@@ -1,0 +1,43 @@
+.rpswapi{
+  width:510px;
+  margin:0 auto;
+}
+
+.gauchewapi{
+  float:left;
+  width:200px;
+height:840px;
+  border-right:#fff 10px solid;
+}
+
+
+.droitewapi{
+  background-color:#fff;
+-webkit-box-shadow: 4px 4px 5px 0px rgba(50, 50, 50, 0.15);
+-moz-box-shadow:    4px 4px 5px 0px rgba(50, 50, 50, 0.15);
+box-shadow:         4px 4px 5px 0px rgba(50, 50, 50, 0.15);
+  float:left;
+  width:300px;
+  height:840px;
+}
+
+.droitewapi h1{
+  background-color:#4077a1;
+  color:#fff;
+  font-family: 'Flavors', cursive;
+  font-size:18px;
+  font-weight:normal;
+  padding:5px;
+  margin:5px 0px 5px 0px;
+}
+
+.droitewapi .wapirp{
+  padding:10px;
+  height:120px;
+  overflow:auto;
+}
+
+.wapirp a, .wapirp a:hover, .wapirp a:visited, .wapirp{
+    font-size:14px;
+  line-height:17px;
+}

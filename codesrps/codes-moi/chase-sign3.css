@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
+@import url('https://coderps.xyz/codesrps/pisraleglobal.css');
+
+:root{ 
+--cS3-border:linear-gradient(to left, #9C9CBE, #DCD0E4);
+--cs3-fond:url('https://i30.servimg.com/u/f30/19/45/51/53/eberha11.jpg');
+}
+.chaseSign3{ width:450px; margin:0 auto; display:flex; flex-wrap:wrap; 
+justify-content:center; align-items:center; }
+
+.chaseSign3 img{ border-radius:50%; border:2px solid white; filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.15));
+width:90px; height:90px; position:relative; z-index:2; }
+.chaseSign3 img:nth-child(1){ left:10px; }
+.chaseSign3 img:nth-child(3){ left:-10px; }
+.chaseSign3 .chaseQuote{ width:270px; text-align:justify; padding:10px; 
+font-family: 'Abel', sans-serif; font-size:12px; line-height:12px; 
+  border: 10px solid;
+  border-image-slice: 1;
+  border-width: 3px;
+border-image-source: var(--cS3-border);}
+.chaseSign3 .chaseQuote em{ font-size:9px; }
+
+.chaseSign3 .chaseBorder{ background:var(--cs3-fond); height:6px; width:50%; z-index:1;
+    background-size:cover; background-position:center; }

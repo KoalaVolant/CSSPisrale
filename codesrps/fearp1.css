@@ -1,0 +1,92 @@
+/* Fiche rp 1 de Fear */
+
+.fear{
+  width:500px;
+  margin:0 auto; 
+  background-color:#fff;
+  border-left:#CFCFCF 5px dashed;
+    border-right:#CFCFCF 5px dashed;
+-webkit-border-radius: 2000px;
+-webkit-border-bottom-right-radius: 600px;
+-webkit-border-bottom-left-radius: 600px;
+-moz-border-radius: 2000px;
+-moz-border-radius-bottomright: 600px;
+-moz-border-radius-bottomleft: 600px;
+border-radius: 2000px;
+border-bottom-right-radius: 600px;
+border-bottom-left-radius: 600px;
+  padding:15px;
+}
+
+.fear div{
+  margin-top:20px;
+}
+
+.fear img{
+  -webkit-border-radius: 1000px;
+-moz-border-radius: 1000px;
+border-radius: 1000px;
+  width:450px;
+  margin:0 auto; 
+  height:250px;
+  margin-top:-75px;
+  border-bottom:#747474 6px solid; 
+  -webkit-filter: blur(6px) grayscale(1);
+filter: blur(6px) grayscale(1);
+}
+
+.fear:hover img{
+  -webkit-filter: blur(0px)  grayscale(0.1);
+filter: blur(0px) grayscale(0.1);
+}
+
+.fear h1{
+  color:#9E9E9E;
+  font-weight:lighter;
+  text-transform:uppercase;
+  font-size:20px;
+  line-height:21px;
+  width:350px;
+  margin-left:5px;
+  padding-right:10px;
+  border-right:#A6A6A6 2px dotted;
+  font-family: 'Anton', sans-serif;
+}
+
+.fear:hover h1{
+  color:#292929;
+}
+
+.fear:hover h2{
+  color:#999999;
+}
+
+.fear h2{
+  font-size:18px;
+    font-family: 'Anton', sans-serif;
+    font-weight:lighter;
+  text-transform:uppercase;
+  color:#BBBBBB;
+  margin-top:-60px;
+  margin-left:385px;
+  display:block;
+  clear:both;
+}
+
+.fear span{
+  color:#3E3E3E;
+  text-align:justify;
+  font-size:11px;
+  line-height:12px;
+  padding:25px; 
+  display:block;
+  margin-top:-10px;
+}
+
+.fear img, .fear:hover img, .fear h1, .fear:hover h1, .fear h2, .fear:hover h2{
+  -webkit-transition: all 1000ms ease;
+-moz-transition: all 1000ms ease;
+-ms-transition: all 1000ms ease;
+-o-transition: all 1000ms ease;
+transition: all 1000ms ease;
+}

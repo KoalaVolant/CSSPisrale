@@ -1,0 +1,86 @@
+r.raphrp{
+  width:450px;
+  margin:0 auto;
+        -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  background-image:url('https://i62.servimg.com/u/f62/11/66/37/71/textur12.jpg');
+  padding:20px;
+  font-family:Verdana;
+  text-align:justify;
+}
+
+.raphrp *{
+          -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.raphrp img:first-of-type{
+  display:block;
+  width:100%;
+  height:200px;
+  object-fit:cover;
+}
+
+.raphrp div{
+  background-color:#fff;
+  border:#D8D8D8 1px solid;
+  border-top:none;
+  padding:15px;
+  color:#243639;
+  font-size:12px;
+  line-height:13px;
+}
+
+.raphrp strong, .raphrp b{
+  color:#59848C;
+}
+
+.raphrp span{
+  display:block;
+  background-color:#fff;
+  padding:5px;
+  width:100%;
+  margin-bottom:-20px;
+  -webkit-filter: blur(4px);
+filter: blur(4px);
+  transition:1s;
+}
+
+.raphrp:hover span{
+  -webkit-filter: blur(0px);
+filter: blur(0px);
+}
+
+.raphrp h1, .raphrp h3{
+font-family: 'Arapey', serif;
+  margin:0;
+  font-weight:normal;
+}
+
+.raphrp h1{
+  font-size:22px;
+  color:#5F9196;
+  line-height:23px;
+  text-transform:uppercase;
+}
+
+.raphrp h2{
+  margin:-10px 0 -10px 0;
+  text-align:center;
+  font-weight:normal;
+  letter-spacing:2px;
+  font-family:Times New Roman;
+  font-size:12px; line-height:13px;
+  color:#939393;
+}
+
+.raphrp h3{
+  font-size:13px;
+  line-height:14px;
+  color:#749FA7;
+}
+
+.raphrp h3::before{content: "«";} /* Mettre des chevrons à une citation */
+.raphrp h3::after{content: "»";}

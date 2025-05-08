@@ -1,0 +1,66 @@
+.lurp{width:500px; margin:0 auto;}
+.lurp h1, .lurp h1:hover{
+          -webkit-transition: 600ms ease;
+-moz-transition: 600ms ease;
+-ms-transition: 600ms ease;
+-o-transition: 600ms ease;
+transition: 600ms ease;
+}
+
+.lurp h1{
+  background-image:url('http://img15.hostingpics.net/pics/989406firefirefirefire.png');
+  background-size:100%;
+  padding:15px;
+  text-align:center;
+  color:#fff;
+  font-size:30px;
+  line-height:32px;
+  text-transform:uppercase;
+    font-family: 'Almendra', serif;
+}
+
+#lululu{
+  background-color:#000;
+  margin-top:-40px;
+  padding:0px 30px 30px 30px;
+  background-repeat:no-repeat;
+background-image:url('http://img11.hostingpics.net/pics/962229Goshfire.png');
+background-position:bottom;}
+
+.mili{
+  padding:10px;
+}
+
+.mili img{
+  width:120px;
+  margin-top:10px;
+  margin-bottom:-25px;
+  border:#F26210 1px dotted;
+  margin-left:8px;
+}
+
+#lululu h2{
+    font-size:24px;
+  line-height:26px;
+  text-transform:uppercase;
+    font-family: 'Almendra', serif;
+  color:#808080;
+  padding:7px;
+  text-align:center;
+  background-color:#0F0F0F;
+}
+
+#lululu p{
+  padding:25px;
+  color:#ADADAD;
+      background-color:#1D1D1D;
+  margin-top:-60px;
+}
+
+#lululu a{
+  color:#fff;
+}
+
+.lurp h1:hover{
+  background-position:bottom;
+}

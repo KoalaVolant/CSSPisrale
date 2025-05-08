@@ -1,0 +1,29 @@
+.henrysign{
+  width:210px;
+  margin:0 auto;
+}
+
+.henrysign h1{
+  font-family: 'Rancho', cursive;
+  font-size:24px;
+  margin:0;
+  text-transform:uppercase;
+  text-align:center;
+  margin-bottom:5px;
+  letter-spacing:7px;
+}
+
+.henrysign img{
+  width:200px;
+  padding:3px; 
+  border:#BF4040 dotted 2px;
+}
+
+.henrysign h2{
+    font-family: 'Rancho', cursive;
+  font-weight:normal;
+  font-size:16px;
+  line-height:18px;
+  text-align:right;
+  margin:0;
+}

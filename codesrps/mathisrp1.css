@@ -1,0 +1,46 @@
+  .mathis{
+  width:490px;
+  margin:0 auto;
+  background-image:url('https://s-media-cache-ak0.pinimg.com/originals/b0/2f/12/b02f12d14b88297841f356f453eccd24.jpg');
+padding:25px;
+background-size:100%;
+}
+
+.mathis img{
+  width:220px;
+  height:150px;
+  -moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);
+  padding:3px;
+  border:#43707C 1px solid;
+  float:left;
+}
+
+.mathis h1{
+  font-size:28px;
+  line-height:30px;
+  width:255px;
+  margin-top:45px;
+  float:left;
+font-family: 'Reenie Beanie', cursive;
+  color:#71A6B3;
+  text-align:right;
+  padding:3px;
+  border-bottom:#43707C 2px dotted;
+}
+
+.mathis div{
+  background-color:#1C1B20;
+  color:#9C99A8;
+  clear:both;
+  padding:25px;
+text-align:justify;
+  border-bottom:#52869A dotted 2px;
+}
+
+.mathis b, .mathis strong{
+  color:#52869A;
+}

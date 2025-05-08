@@ -1,0 +1,80 @@
+/* Dan dan rp*/
+
+.dandanrp{
+  width:500px;
+  margin:0 auto;
+  padding:0px 20px 20px 20px;
+  background-image:url('https://s-media-cache-ak0.pinimg.com/564x/14/d5/d8/14d5d8151c7b8e3d5d4f247cefdd597a.jpg');
+  background-size:100%;
+
+}
+
+.dandanrp h1{
+  font-family: 'Cookie', cursive;
+  font-size:28px;
+  line-height:30px;
+  padding:10px;
+  text-align:center;
+  color:#fff;
+  text-shadow:0px 0px 5px #616161;
+-webkit-border-top-left-radius: 50px;
+-webkit-border-top-right-radius: 50px;
+-moz-border-radius-topleft: 50px;
+-moz-border-radius-topright: 50px;
+border-top-left-radius: 50px;
+border-top-right-radius: 50px;
+  margin-bottom:-15px;
+}
+
+.dandanrp img{
+  width:120px;
+  height:100px;
+  border:#65839A 3px solid;
+/*-webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;*/
+  float:left;
+}
+
+.dandanrp .piou1{
+    -webkit-border-radius: 50px;
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius: 50px;
+-moz-border-radius-bottomright: 0;
+border-radius: 50px;
+border-bottom-right-radius: 0;
+}
+
+.piou2{
+  -webkit-border-radius: 50px;
+-webkit-border-bottom-left-radius: 0;
+-moz-border-radius: 50px;
+-moz-border-radius-bottomleft: 0;
+border-radius: 50px;
+border-bottom-left-radius: 0;
+  margin-right:10px;
+  margin-left:10px;
+}
+
+.dandanrp div{
+  background-color:#fff;
+  padding:25px;
+  font-size:12px;
+  line-height:14px;
+  color:#454545;
+  text-align:justify;
+}
+
+.dandanrp:hover div{
+-webkit-box-shadow: 0px 0px 29px 0px rgba(255,255,255,1);
+-moz-box-shadow: 0px 0px 29px 0px rgba(255,255,255,1);
+box-shadow: 0px 0px 29px 0px rgba(255,255,255,1);
+}
+
+.dandanrp div, .dandanrp:hover div{
+ -webkit-transition: all 900ms ease;
+-moz-transition: all 900ms ease;
+-ms-transition: all 900ms ease;
+-o-transition: all 900ms ease;
+  transition: all 900ms ease;
+}

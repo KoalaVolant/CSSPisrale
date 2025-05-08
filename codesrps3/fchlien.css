@@ -1,0 +1,195 @@
+:root {
+    --glvwhite: #fff;
+    --glvblue: #03A9F4;
+    --glvdark-blue: #0b0a44;
+    --glvlight-blue: #5190ee;
+    --glvpurple: #9267dd;
+    --glvpurple-opacity: rgba(63, 18, 168, 0.63);
+}
+
+.purplelinks {
+    font-family: 'Inter', sans-serif;
+}
+
+.purpleent {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 20px 20px 0 0;
+    background: var(--glvwhite);
+}
+
+.purpleimgname {
+    position: relative;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.purpleimgname img {
+    border-radius: 20px;
+}
+
+.purpleimgname span {
+    position: absolute;
+    padding: 10px;
+    bottom: 0;
+    font-size: 26px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 24px;
+    color: var(--glvwhite);
+}
+
+.purpleright {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.purpletags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 5px 10px;
+}
+
+.purpletags span {
+    flex: 25%;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 30px;
+    color: var(--glvwhite);
+    background-color: var(--glvblue);
+    border-radius: 5px;
+}
+
+.purpleblabla {
+    flex: 1;
+    border: 1px solid gray;
+    border-left: 0;
+    padding: 5px 15px;
+    font-size: 16px;
+    text-align: justify;
+    overflow: auto;
+    max-height: 130px;
+    scrollbar-width: none;
+}
+
+.purplessearchlinks {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.purplelsearchtitle {
+    background: linear-gradient(to right, var(--glvdark-blue), var(--glvlight-blue), var(--glvwhite));
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    display: inline;
+    line-height: 35px;
+    margin-left: 10px;
+}
+
+.purplelsearchtxt {
+    flex: 1;
+    height: 100%;
+    background: var(--glvpurple);
+    border-radius: 5px;
+    max-height: 138px;
+    overflow: auto;
+    scrollbar-width: none;
+    padding: 5px 10px;
+    color: var(--glvwhite);
+}
+
+.purpletags, .purpleblabla, .purplelsearchtitle, .purplelsearchtxt {
+    padding-left: 35px;
+}
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.purplelinkcontenu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    border-radius: 20px;
+}
+
+.purplelinkcontenu br, .purpleent br, .purplelinkcontenu br {
+    display: none;
+}
+
+.purpleblabla br, .purplelsearchtxt br, .purplelinktxt br {
+    display: block;
+}
+
+.purplelink {
+    position: relative;
+    z-index: 0;
+    width: 200px;
+    height: 250px;
+    overflow: hidden;
+}
+
+.purplelink img {
+    position: absolute;
+    z-index: 1;
+    width: 200px;
+    height: 250px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 20px;
+}
+
+.purplelinkcont {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 2;
+    width: 200px;
+    height: 250px;
+    border-radius: 20px;
+    padding: 15px;
+    color: var(--glvwhite);
+    transition: all 0.5s ease-out;
+}
+
+.purplelink:hover .purplelinkcont {
+    background-color: var(--glvpurple-opacity);
+    transition: all 0.5s ease-out;
+}
+
+.purplelinkctitle {
+    font-size: 26px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 25px;
+    transition: all 0.5s ease-out;
+}
+
+.purplelinktxt {
+    height: 0px;
+    text-align: justify;
+    font-size: 12px;
+    overflow: auto;
+    scrollbar-width: none;
+    transition: all 0.5s ease-out;
+}
+
+.purplelink:hover .purplelinktxt {
+    height: 175px;
+    transition: all 0.5s ease-out;
+}

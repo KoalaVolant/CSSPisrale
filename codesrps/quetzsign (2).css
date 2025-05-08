@@ -1,0 +1,94 @@
+/* sign Quetzalcoatl */ 
+
+.quetsign{
+  width:500px; 
+  margin:0 auto;
+  background-image:url('http://png.clipart.me/graphics/thumbs/144/damask-seamless-floral-pattern-royal-wallpaper-flowers-on-a-black-background_144271387.jpg');
+    -webkit-border-radius: 70px;
+-moz-border-radius: 70px;
+border-radius: 70px;
+}
+
+.quetsign img{
+  width:100px;
+  height:150px;
+  float:left;
+  margin-left:15px;
+}
+
+.quetsign img+img{
+  margin-left:10px;
+}
+
+.quetsign div{
+  float:left;
+  width:250px;
+  margin-left:15px;
+}
+
+.quetsign h1{
+    font-family: 'Lobster Two', cursive;
+  color:#00AA00;
+  text-align:center;
+  font-size:24px;
+  line-height:26px;
+  letter-spacing:2px;
+background: -webkit-linear-gradient(left, #2132ce 8%,#1a8218 34%,#d3c82a 62%,#d3c82a 62%,#b20000 80%); /* Chrome10-25,Safari5.1-6 */
+    -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.quetsign h2{
+    color:#dedede;
+  text-align:center;
+  font-family: 'News Cycle', sans-serif;
+  font-size:12px;
+  line-height:13px;
+}
+
+/* Animations */
+
+.quetsign:hover{
+    border-right:#B90000 10px double;
+}
+
+.quetsign:hover img{
+  -moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);
+  border-left:#FFCC00 2px dotted;
+}
+
+.quetsign:hover div{
+  margin-left:10px;
+}
+
+.quetsign:hover img+img{
+-moz-transform: rotate(5deg);
+-webkit-transform: rotate(5deg);
+-o-transform: rotate(5deg);
+-ms-transform: rotate(5deg);
+transform: rotate(5deg);
+    border-right:#0000FF 2px dotted;
+  border-left:none;
+}
+
+/* Transitions */
+
+.quetsign, .quetsign:hover, .quetsign:hover img, .quetsign img, .quetsign:hover img+img, .quetsign img+img{
+  -webkit-transition: all 900ms ease;
+-moz-transition: all 900ms ease;
+-ms-transition: all 900ms ease;
+-o-transition: all 900ms ease;
+transition: all 900ms ease;
+}
+
+.quetsign:hover div, .quetsign div{
+  -webkit-transition: all 200ms ease;
+-moz-transition: all 200ms ease;
+-ms-transition: all 200ms ease;
+-o-transition: all 200ms ease;
+transition: all 200ms ease;
+}

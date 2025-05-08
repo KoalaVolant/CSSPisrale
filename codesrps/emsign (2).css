@@ -1,0 +1,44 @@
+.em{
+  width:500px;
+  margin:0 auto;
+}
+
+.un, .deux{
+  float:left;
+}
+
+.un img, .deux img{
+  width:120px;
+  height:120px;
+}
+
+.un h1, .deux h2{
+  width:100px;
+  padding:10px;
+  font-family: 'Chelsea Market', cursive;
+  font-size:18px;
+    text-align:center;
+  text-transform:uppercase;
+}
+
+.un h1{
+  background-color:#fff;
+  color:#72BDD6;
+  -moz-transform: rotate(-3deg);
+-webkit-transform: rotate(-3deg);
+-o-transform: rotate(-3deg);
+-ms-transform: rotate(-3deg);
+transform: rotate(-3deg);
+-webkit-box-shadow: 1px 1px 1px 1px #E6E6E6;
+box-shadow: 1px 1px 1px 1px #E6E6E6;
+}
+
+ .deux h2{
+    background-color:#72BDD6;
+    color:#fff;
+  -moz-transform: rotate(3deg);
+-webkit-transform: rotate(3deg);
+-o-transform: rotate(3deg);
+-ms-transform: rotate(3deg);
+transform: rotate(3deg);
+  }

@@ -1,0 +1,22 @@
+/* Fiche RP Leander Nouvelle Version */ 
+
+.leanrp{ display:flex; justify-content:space-between; width:450px; margin:0 auto; }
+.leanrp *{ box-sizing:border-box; }
+
+.lean1{ width:100px; } 
+.lean1 img{ width:100px; height:160px; object-fit:cover; clip-path: polygon(13% 0, 100% 11%, 95% 100%, 0% 100%); } 
+.lean1 span{ display:block; width:100px; font-size:11px; font-family:Verdana; padding:5px; background-color:#fff; color:#555; text-align:center; margin-top:5px; } 
+.lean1 .cole1{ color:#5AA934; border-color:#5AA934;} 
+.lean1 .cole2{ color:#C5C018; border-color:#C5C018;} 
+.lean1 .cole3{ color:#CC8211; border-color:#CC8211;} 
+.lean1 .cole4{ color:#CC1111; border-color:#CC1111;} 
+
+.lean2{ width:345px; }
+.lean2 h1{ background-color:#000; font-family: 'Unica One', cursive; color:#fff; font-size:16px; line-height:18px; padding:10px; 
+clip-path: polygon(0 0, 100% 0%, 91% 100%, 0% 100%); margin:0px 0px 5px 0px; }
+  .lean2 .cole1{ background-color:#5AA934; } 
+.lean2 .cole2{ background-color:#C5C018; } 
+.lean2 .cole3{ background-color:#CC8211; } 
+.lean2 .cole4{ background-color:#CC1111; } 
+
+.lean2 span{ display:block; padding:10px; font-family:verdana; font-size:12px; line-height:14px; text-align:justify; } 

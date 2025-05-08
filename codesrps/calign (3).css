@@ -1,0 +1,70 @@
+/* Code sign Caliel */
+
+.caliel{
+    width:450px;
+  height:150px;
+  background-image:url('http://img15.hostingpics.net/pics/851646bokehcaliel.png');
+  background-size:cover;
+  padding:10px;
+  margin:0 auto;
+}
+
+.caliel:hover{
+  background-image:url('http://38.media.tumblr.com/3db885ceebdde75b2c33cea856cb96cd/tumblr_mznqctf6Rz1tpe7lxo1_500.gif');
+}
+
+.caliel h1{
+  font-family: 'Alegreya SC', serif;
+  font-size:25px;
+  color:#fff;
+  text-shadow:#fff 0px 0px 5px;
+  margin-left:140px;
+  margin-top:-15px;
+  
+}
+
+.caliel:hover h1{
+  margin-top:-130px;
+  margin-left:120px;
+  font-size:30px;
+  text-shadow:#000 0px 0px 5px;
+}
+
+.imagliel{
+  width:450px;
+  height:150px;
+  background-size:cover;
+}
+
+.imagliel img{
+  width:450px;
+  height:150px;
+  transition:500ms;
+}
+
+.imagliel span{
+  display:none;
+  transition:500ms;
+}
+
+.imagliel:hover span{
+  display:block;
+  width:435px;
+  height:100px;
+  padding:10px;
+  transition:500ms;
+}
+
+.imagliel .txtliel{
+  margin-top:25px;
+  color:#fff;
+  font-size:12px;
+  text-align:center;
+  line-height:14px;
+  text-shadow:#000 0px 0px 5px
+}
+
+.imagliel:hover img{
+  display:none;
+  transition:500ms;
+}

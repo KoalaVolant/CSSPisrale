@@ -1,0 +1,16 @@
+/* Sarah Fiche de Lien */
+
+.sarahlien{ 
+  width:450px; justify-content:center; margin:15px;
+  display:flex; position:relative;
+}
+.sarahlien *{ box-sizing:border-box; }
+
+.sarahlien div:nth-of-type(1){ position:relative; width:200px; height:320px; }
+.sarahlien span{ display:block; background-color:#fff; font-family: 'Playfair Display', serif; font-size:18px; padding:20px 10px; position:absolute; bottom:20px; left:-27px; color:#E67644;  }
+.sarahlien img{ object-fit:cover; width:200px; height:320px; padding:5px; border:2px solid #FCAA67; }
+
+.sarahlien h3{ background-color:#E67644; color:#E8E8E8; font-family: 'Bebas Neue', cursive; font-size:14px; margin:3px 0px; padding:5px; letter-spacing:1px; width:230px; position:relative; left:-7px; font-weight:normal;}
+.sarahlien h3:nth-of-type(1){ margin-top:15px; }
+.sarahlien p{ display:block; background-color:#E8E8E8; padding:10px; height:195px; overflow:auto; font-size:11px; line-height:1.6em; text-align:justify; font-family:Verdana; 
+  border-bottom:3px solid #FC814A; border-right:3px solid #FC814A; position:relative; bottom:6px; right:7px; width:300px; color:#373639; }

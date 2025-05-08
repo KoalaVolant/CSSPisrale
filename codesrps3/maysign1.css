@@ -1,0 +1,21 @@
+:root{ --may1:#FFAA6C; --may2:url('https://i.imgur.com/Dq0HmRw.jpg');}
+
+.maysign, .maysign *{ box-sizing:border-box;  }
+.maysign{ margin:0 auto; width:390px; position:relative; font-family:'Poppins', sans-serif;; }
+.maysign br{ display:none; }
+.maysign img{ object-fit:cover; border-radius:8px; }
+
+.maysign .one{ font-weight:600; letter-spacing:4px; font-size:20px; }
+.maysign .one em{ position:relative; }
+.maysign .one em:before{ content:' '; width:100%; height:5px; background:var(--may1); z-index:-1; position:absolute; bottom:5px; left:0; }
+
+.maysign .maydpf{ display:flex; margin-top:10px; align-items:flex-end; }
+.maysign .maydpf img{ width:20%; height:40px; margin-right:10px; object-position:20% 20%;  }
+.maysign .maydpf div span{ font-size:20px; }
+.maysign .maydpf div span:first-child{ font-size:16px; letter-spacing:2px; font-style:italic; display:block; position:relative; }
+.maysign .maydpf div span:first-child:after{ content:' '; width:18px; height:18px; background:var(--may2); background-size:100% 100%;  z-index:-1; position:absolute; bottom:3px; left:115px;}
+.maysign .maydpf div .tree{ margin-top:3px; display:block; font-weight:900; letter-spacing:4px; }
+
+.maysign .twoi, .maysign .treei{ position:absolute; }
+.maysign .twoi{ width:60px; height:80px; top:-35px; right:100px; }
+.maysign .treei{ width:70px; height:100px; right:20px; top:-35px; }

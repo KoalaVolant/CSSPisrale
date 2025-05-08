@@ -1,0 +1,23 @@
+/* Rp SAm Sam */ 
+
+.samtroisrp{ width:450px; margin:0 auto; }
+.samtroisrp *{ box-sizing:border-box; }
+
+.entroisam{ display:flex; justify-content:space-between; } 
+.entroisam img{ clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); width:100px; height:100px; object-fit:cover; }
+
+.leftsam{ display:flex; justify-content;space-between; position:relative;     top: 7px;
+    left: -40px; } 
+.leftsam img{ position:absolute; } 
+.leftsam img:nth-child(1){ top:0px; left:-47px; }
+.leftsam img:nth-child(2){ top: 55px;    left: 6px; }
+.leftsam img:nth-child(3){ top:0px; left:60px; }
+.rightsam{ width:338px;     position: relative;    top: 10px; min-height: 95px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;}
+.rightsam h1{ padding:5px; font-size:18px; line-height:19px; margin:0px; font-family: 'Grandstander', cursive; 
+  color:#444; font-weight:normal; text-align:right;  }
+
+.contentsamtrois{ background-image:url('https://i.pinimg.com/564x/3c/c1/c8/3cc1c8e4744511ae6935082a2f94606f.jpg'); padding:15px; }
+.contentsamtrois span{ display:block; background-color:#fff; padding:20px; text-align:justify; font-size:13px; line-height:1.5em; font-family:Verdana; }

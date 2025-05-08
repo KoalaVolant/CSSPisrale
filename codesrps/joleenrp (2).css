@@ -1,0 +1,12 @@
+/* Fiche rp Joleen */ 
+
+.joleenrp{ width:450px; margin:0 auto; }
+.joleenrp *{ box-sizing:-border-box; } 
+
+.joleenrp div{ display:flex; justify-content:space-between; padding-bottom:5px;  }
+.joleenrp div img{ width:210px; height:100px; object-fit:cover; padding:5px; border:1px solid #C01F23; } 
+
+.joleenrp h1{ font-family: 'Parisienne', cursive; margin:0px; font-size:22px; line-height:18px; font-weight:normal; color:#991518; text-align:center; }
+.joleenrp h2{ letter-spacing:-2px; font-family:Times New Roman; font-size:16px; text-align:center; margin:0; color:#dedede; }
+
+.joleenrp span{ display:block; margin-top:10px; border:1px solid #6A0F11; padding:20px 10px; text-align:justify; border-left-width:5px; }

@@ -1,0 +1,52 @@
+:root{
+    --fond-deg:linear-gradient(90deg, #BBBBB6 32.29%, #647076 89.86%);
+    --fond-img:url('https://i.imgur.com/eF2fshb.jpg'); 
+    --fond-img2:url('https://i.imgur.com/ezn1MYo.jpg');
+    --trianglefond:url('https://i.servimg.com/u/f30/19/45/51/53/cateno10.png');
+    --fond-bodyline:#D9D9D9;
+    --dark:#647076;
+    --darkblue:#648697;
+    --light:#BBBBB6;
+    
+    --black:#222; 
+    --white:#fff;
+    
+    --text-shadow:2px 1px 2px #757575;
+    --font-text:'Inter', sans-serif;
+    --font-title:'GothamPro', sans-serif;
+}
+
+.projetprdbyl{ width:500px; margin:0 auto; padding:10px; background:var(--white);  }
+.projetprdbyl .bylimg{ width:100%; position:relative; z-index:10;}
+.projetprdbyl br{ display:none; }
+
+.projetprdbyl, .projetprdbyl *{ box-sizing:border-box; }
+
+/* Saut de ligne */
+
+.projetprdbyl .bylbloc br{ display:block; }
+
+/* Titre */ 
+
+.projetprdbyl .prdbyltitle{ font-size:40px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-title); text-align:center; line-height:45px; color:var(--black); font-weight:200;  position:relative; z-index:7; margin:10px 0;}
+.projetprdbyl .prdbyltitle strong{ color:var(--dark);  position:relative; z-index:8;}
+.projetprdbyl .prdbyltitle:after{ content:' '; background:var(--trianglefond); opacity:0.5; height:100px; position:absolute; top:-40px; z-index:1; left:50%; transform:translateX(-50%); width:130px; }
+
+/* Contexte */ 
+
+.projetprdbyl .bylbloc{ border:1px solid var(--light); padding:15px; font-family:var(--font-text); text-align:justify;  background:var(--white); position:relative; z-index:8; font-size:13px; line-height:18px;  }
+.projetprdbyl .bylcont{ height:300px; overflow:auto; }
+
+/* Titres */ 
+
+.projetprdbyl .bylprdtitle2{ background:var(--fond-deg); color:var(--white); text-transform:uppercase; font-family:var(--font-title); font-size:25px; padding:10px; font-weight:200; letter-spacing:3px; margin:10px 0px;}
+
+/* Boutons */ 
+
+.bylbtns{ display:flex; flex-wrap:wrap; }
+.bylbtns span{ padding:6px; font-family:var(--font-title); border:var(--dark) 1px solid; margin:2px; font-size:13px; color:var(--black); position:relative; width:49%; display:flex; align-items:center; justify-content:center; text-align:center; transition:500ms; }
+.bylbtns span:hover{  background:var(--dark); color:var(--white); transition:500ms; }
+
+/* Gras */ 
+
+.projetprdbyl .bylbloc b, .projetprdbyl .bylbloc strong{ font-family:var(--font-title);}

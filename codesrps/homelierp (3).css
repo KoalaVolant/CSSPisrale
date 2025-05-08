@@ -1,0 +1,56 @@
+.homelie{
+  width:500px;
+  margin:0 auto;
+}
+
+.homelie h1{
+  background-color:#4A8EA8;
+  color:#fff;
+  font-family: 'Karla', sans-serif;
+  font-size:22px;
+  line-height:24px;
+  padding:10px;
+  text-align:center;
+  width:400px;
+  margin-top:-5px;
+-webkit-border-radius: 40px;
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-bottomright: 0;
+border-radius: 40px;
+  margin-left:45px;
+    border-bottom:#98BDCD 2px dotted;
+border-bottom-right-radius: 0;
+  position:relative;
+  z-index:13;
+}
+
+.homelie img{
+  width:500px;
+  -webkit-border-radius: 120px;
+-moz-border-radius: 120px;
+border-radius: 120px;
+  border-left:5px solid #fff;
+  border-right:5px solid #fff;
+  position:relative;
+  z-index:7;
+}
+
+.homelie p, .homelie .homelierp{
+  -webkit-border-radius: 40px;
+-moz-border-radius: 40px;
+border-radius: 40px;
+  text-align:justify;
+  background-color:#fff;
+  width:475px;
+  color:#2D5666;
+  padding:20px;
+  font-size:12px;
+  margin-top:-25px;
+  line-height:15px;
+  -moz-box-shadow: 2px 2px 5px 0px #c0c0c0;
+-webkit-box-shadow: 2px 2px 5px 0px #c0c0c0;
+-o-box-shadow: 2px 2px 5px 0px #c0c0c0;
+box-shadow: 2px 2px 5px 0px #c0c0c0;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#c0c0c0, Direction=134, Strength=5);
+}

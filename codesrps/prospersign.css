@@ -1,0 +1,25 @@
+.prospsign{
+  width:330px;
+  margin:0 auto;
+}
+
+.prospsign img{
+  width:150px;
+  height:110px;
+  object-fit:cover;
+  padding:3px;
+  border:#fff 1px solid;
+}
+
+.prospsign img+img{
+  border-color:#407DB0;
+  margin-left:10px;
+}
+
+.prospsign h1{
+  font-family: 'Noto Serif', serif;
+  text-align:justify;
+  font-size:11px;
+  font-weight:normal;
+  line-height:12px;
+}

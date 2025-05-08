@@ -1,0 +1,752 @@
+<!DOCTYPE HTML>
+<html>
+
+<!--[if IE 7 ]>    <html class= "ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html class= "ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html class= "ie9"> <![endif]-->
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<title>Caroline Montcharmont - CV</title>
+
+<!-- *************************************************************************
+**************************   STYLE SHEET   *******************************
+************************************************************************** -->
+
+<link href="css/main.css" rel="stylesheet" type="text/css" />
+<link href="css/prettyPhoto.css" rel="stylesheet" type="text/css" />
+
+<!-- *************************************************************************
+**************************        JS       *******************************
+************************************************************************** -->
+ 
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.quicksand.js"> </script>
+<script type="text/javascript" src="js/custom.js"> </script>
+<script type="text/javascript" src="js/hoverIntent.js"> </script>
+<script type="text/javascript" src="js/jquery.prettyPhoto.js"></script>
+<script type="text/javascript" src="js/jquery.easing.1.3.js"> </script>
+<script type="text/javascript" src="js/twitter.js"> </script>
+
+<!-- *************************************************************************
+*********************  THIS IS THE CONTACT FORM JS  **************************
+************************************************************************** -->
+
+<script type='text/javascript'>
+
+$(document).ready(function(){
+var active_color = '#929191'; // Colour of user provided text
+var inactive_color = '#929191'; // Colour of default text
+$("input.default-value").css("color", inactive_color);
+var default_values = new Array();
+$("input.default-value").focus(function() {
+if (!default_values[this.id]) {
+default_values[this.id] = this.value;
+}
+if (this.value == default_values[this.id]) {
+this.value = '';
+this.style.color = active_color;
+}
+$(this).blur(function() {
+if (this.value == '') {
+this.style.color = inactive_color;
+this.value = default_values[this.id];
+}
+});
+});
+
+$('#contactform').submit(function(){
+
+formvalues = $("#contactform").serialize();
+
+$.ajax({
+type: "POST",
+url: "mailer.php",
+data: formvalues,
+dataType: "json",
+success: function(data) {
+if (data.success==1) {
+$("#contactwrapper").slideUp(750,function() {
+$('#contactmessage').html('Thanks! Please check your email to confirm your subscription.');
+});
+}
+else{
+if (data.invalid_email==1) { $('#email').addClass("form_error"); }
+else { $('#email').removeClass("form_error"); }
+
+}
+}
+});
+return false; 
+});
+
+});
+</script>
+
+</head>
+
+<body>
+
+<!-- Start of color wrapper -->
+<div class="color_wrapper">
+
+</div><!-- End of color wrapper -->
+
+<!-- Start of header wrapper -->
+<div id="header_wrapper">
+
+	<!-- Start of header -->
+    <div class="header">
+    
+    	<!-- Start of top logo -->
+        <div id="top_logo">
+      	<h1>Caroline Montcharmont</h1>
+        
+        </div><!-- End of top_logo -->
+        
+        <!-- Start of top download -->
+        <div id="top_download">
+        <a href="fichiers/Cvcarolinemontcharmont.pdf" target="_blank">TÃ©lÃ©charger mon CV</a>
+        
+        </div><!-- End of top download -->
+        
+        <!-- Start of about one half first -->
+        <div class="about_one_half_first">
+        <img src="fichiers/Imagephotomoicv.png" class="about_me_img" height="177" width="250" alt="me" />
+        
+        <h4>Webdesigner / IntÃ©gratrice front-end</h4>
+        
+        
+        <p>PossÃ©dant une polyvalence graphisme / dÃ©veloppement, je suis quelqu'un qui sait m'adapter. Curieuse et ouverte, je suis Ã©galement force de propositions et Ã  mÃªme de trouver des solutions. Je suis en mesure de travailler aussi bien seule qu'en Ã©quipe, et je suis Ã  l'Ã©coute des besoins du client.</a></p>
+        
+        <p><span class="signature">Caroline Montcharmont</span></p>        
+        
+        </div><!-- End of about one half first -->
+        
+        <!-- Start of about one half -->
+        <div class="about_one_half">
+        
+            <!-- Start of one half first -->
+            <div class="one_half_first">
+            
+                <!-- Start of contact me phone -->
+                <div class="contact_me_phone">
+                06.05.36.42.11
+                
+                </div><!-- End of contact me phone -->
+                
+            </div><!-- End of one half first -->
+
+            <!-- Start of one half -->
+            <div class="one_half">
+            
+                <!-- Start of contact me email -->
+                <div class="contact_me_email">
+                <a href="mailto:info@montcharmont.c@gmail.com">montcharmont.c[at]gmail.com</a>
+                
+                </div><!-- End of contact me email -->
+                
+            </div><!-- End of one half -->
+            
+            <!-- Start of one half first -->
+            <div class="one_half_first">
+            
+                <!-- Start of contact me location -->
+                <div class="contact_me_location">
+                Toulouse, 31200
+                
+                </div><!-- End of contact me location -->
+                
+            </div><!-- End of one half first -->
+            
+
+                   
+        </div><!-- End of about one half -->
+            
+    </div><!-- End of header -->
+    
+    <div class="clear"></div>
+
+</div><!-- End of header wrapper -->
+
+<!-- Start of wrapper -->
+<div class="wrapper">
+    
+    	<!-- Start of full width -->
+        <div class="full_width">
+        
+
+            <!-- Start of one half first -->
+            <div class="one_half_first">
+            
+            <h6><span class="styled_heading">CompÃ©tences</span></h6>
+                
+                <!-- Start of content -->
+                <div class="content">
+                    
+                    <!-- Start of col -->
+                    <div class="col">
+                        
+                        <!-- Start of skill ul -->
+                        <ul id="skill">
+                            <li><span class="expand photoshop"></span><em>Photoshop</em></li>
+                            <li><span class="expand illustrator"></span><em>InDesign</em></li>
+                            <li><span class="expand indesign"></span><em>Illustrator & Flash</em></li>
+							<li><span class="expand sharepoint"></span><em>Sharepoint</em></li>  
+                            <li><span class="expand flash"></span><em>Wordpress</em></li>
+                            <li><span class="expand wordpress"></span><em>PHP</em></li>
+                            <li><span class="expand html"></span><em>HTML</em></li>
+                            <li><span class="expand css"></span><em>CSS</em></li>
+<li><span class="expand javascript"></span><em>Javascript & JQuery</em></li>                            
+                        </ul><!-- End of skill ul -->
+                    
+                    </div><!-- End of col -->
+           
+                </div><!-- End of content -->           
+            
+            </div><!-- End of one half first -->
+            
+            <!-- Start of one half -->
+            <div class="one_half">
+            
+            <h6><span class="styled_heading">Formation</span></h6>
+            
+                <ul class="education">
+                <li><span class="small_heading">UniversitÃ© Toulouse 1 Capitole - Toulouse (31200)</span>
+                        
+                        <!-- Start of lgt block -->
+                        <div class="lgt_block">
+                        2014 - 2015
+                        
+                        </div><!-- End of lgt block -->
+                        
+                        <!-- Start of drk block -->
+                        <div class="drk_block">
+                        Licence Professionnelle Responsable Technique dâ€™Applications Internet
+                        
+                        </div><!-- End of drk block -->
+                        
+                        <!-- Start of content -->
+                        <div class="content2">
+                        <p>DÃ©veloppement web et rÃ©seau. Conception et modulation de base de donnÃ©es. Conception de sites internet. Programmation, PHP, Java, CSS, HTML... <span class="highlight_text">Mention assez bien - 13/20</span></p>
+                        
+                        </div><!-- End of content -->
+                        
+                        </li>
+						
+                    <li><span class="small_heading">LycÃ©e Charles de Gaulle - Chaumont (52000)</span>
+                        
+                        <!-- Start of lgt block -->
+                        <div class="lgt_block">
+                        2012 - 2014
+                        
+                        </div><!-- End of lgt block -->
+                        
+                        <!-- Start of drk block -->
+                        <div class="drk_block">
+                        BTS Design Graphique option Communication et MÃ©dias NumÃ©riques
+                        
+                        </div><!-- End of drk block -->
+                        
+                        <!-- Start of content -->
+                        <div class="content2">
+                        <p>DÃ©couverte et utilisation des domaines de la communication visuelle et multimÃ©dias. Campagnes publicitaires, site web, gÃ©nÃ©riques et vidÃ©os, expression plastique, histoire des affiches et de la communication... <span class="highlight_text">Moyenne : 12,44/20</span></p>
+                        
+                        </div><!-- End of content -->
+                        
+                        </li>
+    
+                    <li><span class="small_heading">LycÃ©e Louis Pasteur - BesanÃ§on (25000)</span>
+                        
+                        <!-- Start of lgt block -->
+                        <div class="lgt_block">
+                        2009 - 2012
+                        
+                        </div><!-- End of lgt block -->
+                        
+                        <!-- Start of drk block -->
+                        <div class="drk_block">
+                        BaccalaurÃ©at STI Arts AppliquÃ©s
+                        
+                        </div><!-- End of drk block -->
+                        
+                        <!-- Start of content -->
+                        <div class="content2">
+                        <p></p>
+                        
+                        </div><!-- End of content -->
+                        
+                        </li>
+                
+                </ul>
+    
+          </div><!-- End of one half -->
+          
+      </div><!-- End of full width -->
+      
+      <div class="clear"></div>
+            
+      <!-- Start of full width -->
+      <div class="full_width">
+      
+      <h6><span class="styled_heading">ExpÃ©riences professionnelles</span></h6>
+        
+            <!-- Start of one half first -->
+            <div class="one_half_first">
+            
+                <ul class="none">
+                
+                    <li><span class="small_heading">Licence Professionnelle RTAI</span>
+                        
+                        <!-- Start of lgt block -->
+                        <div class="lgt_block">
+                        Dec 2014 - Avril 2015
+                        
+                        </div><!-- End of lgt block -->
+                        
+                        <!-- Start of drk block -->
+                        <div class="drk_block">
+                        Projet tuteurÃ©
+                        
+                        </div><!-- End of drk block -->
+                        
+                        <!-- Start of content -->
+                        <div class="content2">
+                        <p>Le projet tuteurÃ© consistait Ã  produire une refonte Ã©ditoriale et professionnelle du site de la formation. Il a Ã©tÃ© produit pour Christophe Alcantara, le directeur des Ã©tudes et a Ã©tÃ© encadrÃ© par plusieurs professeurs. C'Ã©tait un travail fait en groupe de cinq, et bien que j'ai participÃ© Ã  toutes les Ã©tapes, j'ai notamment fait les aspects graphiques, et la page "Etudiants" du site.<br>
+						<span class="highlight_text"><a href="http://rtai.fr/">rtai.fr</a></span> </p>
+                        
+                            <ul class="square">
+                                <li>Responsive Design, CSS & HTML</li>
+                                <li>Utilisation de Wordpress</li>
+                                <li>Gestion de projet et travail de groupe</li>
+                            </ul>
+                        
+                        </div><!-- End of content -->
+                        
+                        </li>
+                
+                </ul>        
+            
+            </div><!-- End of one half first -->
+            
+            <!-- Start of one half -->
+            <div class="one_half">
+            
+                <ul class="none">
+                
+                    <li><span class="small_heading">Centre de Recherches du Cancer de Toulouse</span>
+                        
+                        <!-- Start of lgt block -->
+                        <div class="lgt_block">
+                        Avril 2015 - AoÃ»t 2015
+                        
+                        </div><!-- End of lgt block -->
+                        
+                        <!-- Start of drk block -->
+                        <div class="drk_block">
+                        Stagiaire dÃ©veloppeur web
+                        
+                        </div><!-- End of drk block -->
+                        
+                        <!-- Start of content -->
+                        <div class="content2">
+                        <p>Dans le cadre de mon stage de fin d'Ã©tudes, j'ai conÃ§u le site du PÃ´le Technologique du CRCT. J'ai Ã©galement du crÃ©er l'identitÃ©e visuelle (le logotype) du pÃ´le, et en dÃ©cliner une charte graphique, une plaquette informative ainsi que des cartes de visites. J'ai utilisÃ© le CMS Wordpress de faÃ§on autonome, puisque les personnes qui m'encadraient n'avaient pas les compÃ©tences techniques pour m'aider Ã  ce niveau. De fait, j'ai eut une relation client avec ces personnes qui m'ont permis de voir certaines facettes de l'analyse du besoin client. 
+						<span class="highlight_text"><a href="http://www.poletechno-crct.inserm.fr/">poletechno-crct.inserm.fr</a></span></p>
+                        
+                            <ul class="square">
+                                <li>Utilisation de Wordpress</li>
+                                <li>Production d'identitÃ©e visuelle avec Photoshop, In Design et Illustrator</li>
+                                <li>Relation client</li>
+                            </ul>
+                        
+                        </div><!-- End of content -->
+                        
+                        </li>
+                
+                </ul> 
+            
+            </div><!-- End of one half --> 
+			
+			 <!-- Start of one half -->
+            <div class="one_half">
+            
+                <ul class="none">
+                
+                    <li><span class="small_heading">Geser-Best / Atos</span>
+                        
+                        <!-- Start of lgt block -->
+                        <div class="lgt_block">
+                        29 février 2016 - juin 2017
+                        
+                        </div><!-- End of lgt block -->
+                        
+                        <!-- Start of drk block -->
+                        <div class="drk_block">
+                        Développeur informatique sur Sharepoint
+                        
+                        </div><!-- End of drk block -->
+                        
+                        <!-- Start of content -->
+                        <div class="content2">
+                        <p>En tant qu'employé pour Geser-Best, j'ai été sous-traitante chez Atos, pour le projet ECM Bus, côté migration. J'ai pu ainsi migrer des sites sous Sharepoint. D'abord avec des specs clients, puis as-is. J'ai pu également voir avec les clients, les éventuels retours qu'ils avaient.</p>
+                        
+                            <ul class="square">
+                                <li>Utilisation de Sharepoint</li>
+                                <li>Gestion de projet</li>
+                                <li>Relation client</li>
+                            </ul>
+                        
+                        </div><!-- End of content -->
+                        
+                        </li>
+                
+                </ul> 
+            
+            </div><!-- End of one half -->
+            
+        </div><!-- End of full width -->
+	
+        <div class="clear"></div>
+		
+		<div class="full_width">
+      
+      <h6><span class="styled_heading">ExpÃ©riences personnelles</span></h6>
+        
+            <!-- Start of one half first -->
+            <div class="one_half_first">
+            
+                <ul class="none">
+                
+                    <li><span class="small_heading">Saline Royale d'Arc et Senans</span>
+                        
+                        <!-- Start of lgt block -->
+                        <div class="lgt_block">
+                        Juin 2013
+                        
+                        </div><!-- End of lgt block -->
+                        
+                        <!-- Start of drk block -->
+                        <div class="drk_block">
+                        Stage professionnel de BTS
+                        
+                        </div><!-- End of drk block -->
+                        
+                        <!-- Start of content -->
+                        <div class="content2">
+                        <p>Ce stage de premiÃ¨re annÃ©e de BTS a Ã©tÃ© rÃ©alisÃ© Ã  la Saline Royale d'Arc et Senans, citÃ© de l'Utopie, se situant dans le dÃ©partement du Doubs.
+						J'y ai notamment fait plusieurs projets divers pour le musÃ©e, ainsi j'ai pu voir la diversitÃ© des supports de communication d'un point de vue culturel. J'ai Ã©galement abordÃ© la notion de community management, et aies pu dÃ©couvrir rapidement Joomla.
+						Mais ce qui a Ã©tÃ© le plus essentiel Ã  mes yeux durant ce stage, ce fut la relation client que j'ai eut avec une de mes missions, oÃ¹ j'ai pu crÃ©er un flyer pour une visite des jardins adaptÃ©s aux enfants, et ainsi voir son utilisation durant une des visites et son efficacitÃ©.<br>
+				</p>
+                        
+                            <ul class="square">
+                                <li>RÃ©alisation de flyers des visites</li>
+                                <li>Suivi d'un projet complet</li>
+                                <li>Vision des aspects culturels en communication</li>
+								<li>Community management</li>
+                            </ul>
+                        
+                        </div><!-- End of content -->
+                        
+                        </li>
+                
+                </ul>        
+            
+            </div><!-- End of one half first -->
+            
+            <!-- Start of one half -->
+            <div class="one_half">
+            
+                <ul class="none">
+                
+                    <li><span class="small_heading">Chaumont Habitat - Appart' eco</span>
+                        
+                        <!-- Start of lgt block -->
+                        <div class="lgt_block">
+                        Janvier 2013
+                        
+                        </div><!-- End of lgt block -->
+                        
+                        <!-- Start of drk block -->
+                        <div class="drk_block">
+                        Workshop
+                        
+                        </div><!-- End of drk block -->
+                        
+                        <!-- Start of content -->
+                        <div class="content2">
+                        <p>Durant mon BTS, j'ai pu participer Ã  divers workshops. Celui-ci Ã©tait sur la crÃ©ation d'une identitÃ©e visuelle, ayant pour thÃ¨me l'Ã©cologie. C'Ã©tait un travail en groupe de six, oÃ¹ pendant une semaine, nous devions produire ce qui Ã©tait attendu par le client. 
+						Notre projet est celui qui a Ã©tÃ© sÃ©lectionnÃ©.
+</p>
+                        
+                            <ul class="square">
+                                <li>IdentitÃ©e visuelle et ses dÃ©rivÃ©s</li>
+                                <li>Travail en groupe</li>
+                                <li>DÃ©monstration au client</li>
+                            </ul>
+                        
+                        </div><!-- End of content -->
+                        
+                        </li>
+                
+                </ul> 
+            
+            </div><!-- End of one half --> 
+			
+            
+        </div><!-- End of full width -->
+                
+        <!-- Start of full width -->
+        <div class="full_width">
+        
+            
+            <div class="clear2"></div>
+            
+            <!-- Start of one half first -->
+            <div class="one_half_first">
+            
+            <h6><span class="styled_heading">Loisirs</span></h6>
+            
+            	 <ul class="square">
+                    <li>Ecriture : rigueur, rÃ©daction</li>
+                    <li>Lecture : connaissances culturelles</li>
+                    <li>Escalade : repousser les limites, rÃ©flexion</li>
+                </ul>
+            
+            </div><!-- End of one half first -->
+            
+            <!-- Start of one half -->
+            <div class="one_half">
+            
+            <h6><span class="styled_heading">ActivitÃ©s</span></h6>
+            
+                <ul class="square">
+                    <li>Administration de forums (gestion d'une communauté...)</li>
+                    <li>Membre du comitÃ© de lecture des <a href="http://www.boutique.sharonkena.com/">Editions Sharon Kena</a> depuis 2013</li>
+                </ul>
+            
+            </div><!-- End of one half -->
+                
+        </div><!-- End of full width --> 
+        
+        <div class="clear"></div>    
+    
+    <!-- Start of full width -->
+    <div class="full_width">
+    
+    <h6><span class="styled_heading">Portfolio</span></h6>
+            
+        <!-- Start of filter -->
+        <ul id="filter">
+                    
+          <li class="segment-1 selected-1 active"><a data-value="all" href="#">Tous</a><span class="sep"></span></li>
+          <li class="segment-38"><a data-value="term-38" href="#">Web</a><span class="border"></span><span class="sep"></span></li>
+                
+        </ul><!-- End of filter -->
+                
+        <!-- Start of portfolio bg -->
+        <div id="portfolio-bg" class="clearfix">
+                
+            <!-- Start of image grid -->
+            <ul class="image-grid grid clearfix">
+                
+                <!-- ******************** THIS IS THE START OF PORTFOLIO ITEM ******************** -->
+                
+                <li class="term-38" data-id="id-1">
+                
+                    <div>
+                
+                        <!-- Start of post thumb -->
+                        <div class="post-thumb clearfix">
+                        
+                        <a href="fichiers/histoire.jpg" title="Site de la DerniÃ¨re Geste - http://ladernieregeste.osmose-hebergement.com/" class="prettyPhoto[portfolio]"><img src="fichiers/histoire.jpg" alt="La DerniÃ¨re Geste" width="295" height="174" /></a>
+                 
+                        </div><!-- End of post thumb -->
+                    
+                    </div>
+                    
+                </li>
+                
+                <!-- ******************** THIS IS THE END OF PORTFOLIO ITEM ******************** -->
+                
+                
+                 
+                <!-- ******************** THIS IS THE START OF PORTFOLIO ITEM ******************** -->
+                
+                <li class="term-38" data-id="id-2">
+                
+                    <div>
+                
+                        <!-- Start of post thumb -->
+                        <div class="post-thumb clearfix">
+                        
+                        <a href="fichiers/rtai2.jpg" title="Site de la Formation RTAI - http://rtai.fr/" class="prettyPhoto[portfolio]"><img src="fichiers/rtai2.jpg" alt="RTAI" width="295" height="174" /></a>
+                 
+                        </div><!-- End of post thumb -->
+                    
+                    </div>
+                    
+                </li>
+                
+                <!-- ******************** THIS IS THE END OF PORTFOLIO ITEM ******************** -->
+                
+                
+                
+                <!-- ******************** THIS IS THE START OF PORTFOLIO ITEM ******************** -->
+                
+                <li class="term-38" data-id="id-3">
+                
+                    <div>
+                
+                        <!-- Start of post thumb -->
+                        <div class="post-thumb clearfix">
+                        
+                        <a href="fichiers/ptcrct.jpg" title="Site du PÃ´le Technologique CRCT - http://poletechno-crct.inserm.fr" class="prettyPhoto[portfolio]"><img src="fichiers/ptcrct.jpg" alt="PÃ´le Technologique CRCT" width="295" height="174" /></a>
+                 
+                        </div><!-- End of post thumb -->
+                    
+                    </div>
+                    
+                </li>
+                
+                <!-- ******************** THIS IS THE END OF PORTFOLIO ITEM ******************** -->
+                
+                
+                
+                
+            </ul><!-- End of image grid -->
+                
+        </div><!-- End of portfolio bg -->
+                    
+	</div><!-- End of full width -->
+    
+    <div class="clear2"></div>
+    
+    <!-- Start of full width -->
+    <div class="full_width">
+      
+        
+        <h6><span class="styled_heading">Contact</span></h6>
+         
+        <center><form action="mailer.php" id="contact_form" method="post">
+           
+            <ul class="form">				
+            
+                <li class="short">
+                    <label>PrÃ©nom<span class="required"></span></label>
+                    <input type="text" name="first" id="first" value="PrÃ©nom" class="requiredField" onblur="if(this.value == '') { this.value = 'First Name'; }" onfocus="if(this.value == 'First Name') { this.value = ''; }" />
+                </li>
+                
+                <li class="short">
+                    <label>Nom<span class="required"></span></label>
+                    <input type="text" name="last" id="last" value="Nom de famille" class="requiredField" onblur="if(this.value == '') { this.value = 'Last Name'; }" onfocus="if(this.value == 'Last Name') { this.value = ''; }" />
+                </li>
+                                                            
+                <li class="long">
+                    <label>Adresse mail<span class="required"></span></label>					
+                    <input type="text" name="email" id="email" value="Adresse mail" class="requiredField email" onblur="if(this.value == '') { this.value = 'Email Address'; }" onfocus="if(this.value == 'Email Address') { this.value = ''; }" />                        </li>
+                
+                <li class="short">
+                    <label>Nom de l'entreprise</label>
+                    <input type="text" name="company" id="company" value="Nom de l'entreprise" class="requiredField" onblur="if(this.value == '') { this.value = 'Company Name'; }" onfocus="if(this.value == 'Company Name') { this.value = ''; }" />
+                </li>
+                
+                <li class="short">
+                    <label>NumÃ©ro de tÃ©lÃ©phone</label>
+                    <input type="text" name="phone" id="phone" value="NumÃ©ro de tÃ©lÃ©phone" class="requiredField" onblur="if(this.value == '') { this.value = 'Telephone Number'; }" onfocus="if(this.value == 'Telephone Number') { this.value = ''; }" />
+                </li>
+                                
+                <li class="textarea">
+                    <label>Message<span class="required"></span></label>
+                    <textarea name="message" id="message" rows="20" cols="30"></textarea>
+                </li>
+                                        
+                <li class="button"><input name="submitted" id="submitted" value="Envoyer" class="submit" type="submit" />
+                </li>
+            
+            </ul>
+                
+            </form>    </center>    
+        
+
+        
+       
+    
+	</div><!-- End of full width -->
+    
+</div><!-- End of wrapper -->
+
+<div class="clear2"></div>
+
+<!-- Start of footer wrapper -->
+<div id="footer_wrapper">
+
+	<!-- Start of footer -->
+    <div class="footer">
+    
+    	<!-- Start of copyright -->
+        <div class="copyright">
+        &copy; Copyright 2015 Caroline Montcharmont Tous droits rÃ©servÃ©s
+        
+        </div><!-- End of copyright -->
+        
+        <!-- Start of social section -->
+        <div class="social_section">
+        
+            <!-- Start of facebook -->
+            <div class="facebook">
+            
+            <a href="https://www.facebook.com/profile.php?id=100009674529023&fref=ts" target="_blank"></a>
+            
+            </div><!-- End of facebook -->
+           
+            
+            <!-- Start of linkedin -->
+            <div class="linkedin">
+            
+            <a href="https://fr.linkedin.com/pub/caroline-montcharmont/a4/1b5/1" target="_blank"></a>
+            
+            </div><!-- End of linkedin --> 
+
+            <!-- Start of linkedin -->
+            <div class="deviantart">
+            
+            <a href="http://mntcrt-caroline.deviantart.com" target="_blank"></a>
+            
+            </div><!-- End of linkedin -->           			
+        
+        </div><!-- End of social section -->
+    
+    </div><!-- End of footer -->
+
+</div><!-- End of footer wrapper -->
+
+<!-- Start of color wrapper -->
+<div class="color_wrapper">
+
+</div><!-- End of color wrapper -->
+
+<!-- PRETTYPHOTO CODE -->
+<script type="text/javascript">
+$(document).ready(function(){
+$("a[class^='prettyPhoto']").prettyPhoto({
+               showTitle: true});
+               $("a[class^='prettyPhoto']").prettyPhoto({social_tools:false});
+});
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-65671760-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+
+</html>

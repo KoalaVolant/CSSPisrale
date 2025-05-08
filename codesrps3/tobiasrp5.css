@@ -1,0 +1,44 @@
+.tobiasrp5, .tobiasrp5 *{ box-sizing:border-box; }
+.tobiasrp5{ width:500px; margin: 0 auto; position:relative; }
+.tobiasrp5 img{ object-fit:cover; }
+.tobiasrp5 br{ display:none; }
+
+/* ROOT */ 
+
+:root{ 
+--tobiasrp-color1:#4d2d00; 
+--tobiasrp-color2:#B6A999;
+--tobiasrp-color3:#816642;}
+
+/* TITRE T CITATION */ 
+
+.tobiasrp5 .tobiasrp5index{ position:relative; z-index:3; }
+/* TITRE */ 
+
+.tobiasrp5 .tobiasrp5title{ background:var(--tobiasrp-color1); font-family: 'Playfair Display', serif; color:white; font-size:20px; font-weight:900; padding:5px; position:relative; }
+.tobiasrp5 .tobiasrp5title:before{ content:' '; background:var(--tobiasrp-color2); width:100%; height:30px; position:absolute; bottom:-10px; left:0; z-index:-1; transform:rotate(2deg); }
+
+/* CONTENT FLEX */ 
+
+.tobiasrp5 .tobiasrp5flex{ display:flex; justify-content:space-between; }
+
+/* CONTENT */ 
+
+.tobiasrp5 .tobiasrp5content{ background:#fff; padding:50px 30px; text-align:justify; font-family: 'Lato', sans-serif; font-size:14px; line-height:1.4em; width:75%; overflow:auto; color:#222; height:550px;
+position:relative; top:-20px; z-index:1; }
+.tobiasrp5 .tobiasrp5content br{ display:block;}
+/* CONTENT IMG */ 
+
+.tobiasrp5 .tobiasrp5images{ width:25%; padding-top:15px;  }
+.tobiasrp5 .tobiasrp5images:before{ content:' '; background:var(--tobiasrp-color3); width:50px; height:97%; position:absolute; top:0; right:50px;  z-index:-2; transform:rotate(4deg); }
+.tobiasrp5 .tobiasrp5images img{ margin:5px 0; width:100%; }
+
+/* CITATION */
+
+.tobiasrp5 .tobiasrp5quote{ background:var(--tobiasrp-color2); font-family: 'Playfair Display', serif; color:white; font-size:12px; line-height:13px; padding:5px; position:relative; top:-15px;}
+.tobiasrp5 .tobiasrp5quote:before{ content:' '; background:var(--tobiasrp-color1); width:100%; height:30px; position:absolute; top:-10px; left:0; z-index:-1; transform:rotate(2deg); }
+
+/* SCROLLBAR */ 
+
+  .tobiasrp5content::-webkit-scrollbar, .tobiasrp5content scrollbar {height:12px; width:10px; background:var(--tobiasrp-color1); margin-right:5px;}
+  .tobiasrp5content::-webkit-scrollbar-thumb, .tobiasrp5content scrollbar-thumb {background:var(--tobiasrp-color2); height:30px; border-radius:30px;}

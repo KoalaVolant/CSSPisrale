@@ -1,0 +1,749 @@
+<meta charset="utf-8" />        <title>Page d'accueil</title>              <link href="https://fonts.googleapis.com/css?family=Fjalla+One|PT+Sans+Narrow|Satisfy" rel="stylesheet" />                      <style type="text/css">
+      /* Slider provenant de http://www.creativejuiz.fr/blog/tutoriels/infinite-slideshow-quelques-lignes-jquery */ 
+
+::-webkit-scrollbar {
+    background: none;
+    height: 12px;
+    margin-right: 5px;
+    width: 5px;
+}
+
+::-webkit-scrollbar-corner {
+    background: #d9d9d9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 12px;
+    cursor: crosshair;
+    height: 30px;
+}  
+
+  .slideshow {
+   width: 700px;
+   height: 175px;
+  margin:0 auto;
+   overflow: hidden;
+}
+
+.slideshow ul {
+    /* 4 images donc 4 x 100% */
+   width: 400%;
+   height: 175px;
+   padding:0; margin:0;
+   list-style: none;
+}
+.slideshow li {
+   float: left;
+}
+          
+          body {
+          margin: 0;
+          }
+          
+          
+a, a:link, a:visited, a:active { 
+  target: _blank;
+  text-decoration: none; 
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+          color: #775A99;
+}
+a:hover {
+  text-decoration: none !important;
+          color: #C73046;
+}
+          
+          
+          
+.infobulle {
+          position: relative;
+          z-index: 0;
+-webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+        }
+
+.infobulle:hover {
+                background-color: transparent;
+                z-index: 50;
+            }
+
+            .infobulle div {
+                position: absolute;
+                bottom: -60px;    
+                left: -70px;  
+                background-color: #333333;  
+                color: white;  
+                font-family: times new roman;
+                font-size: 15px;
+                padding: 5px;
+                visibility: hidden;
+                text-align: center;
+                line-height: 1.2em;
+                transition:All 0.25s ease;
+                -webkit-transition:All 0.25s ease;
+                -moz-transition:All 0.25s ease;
+                -o-transition:All 0.25s ease;
+                transform: rotate(0deg) scale(0.1) skew(1deg) translateY(0px);
+                -webkit-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -moz-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -o-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -ms-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+            }
+          
+          .infobulle img div {
+          width: 150px;
+          }
+          
+            .infobulle:hover div {    /*Style de l'infobulle*/
+                visibility: visible;   
+                width: auto;  
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                   transform: rotate(0deg) scale(0.8) skew(1deg) translateY(125px);
+                -webkit-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(125px);
+                -moz-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(125px);
+                -o-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(125px);
+                -ms-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(125px);
+            }
+
+.bulle {
+            position: relative;
+            z-index: 0;
+        }
+
+            .bulle:hover {
+                background-color: transparent;
+                z-index: 50;
+            }
+
+            .bulle div {
+                position: absolute;
+                top: -23px;
+                left: -50px;
+                background-color: #333333;  
+                color: grey; 
+                padding: 5px;
+                font-family: old standard tt;
+                font-size: 14px;
+                visibility: hidden;
+                text-align: center;
+                color: #C9AAA5;
+                transition:All 0.25s ease;
+                -webkit-transition:All 0.25s ease;
+                -moz-transition:All 0.25s ease;
+                -o-transition:All 0.25s ease;
+                transform: rotate(0deg) scale(0.1) skew(1deg) translateY(0px);
+                -webkit-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -moz-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -o-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -ms-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+            } 
+          
+          .bulle div img {  /*style des images dans l'infobulle*/
+                    padding: 0px;
+                    width: 220px;
+                }
+          
+            .bulle:hover div {    
+                visibility: visible;
+                width: auto;  
+                font-size:
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                transform: rotate(0deg) scale(0.8) skew(1deg) translateY(75px);
+                -webkit-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(75px);
+                -moz-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(75px);
+                -o-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(75px);
+                -ms-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(75px);
+            }
+          
+          .bulle2 {
+            position: relative;
+            z-index: 0;
+        }
+
+            .bulle2:hover {
+                background-color: transparent;
+                z-index: 50;
+            }
+
+            .bulle2 div {
+                position: absolute;
+                top: -100px;
+                left: -20px;
+                background-color: #333333;  
+                color: grey; 
+                padding: 5px;
+                visibility: hidden;
+                text-align: center;
+                color: #C9AAA5;
+                transition:All 0.25s ease;
+                -webkit-transition:All 0.25s ease;
+                -moz-transition:All 0.25s ease;
+                -o-transition:All 0.25s ease;
+                transform: rotate(0deg) scale(0.1) skew(1deg) translateY(0px);
+                -webkit-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -moz-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -o-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+                -ms-transform: rotate(0deg) scale(0) skew(1deg) translateY(0px);
+            } 
+          
+          .bulle2 div img {  /*style des images dans l'infobulle*/
+                    padding: 0px;
+                    width: 150px;
+                }
+          
+            .bulle2:hover div {    
+                visibility: visible;
+                width: auto;  
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                transform: rotate(0deg) scale(0.8) skew(1deg) translateY(50px);
+                -webkit-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(-50px);
+                -moz-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(-50px);
+                -o-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(-50px);
+                -ms-transform: rotate(0deg) scale(0.8) skew(1deg) translateY(-50px);
+            }
+          
+          
+          .font {
+          padding: 5px; 
+          width: 875px; 
+          height: auto;  
+background-image: url("http://imageshack.com/a/img924/6665/pfdE3p.gif");
+background-position: center;
+    box-shadow: inset 7px 7px 0 RGBA(255,255,255,0.47),inset -7px 0 0 RGBA(255,255,255,0.47);
+
+          }
+          
+                  .infos {
+            position: relative;
+            top: 20px;
+                width: 100.7%;
+            height: 25px;
+            background-color: #202221;
+            font-family: 'Satisfy', cursive; 
+            font-size: 20px;
+    margin-left: -5;
+            color: #775A99;
+            padding: 2px;
+           }
+                  
+          .titre {
+          font-family: 'Satisfy', cursive; 
+          font-size: 25px; 
+          text-decoration: none;
+          color: #775A99; 
+          text-align: center; 
+          position: relative; 
+          top: 15px;
+          }
+          
+.rubrique1 {
+    width: auto;
+    height: 70px;
+    background-color: rgba(255,255,255,0.7);
+    font-family: arial;
+    font-size: 11px;
+    color: white;
+    padding: 20px;
+    text-align: justify;
+}
+           .rubrique2 {
+          width: auto;
+          height: 150px; 
+          font-family: arial; 
+          font-size: 11px; 
+          color: white; 
+          padding: 20px; 
+          text-align: justify;
+    background-color: rgba(255,255,255,0.7);
+          }
+          
+          .topsites {
+          font-family: arial; 
+          font-size: 40px; 
+          padding-top: 10px;
+          color: white;  
+          text-align: center; 
+          letter-spacing: 10px;
+          }
+          
+          .pseudostaff {
+          font-family: old standard tt; 
+          text-transform: uppercase; 
+          font-size: 18px; 
+          letter-spacing: -1px; 
+          color: #C9AAA5;
+          }
+          
+          
+          .infostaff {
+          font-family: arial; 
+          letter-spacing: -1px; 
+          font-size: 14px; 
+          color: #6F6F6F; 
+          padding-top: 5px;
+          }
+          
+          .MP {
+          font-family: old standard tt; 
+          text-transform: uppercase; 
+          font-weight: bold;
+          font-size: 20px; 
+          letter-spacing: -1px; 
+          }
+          
+          .contexte {
+          height: 145px;
+          overflow: auto;
+          font-family: arial; 
+          font-size: 11px; 
+          color: #605547;
+          text-align: justify;
+          }
+          
+.info {
+    font-family: arial;
+    font-size: 10px;
+    color: #605547;
+    line-height: 0.8em;
+    text-align: left;
+    line-height: 12px;
+}
+          
+          .mois {
+          font-family: arial
+          font-size: 10px;
+          text-transform: uppercase;
+          color: white;
+          text-align: justify;
+          line-height: 1em;
+          }
+          
+          .tumblr { 
+          width: 67px; 
+          height: 24px; 
+          background: url(http://image.noelshack.com/fichiers/2014/44/1414841683-tumblr-logotype-white-24.png) no-repeat; 
+          opacity: 0.8;
+          } 
+          .tumblr:hover { 
+          width: 67px; 
+          height: 24px; 
+          background: url(http://image.noelshack.com/fichiers/2014/44/1414841683-tumblr-logotype-white-24.png) no-repeat; 
+          opacity: 1;
+          }
+          .tumblr div {
+          opacity: 0;
+          }
+          
+          .imgyoup {
+          width: 75px;
+          transition:All 0.2s ease;
+          -webkit-transition:All 0.2s ease;
+          -moz-transition:All 0.2s ease;
+          -o-transition:All 0.2s ease;
+          transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+          -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+          -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+          -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+          -ms-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+          }
+          
+          .imgyoup:hover{
+          transform: rotate(0deg) scale(1) skew(1deg) translateY(-20px);
+          -webkit-transform: rotate(0deg) scale(1) skew(1deg) translateY(-20px);
+          -moz-transform: rotate(0deg) scale(1) skew(1deg) translateY(-20px);
+          -o-transform: rotate(0deg) scale(1) skew(1deg) translateY(-20px);
+          -ms-transform: rotate(0deg) scale(1) skew(1deg) translateY(-20px);
+          opacity: 0.9;
+          }
+          
+          
+          
+         
+   
+          
+	</style>                      
+<center>
+	                          
+	<div class="font">
+		       <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>                     
+		<div class="infos">
+			                     <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t2-reglement">règlement</a>    ♠             <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t1-contexte">contexte</a>   ♠             <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t12-bottin-des-avatars">bottins</a> ♠             <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t1245-description-des-groupes">groupes</a> ♠             <a target="_blank" href="http://supernaturalrpg.forum-canada.com/f4-postes-vacants">postes vacants</a> ♠             <a target="_blank" href="http://supernaturalrpg.forum-canada.com/f59-scenarios">scénarios</a>        ♠          <a target="_blank" href="http://supernaturalrpg.forum-canada.com/f81-archives-recapitulatif-des-intrigues">Intrigues</a>         
+		</div>
+		                 <br /><br /><script type="text/javascript">
+   $(function(){
+      setInterval(function(){
+         $(".slideshow ul").animate({marginLeft:-700},800,function(){
+            $(this).css({marginLeft:0}).find("li:last").after($(this).find("li:first"));
+         })
+      }, 4500);
+   });
+</script>             
+		<div class="slideshow">
+			               
+			<ul>
+				             
+				<li>
+					       <a href="http://supernaturalrpg.forum-canada.com/f39-missions-enquetes" target="_blank"><img src="http://img11.hostingpics.net/pics/831736Slider1MissionEnquete.png" alt="" style="width: 700px; height: 200px;" /></a>       
+				</li>
+				             
+				<li>
+					       <a href="http://supernaturalrpg.forum-canada.com/t5-les-membres-du-mois" target="_blank"><img src="http://img4.hostingpics.net/pics/488821membredumois.png" alt="" style="width: 700px; height: 200px;" /></a>       
+				</li>
+				                        
+				<li>
+					       <a href="http://supernaturalrpg.forum-canada.com/t933-la-resistance" target="_blank"><img src="http://img15.hostingpics.net/pics/768438RsistanceYeahSlider.png" alt="" style="width: 700px; height: 200px;" /></a>       
+				</li>
+				                        
+				<li>
+					       <a href="https://www.facebook.com/supernaturaltheendbegins/" target="_blank"><img src="http://img4.hostingpics.net/pics/41386557fb.png" alt="" style="width: 700px; height: 200px;" /></a>       
+				</li>
+				               
+			</ul>
+			             
+		</div>
+		                                 
+		<table border="0">
+			                              
+			<tbody>
+				                   
+				<tr>
+					                                
+					<td>
+						                                  
+						<div class="titre">
+							                          Wanted                         
+						</div>
+						                                  
+						<div class="rubrique1">
+							                                    
+							<table border="0">
+								                                      
+								<tbody>
+									                   
+									<tr>
+										                                        
+										<td>
+											                                          
+											<div class="bulle">
+												                                    <img class="imgyoup" style="width: 60px; border-radius: 50px;" src="http://images2.fanpop.com/image/photos/9000000/Becky-becky-rosen-9085738-100-100.jpg" />                                        
+												<div>
+													                                      <img src="http://31.media.tumblr.com/tumblr_m76uwbFZBt1rziwwco1_250.gif" />                            <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t1146-becky-rosen-humain-journaliste">Becky Rosen-Humaine</a>                                     
+												</div>
+												                                            
+											</div>
+											                                          
+										</td>
+										                                          
+										<td>
+											                                            
+											<div class="bulle">
+												                                    <img class="imgyoup" style="width: 60px; border-radius: 50px;" src="https://i68.servimg.com/u/f68/11/66/37/71/-mads-10.png" />                                    
+												<div>
+													                                      <img src="http://24.media.tumblr.com/d2d7dbc063ebc189938a52b0dc968c5f/tumblr_n328eeZQm81qdwrslo1_500.gif" />                            <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t1155-athanasius-dorn-resistant">Athanasius Dorn-Résistant</a>                                    
+												</div>
+												                                            
+											</div>
+											                                          
+										</td>
+										                                          
+										<td>
+											                                            
+											<div class="bulle">
+												                                    <img class="imgyoup" style="width: 60px; border-radius: 50px;" src="http://imstars.aufeminin.com/stars/fan/keanu-reeves/keanu-reeves-20050420-35914_s100.jpg" />                                    
+												<div>
+													                                      <img src="http://25.media.tumblr.com/6e5f2acee91f29f1a7322d0a0a32984b/tumblr_mkq0diRw551s2lfoto1_500.gif" />                            <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t1140-anubis-creature-dieu-paien">Anubis-Dieu Païen</a>                                    
+												</div>
+												                                            
+											</div>
+											                                          
+										</td>
+										                                      
+									</tr>
+									                                    
+								</tbody>
+								                   
+							</table>
+							                                  
+						</div>
+						                                
+					</td>
+					                                
+					<td>
+						                                  
+						<div class="titre">
+							                          Breaking News                         
+						</div>
+						                                  
+						<div class="rubrique1">
+							                                                         <span class="info">                     IMPORTANT! Forum adressé au 16 et +. Supernatural peut avoir des sujets crues. Ne pas oublier que tout est fictif.  <br /> 28.05.2016 ¤ Redécouvrez le forum <a target="_blank" href="http://supernaturalrpg.forum-canada.com/">www</a><br /> 28.10.16 ¤ Plus aucune limite de mots<a target="_blank" href="http://supernaturalrpg.forum-canada.com/">www</a><br />                                      26.09.14 ¤ Nouveau groupe,la résistance! <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t933-la-resistance">www</a><br />         11.08.15 ¤ Le forum a fêté ses un an <a target="_blank" href="http://supernaturalrpg.forum-canada.com/">www</a><br />         </span>                        
+						</div>
+						                                
+					</td>
+					                                
+					<td>
+						                                  
+						<div class="titre">
+							                          Top-Sites                         
+						</div>
+						                                  
+						<div class="rubrique1">
+							                                    
+							<div class="topsites">
+								                          <a target="_blank" href="http://www.root-top.com/topsite/forumrpg/in.php?ID=8909">♠</a>                   <a target="_blank" href="http://www.root-top.com/topsite/obsession27/in.php?ID=22058">♣</a>                   <a target="_blank" href="http://www.root-top.com/topsite/filetdudiable/in.php?ID=816">♥</a>              <a target="_blank" href="http://www.root-top.com/topsite/pubrpgdesign/in.php?ID=85">♦</a>                          
+							</div>
+							                                  
+						</div>
+						                                
+					</td>
+					                              
+				</tr>
+				                            
+			</tbody>
+			                   
+		</table>
+		                            
+		<table border="0">
+			                              
+			<tbody>
+				                   
+				<tr>
+					                                
+					<td>
+						                                  
+						<div class="titre">
+							                          Le Staff                         
+						</div>
+						                                  
+						<div class="rubrique2">
+							                          <br /><br />                          
+							<center>
+								                   
+								<div style="margin-left:200px;">
+									                                        
+									<center>
+										                 
+									</center>
+									                 
+								</div>
+								                 
+								<table style="margin-top:-25px;" border="0">
+									                                        
+									<tbody>
+										                   
+										<tr>
+											                                        
+											<td>
+												                                          
+												<div class="infobulle">
+													                                  <img class="imgyoup" style="border-radius: 50px;" src="http://vignette3.wikia.nocookie.net/jessemccartney/images/2/23/Jesse_McCartney7.png/revision/latest/scale-to-width-down/100?cb=20150201234703" />                                  
+													<div style="left: 0px;">
+														                                     <img style="width: 215px;" src="http://static.tumblr.com/akqjkff/gtnlyt5i8/tumblr_lwu5ipezbh1qexkhbo1_250.gif" />                          <span class="pseudostaff">                            Percy                           </span>                          <br />                          <span class="infostaff">                            « admin tout chou » <br /> DC : Alice Blair<br />présente                          </span>                          <br />                          <span class="MP">                            <a target="_blank" href="http://supernaturalrpg.forum-canada.com/privmsg?mode=post&u=3">MP</a>                          </span>                                  
+													</div>
+													                                          
+												</div>
+												                                        
+											</td>
+											                                                                                                                                        
+											<td>
+												                                          
+												<div class="infobulle">
+													                                  <img class="imgyoup" style="border-radius: 50px;" src="http://images5.fanpop.com/image/photos/25100000/Emilia-emilia-clarke-25133361-100-100.png" />                                  
+													<div>
+														                                     <img style="width: 215px;" src="http://66.media.tumblr.com/2e4206060df3a89680b75fe24cbcaed9/tumblr_niyhut67Zd1qfb5cjo2_500.gif" />                          <span class="pseudostaff">                           Maggie Isley                          </span>                          <br />                          <span class="infostaff">                            « Admin panda  » <br /> DC :l<br />Présent          </span>                          <br />                          <span class="MP">                            <a target="_blank" href="http://supernaturalrpg.forum-canada.com/privmsg?mode=post&u=71">MP</a>                          </span>                                  
+													</div>
+													                                          
+												</div>
+												                                          
+											</td>
+											                                                                                                             
+										</tr>
+										             
+										<tr>
+											                                                                                                        
+											<td>
+												                                          
+												<div class="infobulle">
+													                                  <img class="imgyoup" style="border-radius: 50px;" src="http://imageshack.com/a/img921/2295/ov7Q1o.gif" />                                  
+													<div style="left: 0px;">
+														                                     <img style="width: 215px;" src="http://imageshack.com/a/img922/582/G8fxbe.gif" />                          <span class="pseudostaff">                            Mihr                      </span>                          <br />                          <span class="infostaff">                            « modo designer chouchou, apportant ses idées  » <br /> DC : Orias<br />Présente                         </span>                          <br />                          <span class="MP">                            <a target="_blank" href="http://supernaturalrpg.forum-canada.com/privmsg?mode=post&u=3">MP</a>                          </span>                                  
+													</div>
+													                                          
+												</div>
+												                                                                                                                                                                                                                     
+											</td>
+											             
+											<td>
+												                                        
+												<div class="infobulle">
+													                                  <img class="imgyoup" style="border-radius: 50px;" src="http://img15.hostingpics.net/pics/541052Boblennonicon.png" />                                  
+													<div style="left: 0px;">
+														                                     <img style="width: 215px;" src="https://66.media.tumblr.com/bf07d11f7e19f9c64a920de3b1290e09/tumblr_nn0wl9M7jI1sb7i22o1_400.gif" />                          <span class="pseudostaff">                            Zark-Arthur                          </span>                          <br />                          <span class="infostaff">                            « Modo disjoncté scénariste » <br /> DC : AUCUN<br />présent                          </span>                          <br />                          <span class="MP">                            <a target="_blank" href="http://supernaturalrpg.forum-canada.com/privmsg?mode=post&u=167">MP</a>                          </span>                                  
+													</div>
+													                                          
+												</div>
+												                                                                                                                                            
+											</td>
+											                                                                                                                        
+										</tr>
+										                                      
+									</tbody>
+									                   
+								</table>
+								                   
+							</center>
+							                                  
+						</div>
+						                                
+					</td>
+					                                
+					<td>
+						                                  
+						<div class="titre">
+							                          Contexte                         
+						</div>
+						                                  
+						<div class="rubrique2">
+							                                    
+							<div class="contexte">
+								                                                                                    Octobre 2010,Le maléfice sur la ville s'est volatilisé. Les gens peuvent quitter Sheol Falls à nouveau. L'arrivée des enfants de Chaos propage un vent de panique chez les créatures et les démons. Du côté des créatures, il veulent ouvrir le purgatoire pour libérer « Mère ». Les démons, eux, tente de libérer à nouveau Lucifer pour les protéger. Pour les humains, le maire a été retrouvé pendu dans sa salle de bains. Ils sont à nouveau dévastés. Les anges sont désorientés. Certains se rangent du côté des démons pour libérer Lucifer. Leur frère est assez puissant pour empêcher cette catastrophe.  <a target="_blank" href="http://supernaturalrpg.forum-canada.com/t1-contexte">Cliquez pour connaître la suite.</a>                                                          
+							</div>
+							                                  
+						</div>
+						                                
+					</td>
+					                              
+				</tr>
+				                            
+			</tbody>
+			                   
+		</table>
+		                            
+		<table border="0">
+			                              
+			<tbody>
+				                   
+				<tr>
+					                                
+					<td>
+						                                  
+						<div class="titre">
+							                          Top-Partenaires                         
+						</div>
+						                                  
+						<div style="overflow: auto;" class="rubrique1">
+							                                    
+							<center>
+								                                                                <a target="_blank" href="http://vampire-chronicles.forumgratuit.ch"> <img style="opacity: 0.8;" src="http://image.noelshack.com/fichiers/2014/28/1405094109-vcpartena3.jpg" /></a> <a target="_blank" href="http://gothamcitydc.forumactif.org"> <img style="opacity: 0.8;" src="http://img15.hostingpics.net/pics/234019bouton1.gif" /></a>                     <a target="_blank" href="http://pensionnat-matsue.forumgratuit.org/"><img src="http://img4.hostingpics.net/pics/213453135.jpg" /></a>                  <a target="_blank" href="http://onedaymore.forumactif.org"> <img src="http://nsm08.casimages.com/img/2014/09/28//14092807145511071512563189.png" /></a>  <a href="http://black-out.forumactif.org/"><img src="http://img4.hostingpics.net/pics/364734boutonBOlight100x35.gif" /></a>   <a target="_blank" href="http://late-white-rabbit.forumactif.org"> <img style="opacity: 0.8;" src="http://img15.hostingpics.net/pics/791338LOGO4.png" /></a>  <a target="_blank" href="http://www.allsoulsnight.net"> <img style="opacity: 0.8;" src="http://img15.hostingpics.net/pics/852408pub2.png" /></a>   <a target="_blank" href="http://apocalypse-tomorrow.forumactif.com/"> <img style="opacity: 0.8;" src="https://i97.servimg.com/u/f97/15/02/06/25/bouton11.png" /></a><a target="_blank" href="http://vetrragnarok.forumactif.org/"> <img style="opacity: 0.8;" src="https://i37.servimg.com/u/f37/16/16/58/85/part10.png" /></a><a href="http://www.falling-angels.org/"><img src="http://img11.hostingpics.net/pics/152815essaibutton6.gif" /></a>                                        
+							</center>
+							                                  
+						</div>
+						                                
+					</td>
+					                                
+					<td>
+						                                  
+						<div class="titre">
+							                          Infos                         
+						</div>
+						                                  
+						<div class="rubrique1">
+							                                    
+							<center>
+								                                    
+								<div class="info">
+									                                                                         Forum RPG sur la série Supernatural.   <br />Nous sommes en Octobre/novembre 2010<br /> Hot + Torture autorisés, avec mention. <br /> Forum adressé au 16 ans et +<br />  © Lyr                             
+								</div>
+								                                    
+							</center>
+							                                  
+						</div>
+						                                
+					</td>
+					                                
+					<td>
+						                                  
+						<div class="titre">
+							                          Membres du Mois                         
+						</div>
+						                                  
+						<div class="rubrique1">
+							                                    
+							<table border="0">
+								                                        
+								<tbody>
+									                   
+									<tr>
+										                                          
+										<td>
+											                                            
+											<div class="bulle2">
+												                                    <img style="border-radius: 50px;" src="http://galeri8.uludagsozluk.com/420/nikolaj-coster-waldau_651632_s.jpg" />                                    
+												<div style="top: -170px;">
+													                                      <img style="width: 150px;" src="http://66.media.tumblr.com/05e5f725d36a4b70fe90f507c2f46214/tumblr_nu4duii13y1rshgzoo1_500.gif" />                                      
+													<center>
+														                                        <span class="pseudostaff">                                   QUETZALCOATL        </span>                                      
+													</center>
+													                                      <br />                                      
+													<p class="mois">
+                                                                                                                                                    Dieu païen laissant sa marque sur Sheol o/                               
+													</p>
+													                                                
+												</div>
+												                                            
+											</div>
+											                                          
+										</td>
+										                                          
+										<td>
+											                                            
+											<div class="bulle2">
+												                                    <img style="border-radius: 50px;" src="http://i.skyrock.net/6934/91616934/pics/3230461509_0_89_OnPVmNk0.jpg" />                                    
+												<div>
+													                                       <img style="width: 150px;" src="https://secure.static.tumblr.com/4318d56c25ed0328ff333fe343ed82ad/qsdkvji/Raeo67p5e/tumblr_static_tumblr_static_duwghjjkmpcs4o8cgkk0gg44c_640.gif" />                                                                  
+													<center>
+														                                        <span class="pseudostaff">                        DAVE J. CRANE                  </span>                                      
+													</center>
+													                                      <br />                                      
+													<p class="mois">
+														                                     Petite créature qui n'hésite pas à passer partout sur le fofo !                               
+													</p>
+													                                                
+												</div>
+												                                            
+											</div>
+											                                          
+										</td>
+										                                        
+									</tr>
+									                                    
+								</tbody>
+								                   
+							</table>
+							                                  
+						</div>
+						                                
+					</td>
+					                              
+				</tr>
+				                            
+			</tbody>
+			                   
+		</table>
+		                            
+		<div class="tumblr">
+			                    <a target="_blank" href="http://lejournaldesheofall.tumblr.com/">            <img src="http://image.noelshack.com/fichiers/2014/44/1414841683-tumblr-logotype-white-24.png" />          </a>                  
+		</div>
+		                          
+	</div>
+	                        
+</center>

@@ -1,0 +1,9 @@
+.rorysign{ width:271px; margin:0 auto; background-image:url('https://i.pinimg.com/564x/99/87/ed/9987ed49bbb86d1ea7a9fa417fcb7cd3.jpg'); background-size:cover; padding:10px; }
+.rorysign img{ width:90px; height:100px; object-fit:cover; } 
+.rorysign h1{ background-color:#fff; border:#BD9FB7 1px dotted; font-size:10px; line-height:10px; padding: 10px; font-family:Trebuchet Ms; font-weight:normal; margin:5px 0px; 
+  text-align:center; text-transform:uppercase; color:#596688; position:relative;}
+.rorysign h1 strong{ font-size:14px; color:#815579; position:absolute; display:block; top:-8px; left:50%; transform:translateX(-50%); font-weight:bold;  
+  text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;
+  font-size: 20px;    width: 250px; font-family: 'Balsamiq Sans', cursive;}
+.rorysign .roryimg1{ clip-path: polygon(9% 0, 80% 0%, 100% 100%, 4% 94%); }
+.rorysign .roryimg3{ clip-path: polygon(9% 0, 80% 0%, 96% 94%, 0 100%); }

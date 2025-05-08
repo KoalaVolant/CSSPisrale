@@ -1,0 +1,40 @@
+.edri{
+  width:540px;
+  margin:0 auto;
+}
+
+.edri img{
+  padding:3px;
+  width:150px;
+  margin-right:5px;
+  border:#3D692C 1px solid;
+}
+
+.edri h1{
+  text-align:center;
+  width:466px;
+  margin-top:-52px;
+  font-weight:normal;
+  font-size:9px;
+  line-height:10px;
+    background-color:#fff;
+  padding:25px 10px 10px 10px;
+  color:#9D2F2F;
+  text-transform:lowcase;
+}
+
+.edri h2{
+  text-align:center;
+  font-size:40px;
+  width:466px;
+  letter-spacing:-2px;
+  font-family:Times New Roman; 
+  color:#294318;
+  font-family: 'Gentium Basic', serif;
+margin-top:-5px;
+}
+
+.edri:hover h2{
+  color:#000;
+  font-weight:bolder;
+}

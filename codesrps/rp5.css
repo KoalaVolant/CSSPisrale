@@ -1,0 +1,42 @@
+.wrappcal{
+width:500px;
+background-size:cover;
+}
+
+.gifcal{
+width:450px; 
+margin-left:5px; 
+margin-top:50px;
+}
+
+.titrcal{
+color:#fff; 
+font-family: 'Raleway', sans-serif; 
+font-size:20px; 
+margin-left:5px; 
+background-color:#000; 
+padding:5px; 
+width:439px; 
+letter-spacing:3px; 
+line-height:24px;
+}
+
+.rpcal{
+width:380px; 
+text-align:justify; 
+margin-left:5px; 
+padding:20px; 
+background-color:#fff; 
+color:#000; 
+font-size:12px; 
+line-height:15px; 
+border-top:dotted 1px #F7F24F;
+border-bottom:dotted 1px #F7F24F;
+}
+
+.copyrightcal{
+color:#fff; 
+font-size:8px; 
+margin-top:-20px; 
+margin-left:340px;
+}

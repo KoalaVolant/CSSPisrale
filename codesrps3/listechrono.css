@@ -1,0 +1,54 @@
+:root{
+	--fc-color-titre:#4F3130; 
+	--fc-color-encours:#A64E5E;
+	--fc-color-abandon:#CC867B;
+	--fc-color-fini:#A88138;
+}
+
+/* CREDITS */
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+/* TOTAL */
+
+.fichechrono, .fichechrono *{ box-sizing:border-box; }
+.fichechrono img{ object-fit:cover; }
+.fichechrono br{ display:none; }
+.fichechrono{ width:500px; margin:0 auto; }
+
+/* ENTETE */ 
+
+.fichechrono-entete .image-entete1{ width:70%; height:150px; }
+.fichechrono-entete .image-entete2{ width:28%; 
+	margin-left:10px; height:150px; }
+.fichechrono-titre-entete span{ display:block; font-size:25px; font-family: 'Gloock', serif; 
+	text-align:right; margin:5px 0; color:var(--fc-color-titre); }
+.fichechrono-titre-entete .dispo-entete{ color:#222; font-size:15px; font-weight:lighter; }
+
+/* LEGENDE */ 
+
+.fichechrono-legende{ margin:10px 0; background:#f0f0F0; padding:5px; font-family: 'Gloock', serif; display:flex;
+justify-content:space-between; padding:10px;  }
+.fichechrono-legende span{ padding-left:20px; position:relative; }
+.fichechrono-legende span:before{ background:#000; content:' '; 
+width:15px; height:15px; position:absolute; left:0px; border-radius:50%; }
+.fichechrono-legende .abandon:before{ background:var(--fc-color-abandon); }
+.fichechrono-legende .encours:before{ background:var(--fc-color-encours); }
+.fichechrono-legende .fini:before{ background:var(--fc-color-fini); }
+
+/* Fiche chrono */ 
+
+.fichechrono-listerp{ padding-left:10px; padding-bottom:10px; border-left:45px solid #f0f0f0;}
+.fichechrono-dategeante{ background:#f0f0F0; padding:5px; font-family: 'Gloock', serif; 
+	font-size:20px; color:var(--fc-color-titre); }
+
+.fichechrono-rp br{ display:block; }
+.fichechrono-rp{ margin:20px 0; position:relative;  }
+.fichechrono-rp a{ font-family: 'Gloock', serif;  font-weight:bold; font-size:15px; letter-spacing:1px; }
+.fichechrono-rp:before{ background:#000; content:' '; 
+width:25px; height:25px; position:absolute; left:-45px; border-radius:50%;}
+.fichechrono-rp:after{ background:#000; content:' '; 
+width:110%; height:1px; position:absolute; left:-45px; border-radius:50%;}
+.fichechrono-rp.encours:before, .fichechrono-rp.encours:after{ background:var(--fc-color-encours); }
+.fichechrono-rp.fini:before, .fichechrono-rp.fini:after{ background:var(--fc-color-fini); }
+.fichechrono-rp.abandon:before, .fichechrono-rp.abandon:after{ background:var(--fc-color-abandon); }

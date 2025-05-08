@@ -1,0 +1,192 @@
+/* Couleurs et Apparence */ 
+
+.fiche-pres{
+  background-image:url('https://i62.servimg.com/u/f62/11/66/37/71/textur10.jpg');
+  background-size:100%;
+-webkit-box-shadow: inset 0px 0px 30px 18px rgba(0,0,0,0.75);
+-moz-box-shadow: inset 0px 0px 30px 18px rgba(0,0,0,0.75);
+box-shadow: inset 0px 0px 30px 18px rgba(0,0,0,0.75);
+ border:#A46B26 5px solid;
+-webkit-clip-path: polygon(0 1.5%, 100% 0, 100% 100%, 0% 100%);
+clip-path: polygon(0 1.5%, 100% 0, 100% 100%, 0% 100%);
+  position:relative;
+}
+
+.fiche-pres h5 i::before{content: "«";} /* Mettre des chevrons à une citation */
+.fiche-pres h5 i::after{content: "»";}
+
+/* Les titres */
+
+.fiche-pres h5{ /* Les citations */
+  background-color:#745421;
+  color:#fff;
+  padding:10px;
+  margin-top:-30px;
+  font-size:15px;
+  line-height:17px;
+  text-align:center;
+  font-family: 'Playfair Display', serif;
+  -webkit-box-shadow: inset 0px 0px 30px 18px rgba(42,8,9,1);
+-moz-box-shadow: inset 0px 0px 30px 18px rgba(42,8,9,1);
+box-shadow: inset 0px 0px 30px 18px rgba(42,8,9,1);
+}
+
+.fiche-pres .citsp{
+    margin-top:-30px;
+}
+
+.fiche-pres h6{ /* Les crédits */
+  color:#fff;
+  font-size:10px;
+  text-align:center;
+text-shadow: 0px 0px 2px rgba(150, 150, 150, 1);
+    padding:5px;
+  background-color:#000;
+}
+
+.fiche-pres h2{ /* Les titres des parties */
+  font-family: 'Macondo', cursive;
+  color:#fff;
+  text-transform:uppercase;
+  font-size:24px;
+  text-align:center;
+  text-shadow:#000 0px 0px 5px;
+  margin:5px 0px;
+  padding:10px;
+    -webkit-box-shadow: inset 0px 0px 10px 18px rgba(42,8,9,1);
+-moz-box-shadow: inset 0px 0px 10px 18px rgba(42,8,9,1);
+box-shadow: inset 0px 0px 10px 18px rgba(42,8,9,1);
+    background-color:#745421;
+}
+
+.fiche-pres h3{ /* Les titres d'en savoir plus sur le perso */
+  text-align:center;
+padding:15px;
+  font-size:18px !important;
+  margin-bottom:-30px !important;
+  text-transform:uppercase;
+    font-family: 'Playfair Display', serif;
+  text-shadow:#373737 0px 0px 2px;
+}
+
+/* Identitee */ 
+
+.cont-id b{
+  color:#471410;
+  font-size:13px;
+    font-family: 'Playfair Display', serif;
+}
+
+/* Bloc de présentation*/
+.bloc-pres{
+  padding:20px;
+      text-align:justify;
+  background-color:#D09253;
+  -webkit-box-shadow: inset 0px 0px 30px 18px rgba(42,8,9,1);
+-moz-box-shadow: inset 0px 0px 30px 18px rgba(42,8,9,1);
+box-shadow: inset 0px 0px 30px 18px rgba(42,8,9,1);
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#d09253+0,531c1c+100 */
+background: #d09253; /* Old browsers */
+background: -moz-linear-gradient(top, #d09253 0%, #531c1c 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, #d09253 0%,#531c1c 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, #d09253 0%,#531c1c 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d09253', endColorstr='#531c1c',GradientType=0 ); /* IE6-9 */
+}
+
+.cont-id, .fiche-pres p, .savoir span{
+  background-color:#E9C896;
+  font-size:12px;
+  line-height:15px;
+  color:#373737;
+}
+
+.fiche-pres p{
+  padding:20px;
+}
+  
+/* Structure */
+
+.fiche-pres{ /* Conteneur de la fiche */
+  width:500px;
+  padding:15px;
+  box-sizing:border-box;
+  margin:0 auto;
+}
+
+.fiche-pres .first{
+  width:450px;
+  height:200px;
+  object-fit:cover;
+  display:block;
+  margin:0 auto;
+    -moz-transform: rotate(-4deg);
+-webkit-transform: rotate(-4deg);
+-o-transform: rotate(-4deg);
+-ms-transform: rotate(-4deg);
+transform: rotate(-4deg);
+}
+
+.fiche-pres .deuce{
+    width:420px;
+  height:200px;
+  object-fit:cover;
+  display:block;
+  margin:0 auto;
+}
+
+.fiche-pres *{
+    box-sizing:border-box;
+}
+
+
+.fiche-pres h1, .fiche-pres h2, .fiche-pres h3, .fiche-pres h4, .fiche-pres h5, .fiche-pres h6{
+  margin:0;
+  position:relative;
+  z-index:800;
+  font-weight:normal;
+}
+
+.identitee{
+  width:470px;
+  display:flex;
+  margin:0 auto;
+  justify-content:space-around;
+}
+
+.va-id{
+  width:200px;
+  height:320px;
+}
+
+.cont-id{
+  width:230px;
+  height:320px;
+  overflow:auto;
+  padding:10px;
+}
+
+.savoir div, .hrppres{
+  width:430px;
+  display:flex;
+  justify-content:space-around;
+}
+
+.savoir img{
+  width:190px;
+  height:200px;
+}
+
+.savoir span{
+  display:block;
+  width:210px;
+  height:200px;
+  overflow:auto;
+}
+
+.peurenvie{
+  flex-direction: row-reverse;
+}
+
+.hrppres span img{width:100px; height:100px;}
+
+.hrppres p{width:320px; height:125px; overflow:auto; margin-top:0px;}

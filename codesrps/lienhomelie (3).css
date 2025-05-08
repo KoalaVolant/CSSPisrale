@@ -1,0 +1,159 @@
+.wrapmelie{
+  padding:10px;
+  width:550px;
+  margin-bottom:30px;
+}
+
+.giflie{
+  float:left;
+  width:250px;
+  height:200px;
+  background-size:cover;
+}
+
+.wrapmelie .p{
+  width:295px;
+  height:200px;
+  float:left;
+  border-right:#fff 3px solid;
+  background-color:#9AB5BA;
+}
+
+.p p{
+  color:#1B2527;
+  font-size:12px;
+  line-height:14px;
+  margin-top:-45px;
+    text-align:center;
+  height:150px;
+  overflow:auto;
+  padding:10px;
+}
+
+.p h1{
+  color:#fff;
+  font-size:24px;
+  text-align:center;
+  font-family: 'Alegreya', serif;
+}
+
+.perslie{
+  margin-top:105px;
+}
+
+.perslie, .recherche{
+    width:540px;
+    padding:0px 10px 10px 10px;
+  font-size:11px;
+  line-height:13px;
+      clear:both;
+  color:#1B2527;
+  display:block;
+  background-color:#fff;
+}
+
+.perslie h1, .recherche h1{
+  background-color:#BBCDD0;
+  font-size:20px;
+  padding:5px;
+  clear:both;
+  color:#263537;
+  font-family: 'Alegreya', serif;
+}
+
+.persos{
+  width:550px;
+  margin:0 auto;
+}
+
+.persos img{
+  width:180px;
+  float:left;
+  margin-right:10px;
+}
+
+.persos .p{
+  height:75px;
+  width:340px;
+  padding:10px; 
+  margin-bottom:15px;
+  overflow:auto;
+  float:left;
+  font-size:10px;
+  background-color:#fff;
+  box-shadow:#666 0px 0px 5px;
+  color:#666;
+  line-height:12px;
+}
+
+.persos h3{
+  font-size:19px;
+  color:#384A4E;
+  border-bottom:#65868D dotted 1px;
+  text-transform:uppercase;
+  margin-top:-5px;
+  font-family: 'Alegreya', serif;
+}
+
+.wraphomelie{
+  width:550px;
+}
+
+.wraphomelie h1{
+    background-color:#BBCDD0;
+  font-size:24px;
+  padding:5px;
+  color:#263537;
+  font-family: 'Alegreya', serif;
+  clear:both;
+}
+
+.pershom{
+  width:550px;
+  margin-top:-25px;
+  margin-bottom:45px;
+}
+
+.pershom .giflienlie{
+  width:200px;
+  height:160px;
+  margin-top:10px;
+  border-top:#fff 2px solid;
+    border-left:#fff 2px solid;
+    border-bottom:#fff 2px solid;
+  background-size:cover;
+  float:left;
+}
+
+.pershom .p{
+  float:left;
+  box-shadow:#666 0px 0px 5px;
+  width:300px;
+  height:130px;
+  margin-top:-10px;
+  padding:10px;
+  overflow:auto;
+  background-color:#fff;
+}
+
+.pershom .homelia h1{
+  font-size:19px;
+  color:#384A4E;
+  background-color:none;
+  text-align:left;
+  clear:none;
+  border-bottom:#65868D dotted 1px;
+  text-transform:uppercase;
+  margin-top:-5px;
+  font-family: 'Alegreya', serif;
+}
+
+.pershom .homelia{
+  float:left;
+}
+
+.pershom .p h2{
+  text-align:right;
+  color:#224841;
+  margin-top:-15px;
+}

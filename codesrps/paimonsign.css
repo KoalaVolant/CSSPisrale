@@ -1,0 +1,49 @@
+/* Paimon */ 
+
+.paimonsign{
+  width:350px;
+  background-image:url('https://s-media-cache-ak0.pinimg.com/736x/44/b2/53/44b253237c707d1c4230cdcee58808ee.jpg');
+  margin:0 auto;
+}
+
+.imgpaimon{
+  background-image:url('http://static.tumblr.com/69a59a5fab6e33024033b863e9c0855a/zbfauzz/Jnbmrpfhr/tumblr_static_moriarty..gif');
+  width:350px;
+  background-size:100%;
+  margin:0 auto;
+    background-position:middle;
+  height:150px;
+}
+
+.ara{
+  background-image:url('http://img11.hostingpics.net/pics/864129Arabesqie1.png');
+  width:200px;
+  height:40px;
+  background-size:100%;
+  margin:0 auto;
+}
+
+.paimonsign h1{
+    font-family: 'Princess Sofia', cursive;
+  font-size:35px; 
+  line-height:37px;
+  text-align:center;
+  color:#fff;
+  margin-top:-35px;
+}
+
+.paimonsign h2{
+  font-family: 'Norican', cursive;
+  font-size:14px;
+  font-weight:normal;
+  line-height:16px;
+  text-align:center;
+  margin-top:-25px;
+  background-color:#000;
+  padding:10px;
+  color:#AD3A3A;
+}
+
+/*     font-family: 'Lovers Quarrel', cursive;
+    font-family: 'Engagement', cursive;
+     */ 

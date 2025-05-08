@@ -1,0 +1,21 @@
+/* Sign Viorel */ 
+
+.viorsign{ width:400px; display:flex; justify-content:space-between; margin:0 auto; }
+.viorsign *{ box-sizing:border-box; } 
+
+.viorsign span{ display:block; width:130px;}
+.viorsign img{ width:130px; height:100px; object-fit:cover; margin-bottom:5px; 
+padding:3px; }
+.viorsign span h1, .viorsign span:hover h1{ -webkit-transition: all 400ms linear;
+-moz-transition: all 400ms linear;
+-ms-transition: all 400ms linear;
+-o-transition: all 400ms linear;
+transition: all 400ms linear; }
+.viorsign span:hover h1{ width:100%; font-size:14px; top:-50%; letter-spacing:1px; transformY(50%); }
+
+.viorsign h1{ color:#fff; width:80%; text-align:center; padding:3px; margin:0 auto; text-transform:uppercase; font-family: 'Grandstander', cursive; 
+background: rgb(64,45,82); position:relative; top:0px; font-size:12px; 
+background: -moz-linear-gradient(90deg, rgba(64,45,82,1) 0%, rgba(121,46,9,1) 100%, rgba(0,212,255,1) 100%);
+background: -webkit-linear-gradient(90deg, rgba(64,45,82,1) 0%, rgba(121,46,9,1) 100%, rgba(0,212,255,1) 100%);
+background: linear-gradient(90deg, rgba(64,45,82,1) 0%, rgba(121,46,9,1) 100%, rgba(0,212,255,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#402d52",endColorstr="#00d4ff",GradientType=1);}

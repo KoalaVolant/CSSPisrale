@@ -1,0 +1,37 @@
+:root{ 
+--melenrp-border:#CCCCCC; 
+--melenrp-white:#fff;
+--melenrp-fond:#ECC602; 
+--melenrp-fondimg:rgba(232, 209, 0, 0.6);
+}
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.yellow-rp1, .yellow-rp1 *{ box-sizing:border-box; font-family: "Inter", sans-serif; }
+.yellow-rp1{ margin:0 auto; width:500px; }
+.yellow-rp1 br{ display:none; }
+.yellow-rp1 img{ object-fit:cover; }
+
+.yellow-rp1{ border:1px solid var(--melenrp-border); padding:15px; border-top-right-radius: 50px; }
+.yellow-rp1 .melenent1{ position:relative; width:105%; left:-30px; height:200px; 
+	}
+.yellow-rp1 .melenent1 img{ width:100%; height:200px; }
+.yellow-rp1 .melenent1 .melenimg{ position:relative; border-bottom-left-radius: 50px; 
+	height:200px; overflow:hidden; }
+
+.yellow-rp1 .melenent1 .melenimg:after{ content:' '; position:absolute; display:block;
+top:0; left:0; width:100%; height:100%; background: var(--melenrp-fondimg); }
+
+.yellow-rp1 .melenent1 .melentitle{ text-align:right; position:absolute; 
+	text-transform:uppercase; font-weight:800; color:var(--melenrp-white); 
+	bottom:10px; right:10px; width:90%; font-size:16px; }
+.yellow-rp1 .melenent1 .melenfeat{ position:absolute; right:10px; top:10px; display:flex; }
+.yellow-rp1 .melenent1 .melenfeat span{ display:block; 
+	background:var(--melenrp-fond); padding:3px 5px; text-transform:uppercase; color:var(--melenrp-white); 
+font-size:10px; }
+	.yellow-rp1 .melenent1 .melenfeat span:first-child{ margin-right:5px; }
+
+.yellow-rp1 .melencontent{ text-align:justify; padding:20px; padding-bottom:0px;}
+.yellow-rp1 .melencontent br{ content: " ";
+  display:  inline-block;
+  line-height:11px !important; }

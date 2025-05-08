@@ -1,0 +1,11 @@
+/* Signature Nashoba */ 
+
+.nashosign{ width:400px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
+.nashosign *{ box-sizing:border-box; margin:0px 5px; } 
+
+.nashosign img{ width:100px; height:70px; object-fit:cover; }
+.nashosign h1{ font-family: 'Cardo', serif; margin:0; font-size:17px; line-height:17px; text-align:right; text-transform:uppercase;}
+.nashosign .nash1{ text-align:left; }
+
+.nashosign h1 b{ color:#900C10; }
+.nashosign .nash1 b{ color:#06636A; }

@@ -1,0 +1,37 @@
+.lughlistrp{
+  width:450px;
+  margin:0 auto;
+  background-color:#fff;
+  font-family:Verdana;
+  padding:20px;
+  color:#4E4E4E;
+  border-left:#D85E23 10px solid;
+}
+
+.lughlistrp a, .lughlistrp a:link, .lughlistrp a:hover, .lughlistrp a:visited{
+  color:#BE6C58;
+}
+
+.lughlistrp img{
+  width:200px;
+  height:150px;
+  object-fit:cover;
+  padding:2px;
+  border:#BE6C58 5px solid;
+}
+
+.lughlistrp img+img{
+  margin-left:10px;
+}
+
+.lughlistrp h1{
+  font-family:Century Gothic;
+  text-align:center;
+  font-size:23px;
+  margin:20px 0px 20px 0px !important;
+  padding-bottom:5px;
+  color:#4E4E4E;
+  text-transform:uppercase;
+  font-weight:normal;
+  border-bottom:#E43516 5px solid;
+}

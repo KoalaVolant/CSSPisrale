@@ -1,0 +1,38 @@
+.wrappro{
+  width:500px;
+  margin:0 auto;
+}
+
+.wrappro div {
+  background-size:cover;
+  border:solid 5px white;
+  width:450px;
+  height:200px;
+}
+
+.wrappro h1{
+  font-size:20px;
+  margin-top:-25px;
+  width:440px;
+  letter-spacing:1px;
+  line-height:22px;
+  font-family: 'Slabo 27px', serif;
+  background-color:#FF6804;
+  color:#fff;
+  padding:10px;
+}
+
+.contro{
+  background-color:#F89807;
+  padding:25px;
+  width:390px;
+  font-size:12px;
+  line-height:16px;
+  margin-top:-31px;
+  color:#fff;
+  text-align:justify;
+  border-left:10px solid #fff;
+    border-right:10px solid #fff;
+  border-bottom:2px dotted #fff;
+  display:block;
+}

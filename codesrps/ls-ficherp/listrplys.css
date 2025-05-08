@@ -1,0 +1,79 @@
+.lyslistrp{
+  margin:0 auto;
+  width:500px;
+  padding:25px;
+  background-image:url('https://img15.hostingpics.net/pics/325501patternbyCarllton38.jpg');
+}
+
+.lyslistrp img{
+  margin:12px 5px;
+  width:210px;
+  padding:5px;
+  border:#fff 2px dashed;
+}
+
+.lyslistrp h1{
+  font-family: 'Crafty Girls', cursive;
+  font-size:35px;
+  text-align:center;
+  color:#60A87E;
+  padding:3px;
+  margin:0;
+}
+
+.lyslistrp h2{
+  font-size:16px;
+  font-family:Verdana;
+  text-transform:uppercase;
+  font-weight:normal;
+  margin:0;
+  padding:5px;
+  color:#838383;
+}
+
+.listrplys{
+  width:100%;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-around;
+}
+
+.blc{
+  height:200px;
+  background-color:#fff;
+  padding:15px;
+  border-top:#488663 7px solid;
+  border-bottom:#488663 7px solid;
+}
+
+.blc p{
+  color:#676767;
+  height:180px;
+  overflow:auto;
+}
+
+.blc a, .blc a:visited, .blc a:active, .blc a:link{
+  color:#356248;
+  text-decoration:none;
+}
+
+.blc a:hover{
+  color:#68AE86;
+}
+
+.blc h1{
+  font-size:25px;
+}
+
+.cours{
+  width:100%;
+}
+
+.fini, .abandon{
+    margin-top:15px;
+  width:210px;
+}
+
+.fini{
+  margin-right:10px;
+}

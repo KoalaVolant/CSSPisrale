@@ -1,0 +1,53 @@
+/* QEEL par KoalaVolant */ 
+
+/* Couleurs */
+
+.qeel-right div{ background-color:#D7C66C; color:#222; -webkit-border-radius: 20px;
+-moz-border-radius: 20px;
+border-radius: 20px; font-family:Arial;  }
+
+.qeel-title h2{ background-image:url('https://www.zupimages.net/up/20/28/5uw8.png'); background-repeat:no-repeat; 
+  font-family: 'Pacifico', cursive; color:#99030e; text-shadow: -3px -2px 0px rgba(255,255,255,1);}
+
+.qeel-left div{ background-color:#fff; }
+
+.wrap-groupes span{ font-family: 'Pacifico', cursive; }
+
+/* A remplir avec les couleurs des groupes */
+.groupe1, .gr1 strong{ color:; }
+.groupe2, .gr2 strong{ color:; }
+.groupe3, .gr3 strong{ color:; }
+.groupe4, .gr4 strong{ color:; }
+.groupe5, .gr5 strong{ color:; }
+
+/* Structure */ 
+
+.qeel-left div{ display:none; }
+.dpb-bloc{ display:block !important; }
+
+.qeel-ele{ 803px; margin:0 auto; } 
+.qeel-ele *{ box-sizing:border-box; }
+
+.qeel-struct{ display:flex; justify-content:space-around; flex-wrap:wrap; align-items:center; } 
+
+.qeel-title{ display:flex; justify-content:center; align-items:center; }
+.qeel-title h2{ font-size:35px; width:469px; height:35px; padding-left:20px;  line-height:21px;} 
+.qeel-left{ width:413px; height:364px; position:relative; }
+.qeel-img{ width:413px; height:364px; object-fit:cover; }
+  
+.qeel-dernier .gensmall{ display:block; min-height:40px; overflow:auto; margin-top:10px; }
+
+.qeel-right div{ width:552px; padding:15px; font-size:12px; line-height:15px;}
+.qeel-right .gensmall{ font-size:12px !important; line-height:15px !important; font-family:Arial !important; }
+.right2{ margin-top:10px; }
+
+.wrap-groupes{ width:100%; display:flex; justify-content:center; flex-wrap:wrap; }
+.wrap-groupes span{ display:block; margin:10px; font-size:30px; font-weight:bold; }
+
+.qeel-left div{ position:absolute; bottom:0px; left:0px; padding:10px;     width: 95%;    margin: 10px;} 
+.qeel-left div h2{ text-align:center; margin:5px 0px;}
+/* Régler bug QEEL */ 
+
+.qeel-left{ order:1; }
+.qeel-right{ order:2; }
+.wrap-groupes{ order:3; }

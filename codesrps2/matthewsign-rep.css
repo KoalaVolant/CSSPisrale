@@ -1,0 +1,7 @@
+/* Matthew Sign*/ 
+
+.mattysign{ width:330px; margin:0 auto; display:flex; justify-content:center; flex-wrap:wrap; } 
+.mattysign img{ width:90px; height:90px; object-fit:cover; margin:5px 3px; padding:3px; border:3px double #B3C7CC; }
+.mattysign h1{ margin:0; font-size:18px; text-align:center; letter-spacing:3px; font-family: 'Seaweed Script', cursive; color:#6D9292; border-bottom:1px dotted #8AA8B0; padding-bottom:0px; }
+.mattysign h2{ margin:0; font-family:Verdana; letter-spacing:1px; font-size:10px; 
+  text-align:justify; font-weight:normal;  color:#888; text-align:justify; line-height:10px; width:290px; margin:0 auto; } 

@@ -1,0 +1,82 @@
+.gary{
+  width:450px;
+  margin:0 auto;
+  background-image:url('http://67.media.tumblr.com/71fabcb77dafef6378ba2eb9af0bbe8c/tumblr_moqtionyrk1romejoo1_500.png');
+-webkit-border-radius: 60px;
+-moz-border-radius: 60px;
+border-radius: 60px;
+  padding:25px;
+}
+
+.gary img{
+  width:200px; 
+  height:150px;
+-webkit-border-radius: 40px;
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-bottomright: 0;
+border-radius: 40px;
+border-bottom-right-radius: 0;
+  border:#fff 5px solid;
+}
+
+.gary img+img{
+-webkit-border-radius: 40px;
+-webkit-border-bottom-left-radius: 0;
+-moz-border-radius: 40px;
+-moz-border-radius-bottomleft: 0;
+border-radius: 40px;
+border-bottom-left-radius: 0;
+}
+
+.titre{
+  background-color:#fff; 
+  -moz-transform: rotate(2deg);
+-webkit-transform: rotate(2deg);
+-o-transform: rotate(2deg);
+-ms-transform: rotate(2deg);
+transform: rotate(2deg);
+  width:448px;
+  height:50px;
+  margin-top:25px;
+}
+
+.gary h1{
+  background-color:#F89A83;
+  padding:10px;
+  font-size:19px;
+  line-height:21px;
+  -moz-transform: rotate(-2deg);
+-webkit-transform: rotate(-2deg);
+-o-transform: rotate(-2deg);
+-ms-transform: rotate(-2deg);
+transform: rotate(-2deg);
+  font-family: 'Leckerli One', cursive;
+  color:#fff;
+  margin-top:-35px;
+  font-weight:normal;
+}
+
+.gary .feat{
+background-color:#fff;
+    color:#F89A83;
+  margin-top:0px;
+  width:150px;
+  font-size:14px;
+ text-align:center;
+  padding:5px;
+  margin-top:-5px;
+}
+
+.garycontent{
+  background-color:#fff;
+  padding:30px;
+  font-size:12px;
+  line-height:14px;
+  text-align:justify;
+  color:#3F3127;
+}
+
+.garycontent b, .garycontent strong{
+  color:#F89A83;
+}

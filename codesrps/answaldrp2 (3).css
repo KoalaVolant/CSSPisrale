@@ -1,0 +1,51 @@
+.anspper{
+  width:420px;
+  margin:0 auto;
+  background-color:#324B23;
+  padding:0px 25px 0px 25px;
+  position:relative;
+  z-index:13;
+  
+}
+
+.answmg{
+  background-image:url('http://38.media.tumblr.com/9c223242949bc6ee5816fb6d16cfaa24/tumblr_miymwoOjAg1qcm0jmo5_250.gif');
+  background-size:cover;
+  width:430px;
+  height:200px;
+    transform: rotate(3deg) ;
+    -webkit-transform: rotate(3deg) ;
+    -moz-transform: rotate(3deg) ;
+    -o-transform: rotate(3deg) ;
+    -ms-transform: rotate(3deg) ;
+  border:#98C27E 7px solid;
+  margin-bottom:-15px;
+  margin-left:45px;
+  position:relative;
+  z-index:7;
+}
+
+.anspper h1{
+  background-color:#58833F;
+  font-weight:normal;
+  color:#fff;
+  text-transform:uppercase;
+  text-align:center;
+  font-size:24px;
+  line-height:28px;
+  width:450px;
+  margin-left:-25px;
+  margin-top:-20px;
+  padding:10px;
+  font-family: 'Patua One', cursive;
+}
+
+.anspper p{
+  background-color:#fff;
+  font-size:12px;
+  line-height:14px;
+  color:#182411;
+  margin-top:-35px;
+  text-align:justify;
+  padding:15px;
+}

@@ -1,0 +1,53 @@
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+:root{ 
+--fichelien10-font:"Bungee", sans-serif;
+--fichelien10-font2:"Poppins", sans-serif; 
+
+--fichelien10-color1:#FF5876;
+--fichelien10-color2:#C1EEF2;
+--fichelien10-white:#fff;
+--fichelien10-grey:#757575;
+--fichelien10-noir:#000; }
+
+.fichelien10, .fichelien10 *{ box-sizing:border-box; }
+.fichelien10{ margin:0 auto; width:550px; }
+.fichelien10 br{ display:none; }
+.fichelien10 img{ object-fit:cover; }
+
+.fichelien10{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end;
+font-family:var(--fichelien10-font2);background:var(--fichelien10-white); position:relative; }
+.fichelien10 img{ width: 35%; height:250px; }
+.fichelien10 .fichelien10droite{ width:64%;  padding:10px;   }
+
+.fichelien10 .fichelien10nom{ font-family:var(--fichelien10-font); font-size:30px; }
+.fichelien10 .fichelien10tags{ display:flex; }
+.fichelien10 .fichelien10tags span{ background:var(--fichelien10-color1); margin:0 2px; margin-top:10px;
+padding:5px; text-transform:uppercase; color:var(--fichelien10-white); font-family:var(--fichelien10-font2); }
+
+.fichelien10 .fichelien10infos{ margin-top:5px; text-align:justify; height:90px; overflow:auto; }
+.fichelien10 .fichelien10infos br, .fichelien10 .fichelien10quote br{ content:none; display:inline-block; }
+.fichelien10 .fichelien10quote{ margin-top:10px; padding:10px; letter-spacing:2px; background:var(--fichelien10-color2); 
+font-size:10px; line-height:10px; text-align:center; position:absolute; bottom:-45px;  }
+
+.fichelien10links, .fichelien10links *{ box-sizing:border-box; }
+.fichelien10links{ margin:0 auto; width:550px; }
+.fichelien10links br{ display:none; }
+.fichelien10links img{ object-fit:cover; }
+
+.fichelien10links{ margin-top:20px; display:flex; flex-wrap:wrap; justify-content:space-between; 
+	align-items:flex-end; padding:10px; 
+font-family:var(--fichelien10-font2);background:var(--fichelien10-white); position:relative; }
+.fichelien10links .fichelien10cate{ background:var(--fichelien10-color1); text-transform:uppercase; padding:5px;
+color:var(--fichelien10-white); font-size:16px; margin-bottom:10px;  width:100%; }
+
+.fichelien10links .fichelien10lien{ display:flex; width:49%; justify-content:space-between; margin-bottom:20px; }
+.fichelien10links .fichelien10lien .fichelien10limg{ width:35%; }
+.fichelien10links .fichelien10lien .fichelien10limg img{width:100%; height:100px; }
+.fichelien10links .fichelien10lien .fichelien10limg span{ background:var(--fichelien10-color2); margin-top:5px; 
+width:100%; font-size:11px; display:block; text-align:center; }
+.fichelien10links .fichelien10lien .fichelien10lcnt{ width:63%; height:150px; overflow:auto; font-size:12px; 
+line-height:14px; overflow:auto; text-align:justify; padding-right:5px; }
+.fichelien10links .fichelien10lien .fichelien10lcnt div{font-family:var(--fichelien10-font); font-size:13px;
+margin-bottom:2px; }
+.fichelien10links .fichelien10lien .fichelien10lcnt br{ content:none; display:inline-block; }

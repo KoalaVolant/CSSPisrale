@@ -1,0 +1,44 @@
+.golden450, .golden450 *{ box-sizing:border-box; }
+.golden450{ margin:0 auto; width:500px; }
+.golden450 br{ display:none; }
+.golden450 img{ object-fit:cover; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+:root{ 
+--golden450-color:linear-gradient(60deg, rgba(56,54,46,1) 2%, rgba(156,131,67,1) 100%); 
+--golden450-color2:rgba(156,131,67,1);
+--golden450-white:#fff; 
+--golden450-txt:#333; 
+
+--golden450-typotxt:"Noto Serif", serif;
+--golden450-typotit:"Grenze Gotisch", serif;}
+
+.golden450 .gold450-imgti{ position:relative; height:200px; width:100%; z-index:50; }
+.golden450 .gold450-imgti [class*="gold450-img"]{ position:absolute; border-radius:50%; }
+.golden450 .gold450-imgti img{ border-radius:50%; }
+.golden450 .gold450-imgti .gold450-img1{ left:40%; transform:translate(-50%); 
+}
+.golden450 .gold450-imgti:after{ content:' '; position:absolute; border-radius:50%; 
+	border:5px solid var(--golden450-color2); width:100px; height:100px; top:0px;
+left:20px;}
+.golden450 .gold450-imgti .gold450-img1:before{ content:' '; width:105%; height:105%; 
+position:absolute; top:-5px; left:-5px; 
+	background:var(--golden450-color); z-index:-1; border-radius:50%;  }
+.golden450 .gold450-imgti .gold450-img1 img{ width:200px; height:200px; }
+.golden450 .gold450-imgti .gold450-img2 img{ width:140px; height:140px; }
+.golden450 .gold450-imgti .gold450-img2{ right:15%; bottom:20px;
+	outline:3px solid var(--golden450-color2); outline-offset:-15px; }
+
+.golden450 .gold450-title1{ position:absolute; background:var(--golden450-white);
+padding:10px; z-index:15; border-radius:10px;  font-family:var(--golden450-typotit); 
+color:var(--golden450-txt); font-size:20px; line-height:22px; 
+	width:100%; text-align:center; top:50%; transition:1s; 
+	transform:translateY(-50%) scale(1); }
+.golden450:hover .gold450-title1{ transform:translateY(-50%) scale(0); transition:1s; }
+
+.golden450 .gold450-rp br{ display:inline-block; content:none; }
+.golden450 .gold450-rp{ position:relative; z-index:88; top:-20px;
+	background:var(--golden450-white); padding:25px; font-size:14px;
+line-height:1.5em; font-family:var(--golden450-typotxt); text-align:justify;  border:8px solid; 
+	border-image: var(--golden450-color) 1; color:var(--golden450-txt); }

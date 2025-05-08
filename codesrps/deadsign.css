@@ -1,0 +1,75 @@
+/* Code sign */
+
+.deadysignprequel{
+  width:100%;
+  margin-top:80px;
+}
+
+.deadysign{
+  width:450px;
+  margin:0 auto;
+  height:120px;
+  background-size:60%;
+  background-image:url('https://i30.servimg.com/u/f30/19/45/51/53/db037110.jpg');
+  display:flex;
+  border-radius:20px;
+  border:#fff 4px solid;
+}
+
+.deadysign img{
+  width:200px;
+  height:207px;
+  margin-top:-88px;
+}
+
+.deadysign .textwade{
+  width:220px;
+  margin-left:15px;
+}
+
+.deadysign h1{
+  font-family: 'Bangers', cursive;
+  font-size:28px;
+  text-align:center;
+  color:#3D0E0F;
+  text-shadow:#fff 2px 2px 5px;
+}
+
+.deadysign h2{
+  font-family: 'Quicksand', sans-serif;
+  font-size:13px;
+  font-weight:bolder;
+  margin-top:-10px;
+  line-height:14px;
+  padding:0px 25px 0px 15px;
+   text-shadow:#fff 1px 1px 2px;
+  color:#252525;
+  box-sizing:border-box;
+}
+
+.deadysign .two, .deadysign:hover .one{
+  display:none;
+}
+
+.deadysign:hover .two{
+  display:block;
+}
+
+.deadysign .deady1{
+  margin-left:-220px;
+opacity:0;
+}
+
+.deadysign .deady2{
+  margin-left:-20px;
+}
+
+.deadysign:hover .deady1{
+  margin-left:-20px;
+opacity:1;
+}
+
+.deadysign:hover .deady2{
+  margin-left:-220px;
+opacity:0;
+}

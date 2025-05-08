@@ -1,0 +1,40 @@
+.prosperlistrp{
+  width:450px;
+  margin:0 auto;
+}
+
+.prosperlistrp div{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+}
+
+.prosperlistrp div img{
+  width:180px;
+  height:150px;
+  object-fit:cover;
+}
+
+.prosperlistrp div span{
+  background-color:#fff;
+  width:255px;
+  height:200px;
+  padding:10px;
+  margin:10px;
+  overflow:auto;
+  box-sizing:border-box;
+  border:#A6C1D9 1px solid; 
+  font-family:Verdana;
+  color:#555;
+}
+
+.prosperlistrp h1{
+  font-size:15px;
+  text-transform:uppercase;
+  color:#4677A4;
+}
+
+.prosperlistrp a, .prosperlistrp a:link, .prosperlistrp a:hover, .prosperlistrp a:visited{
+  color:#4677A4;
+  text-decoration:none;
+}

@@ -1,0 +1,31 @@
+.signredio2{
+  width:270px;
+  margin:0 auto;
+}
+
+.signredio2 img{
+  width:250px;
+  height:80px;
+  padding:3px;
+  border:#454545 1px dotted;
+}
+
+.signredio2 h1{
+  text-align:justify;
+  width:250px;
+  padding:3px;
+  font-size:10px;
+  line-height:10px;
+  font-weight:normal;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+koala2{
+  font-size:8px;
+  font-family:century gothic;
+  letter-spacing:4px;
+  text-align:center;
+  display:block;
+  margin-top:-5px;
+  color:#AAAAAA;
+}

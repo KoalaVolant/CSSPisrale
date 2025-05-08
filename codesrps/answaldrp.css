@@ -1,0 +1,53 @@
+.wrappans{
+width:500px; 
+text-align:justify;
+}
+
+.imgcadr{
+border:#7CA541 solid 3px;
+-webkit-border-top-left-radius: 120px; 
+-webkit-border-bottom-right-radius: 120px;
+-moz-border-radius-topleft: 120px; 
+-moz-border-radius-bottomright: 120px; 
+border-top-left-radius: 120px; 
+border-bottom-right-radius: 120px; 
+padding:0 55px 0 0;
+}
+
+.imgcadrdevant{
+-webkit-border-top-left-radius: 120px; 
+-webkit-border-bottom-right-radius: 120px;
+-moz-border-radius-topleft: 120px; 
+-moz-border-radius-bottomright: 120px; 
+border-top-left-radius: 120px; 
+border-bottom-right-radius: 120px; 
+border:#fff 5px solid;
+width:500px;
+}
+
+.paranswald{
+padding:15px; 
+background-color:#fff; 
+margin-top:10px; 
+-webkit-border-bottom-right-radius: 100px; 
+-webkit-border-bottom-left-radius: 100px; 
+-moz-border-radius-bottomright: 100px; 
+-moz-border-radius-bottomleft: 100px; 
+border-bottom-right-radius: 100px; 
+border-bottom-left-radius: 100px; 
+padding-bottom:65px; 
+border-left:6px #7CA541 solid; 
+border-right:6px #7CA541 solid;
+border-top:3px #7CA541 solid;
+box-shadow: 2px 1px 5px 0px #c0c0c0
+-moz-box-shadow: 2px 1px 5px 0px #c0c0c0;
+-webkit-box-shadow: 2px 1px 5px 0px #c0c0c0; 
+-o-box-shadow: 2px 1px 5px 0px #c0c0c0; 
+box-shadow: 2px 1px 5px 0px #c0c0c0; 
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#c0c0c0, Direction=116, Strength=5);
+}
+
+.bans{
+font-size:10px;
+text-align:center;
+}

@@ -1,0 +1,39 @@
+.alek3{
+width:500px;
+margin:0 auto;
+padding:15px;
+background-color:#C0C0C0;
+}
+
+.alek3{
+width:400px;
+margin:0 auto;
+border-radius:;
+border:#fff 1px dotted;
+padding:10px;
+}
+
+.alek3 h1{
+font-size:20px;
+text-transform:uppercase;
+line-height:22px;
+background-color:#2C3A43;
+}
+
+.alek3 h2{
+font-size:14px;
+line-height:16px;
+background-color:#274729;
+}
+
+.alek3 h1, .alek3 h2{
+width:230px;
+font-family:Comic Sans MS;
+padding:5px;
+color:#fff;
+}
+
+.alek3content{
+box-shadow:#676767 0px 0px 5px;
+border-radius:touttordu;
+}

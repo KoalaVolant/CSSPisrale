@@ -1,0 +1,44 @@
+:root{ 
+--answald-color:#A2ABB5; }
+
+.wrappans{
+width:500px; 
+text-align:justify;
+    margin:0 auto; position:relative;
+}
+
+.wrappans, .wrappans *{ box-sizing:border-box; }
+
+.imgcadr{
+border:var(--answald-color) solid 3px;
+border-top-left-radius: 120px; 
+border-bottom-right-radius: 120px; 
+}
+
+.imgcadrdevant{
+border-top-left-radius: 120px; 
+border-bottom-right-radius: 120px; 
+border:#fff 5px solid;
+width:100%;
+    height:200px; 
+    object-fit:cover;
+}
+
+.paranswald{
+padding:25px; 
+    font-size:13px !important; line-height:1.5em !important; 
+background-color:#fff; display:block; 
+-webkit-border-bottom-right-radius: 100px; 
+-webkit-border-bottom-left-radius: 100px; 
+-moz-border-radius-bottomright: 100px; 
+-moz-border-radius-bottomleft: 100px; 
+border-bottom-right-radius: 100px; 
+border-bottom-left-radius: 100px; 
+padding-bottom:55px; 
+border-left:6px #7CA541 solid; 
+border-right:6px #7CA541 solid;
+border-top:3px #7CA541 solid;
+    border-color:var(--answald-color);
+}
+
+.koalanswald{ font-size:8px; letter-spacing:5px; position:absolute; bottom:10px; left:50%; transform:translateX(-50%); }

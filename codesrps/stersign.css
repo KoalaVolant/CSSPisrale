@@ -1,0 +1,33 @@
+.stersign{
+  width:381px;
+  background-image:url('https://i.pinimg.com/564x/a8/82/c7/a882c7d22df5c852ae064a6831e5ebd2.jpg');
+box-sizing:border-box;
+  margin:0 auto;
+  padding-bottom:10px;
+}
+
+.stersign div{
+  margin:0 auto;
+  width:381px;
+}
+
+.stersign div img{
+  width:188px;
+  height:100px;
+    object-fit:cover;
+}
+
+.stersign div img+img{
+  margin-left:5px;
+}
+
+.stersign h1{
+  text-align:center;
+  margin:0;
+  color:#fff;
+  text-shadow:#fff 0px 0px 5px;
+  font-family: 'Monoton', cursive;
+  font-size:24px;
+  font-weight:normal;
+  letter-spacing:3px;
+}

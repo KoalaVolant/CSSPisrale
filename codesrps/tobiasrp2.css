@@ -1,0 +1,11 @@
+.totorp2{ width:450px; margin:0 auto; }
+.totorp2 *{box-sizing:border-box; }
+
+.totorp2 .totoimg{ width:100%; height:190px; object-fit:cover; padding:4px; border:4px solid #467356;  }
+.totorp2 .tototete{ position:relative; width:100%; height:190px; overflow:hidden;  width: 92%;    margin: 0 auto;}
+.totorp2 .tototete h1{ width:60%; height:190px; background-color:#467356; color:#fff; font-family: 'Oswald', sans-serif; font-size:15px; position:absolute; top:0px; 
+  clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%); margin:0; transition:900ms; left:0; } 
+.totorp2:hover .tototete h1{ left:-60%; ; }
+.totorp2 .tototete h1 strong{ font-weight:normal; width: 71%;    margin-left: 15px;    transform: translateY(78%);    display: block; }
+.totorp2 .tototxt{ background-color:#fff; padding:35px; border:#467356 5px solid; text-align:justify; color:#467356; 
+  clip-path: polygon(6% 3%, 95% 0, 97% 90%, 0% 100%);}

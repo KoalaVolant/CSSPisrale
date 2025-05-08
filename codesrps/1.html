@@ -1,0 +1,149 @@
+ <div style="background-color: #264033;">
+    <table width="100%"><br /><center><img src="http://i21.servimg.com/u/f21/19/32/03/68/ban_qe10.png" class="image" /><br />
+      <div style="font-size: 30px; margin-top: -25px; color: #CCCEE6 !important; font-family: 'Mr Bedfort', cursive;">Qui est en ligne ?</div></center>
+    <tr>
+              <td width="350px"><center><div class="blocqeel2"><div class="blocqeel1"><span class="gensmall"><span id="matt">{TOTAL_USERS}
+                    </span>
+                    <script type="text/javascript">document.getElementById('matt').innerHTML=document.getElementById('matt').innerHTML.replace(/Nous avons/,"Nos").replace(/membres enregistrés/,"habitants");
+                    </script> <span id="bert">{TOTAL_POSTS}
+                    </span>
+                    <script type="text/javascript">document.getElementById('bert').innerHTML=document.getElementById('bert').innerHTML.replace(/Nos membres ont posté un total de/,"ont posté").replace(/messages/,"messages.");
+                    </script> <br /><span id="yosh">{NEWEST_USER}
+                    </span>
+                    <script type="text/javascript">document.getElementById('yosh').innerHTML=document.getElementById('yosh').innerHTML.replace(/L'utilisateur enregistré le plus récent est/,"Bievenue à");
+                </script><br />
+                <span id="connectes">{RECORD_USERS}
+                </span>
+                <script type="text/javascript">document.getElementById('connectes').innerHTML=document.getElementById('connectes').innerHTML.replace(/Le record du nombre d'utilisateurs en ligne est de/,"Le record du nombre d'habitants en ligne est de");
+                </script> <br />
+                <table>{L_WHOSBIRTHDAY_TODAY}
+                  {L_WHOSBIRTHDAY_WEEK}</table></span>
+                </div></div>
+                <br /><br /><br />
+                <div class="blocqeel3"><div class="blocqeel4"><span class="gensmall"> <span id="celine">{TOTAL_USERS_ONLINE}</span>
+                      <script type="text/javascript">document.getElementById('celine').innerHTML=document.getElementById('celine').innerHTML.replace(/Il y a en tout/,"Il y a en tout").replace(/utilisateur(s?) en ligne/,"Habitants en ligne").replace(/::/," : ").replace(/Enregistré(s?)/,"Recensées").replace(/Invisible(s?) et/,"Fantômes et").replace(/Invité(s?)/,"Visiteurs");
+                      </script>
+    <br />
+    <span id="alpha">{LOGGED_IN_USER_LIST}
+                    </span>
+                    <script type="text/javascript">document.getElementById('alpha').innerHTML=document.getElementById('alpha').innerHTML.replace(/Utilisateurs enregistrés/,"Habitants présents");</script></span>
+                </div></div>
+                <br /><br /><br />
+                <div class="blocqeel6"><div class="blocqeel5"><table id="kaboum">{L_CONNECTED_MEMBERS}</table>
+        <script type="text/javascript">
+        jQuery('#kaboum span.gensmall').html(jQuery('#kaboum span.gensmall').html().replace('Membres connectés au cours des 24 dernières heures : ','Derniers habitants ces 24 heures : '));
+        </script>
+                </div></div></center></td>
+              <td>    <script type="text/javascript">
+            //<!--
+                    function change_groupeonglet(name)
+                    {
+                            document.getElementById('groupeonglet_'+anc_groupeonglet).className = 'groupeonglet_0 groupeonglet';
+                            document.getElementById('groupeonglet_'+name).className = 'groupeonglet_1 groupeonglet';
+                            document.getElementById('contenu_groupeonglet_'+anc_groupeonglet).style.display = 'none';
+                            document.getElementById('contenu_groupeonglet_'+name).style.display = 'block';
+                            anc_groupeonglet = name;
+                    }
+            //-->
+            </script><div class="groupeonglets"><div class="fondgroupe">
+            <center><table><tr><td><center><span class="groupeonglet_0 groupeonglet" id="groupeonglet_staff " onmouseover="javascript:change_groupeonglet('staff');">Staff</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_chefs" onmouseover="javascript:change_groupeonglet('chefs');">Chefs de Service</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_infirmieres" onmouseover="javascript:change_groupeonglet('infirmieres');">Infirmières-Sage-Femmes</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_urgentistes" onmouseover="javascript:change_groupeonglet('urgentistes');">Médecins urgentistes</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_generalistes" onmouseover="javascript:change_groupeonglet('generalistes');">Médecins généralistes</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_ambulanciers" onmouseover="javascript:change_groupeonglet('ambulanciers');">Ambulanciers</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_personnels" onmouseover="javascript:change_groupeonglet('personnels');">Autres personnels de l'hôpital</span></center></td>
+              
+              <td><center><nobr><span class="groupeonglet_0 groupeonglet" id="groupeonglet_habitants" onmouseover="javascript:change_groupeonglet('habitants');">Habitants de la ville</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_scientifiques" onmouseover="javascript:change_groupeonglet('scientifiques');">Police Scientifique</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_polices" onmouseover="javascript:change_groupeonglet('polices');">C.P.D Chicago Police Dept</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_federaux" onmouseover="javascript:change_groupeonglet('federaux');">Agents Fédéraux</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_etudiants" onmouseover="javascript:change_groupeonglet('etudiants');">Etudiants, Lycéens, Collégiens...</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_malfrats" onmouseover="javascript:change_groupeonglet('malfrats');">Criminels, Malfrats Délinquants...</span><br />
+              <span class="groupeonglet_0 groupeonglet" id="groupeonglet_pnj" onmouseover="javascript:change_groupeonglet('pnj');">PNJ</span><br /></nobr></center></td></tr></table></center></div>
+
+            </div>
+            <br /><br />
+            <div class="contenu_groupeonglets">
+              <div class="contenu_groupeonglet" id="contenu_groupeonglet_vide"><center><div class="titreqeel1" style="font-size: 20px;">Survolez les groupes pour obtenir leur description</div><br /><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" style="height: 130px;" /></center></div>
+
+              <div class="contenu_groupeonglet" id="contenu_groupeonglet_staff"><div class="titreqeel1">Staff</div><br />
+                <div class="titreqeel2">« Nous sommes vos maîtres!»</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a></div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_chefs"><div class="titreqeel1">Chefs de Service</div><br />
+                <div class="titreqeel2">« Les boss référents »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_infirmieres"><div class="titreqeel1">Infirmières - Sage-Femmes</div><br />
+                <div class="titreqeel2">« Nous sommes aux petits soins »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+ 
+
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_urgentistes"><div class="titreqeel1">Médecins urgentistes</div><br />
+                <div class="titreqeel2">« Nous connaissons l'adrénaline »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_generalistes"><div class="titreqeel1">Médecins généralistes</div><br />
+                <div class="titreqeel2">« Nous soignons le commun des mortels »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_ambulanciers"><div class="titreqeel1">Ambulanciers</div><br />
+                <div class="titreqeel2">« Nous connaissons la vitesse... »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_personnels"><div class="titreqeel1">Autres personnels de l'hôpital</div><br />
+                <div class="titreqeel2">« Nous faisons partie des murs »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_habitants"><div class="titreqeel1">Habitants de la ville</div><br />
+                <div class="titreqeel2">« Nous sommes le commun des mortels »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_scientifiques"><div class="titreqeel1">Police Scientifique</div><br />
+                <div class="titreqeel2">« Nous sommes les renifleurs de scènes de crime »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_polices"><div class="titreqeel1"> C.P.D Chicago Police Dept </div><br />
+                <div class="titreqeel2">« Nous vous protégeons »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_federaux"><div class="titreqeel1">Agents Fédéraux</div><br />
+                <div class="titreqeel2">« Au service de la nation »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_etudiants"><div class="titreqeel1">Etudiants, Lycéens, Collégiens...</div><br />
+                <div class="titreqeel2">« Notre pouvoir, c'est apprendre! »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+<div class="contenu_groupeonglet" id="contenu_groupeonglet_malfrats"><div class="titreqeel1">Criminels, Malfrats, Délinquants</div><br />
+                <div class="titreqeel2">« Notre pouvoir c'est d'apprendre! »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+              
+              <div class="contenu_groupeonglet" id="contenu_groupeonglet_pnj"><div class="titreqeel1">PNJ</div><br />
+                <div class="titreqeel2">« Nous ne jouons pas! »</div>
+                <table><tr><td><center><img src="http://media.giphy.com/media/ZFOVXfHKTrACA/giphy.gif" class="illustrationqeel" style="width: 100px;" /></center></td><td><div style="width: 270px; height: 70px; overflow: auto; text-align: justify;">Meminit quorum intendebantur haec perfusus adventu et sunt atque exilium absolutum in actique quorum in Paulus sunt catenis quisquam atque squalorem et maestitiam eculei quorum ubi sunt nec sub sunt adventu adventu eculei maestitiam cruore non cruore quorum et nullos tormenta maestitiam sceleste sub nullos is carnifex principis maestitiam exilium multos sceleste et susurro ita carnifex gladii sceleste deiectos tenus ad paene ubi intendebantur quorum coopertos ad atque carnifex multos Constantio non sceleste tenus uncosque movebantur castra plures alii perfusus et movebantur haec plures sceleste multos Paulus intendebantur parabat patratis eculei movebantur enim gladii enim squalorem non tenus sunt facile.</div></td></tr></table><a href="#" style="color: #DDDAD6 !important; font-family: 'Miss Fajardose', cursive; font-size: 35px !important; margin-top: -30px;"><center>Consulter le groupe</center></a>
+ </div>
+
+            </div>
+        <script type="text/javascript">
+            //<!--
+                    var anc_groupeonglet = 'vide';
+                    change_groupeonglet(anc_groupeonglet);
+            //-->
+            </script></td>
+  </tr>
+</table><br /><br /><center><a style="color: #CCCEE6 !important;" href="http://seven-days-a-week.forumactif.org/chatbox/index.forum" class="titreqeel1">Afficher la Chatbox</a></center></div>
+<link href='http://fonts.googleapis.com/css?family=Mr+Bedfort|Miss+Fajardose' rel='stylesheet' type='text/css'>

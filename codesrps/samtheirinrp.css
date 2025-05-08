@@ -1,0 +1,11 @@
+.samrprp{ width:450px; margin:0 auto; } 
+.samrprpimg{ display:flex; justify-content:center; width:80%; padding-bottom:10px; margin:0 auto;}
+.samrprpimg img{ width:130px; height:130px; border-radius:50%; -webkit-border-radius:50%; object-fit:cover; 
+  padding:5px; border:12px solid #FFCC00; border-top:none; border-bottom:none; } 
+.samrprpimg img:first-child{ border-right:none; }
+.samrprpimg img:last-child{ border-left:none; }
+
+.samrprp h1{ font-size:16px; line-height:17px; text-align:justify; letter-spacing:4px; color:#FFCC00; font-family: 'Sora', sans-serif; text-transform:uppercase; 
+margin:0px;}
+.samrpcont{ position:relative; top:-15px; text-align:justify; font-family:Verdana; font-size:12px; color:#555; padding:20px; 
+  border:13px #FEFBD3 solid; /*border-top:none; border-bottom:none;*/ } 

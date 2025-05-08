@@ -1,0 +1,51 @@
+.signph{
+  width:420px;
+  margin:0 auto;
+  display:flex;
+  padding:10px;
+}
+
+.signph img{
+  width:190px;
+  height:120px;
+  object-fit:cover;
+  border:#000000 4px double; 
+  padding:3px;
+  -webkit-border-top-right-radius: 50px;
+-webkit-border-bottom-left-radius: 50px;
+-moz-border-radius-topright: 50px;
+-moz-border-radius-bottomleft: 50px;
+border-top-right-radius: 50px;
+border-bottom-left-radius: 50px;
+}
+
+.signph span{
+  display:block;
+  width:310px;
+  margin-left:10px;
+  padding-top:20px;
+}
+
+.signph h1{
+  font-family: 'Grand Hotel', cursive;
+  color:#B98D26;
+  font-size:34px;
+}
+
+.signph h2{
+  font-family:Verdana;
+  margin-top:-15px;
+  color:#795C1A;
+  font-size:10px;
+  line-height:11px;
+  font-weight:normal;
+  font-style:italic;
+}
+
+.signph h2:before{
+  content:"«";
+}
+
+.signph h2:after{
+  content:"»";
+}

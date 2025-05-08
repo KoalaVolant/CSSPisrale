@@ -1,0 +1,62 @@
+/* Greg RP */ 
+
+:root{ 
+--greg2-color:#27365c; 
+}
+.gregoryrp{
+  width:500px;
+  background-image:url('http://www.wallpaperup.com/uploads/wallpapers/2014/04/03/321089/43489360b517546ef02d232a10a528e1.jpg');
+  padding:25px 20px;
+    margin:0 auto;
+    background-size:cover; 
+}
+
+.gregoryrp, .gregoryrp *{ box-sizing:border-box; }
+
+.gregoryrp .gregoryimg{
+  width:500px;
+    border-radius:10px; 
+  margin:0 auto; 
+  height:200px; 
+object-fit:cover;
+    margin-bottom:10px;
+    outline-offset:4px; outline:1px solid #fff; 
+} 
+
+.gregoryrp h1{
+  font-family: 'Teko', sans-serif;
+  background-color:var(--greg2-color);
+  color:#fff;
+  text-align:center;
+  padding;5px;
+  margin-top:5px;
+  font-size:25px;
+  line-height:26px;
+  text-transform:uppercase;
+}
+
+.gregoryrp h2{
+  background-color:#fff;
+  padding:5px;
+  text-align:center;
+  text-transform:uppercase;
+  color:var(--greg2-color);
+  margin-top:-30px;
+  font-size:10px;
+  line-height:11px;
+  font-weight:normal;
+}
+
+.gregoryrp .contenu{
+  padding:25px;
+  font-size:12px;
+  background-color:#f0f0f0;
+    color:#000;
+  line-height:12px;
+  text-align:justify;
+    outline:1px solid #f0f0f0; outline-offset:2px; 
+}
+
+.koalagreg{
+display:flex; justify-content:center; font-size:8px; letter-spacing:6px; 
+}

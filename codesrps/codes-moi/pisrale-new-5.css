@@ -1,0 +1,76 @@
+/*** FICHE DE NEWS PARTENARIAT 5 DE PISRALE ***/
+
+:root{
+  --pis-bg-image:url('https://i.imgur.com/yRhTjJp.jpg'); 
+    
+      --pis-color-deg:linear-gradient(90deg, var(--pis-span-color) 0%, var(--pis-color-contraste) 100%);
+  --pis-color-sur-bg:#f0f0f0; 
+  --pis-span-color:#c8a1b4;
+  --pis-span-color-light:#8f6c6c;
+  --pis-color-contraste:#597399;
+
+  
+  --pis-white:#f0f0f0; 
+      --pis-black:#222;
+  
+  --pis-font-1:'Alumni Sans', sans-serif;
+  --pis-font-2:'Playfair Display', serif;
+    
+}
+
+.pisnews5{ width:500px; max-width:100%; margin:0 auto; padding:10px; background:var(--pis-white);
+box-shadow: -4px 10px 6px -3px rgba(0,0,0,0.1); color:var(--pis-black); border:1px solid #dedede; border-radius:10px;}
+.pisnews5 br{ display:none; }
+
+/* HRADER */
+
+.pisnews5 .fondnews5{ display:block; height:150px; background:var(--pis-bg-image); width:100%; background-size:cover; 
+    font-family:verdana; font-size:12px; line-height:1.6em; }
+
+/* TITRES */
+
+.pisnews5 .titren5{ font-family:var(--pis-font-2); font-size:30px; line-height:35px; margin:20px 10px; 10px 10px; }
+.pisnews5 .titren5 span{ background:var(--pis-span-color); }
+
+.titren5.titrecont5{ margin:15px 0 0 0; font-size:40px; }
+.sstitren5 { font-family:var(--font-2);  font-size:20px; }
+
+/* NEWS */
+
+.content1n5 {
+    display:block; padding:15px;
+}
+
+.content1n5 br{ display:block; }
+
+.content1n5 strong, .content1n5 b{ color:var(--pis-color-contraste); }
+
+/* BUTTONS */
+
+.btnspis{ display:flex; flex-wrap:wrap; justify-content:center; margin:10px 0px;}
+.btnspis a{ display:block; margin:2px; background:var(--pis-color-deg); color:var(--pis-color-sur-bg) !important;
+    font-family:var(--pis-font-1); font-size:22px; border-radius:5px; padding:10px; font-weight:normal; }
+.btnspis a:hover{ background:var(--pis-color-contraste); }
+
+/* PARTENAIRES */ 
+
+.bestiemonth {
+    display:flex; justify-content:space-between; align-items:center; border-radius:5px; 
+    margin:20px 0px; border:1px solid var(--pis-black);   
+}
+.bestiemonth .titren5{ font-size:20px; }
+
+/* CREATIONS */ 
+
+.contentn5 {    margin:20px 0; }
+.contentn5 a{ color:var(--pis-span-color-light) !important; }
+.contentn5 br{ display:block; }
+.contentn5 em{ font-size:30px; font-family:var(--pis-font-1); font-weight:bold; color:var(--pis-color-contraste);}
+.contentn5 strong{ color:var(--pis-color-contraste); }
+
+/* IMAGES */ 
+
+.contentimgn5 { display:flex; }
+.contentimgn5 a{ display:block; margin:0 2px;  }
+.contentimgn5 img{ border-radius:5px; }
+.contentimgn5 img:hover{ outline-offset:-5px; outline:1px solid var(--pis-white); transition:700ms; }

@@ -1,0 +1,80 @@
+:root{
+  --main-color:#a100ba;
+  --second-color:#fff;
+  --third-color:#000;
+  --four-color:#e8e8e8;
+  --five-color:#FE70E2;
+  --six-color:#686868;
+  --seven-color:#C941A4;
+  
+  --fiche1-color:#ff7b00;
+    --fiche2-color:#6491bc;
+  --fiche3-color:#509b55;
+  
+  --pnj:#B52834;
+  --logic:#FF6F00;
+    --usual:#307543;
+    --powerful:#00BA2B;
+    --creepy:#00B8F0;
+    --legend:#0050F0;
+}
+
+.crea-wrap{
+  display:flex;
+  justify-content:space-around;
+  flex-wrap:wrap;
+}
+
+.img-gen-hover{
+  position:relative;
+  width:190px; height:255px;
+  margin-bottom:15px;
+}
+
+.img-gen-hover img{
+    height: 255px;
+    object-fit: cover;
+    position: absolute;
+    width: 190px;
+    z-index: 7;
+    padding: 0px;    top: 0px;    left: 0px;
+}
+
+.wrap2 .img-gen-hover img, .wrap2 .img-gen-hover span, .wrap2 .img-gen-hover h4, .wrap2 .img-gen-hover{
+  width:350px;
+}
+
+.img-gen-hover span{
+    background-color: #fff;
+    display: none;
+    height: 230px;
+    overflow: auto;
+    padding: 10px;
+    position: absolute;
+bottom:26px; left:0px;
+    transition: 600ms;
+    font-size: 11px;
+    line-height: 13px;
+    width: 190px;
+    z-index: 10;
+}
+
+.img-gen-hover:hover span{
+  display:block;
+}
+
+.img-gen-hover h4{
+      font-family: Oswald, sans-serif;
+  background-color:var(--main-color);
+  position:absolute;
+  bottom:-183px;
+  width:190px;
+  padding:5px;
+  text-align:center;
+  font-size:20px;
+left:-20px;
+  color:#fff;
+  letter-spacing:1px;
+  position:relative;
+  z-index:18;
+}

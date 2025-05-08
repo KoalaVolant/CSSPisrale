@@ -1,0 +1,39 @@
+.kamskirp1, .kamskirp1 *{ box-sizing:border-box; }
+.kamskirp1{ margin:0 auto; width:500px; }
+.kamskirp1 br{ display:none; }
+.kamskirp1 img{ object-fit:cover; }
+
+/* ENTETE */ 
+
+.kamskirp1 .kamskient1{ display:flex; justify-content:space-between; 
+	align-items:center; border-radius:5px;
+	position:relative; height:180px; overflow:hidden;
+	background:url('https://i.goopics.net/xtt6s5.jpg'); padding:20px 10px; z-index:5; 
+}
+.kamskirp1 .kamskient1 .kamskientfond1{ position:absolute; z-index:15; width:250%;
+	left:-350px; top:0;  }
+.kamskirp1 .kamskient1 .kamskientfond1 svg{ opacity:0.8;  }
+.kamskirp1 .kamskient1 .kamskientfond1 svg path{ fill:var(--vagueclkr); }
+.kamskirp1 .kamskient1 .kamskivava1{ display:flex; justify-content:space-between; 
+	width:38%; position:relative;
+z-index:25; }
+.kamskirp1 .kamskient1 .kamskivava1 img{ width:48%; border:2px solid white; }
+.kamskirp1 .kamskient1 .kamskititre{ width:59%; position:relative; z-index:25; 
+	font-family: "Arima", system-ui;}
+
+.kamskirp1 .kamskient1 .kamskititre .kamskititle1{ color:var(--kamskirp1-title1); text-align:center;
+font-weight:bold; display:block; font-size:15px; text-transform:uppercase; }
+.kamskirp1 .kamskient1 .kamskititre .kamskititle2{color:var(--kamskirp1-title2); text-align:center;
+	display:block; font-size:11px; line-height:11px; }
+
+
+.kamskirp1 .kamskicont1{ background:#fff; padding:25px; color:#444; 
+	font-family:verdana; text-align:justify;    border-width: 0px;
+    border-style: solid;
+    border-color: transparent; /* rend la bordure transparente sur tous les côtés */
+    border-left: 70px solid;
+    border-image: linear-gradient(to bottom, #E5DED6, #fff) 1; }
+.kamskirp1 .kamskicont1 br, 
+.kamskirp1 .kamskient1 .kamskititre .kamskititle1 br,
+.kamskirp1 .kamskient1 .kamskititre .kamskititle2 br{ content: none;
+  display: inline; }

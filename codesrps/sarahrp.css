@@ -1,0 +1,10 @@
+.sararp{ width:400px; margin:0 auto; font-family:Verdana; }
+.sararp *{ box-sizing:border-box; }
+
+.saraent{ display:flex; width:100%; padding:5px; align-items:center; justify-content:space-between;}
+.saraent img{ width:180px; height:90px; object-fit:cover; margin:5px 0px; border-top:2px solid #86b4bf; border-bottom:2px solid #86b4bf; padding:3px 0px; clip-path: polygon(0 0, 100% 0%, 100% 100%, 9% 100%); }
+.saraent div{ width:400px; padding:10px; border:1px solid #C6DCE1; border-left:0px; }
+.saraent h1{ font-family: 'Manrope', sans-serif; margin:0; font-size:16px; color:#86B4BF; } 
+.saraent h2{ font-size:10px; line-height:16px; margin:0; font-weight:normal; font-family:Georgia;} 
+
+.saracont{ text-align:justify; padding:20px; border:1px solid #7CACBA; background-color:#fff; font-size:11px; line-height:1.6em; }

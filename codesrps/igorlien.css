@@ -1,0 +1,33 @@
+.igorlien, .igorlien *, .igorlinks, .igorlinks *{ box-sizing:border-box; margin:0; }
+.igorlien, .igorlinks{ width:450px; margin:0 auto; }
+.ig-li1{ display:flex;justify-content:space-between; align-items:center; }
+.ig-li1 img{ width:73%; max-width:73%; height:126px; object-fit:cover; }
+.igorlien h2{ padding:20px 0px !important; letter-spacing:-3px; font-family: 'Akshar', sans-serif; font-size:30px !important;
+  text-transform:uppercase; color:#222; font-weight:normal; border:#222 4px solid !important; border-left:none !important; border-right:none !important; }
+
+.ig-li2{ display:flex; justify-content:space-between; margin-top:10px; }
+.ig-li2 span{ display:block; border:1px solid #222; padding:15px; font-size:12px; line-height:14px; text-align:justify; 
+  width:73%; height:320px; overflow:auto; } 
+.ig-li2 div{ width:110px; display:flex; justify-content:space-between; flex-direction:column;  } 
+.ig-li2 img{width:100px; height:100px; object-fit:cover;  }
+.ig-li2 img:nth-child(2){ margin:10px 0px; }
+
+.ig-li3{ display:flex; justify-content:space-between; margin-top:10px; } 
+.ig-li3 div{ width:40%; } 
+.ig-li3 div img{ margin-top:10px; width:100%; max-width:100%; }
+.ig-li3 span{ display:block; border:1px solid #222; padding:15px; font-size:12px; line-height:14px; text-align:justify; 
+  width:58%;  }
+
+/*Les barres de défilement dans les catégories*/
+.igorlien::-webkit-scrollbar, .igorlien scrollbar {height:12px !important; width:5px !important; background:none; margin-right:5px; !important}
+.igorlien::-webkit-scrollbar-thumb, .igorlien scrollbar-thumb {background:#888 !important; height:30px; border-radius:30px; !important}
+.igorlien::-webkit-scrollbar-corner, .igorlien scrollbar-corner {background:none; !important}
+
+
+.igorlinks{ width:500px; display:flex; justify-content:space-between; align-items:center; } 
+.igorlinks.igoreverse{ flex-direction:row-reverse; }
+.igorlinks img{ width:100px; height:100px; object-fit:cover; }
+.igorlinks h2{ font-weight:normal; padding:10px !important; letter-spacing:-2px; text-align:center; font-family: 'Akshar', sans-serif; font-size:20px !important;
+  text-transform:uppercase; color:#222; border:#222 3px solid !important; border-left:none !important; border-right:none !important; width:30%; }
+.igorlinks h2 em{ display:block; font-size:11px; letter-spacing:1px; }
+.igorlinks span{ width:66%; text-align:justify; border:1px solid #222; padding:10px; height:120px; color:#222; font-size:12px; line-height:14px;  overflow:auto; }

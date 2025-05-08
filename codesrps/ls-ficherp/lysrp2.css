@@ -1,0 +1,40 @@
+.lysrp2{
+  width:450px;
+  margin:0 auto;
+  padding:20px;
+  background-color:#fff;
+  border:#3A6952 6px double;
+  color:#595959;
+  font-family:Verdana;
+  font-size:11px;
+  line-height:13px;
+  text-align:justify;
+}
+
+.lysrp2 img{
+  width:420px;
+  height:200px;
+  padding:4px;
+  border:#4E8B6C 2px solid;
+  margin-top:-15px;
+}
+
+.lysrp2 h1{
+  font-family: 'Rouge Script', cursive;
+text-align:center;
+  color:#447B60;
+  font-size:30px;
+  line-height:20px;
+  margin-top:0px;
+}
+
+.lysrp2 h2{
+  margin-top:-35px;
+  font-size:11px;
+  line-height:12px;
+  color:#818181;
+  font-style:italic;
+  text-align:center;
+  font-family:Times New Roman;
+  font-weight:normal;
+}

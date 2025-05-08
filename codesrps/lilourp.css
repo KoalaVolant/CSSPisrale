@@ -1,0 +1,48 @@
+/* Lilou RP */
+
+.lilou{
+  width:500px;
+  margin:0 auto;
+  border-left:#C0C0C0 4px solid;
+  border-right:#C0C0C0 4px solid;
+  background-color:#fff;
+}
+
+.lilou img{
+width:500px;
+}
+
+.lilou h1{
+  padding:10px;
+  letter-spacing:2px;
+ color:#C9C9C9;
+  background-color:#2A2A2A;
+  font-size:20px;
+  line-height:22px;
+  font-family: 'Quattrocento', serif;
+  text-transform:uppercase;
+  text-align:center;
+  margin:-10px 0px -10px 0px;
+}
+
+.lilou h2{
+    padding:10px;
+  letter-spacing:8px;
+  background-color:#C9C9C9;
+  color:#2A2A2A;
+  font-size:12px;
+  line-height:14px;
+  text-align:center;
+  font-family: 'Quattrocento', serif;
+}
+
+.lilou .content{
+  width:450px;
+  margin:0 auto;
+overflow:visible;
+  padding:20px;
+  font-size:12px;
+  line-height:14px;
+   color:#2A2A2A;
+  text-align:justify;
+}

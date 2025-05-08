@@ -1,0 +1,61 @@
+#todd{
+  width:500px;
+  margin:0 auto;
+}
+
+#todd img{
+  width:200px;
+  margin-right:5px;
+}
+
+#todd img, #todd .piwo, #todd .rski, #todd .piloulou{
+  float:left;
+}
+
+#todd .piwo, #todd .piloulou{
+  width:20px;
+  height:120px;
+  background-color:#53595E;
+}
+
+  #todd .piwo{
+  -webkit-border-top-left-radius: 80px;
+-webkit-border-bottom-left-radius: 80px;
+-moz-border-radius-topleft: 80px;
+-moz-border-radius-bottomleft: 80px;
+border-top-left-radius: 80px;
+border-bottom-left-radius: 80px;
+}
+
+#todd .piloulou{
+  -webkit-border-top-right-radius: 80px;
+-webkit-border-bottom-right-radius: 80px;
+-moz-border-radius-topright: 80px;
+-moz-border-radius-bottomright: 80px;
+border-top-right-radius: 80px;
+border-bottom-right-radius: 80px;
+}
+
+
+#todd .rski{
+  width:190px;
+  padding:10px;
+  height:100px;
+  background-color:#91989D;
+}
+
+.rski h1{
+  font-size:25px;
+  font-family: 'Parisienne', cursive;
+  color:#fff;
+  text-align:center;
+text-shadow: 1px 3px 3px #53595E;
+}
+
+.rski p{
+  height:50px;
+  color:#2C2F32;
+  font-size:10px;
+  line-height:11px;
+  text-transform:uppercase;
+}

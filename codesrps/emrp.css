@@ -1,0 +1,19 @@
+/*** Em rP ****/ 
+
+.emrp{ width:450px; margin:0 auto; padding:20px; }
+.emrp *{ box-sizing:border-box; }
+.emrp .sep{ display:flex; justify-content:space-between; padding-bottom:15px; border-bottom:6px double #6AC889; }
+.emrp img{ width:220px; height:150px; object-fit:cover;
+  border:1px solid #999999; padding:5px; 
+-moz-transform: skewY(4deg);
+-webkit-transform: skewY(4deg);
+-o-transform: skewY(4deg);
+-ms-transform: skewY(4deg);
+transform: skewY(4deg); } 
+.emrp h1{ font-size:30px; line-height:35px; background-color:#6AC889; padding:10px; text-align:center; font-family: 'Girassol', cursive; margin:10px 0px; color:#fff; }
+.emrp .img2{ -moz-transform: skewY(-4deg);
+-webkit-transform: skewY(-4deg);
+-o-transform: skewY(-4deg);
+-ms-transform: skewY(-4deg);
+  transform: skewY(-4deg); }
+.emrp div{ text-align:justify; border-bottom:10px double #6AC889; padding-bottom:15px; }

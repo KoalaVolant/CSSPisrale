@@ -1,0 +1,130 @@
+/* Raph Lien */
+
+.raphlink{
+  width:450px;
+  margin:0 auto;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  font-family:Verdana;
+}
+
+.raphlink img{
+  width:120px;
+  height:120px; object-fit:cover;
+  display:block;
+  margin:0 auto;
+  padding:5px;
+  border:#3C94C4 5px solid;
+  -webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+}
+
+.blink{
+  background-color:#fff;
+  width:450px;
+  padding:15px;
+  -webkit-box-shadow: 0px 3px 5px 0px rgba(163,163,163,1);
+-moz-box-shadow: 0px 3px 5px 0px rgba(163,163,163,1);
+box-shadow: 0px 3px 5px 0px rgba(163,163,163,1);
+}
+  
+.bloc1{
+  height:240px; margin-top:-40px;
+}
+
+.bloc2{
+  margin-top:25px;
+  overflow:auto;
+}
+
+.raphlink h1{
+  font-family: 'Risque', cursive;
+  font-size:35px;
+  text-align:center;
+  color:#3C94C4;
+}
+
+.raphlink h2{
+  text-align:justify;
+  font-weight:normal;
+  margin:0; height:140px; overflow:auto;
+  color:#555; padding:10px;
+}
+
+.bloc2 h1{
+  font-size:25px;
+  color:#276B7E;
+  letter-spacing:0px;
+}
+
+.bloc2 strong{ color:#777;    font-size:17px; letter-spacing:1px; font-family: 'Risque', cursive; }
+
+/* Raph Lien */
+
+.wrap-r{
+  width:470px;
+  margin:0 auto;
+  display:flex;
+  flex-wrap:wrap;
+}
+
+.raphlien{
+  width:210px;
+  height:170px;
+  position:relative;
+  margin:10px;
+}
+
+.raphlien img{
+  width:210px;
+  height:170px;
+  object-fit:cover;
+    -webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+    border:#3C94C4 6px solid;
+}
+
+.raphlien span{
+  display:block;
+  background-color:#fff;
+  width:200px;
+  height:160px;
+  padding:10px;
+  overflow:auto;
+  position:absolute;
+  font-size:11px;
+  line-height:12px;
+  top:2px;
+  left:1px;
+  text-align:justify;
+  border:#2D7195 1px solid;
+-moz-transform: scale(0) rotate(-360deg);
+-webkit-transform: scale(0) rotate(-360deg);
+-o-transform: scale(0) rotate(-360deg);
+-ms-transform: scale(0) rotate(-360deg);
+transform: scale(0) rotate(-360deg);
+  -webkit-transition: all 900ms ease;
+-moz-transition: all 900ms ease;
+-ms-transition: all 900ms ease;
+-o-transition: all 900ms ease;
+transition: all 900ms ease;
+}
+
+.raphlien:hover span{
+  -moz-transform: scale(1) rotate(0deg);
+-webkit-transform: scale(1) rotate(0deg);
+-o-transform: scale(1) rotate(0deg);
+-ms-transform: scale(1) rotate(0deg);
+transform: scale(1) rotate(0deg);
+}
+
+.raphlien span h1{
+  margin:0;
+    font-family: 'Risque', cursive;
+  font-size:18px;
+  color:#3C94C4;
+  text-align:center;
+}

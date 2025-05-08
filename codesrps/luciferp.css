@@ -1,0 +1,59 @@
+  .lulu{
+ width:450px;
+  margin:0 auto;
+  padding:35px;
+  background-image:url('https://upload.wikimedia.org/wikipedia/commons/4/41/Fire.JPG');
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position:left;
+  background-color:#000;
+}
+
+.lulu img{
+  width:350px;
+max-height:200px;
+  margin:0 auto; 
+  padding:2px;
+  border:#FF8202 solid 2px; 
+}
+
+.lulu h1{
+    font-family: 'Fjalla One', sans-serif;
+     /* font-family: 'Kumar One', cursive;
+    font-family: 'Bowlby One SC', cursive; */
+  font-size:18px;
+  line-height:22px;
+  letter-spacing:2px;
+  padding:10px;
+  text-align:center;
+  text-transform:uppercase;
+  color:#FF8202;
+  font-weight:normal;
+  background-color:#050404;
+} 
+
+.lulu div{
+  background-color:#1B1B1B;
+  padding:25px;
+  margin-top:-10px;
+  font-size:11px;
+  line-height:12px;
+text-align:justify;
+  color:#BFBFBF;
+  -moz-box-shadow: inset 0px 0px 45px 0px #000000;
+-webkit-box-shadow: inset 0px 0px 45px 0px #000000;
+-o-box-shadow: inset 0px 0px 45px 0px #000000;
+box-shadow: inset 0px 0px 45px 0px #000000;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#000000, Direction=NaN, Strength=45);
+}
+
+.lulu strong, .lulu b{
+  color:#FF8202;
+}
+
+.lulu div::first-letter{
+  font-size:23px;
+  font-weight:bolder;
+  color:#FF8202;
+    font-family: 'Trirong', serif;
+}

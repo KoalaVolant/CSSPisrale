@@ -1,0 +1,71 @@
+.wrap_rpb{
+background-image:url('http://img15.hostingpics.net/pics/7087434512.png');
+width:500px;
+padding:25px 25px 25px 25px;
+}
+
+.gifrpb{
+width:400px;
+margin-left:45px;
+}
+
+.gifrpb img{
+width:400px;
+-webkit-border-radius: 80px;
+-moz-border-radius: 80px;
+border-radius: 80px;
+padding:5px;
+border:#898989 solid 1px;
+-moz-box-shadow: 3px 3px 5px 0px #656565;
+-webkit-box-shadow: 3px 3px 5px 0px #656565;
+-o-box-shadow: 3px 3px 5px 0px #656565;
+box-shadow: 3px 3px 5px 0px #656565;
+position:relative;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=135, Strength=5);
+background-image:url('http://portfolio.vernier.se/files/2014/03/light-grey-wood-photography-hd-wallpaper-1920x1200-4647.jpg');
+z-index:1;
+}
+
+.titrerpb{
+background-image:url('http://portfolio.vernier.se/files/2014/03/light-grey-wood-photography-hd-wallpaper-1920x1200-4647.jpg');
+margin-top:-25px;
+position:relative;
+z-index:2;
+-webkit-border-radius: 100px;
+-moz-border-radius: 100px;
+border-radius: 100px;
+padding:10px;
+font-size:15px;
+margin-left:10px;
+text-align:center;
+-moz-box-shadow:  0px 0px 10px 0px #656565;
+-webkit-box-shadow:  0px 0px 10px 0px #656565;
+-o-box-shadow: 0px 0px 10px 0px #656565;
+box-shadow: 0px 0px 10px 0px #656565;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=NaN, Strength=10);
+font-family: 'Bitter', serif;
+border-bottom:#fff 1px dotted;
+font-weight:bolder;
+  color:#1F120C;
+}
+
+.wrap_rpb p{
+background-color:#DADADA;
+-webkit-box-shadow: inset 0px 0px 67px -15px rgba(0,0,0,0.75);
+-moz-box-shadow: inset 0px 0px 67px -15px rgba(0,0,0,0.75);
+box-shadow: inset 0px 0px 67px -15px rgba(0,0,0,0.75);
+padding:25px;
+  width:400px;
+  margin:0 auto;
+  color:#000;
+font-size:13px;
+line-height:16px;
+}
+
+.koalavolant{
+margin-left:200px;
+color:#858585;
+display:block;
+font-size:7px;
+margin-top:-20px;
+}

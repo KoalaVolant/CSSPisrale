@@ -1,0 +1,33 @@
+.dansign{
+  width:500px;
+  margin:0 auto; 
+}
+
+.dansign img{
+  width:140px;
+  border:#624EB1 1px solid;
+  padding:3px;
+}
+
+.dansign h1{
+  font-family: 'Oregano', cursive;
+  color:#fff;
+text-shadow: 0px 0px 5px rgba(255, 255, 255, 1);
+  font-size:25px;
+  line-height:27px;
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:4px;
+  margin-top:-15px;
+}
+
+.dansign h2{
+  font-family:Times New Roman; 
+  font-size:12px;
+  color:#624EB1;
+  text-align:center;
+  margin-top:-35px;
+  letter-spacing:2px;
+  font-style:italic;
+  font-weight:normal;
+}

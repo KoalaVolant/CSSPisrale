@@ -1,0 +1,74 @@
+.lsrp18{
+  width:420px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+  text-align:justify;
+  margin:0 auto;
+}
+
+.lsrp18 img{
+  padding:4px;
+  border:#000 1px solid;
+  width:420px;
+  height:200px;
+  object-fit:cover;
+  display:block;
+}
+
+.lsrp18 .contenurp img{
+  float:left;
+  width:200px;
+  height:100px;
+  margin-right:10px;
+}
+
+.lsrp18 .feat{
+  position:relative;
+  width:420px;
+  height:200px;
+  
+  
+}
+
+koala2{
+  font-size:8px;
+  font-family:century gothic;
+  letter-spacing:4px;
+  text-align:center;
+  display:block;
+  margin-top:-10px;
+  color:#AAAAAA;
+}
+
+.lsrp18 .feat h1{
+  color:#000;
+  background-color:#fff;
+  text-align:center;
+  width:100%;
+  padding:10px;
+  font-weight:normal;
+  font-size:24px;
+  letter-spacing:2px;
+font-family: 'Anton', sans-serif;
+  display:block;
+  position:absolute;
+top: calc(100px - 38px);
+  text-transform:uppercase;
+  opacity:0;
+  transition:400ms;
+}
+
+.lsrp18:hover .feat h1{
+  opacity:0.60;
+}
+
+
+.lsrp18 .contenurp h1{
+  font-family: 'Satisfy', cursive;
+  font-size:22px;
+  font-weight:normal;
+  line-height:24px;
+  background-color:#fff;
+  color:#4F624E;
+}

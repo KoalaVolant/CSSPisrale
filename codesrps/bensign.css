@@ -1,0 +1,7 @@
+.bensign{ width:350px; margin:0 auto; display:flex; justify-content:space-between; flex-wrap:wrap; }
+.bensign *{ box-sizing:border-box; }
+
+.bensign h1, .bensign h2{ font-family: 'Rubik', sans-serif; font-size:11px; letter-spacing:1px; margin:0px; width:100%; text-align:center; text-transform:uppercase;}
+.bensign h1{ border-bottom:1px solid #dedede; }
+.bensign h2{ border-top:1px solid #dedede;  } 
+.bensign img{width: 115px; height:50px; object-fit:cover; display:block; margin:5px 0px; }

@@ -1,0 +1,94 @@
+/* Mattéo Lien */
+
+ .mattlien{  
+  width:500px; 
+  margin:0 auto; 
+}  
+
+.mattlien h1{ 
+  font-size:25px; 
+  background-color:#5A6361; 
+  padding:5px;
+  color:#fff;
+  text-align:center;
+}  
+
+.mattlien img{ 
+  border:#fff 4px solid;  
+  width:240px; 
+  height:163px;
+  float:left;
+}  
+
+.mattlien div{ 
+  width:226px; 
+  background-color:#5A6361; 
+  color:#fff;
+  float:left;
+  padding:10px;  
+  margin-bottom:50px;
+  font-size:11px; 
+  line-height:13px; 
+  text-align:justify; 
+  height:150px; 
+  overflow:auto; 
+}
+
+.wrapmlien{ 
+  width:550px; 
+  margin:0 auto;
+  clear:both;
+}  
+
+.matlien{ 
+  width:550px; 
+}  
+
+.survl{ 
+  float:left; 
+  width:150px; 
+  height:150px;  
+}
+
+  .survl img{ 
+  width:146px; 
+  height:146px; 
+  border:#fff 4px solid;  
+}  
+
+.survl span{ 
+  display:none; 
+  width:130px; 
+  height:130px; 
+  position:relative;
+z-index:999;}  
+
+.survl:hover img{ 
+  display:none; 
+}  
+
+.survl:hover span{ 
+  display:block;
+  background-color:#5A6361; 
+  padding:10px; 
+}  
+
+.descrmat{ 
+  float:left; 
+  width:350px; 
+  height:130px; 
+  padding:10px; 
+  margin-left:10px;
+  background-color:#dedede; 
+  overflow:auto; 
+  font-size:11px; 
+  line-height:13px; 
+position:relative;
+z-index:13;
+text-align:justify;}  
+
+.descrmat i{ 
+  font-size:10px;
+} 
+  
+/* Fin Mattéo Lien */

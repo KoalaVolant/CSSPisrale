@@ -1,0 +1,71 @@
+.wrappelias{
+	width:550px;
+	background:url(http://i18.servimg.com/u/f18/11/66/37/71/7418310.jpg);
+	background-size:cover;
+	padding:20px;
+	}
+	
+	.imgelias{
+margin-bottom:10px;
+	}
+	
+	.croixelias{
+	color:#C07547;
+	font-size:70px;
+	padding:10px;
+	font-family:Arial;
+	}
+	
+	.featelias, .croixelias{
+	float:left;
+	}
+	
+.imgelias img{
+width:230px;
+height:190px;
+border:#C07547 solid 5px;
+}
+
+.titrefeat{
+margin-top:10px;
+}
+
+h1{
+color:#fff;
+font-family:;
+font-size:30px;
+line-height:32px;
+}
+
+h1, h5{
+font-family: 'IM Fell Great Primer', serif;
+text-align:center;
+}
+
+h5{
+color:#dedede;
+margin-top:-25px;
+}
+
+.textelias{
+background-color:#57351E;
+color:#DEDCDA; 
+margin-top:35px;
+font-family:Verdana;
+font-size:13px;
+padding:20px;
+width:500px;
+line-height:16px;
+-moz-box-shadow: 0px 0px 5px 0px #1B1B1B;
+-webkit-box-shadow: 0px 0px 5px 0px #1B1B1B;
+-o-box-shadow: 0px 0px 5px 0px #1B1B1B;
+box-shadow: 0px 0px 5px 0px #1B1B1B;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#1B1B1B, Direction=NaN, Strength=5);
+-webkit-border-radius: 20px;
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius: 20px;
+-moz-border-radius-bottomright: 0;
+border-radius: 20px;
+border-bottom-right-radius: 0;
+}
+}

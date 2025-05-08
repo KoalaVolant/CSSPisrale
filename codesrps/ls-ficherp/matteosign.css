@@ -1,0 +1,61 @@
+.dli, .fli{
+  background-color:#000;}
+
+.mattsign, .dli, .fli{
+  width:450px;
+}
+
+.mattsign{
+margin:0 auto;
+}
+
+.mattsign img, .mattxt{
+  width:150px;
+  height:92px;
+  float:left;
+}
+
+.mattsign img, .mattsign:hover img, .mattsign img:hover{
+  -webkit-transition: all 600ms ease-out;
+-moz-transition: all 600ms ease-out;
+-ms-transition: all 600ms ease-out;
+-o-transition: all 600ms ease-out;
+transition: all 600ms ease-out;
+}
+
+.mattsign img{
+	-webkit-filter:blur(1px)grayscale(1);
+}
+
+.mattsign:hover img{
+  -webkit-filter:blur(0px)grayscale(1);
+}
+
+.mattsign img:hover{
+	-webkit-filter:blur(0px)grayscale(0);
+  }
+
+.dli{
+  margin-top:10px;
+}
+
+.mattxt{
+  background-color:#fff;
+}
+
+.mattxt h1{
+  text-align:center;
+  font-size:12px;
+  line-height:13px;
+  text-transform:uppercase;
+  font-family: 'Cinzel', serif;
+}
+
+.mattxt h2{
+  font-size:9px;
+  line-height:10px; 
+  color:#808080;
+  margin-top:-17px;
+  font-weight:normal;
+  padding:0px 3px 3px 3px;
+}

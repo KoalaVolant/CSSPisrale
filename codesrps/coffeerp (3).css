@@ -1,0 +1,80 @@
+.wrapcof{
+  width:500px;
+  margin:0 auto; 
+    background-image:url('https://draggingthetide.files.wordpress.com/2013/09/fallingflyingfish_before.jpg');
+  background-size:90%;
+  padding:15px;
+}
+
+.cof{
+  width:480px; 
+  margin:0 auto;
+}
+
+.cofimg, .coftxt{
+    position:relative;
+}
+
+.cofimg{
+  width:200px;
+  float:left;
+  margin:20px 20px 10px 0px;
+    z-index:13;
+}
+
+.cofimg img{
+  -moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);
+  width:200px; 
+  border:2px dotted #D5C1BD;
+  padding:3px;
+}
+
+.coftxt, .coftxt h1, .coftxt h2{
+  width:260px;
+}
+
+.coftxt{
+  float:left;
+  margin-left:-15px;
+  margin-top:15px;
+  z-index:8;
+}
+
+.coftxt h1{
+  background-color:#9B7164;
+  color:#fff;
+font-family: 'Caveat', cursive;
+  font-size:21px;
+  line-height:23px;
+  text-align:right;
+  padding:10px;
+}
+
+.coftxt h2{
+  background-color:#D2BEB9;
+  font-size:12px;
+  line-height:13px;
+  padding:10px;
+  margin-top:-15px;
+  font-family:times new roman;
+}
+
+.cofcontent{
+  width:420px;
+  padding:25px;
+  font-size:11px;
+  line-height:12px;
+  color:#000;
+background-color:#fff;
+  border:#75534A 1px dashed;
+opacity: 0.69;
+filter: alpha(opacity =69);
+  position:relative;
+  z-index:7;
+  margin:0 auto;
+  text-align:justify;
+}

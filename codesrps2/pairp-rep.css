@@ -1,0 +1,104 @@
+/* Pai RP */
+
+:root{
+    --pairp-fond1:#203D59;
+    --pairp-fond2:#112131;
+    --pairp-titre:#f0f0f0;
+    --pairp-sstitre:#a0b8d1;
+}
+
+.lsrp19, .lsrp19 *{ box-sizing:border-box; }
+
+.lsrp19{
+  width:500px;
+  margin:0 auto;
+  background-image:url('http://img11.hostingpics.net/pics/442419darkbluewallpaper3.jpg');
+  background-position:left;
+  background-size:cover;
+  padding:20px;
+border-top-left-radius: 40px;
+border-top-right-radius: 40px;
+}
+
+.lsrp19 div{
+  padding:10px;
+border-top-left-radius: 20px;
+border-top-right-radius: 20px;
+  background-color:var(--pairp-fond1);
+  color:var(--pairp-titre);
+}
+
+.lsrp19 h1{
+  text-align:center;
+  font-family: 'Suranna', serif;
+  text-transform:uppercase;
+  font-size:24px;
+  color:var(--pairp-titre);
+  line-height:25px;
+}
+
+.lsrp19 h2{
+  font-size:11px;
+  color:var(--pairp-titre);
+  text-align:center;
+  margin-top:-15px;
+  letter-spacing:2px;
+  font-weight:normal;
+  font-family:Times New Roman;
+}
+
+koala2{
+  font-size:8px;
+  font-family:century gothic;
+  letter-spacing:4px;
+  text-align:center;
+  display:block;
+  margin-top:-10px;
+  color:#AAAAAA;
+}
+
+.lsrp19 img{
+  width:500px;
+  height:200px;
+  margin-bottom:-10px;
+  position:relative;
+  z-index:7;
+  object-fit:cover;
+}
+
+.lsrp19 h3{
+  background-color:var(--pairp-fond1);
+    text-shadow:1px 1px 4px #000;
+  color:var(--pairp-sstitre);
+  font-size:14px;
+  line-height:14px;
+  padding:10px;
+  width:400px;
+  margin:0 auto;
+  display:block;
+  text-align:center;
+  font-family: 'Suranna', serif;
+  position:relative;
+  z-index:13;
+}
+
+.lsrp19 span{
+  background-color:var(--pairp-fond2);
+  display:block;
+  width:400px;
+  padding:25px;
+  text-align:justify;
+  color:var(--pairp-titre);
+  margin:0 auto;
+  font-size:12px;
+  line-height:1.5em;
+  
+}
+
+.lsrp19 span::first-letter{
+  font-size:35px;
+    font-family: 'Suranna', serif;
+  color:var(--pairp-sstitre);
+}
+
+.koalapaimon1{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

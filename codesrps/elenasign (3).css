@@ -1,0 +1,22 @@
+.ele{
+  width:410px;
+  margin:0 auto;
+  background-color:#000;
+  -webkit-border-radius: 20px;
+-moz-border-radius: 20px;
+border-radius: 20px;
+  border-bottom:#C90E0E 7px double;
+}
+
+.ele img{
+  width:205px;
+}
+
+.ele h1{
+  color:#C90E0E;
+  padding:3px;
+  text-align:center;
+  font-size:25px;
+  margin-top:-3px;
+  font-family: 'Playfair Display', serif;
+}

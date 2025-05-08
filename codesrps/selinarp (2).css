@@ -1,0 +1,80 @@
+.selina{
+  width:550px; 
+  margin:0 auto;
+  padding:25px;
+  background-color:#D2CDDA;
+  -webkit-border-radius: 50px;
+-moz-border-radius: 50px;
+border-radius: 50px;
+}
+
+.selina div{
+  width:320px;
+  z-index:1;
+}
+
+.selina img, .selina div{
+  float:left;
+  position:relative;
+}
+
+.selina img{
+  -webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+  width:220px;
+  height:180px;
+  border:#A69AB6 solid 5px;
+  z-index:7;
+}
+  
+.selina h1{
+  font-size:20px;
+  line-height:21px;
+  background-color:#A69AB6;
+  color:#fff;
+  margin-top:55px;
+  text-align:center;
+  -webkit-border-top-left-radius: 40px;
+-webkit-border-top-right-radius: 40px;
+-moz-border-radius-topleft: 40px;
+-moz-border-radius-topright: 40px;
+border-top-left-radius: 40px;
+border-top-right-radius: 40px;
+}
+
+.selina h2{
+    background-color:#fff;
+  color:#A69AB6;
+  font-size:13px;
+  border:#A69AB6 1px solid;
+  margin-top:-18px;
+  -webkit-border-bottom-right-radius: 40px;
+-webkit-border-bottom-left-radius: 40px;
+-moz-border-radius-bottomright: 40px;
+-moz-border-radius-bottomleft: 40px;
+border-bottom-right-radius: 40px;
+border-bottom-left-radius: 40px;
+}
+
+.selina h2, .selina h1{
+      text-transform:uppercase;
+  padding:5px;
+  margin-left:10px;
+  font-weight:normal;
+    font-family: 'Jockey One', sans-serif;
+    text-align:center;
+}
+
+.selina span{
+  clear:both;
+  display:block;
+  border-left:#A69AB6 2px dotted;
+    border-right:#A69AB6 2px dotted;
+  padding:25px;
+  background-color:#fff;
+  color:#494949;
+  text-align:justify;
+  margin-top:200px;
+  width:500px;
+}

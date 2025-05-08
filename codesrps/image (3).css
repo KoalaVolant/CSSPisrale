@@ -1,0 +1,21 @@
+.image{
+border-radius:20px 20px 20px 20px;
+box-shadow:0px 1px 4px #442f13;
+}
+
+.citation{
+font-family:'Amatic SC';
+font-size:28px;
+color:#fff;
+text-shadow:0px 0px 3px #fffeeb;
+margin-top:-20px;
+}
+
+.cit2{
+margin-top:10px; /* Ca c'est les marges extérieures */
+font-family:'Coming Soon'; /* Ca c'est la police ! */
+width:270px; /* Ca c'est la largeur */ 
+text-align:center; /* Ca c'est la justification */
+font-size:10px;
+line-height:12px; /* Ca c'est la hauteur de ligne !! */
+}

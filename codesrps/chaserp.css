@@ -1,0 +1,19 @@
+/* Chase RP */ 
+
+.chaserp{ width:400px; margin:0 auto; padding:5px; background-color:#fff; border-left:4px double; border-right:4px double;   border-image-slice: 1;
+         border-image-source: linear-gradient(to bottom, #ff9a00, #b7e1e9);}
+.chaserp *{ box-sizing:border-box; } 
+
+.chaseimg{ display:flex; justify-content:center; }
+.chaseimg div{ display:block; margin:5px; width:150px; height:110px; background-size:cover; 
+-webkit-box-shadow: inset 0px 0px 12px 9px rgba(255,255,255,1);
+-moz-box-shadow: inset 0px 0px 12px 9px rgba(255,255,255,1);
+  box-shadow: inset 0px 0px 12px 9px rgba(255,255,255,1);}
+
+.chaserp h1{ font-family: 'Dosis', sans-serif; padding:5px; font-size:14px; letter-spacing:2px; text-align:center; text-transform:uppercase; line-height:15px;
+background: rgb(2,0,36);
+background: -moz-linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(255,154,0,1) 0%, rgba(183,225,233,1) 100%);
+background: -webkit-linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(255,154,0,1) 0%, rgba(183,225,233,1) 100%);
+background: linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(255,154,0,1) 0%, rgba(183,225,233,1) 100%);
+color:#fff; margin:0px; }
+.chasecontent{ padding:0px 10px; font-size:13px; line-height:1.6em; text-align:justify; color:#222; font-family: 'Source Sans Pro', sans-serif;}

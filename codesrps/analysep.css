@@ -1,0 +1,41 @@
+.analysepersonne{
+width:450px;
+margin:0 auto;
+text-align:justify;
+background-color:#fff;
+color:#333300;
+padding:20px;
+}
+
+.analysepersonne h1{
+font-size:22px;
+text-transform:uppercase;
+letter-spacing:1px;
+text-align:center;
+}
+
+.analysepersonne h2{
+font-size:20px;
+letter-spacing:-1px;
+text-transform:uppercase;
+margin:0;
+background-color:#939393;
+color:#000;
+text-align:center;
+padding:5px;
+}
+
+.analysepersonne b, .analysepersonne strong{
+font-size:13px;
+background-color:#B6B6B6;
+padding:5px;
+margin:5px;
+display:block;
+}
+
+.analysepersonne i, .analysepersonne em{
+font-size:12px;
+background-color:#C5C5C5;
+padding:5px;
+display:block;
+}

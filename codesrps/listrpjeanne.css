@@ -1,0 +1,14 @@
+/* Fiche liste rp Jeanne */ 
+
+.listrpsterenn{ width:450px; margin:0 auto; background-color:#fff; padding:10px; } 
+.listrpsterenn *{ box-sizing:border-box; } 
+
+.listrpster{ display:flex; justify-content:center; }
+.listrpster img{ width:180px; margin:0px 5px; height:150px; object-fit:cover; padding:0px 15px; border-left:double 15px #cc3300; border-right:double 15px #cc3300;   border-radius:50%;
+  padding:10px; } 
+
+.listrpsterenn h1, .rpjeanne h2{ font-family: 'Dancing Script', cursive; margin:0px; color:#cc3300; } 
+.listrpsterenn h1{ font-size:24px; text-align:center; padding:10px; }
+.rpjeanne h2{ font-size:20px; font-weight:normal; padding:10px; border:1px solid #cc3300; }
+
+.listrpsterenn span{ display:block; padding:10px; }

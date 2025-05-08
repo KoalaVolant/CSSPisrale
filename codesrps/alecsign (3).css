@@ -1,0 +1,66 @@
+.hanson{
+  width:500px;
+  margin:0 auto;
+}
+
+.hanson h1, .hanson h1:hover, .alec p, .alec p:hover{
+  -webkit-transition: all 500ms ease;
+-moz-transition: all 500ms ease;
+-ms-transition: all 500ms ease;
+-o-transition: all 500ms ease;
+transition: all 500ms ease;
+}
+
+.hanson h1{
+    font-family: 'Source Sans Pro', sans-serif;
+  font-size:20px;
+  color:#fff;
+  background-color:#000;
+  letter-spacing:4px;
+  padding:5px 0px 5px 0px;
+  text-transform:uppercase;
+  text-align:center;
+}
+
+.hanson h1:hover{
+  color:#000;
+  background-color:#fff;
+  letter-spacing:8px;
+}
+
+.alec{
+  margin-top:-32px;
+}
+
+.alec img{
+  float:left;
+  width:250px;
+  height:93px;
+}
+
+.alec p{
+  width:490px;
+  background-color:#fff;
+  color:#000;
+  padding:5px;
+  clear:both;
+  text-align:center;
+font-size:10px;
+  line-height:11px;
+  text-transform:lowercase;
+}
+
+.alec p:hover{
+  background-color:#000;
+  color:#fff;
+  line-height:13px;
+}
+
+.aw{
+width:500px;
+}
+
+.aw img{
+width:150px;
+}
+  

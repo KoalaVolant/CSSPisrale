@@ -1,0 +1,56 @@
+.scefiche{ width:450px; margin:0 auto; font-family:Verdana; color:#222; font-size:12px; line-height:15px;}
+.scefiche *{ box-sizing:border-box; }
+.scefiche .sce1{ display:flex; -moz-transform: scale(0);} 
+.scefiche .sce1 .img-sce1{ z-index:99; position:relative; width:150px;}
+.scefiche .sce1 .img-sce1 h2{ -moz-transform: scale(0);
+-webkit-transform: scale(0);
+-o-transform: scale(0);
+-ms-transform: scale(0);
+transform: scale(0); transition:500ms;
+  width:100%; letter-spacing:1px; text-transform:uppercase; color:#fff; background-color:#222; padding:5px; font-size:11px; line-height:12px; text-align:center; position:absolute; top:45%;}
+.scefiche .sce1:hover .img-sce1 h2{ -moz-transform: scale(1);
+-webkit-transform: scale(1);
+-o-transform: scale(1);
+-ms-transform: scale(1);
+transform: scale(1); }
+.scefiche .sce1 img{ width:150px; height:220px; object-fit:cover; } 
+.scefiche .sce1 h1{ font-size:25px; font-family: 'Oswald', sans-serif; text-transform:uppercase; text-align:right; position:relative; z-index:99; top:15px; color:#111;}
+.scefiche .sce1 span{ display:block; background-color:#fff; padding:15px; outline: 1px solid #fff; outline-offset: 5px; position:relative; z-index:9; height:170px; overflow:auto;}
+.scefiche .sce1 strong{ text-transform:uppercase; font-family: 'Oswald', sans-serif; letter-spacing:2px; }
+
+.scefiche .sce2 h2{ background-color:#222; color:#fff; padding:10px; font-family: 'Oswald', sans-serif; letter-spacing:3px; font-weight:normal; text-transform:uppercase; width:60%; font-size:14px; position:relative; z-index:13;}
+.scefiche .sce2 span{ display:block; background-color:#fff; width:100%; outline: 1px solid #fff; outline-offset: 5px; padding:15px; position:relative; top:-10px; z-index:7;}
+.scefiche .sce2 img{ width:47%; height:100px; object-fit:cover; margin:5px; border:1px solid #222; padding:2px; }
+.scefiche .sce2 p{ display:block; padding:10px; overflow:auto; height:205px; background-color:#F9F9F9; text-align:justify; font-family:Verdana;}
+
+.scefiche .sce3{ position:relative; display:flex; flex-wrap:wrap; justify-content:space-between;width:100%;}
+.scefiche .sce3 h2{padding-top:20px; background-color:#222; color:#fff; padding:10px; margin-bottom:-15px; font-family: 'Oswald', sans-serif; letter-spacing:3px; text-align:right; font-weight:normal; text-transform:uppercase; width:60%; font-size:14px; z-index:13; left:200px; position:relative;}
+.scefiche .sce3 div{ width:48%; height:150px; position:relative; margin:25px 0px; outline: 1px solid #fff; outline-offset:2px; }
+.scefiche .sce3 div img{ width:100%; height:150px; object-fit:cover;} 
+.scefiche .sce3 div span{ -moz-transform: scale(0);
+-webkit-transform: scale(0);
+-o-transform: scale(0);
+-ms-transform: scale(0);
+transform: scale(0); transition:500ms; width:91%; height:130px; overflow:auto; padding:10px; display:block; position:absolute; top:0px; background-color:#fff; margin:10px; font-size:11px; line-height:13px; color:#222; text-align:justify;} 
+.scefiche .sce3 div:hover span{  -moz-transform: scale(1);
+-webkit-transform: scale(1);
+-o-transform: scale(1);
+-ms-transform: scale(1);
+  transform: scale(1); }
+.scefiche .sce3 div span strong{ background-color:#222; color:#fff; text-align:center; width:100%; display:block; padding:3px; letter-spacing:3px; font-family: 'Oswald', sans-serif; font-weight:normal;}
+
+.scefiche .sce4{ display:flex; align-items:center; justify-content:center; }
+.scefiche .sce4 img{ width:100px; height:100px; object-fit:cover; order:2;}
+.scefiche .sce4 span{ display:block; padding:10px; order:1 !important; text-align:justify; background-color:#fff; outline: 1px solid #fff; outline-offset:2px; height:150px; overflow:auto;}
+  .scefiche .sce4 h2{ background-color:#222; color:#fff; padding:5px; margin:0px; font-family: 'Oswald', sans-serif; letter-spacing:3px; font-weight:normal; text-transform:uppercase; font-size:11px; text-align:left; }
+
+.scefiche::-webkit-scrollbar {  width: 6px;  height: 6px; }
+.scefiche::-webkit-scrollbar-button {  width: 0px;  height: 0px; }
+.scefiche::-webkit-scrollbar-thumb {  background: #525252;  border: 0px none #ffffff;   border-radius: 50px;}
+.scefiche::-webkit-scrollbar-thumb:hover, ::-webkit-scrollbar-thumb:active{  background: #525252;}
+.scefiche::-webkit-scrollbar-track {  background: #c4c4c4;  border: 0px none #ffffff;  border-radius: 50px;}
+.scefiche::-webkit-scrollbar-track:hover {  background: #d2d2d2;}
+.scefiche::-webkit-scrollbar-track:active {  background: #e2e2e2;}
+.scefiche::-webkit-scrollbar-corner {  background: transparent;}
+
+.scefiche .koala{ text-align:center; letter-spacing:10px; font-size:8px; margin-top:15px; }

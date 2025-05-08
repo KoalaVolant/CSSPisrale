@@ -1,0 +1,128 @@
+.dawn-gen{
+  width:500px;
+  margin:0 auto;
+  font-family:Verdana;
+}
+
+.dawn-gen *{
+  box-sizing:border-box;
+}
+
+.dawn-gen .img-1{
+  width:400px;
+  height:200px;
+  object-fit:cover;
+  margin:0 auto;
+  display:block;
+  z-index:7; position:relative;
+  border:5px solid #fff;
+}
+
+.dawn-gen .dn{
+  display:none;
+}
+
+.dawn-gen .titre{
+  background-color:#a100ba;
+  padding:15px;
+  text-align:center;
+  display:block;
+  margin-top:-25px;
+  z-index:13; position:relative;
+}
+
+.dawn-gen .titre-1{
+  -webkit-border-top-left-radius: 40px;
+-webkit-border-top-right-radius: 40px;
+-moz-border-radius-topleft: 40px;
+-moz-border-radius-topright: 40px;
+border-top-left-radius: 40px;
+border-top-right-radius: 40px;
+  margin-bottom:-25px;
+}
+
+.dawn-gen .titre-2{
+  -webkit-border-bottom-right-radius: 40px;
+-webkit-border-bottom-left-radius: 40px;
+-moz-border-radius-bottomright: 40px;
+-moz-border-radius-bottomleft: 40px;
+border-bottom-right-radius: 40px;
+border-bottom-left-radius: 40px;
+  clear:both;
+}
+
+.dawn-gen h1{
+  font-size:25px;
+    line-height:28px;
+  font-weight:700;
+  font-family: 'Oswald', sans-serif;
+  color:#fff;
+  text-transform:uppercase;
+}
+
+.dawn-gen h2{
+  margin-top:-15px;
+  font-size:18px;
+  line-height:20px;
+  font-weight:400;
+  font-family: 'Frank Ruhl Libre', serif;
+  color:#c4c4c4;
+}
+
+.dawn-gen h3{
+    color: #a100ba;
+    font-family: Oswald, sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 19px;
+    text-transform: uppercase;
+    text-align: center;
+    border-bottom: 2px solid;
+    padding-bottom: 4px;
+    margin: 10px;
+}
+
+.dawn-gen .img-2, .dawn-gen .img-3{
+  width:100px; height:100px;
+  object-fit:cover;
+  border:#a100ba 4px solid;
+  -webkit-border-radius: 50%;
+-moz-border-radius: 50%;
+border-radius: 50%;
+}
+
+.dawn-gen .img-2{
+  float:left;
+  margin-right:10px;
+}
+
+.dawn-gen div p{
+  float:right;
+}
+
+.dawn-gen div{
+  background-color:#fff;
+  padding:20px;
+  color:#444;
+  font-size:12px;
+  line-height:15px;
+  text-align:justify;
+  z-index:5; position:relative;
+}
+
+.dawn-gen .entredeux{
+    background-color: #a100ba;
+    display: block;
+    width: 115px;
+    height: 64px;
+    position: relative;
+    z-index: 1;
+    margin-top: -35px;
+    margin-left: 10vw;
+    margin-bottom: -35px;
+  -moz-transform: rotate(-10deg);
+-webkit-transform: rotate(-10deg);
+-o-transform: rotate(-10deg);
+-ms-transform: rotate(-10deg);
+transform: rotate(-10deg);
+}

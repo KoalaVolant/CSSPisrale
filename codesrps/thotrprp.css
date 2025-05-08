@@ -1,0 +1,13 @@
+/* Thot RP Refonte */ 
+
+.thotrp{ width:450px; margin:0 auto;}
+.thotrp *{ box-sizing:border-box; }
+.thotrp .imgthot img{ width:300px; height:200px; object-fit:cover; border-left:#fff 3px solid; border-right:#fff 3px solid; display:block; margin:0 auto; }
+.thotrp .imgthot{ background-image:url('https://i.servimg.com/u/f30/19/45/51/53/d4883710.jpg'); }
+.thotcontenu .thotflex{ display:flex; align-items:center; }
+.thotcontenu .thotflex img{ max-width:150px; width:150px; height:100px; object-fit:cover; padding:4px; border:1px solid #0F0F0F;     display: block;    position: relative;  left:-41px;  top: 6px;   }
+.thotcontenu{ background-color:#fff; width:430px; padding:20px; font-family:Verdana; font-size:12px; line-height:1.6em; position:relative; top:-18px; left:10px; color:#222 !important; }
+.thotcontenu span{ display:block; }
+.thotcontenu h1{ color:#363636;     font-size: 17px;    width: 290px;    position: relative;    left: -30px;     line-height: 21px;font-family: 'Abril Fatface', cursive; }
+.thotcontenu h2{ font-family:Georgia; color:#5B6671; position:relative; left:-30px;}
+.thotcontenu div{ text-align:justify; font-size:12px; line-height:1.6em; position:relative; top:-15px; padding:15px 15px 0px 15px;}

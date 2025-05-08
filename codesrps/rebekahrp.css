@@ -1,0 +1,76 @@
+
+#rebekah{
+  width:460px;
+  margin:0 auto;
+  padding:15px;
+  background-color:#15979D;
+}
+
+#img_kah img{
+  width:220px;
+  height:150px;
+  margin-right:10px;
+}
+
+#img_kah img{
+  -webkit-border-top-left-radius: 50px;
+-webkit-border-bottom-left-radius: 50px;
+-moz-border-radius-topleft: 50px;
+-moz-border-radius-bottomleft: 50px;
+border-top-left-radius: 50px;
+border-bottom-left-radius: 50px;
+}
+
+#img_kah img+img{
+    -webkit-border-top-left-radius: 0px;
+-webkit-border-bottom-left-radius: 0px;
+-moz-border-radius-topleft: 0px;
+-moz-border-radius-bottomleft: 0px;
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+  -webkit-border-top-right-radius: 50px;
+-webkit-border-bottom-right-radius: 50px;
+-moz-border-radius-topright: 50px;
+-moz-border-radius-bottomright: 50px;
+border-top-right-radius: 50px;
+border-bottom-right-radius: 50px;
+}
+
+
+#rebekah h1{
+  -webkit-border-bottom-right-radius: 50px;
+-webkit-border-bottom-left-radius: 50px;
+-moz-border-radius-bottomright: 50px;
+-moz-border-radius-bottomleft: 50px;
+border-bottom-right-radius: 50px;
+border-bottom-left-radius: 50px;
+  background-color:#012932;
+  color:#CBFEFE;
+  padding:15px;
+  text-align:center;
+  font-weight:normal;
+  letter-spacing:1px;
+  font-family: 'Niconne', cursive;
+  font-size:24px;
+  line-height:26px;
+  width:330px;
+  margin-top:-10px;
+  margin-left:35px;
+}
+
+#rebekah p{
+  width:380px; 
+  margin:0 auto;
+  background-color:#0DDDD8;
+  color:#022D2C;
+  padding:25px;
+  -webkit-border-radius: 20px;
+-webkit-border-top-right-radius: 40px;
+-webkit-border-bottom-left-radius: 40px;
+-moz-border-radius: 20px;
+-moz-border-radius-topright: 40px;
+-moz-border-radius-bottomleft: 40px;
+border-radius: 20px;
+border-top-right-radius: 40px;
+border-bottom-left-radius: 40px;
+}

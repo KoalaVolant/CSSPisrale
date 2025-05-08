@@ -1,0 +1,47 @@
+    .leosign{
+  margin:0 auto;
+  width:400px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.leosign div{
+  width:190px;
+}
+
+.leosign img{
+  width:190px; height:60px;
+  object-fit:cover;
+    border:1px solid #dd0000;
+    padding:3px;
+}
+
+.leosign h1, .leosign h2{
+  font-family: 'EB Garamond', serif;
+}
+
+.leosign h1{
+  font-size:38px;
+  text-transform:uppercase;
+  color:#dd0000;
+  transition:900ms;
+}
+
+.leosign:hover h1{
+  color:#666;
+}
+
+.leosign h2{
+  font-size:12px;
+  line-height:12px;
+  font-weight:normal;
+  margin-top:-14px;
+  text-align:justify;
+  border-bottom:6px solid #dd0000;
+  padding-bottom:6px;
+  transition:900ms;
+}
+
+.leosign:hover h2{
+  border-bottom:6px solid #666;
+}

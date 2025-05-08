@@ -1,0 +1,56 @@
+:root{ --dan1-bordure:#1C96B9; 
+--dan1-titre:#1C96B9;
+--dan1-lettre:#6A6A6A;}
+
+.danrp{
+  width:550px;
+  margin:0 auto;
+  padding:5px;
+  border-top: 8px solid;
+   border-bottom: 8px solid;
+    border-color:var(--dan1-bordure);
+  background-color:#fff;
+}
+
+.dimg{
+  width:100%;
+    border-radius:5px;
+  height:200px;
+    object-fit:cover;
+  margin:0 auto;
+  background-repeat:no-repeat;
+  background-size:100%;
+  background-position:center;
+}
+
+.danrp h1{
+  color:var(--dan1-titre);
+  text-align:center;
+  font-size:35px;
+line-height:38px;
+  margin-bottom:-15px;
+  font-family: 'Lily Script One', cursive;
+}
+
+.danrp .content{
+  width:500px;
+  padding:15px;
+  color:#464646;
+  font-size:12px;
+  text-align:justify;
+  font-family:Verdana;
+  line-height:15px;
+  margin:0 auto;
+}
+
+.danrp .content::first-letter{
+  color:var(--dan1-lettre);
+  font-size:25px;
+  font-weight:bolder;
+    font-family: 'Lily Script One', cursive;
+  margin-right:3px;
+}
+
+.danrp .koala{
+display:flex; color:var(--dan1-titre); justify-content:center; font-size:8px; letter-spacing:5px;
+}

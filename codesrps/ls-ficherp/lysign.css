@@ -1,0 +1,28 @@
+.lyssign{
+  width:400px;
+  margin:0 auto;
+}
+
+.lyssign img{
+  width:157px;
+  float:left;
+}
+
+.lyssign div{
+  width:210px;
+  float:left;
+  margin-left:10px;
+} 
+
+.lyssign div img{
+  width:210px;
+}
+
+.lyssign div h1{
+  font-family: 'Arsenal', sans-serif;
+  text-align:justify;
+  font-size:11px;
+  line-height:12px;
+  font-weight:normal;
+  margin-top:130px;
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>#app{ width:50%; margin:0 auto; background:#EDF2F4; padding:20px; font-family:Verdana; }
+    #app h1{ color:#2B2D42; font-family: 'Bebas Neue', sans-serif; letter-spacing:4px; border:1px solid #8D99AE;padding:5px; }
+    #app h2{ color:#8D99AE; border-bottom:1px solid #8D99AE; font-family: 'Bebas Neue', sans-serif;}
+    .codefinal{ width:90%; margin:0 auto; display:block; font-size:14px; line-height:18px; background:#CDDDDF; padding:15px; font-family:'Courier New', Courier, monospace; } </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Juste 1 lien</h1> 
+        <h2>Inputs</h2>
+        <label>URL :</label> <input type="text" v-model="urlreel"> <br>
+        <label>Classes :</label> <input type="text" v-model="classesreel"><br>
+        <label>URL de l'image :</label> <input type="text" v-model="urlimgreel"><br>
+        <label>Nom :</label> <input type="text" v-model="nomreel"><br>
+        <label>Catégorie :</label>         <select v-model="catereel">
+            <option>Réels</option>
+            <option>Historique</option>
+            <option>SF-FF</option>
+        </select>
+        <h2>Résultat final</h2>
+        <span class="codefinal">
+            &lt;a target="_blank" href="{{urlreel}}"&gt;&lt;div class="grid-item {{classesreel}}"&gt;
+            &lt;img src="{{ urlimgreel }}"&gt;
+            &lt;div class="long name"&gt;{{ nomreel }}&lt;/div&gt;
+            &lt;div class="info"&gt;
+               {{ catereel }}
+            &lt;/div&gt;
+            &lt;/div&gt;&lt;/a&gt;
+        </span>
+
+        <h1>Juste 1 lien faceclaim dessin</h1>
+        <h2>Inputs</h2>
+        <label>URL :</label> <input type="text" v-model="urlillu"> <br>
+        <label>Classes :</label> <input type="text" v-model="classesillu"><br>
+        <label>URL de l'image :</label> <input type="text" v-model="urlimgillu"><br>
+        <label>Nom :</label> <input type="text" v-model="nompersoillu"><br>
+        <label>Fandom :</label> <input type="text" v-model="fandomillu"><br>
+        <h2>Résultat final</h2>
+        <span class="codefinal">
+            &lt;a target="_blank" href="{{urlillu}}"&gt;&lt;div class="grid-item {{classesillu}}"&gt;
+            &lt;img src="{{ urlimgillu }}"&gt;
+            &lt;div class="long name"&gt;{{ nompersoillu }}&lt;/div&gt;
+            &lt;div class="info"&gt;
+            {{ fandomillu }}
+            &lt;/div&gt;
+            &lt;/div&gt;&lt;/a&gt;
+        </span>
+    </div>
+    <script>
+        app = Vue.createApp({
+            data(){
+                return{ 
+                    urlreel:'URL REEL',
+                    classesreel:'CLASSES REEL',
+                    urlimgreel:'URL IMAGE REEL',
+                    nomreel:'NOM REEL',
+                    catereel:'CATEGORIE REEL',
+                    urlillu:'URL ILLUSTRE',
+                    classesillu:'CLASSES ILLUSTRE',
+                    urlimgillu:'URL IMAGE ILLUSTRE',
+                    nompersoillu:'NOM PERSONNAGE ILLU',
+                    fandomillu: 'FANDOM ILLU'
+                }
+            }
+        });
+        app.mount("#app");
+    </script>
+</body>
+</html>

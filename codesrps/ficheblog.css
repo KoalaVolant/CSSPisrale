@@ -1,0 +1,17 @@
+/* Fiche blog */
+
+.blog-code-1{ width:470px; margin:0 auto; font-family:Verdana; color:#222; padding:20px; background-image:url('https://nsm09.casimages.com/img/2021/11/16//L2ZMMb-unnamed.jpg'); border:10px #fff solid;  }
+.blog-code-1, .blog-code-1 *{ box-sizing:border-box; }
+
+.blog-code-1 h1{ padding:5px !important; width:100%; margin:10px auto; text-align:center; border:2px solid #555 !important; text-transform:uppercase; font-weight:bold; font-size:25px; line-height:30px !important; letter-spacing:-1px; color:#555; font-family: 'Shippori Antique', sans-serif; }
+.blog-code-1 h2{ background-color:#777; padding:2px 5px !important; width:40%; margin:5px 0px !important; font-size:15px !important; line-height:25px !important;  color:#fff; font-family: 'Shippori Antique', sans-serif;}
+
+.bloc-code-bloc{ background-color:#fff; padding:5px; color:#222; }
+
+.bloc-hover-blog{ display:flex; justify-content:center; flex-wrap:wrap;}
+.bloc-hover-blog a{ position:relative; margin:5px; overflow:hidden; }
+.bloc-hover-blog img{ border:5px solid #fff; }
+.bloc-hover-blog a, .bloc-hover-blog a img, .bloc-hover-blog a span{ display:block; width:150px; height:240px; object-fit:cover; }
+.bloc-hover-blog a span{ position:absolute; top:-240px; left:0px; background-color:#fff; padding:50% 10px; font-family: 'Shippori Antique', sans-serif; font-weight:bold; font-size:15px; text-align:center; transition:500ms; }
+.bloc-hover-blog a:hover span{ top:0px; }
+.bloc-hover-blog a span em{ font-weight:normal; font-size:11px; width:100%;} 

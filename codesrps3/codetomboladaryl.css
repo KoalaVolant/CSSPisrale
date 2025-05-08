@@ -1,0 +1,33 @@
+:root{
+	--darylText:#222; 
+	--darylText2:#555;
+	--darylFond:url('https://i.imgur.com/RWYil9d.jpg');
+}
+
+.darylRp, .darylRp *{ box-sizing:border-box;  }
+.darylRp{ margin:0 auto; width:450px;  }
+.darylRp br{ display:none; }
+.darylRp img{ object-fit:cover; }
+
+.darylRp .darylTitle{ font-size: 21px; display:block;
+font-family: Gidugu;
+line-height: 21px;
+letter-spacing: 2.1px;
+text-transform: uppercase; color:var(--darylText); }
+
+.darylRp .darylImgs{ display:flex; justify-content:space-between; }
+.darylRp .darylImgs img{ width:49%; height:100px; border:3px solid #fff; }
+
+.darylRp .darylContentRp{ display:flex; margin-top:15px; }
+.darylRp .darylContentRp .darylFeat{ display:flex; flex-direction:column; writing-mode: vertical-lr; 
+transform:rotate(0deg); font-family:Georgia; }
+.darylRp .darylContent{ margin-left:5px; text-align:justify; padding:15px; position:relative; border:0.75px solid;}
+.darylRp .darylContent br{   content: "";
+  margin: 2em;
+  display: block;
+  font-size: 24%;  }
+.darylRp .darylContent:after{ content: ""; background:var(--darylFond); background-size:50%; background-position:center;
+	width:101%; height:20px; 
+	position:absolute; left:-1px; bottom:-10px; transform:rotate(-1deg); }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

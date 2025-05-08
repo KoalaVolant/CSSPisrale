@@ -1,0 +1,46 @@
+/* fiche lien */
+
+.lavilien-t{ width:450px; margin:0 auto; }
+.lavilien-t, .lavilien-t *{ box-sizing:border-box; }
+.lavititle{ width:100%; display:flex; justify-content:space-between; align-items:center; } 
+.lavititle img{ width:100px; height:100px; object-fit:cover; border:5px solid white; -webkit-border-radius: 50%;-moz-border-radius: 50%;border-radius: 50%; }
+.lavititle h1{ padding:15px; font-family: 'Prata', serif; font-size:18px; color:white !important; margin:0px 0px 0px 5px !important ;    height: 50px;    width: 100%; 
+   }
+
+.lavititle h1, .lavibloc h2{ background: rgb(206,82,31);
+background: -moz-linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+background: -webkit-linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+background: linear-gradient(90deg, rgba(206,82,31,1) 0%, rgba(228,128,52,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ce521f",endColorstr="#e48034",GradientType=1); }
+
+.lavicon-t{ width:100%; display:flex; justify-content:space-between; margin-top:15px;}
+.lavibloc{ width:50%;}
+.lavirech{ margin-left:10px; } 
+.lavibloc h2{ color:white; font-family: 'Prata', serif; font-size:15px !important; 
+  padding:5px !important; width: 75%;    margin: 0px !important;}
+.lavibloc div{ padding:15px; font-size:12px; font-family:Verdana; line-height:16px;
+background-color:white; color:#222; text-align:justify;     height: 410px;
+    overflow: auto;} 
+.lavilinks{ display:flex; justify-content:space-around; flex-wrap:wrap; margin-bottom:5px; }
+.lavilinks span{ display:block; border:#E37E33 1px solid; padding:2px; 
+  margin:2px 2px; width:47%; }
+
+.lavifiche{ display:flex; justify-content:space-between; width:100%; } 
+.lavifiche a{ display:block; background-color:#CF5320; padding:10px; text-align:center; 
+font-family: 'Prata', serif; font-size:15px; color:white; }
+
+.lavilien-t::-webkit-scrollbar, .lavilien-t scrollbar {height:12px; width:5px; background:none; margin-right:5px;}
+.lavilien-t::-webkit-scrollbar-thumb, .lavilien-t scrollbar-thumb {background:var(--four-color); height:30px; border-radius:30px;}
+.lavilien-t::-webkit-scrollbar-corner, .lavilien-t scrollbar-corner {background:none;}
+
+/* Liens */ 
+
+.lavivi, .lavivi *{ box-sizing:border-box; }
+.lavivi{ width:450px; margin:0 auto; display:flex; justify-content:space-between; flex-wrap:wrap; }
+
+.lavivi div{ width:49%; margin-top:10px; } 
+.lavivi div img{ width:130px; height:130px; display:block; margin:0 auto; object-fit:cover; border:5px solid white; -webkit-border-radius: 50%;-moz-border-radius: 50%;border-radius: 50%; }
+.lavivi div h1{ background-color:#CF5320; padding:10px; text-align:center; width:100%;
+  font-family: 'Prata', serif; font-size:15px; color:white; margin:5px 0px; } 
+.lavivi div span{ padding:15px; font-size:12px; font-family:Verdana; line-height:16px;
+  background-color:white; color:#222; text-align:justify;     height: 250px; overflow:auto; display:block; }

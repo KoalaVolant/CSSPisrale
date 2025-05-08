@@ -1,0 +1,141 @@
+.wraplien{
+    width: 450px;
+    padding: 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family:Verdana;
+    margin: auto;
+}
+
+.wraplien a, .wraplien a:link, .wraplien a:hover, .wraplien a:active{
+    text-decoration: none;
+    color:inherit;
+    display: inline;
+    
+}
+
+.wraplien img{
+    width: 400px;
+    height: 150px;
+    margin: auto;
+    display: block;
+    object-fit:cover;
+}
+
+.wraplien h1{
+    font-family: 'Marcellus SC', serif;
+}
+
+.wraplien .ongl{
+    width: 400px;
+    margin:15px auto;
+}
+
+.ongl h1{
+text-align: center;
+    font-size: 14px;
+    padding: 5px;
+    color: #fff;
+    font-weight:normal;
+    background: #213435;
+    display: inline;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+
+.ongl h1:hover{
+        background: #46685B;
+}
+
+.ongl h1:active{
+    background:#648A64;
+}
+.wraplien .infos_lien{
+    width: 400px;
+    margin: auto;
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+}
+
+.wraplien .infos_lien div{
+    width: 400px;
+    height: 280px;
+    position: absolute;
+}
+
+.wraplien .infos_lien #infos_sec:target, .wraplien .infos_lien #liens_rech:target{
+    margin-left: 0;
+    
+}
+.wraplien .infos_lien #infos_prim{
+    background: #46685B;
+    z-index: 7;
+}
+
+.wraplien .infos_lien #infos_sec{
+    color: #000000;
+        background: #648A64;
+    z-index: 13;
+    margin-left: 400px;
+}
+.wraplien .infos_lien #liens_rech{
+    background: #A6B985;
+    z-index: 42;
+    margin-left: -400px;
+}
+
+#infos_prim h1{
+    color: #fff;
+    text-align: center;
+    font-size: 37px;
+        text-shadow:#fff 0px 0px 5px;
+}
+
+#infos_prim p{
+    text-align: center;
+    padding: 15px;
+    font-size: 23px;
+    color: #fff;
+    font-family: Times New Roman;
+    text-shadow:#000 2px 2px 3px;
+    
+}
+
+#infos_sec, #liens_rech{
+    overflow: auto;
+}
+
+#infos_sec p{
+    padding: 15px;
+    font-size: 14px;
+    text-align: center;
+}
+
+#infos_sec p span{
+    font-family: Times New Roman;
+    font-size: 16px;
+}
+
+#infos_sec p+p{
+    text-align: left;
+    margin-top: -45px;
+}
+
+#liens_rech h1{
+    text-align: center;
+    color:#000;
+    font-size: 22px;
+}
+
+#liens_rech p{
+    color:#000;
+    font-size: 14px;
+    padding: 15px;
+}
+
+#lien_rech b, #lien_rech strong{
+    text-shadow:#000 0px 0px 3px;
+}

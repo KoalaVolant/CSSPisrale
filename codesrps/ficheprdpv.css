@@ -1,0 +1,255 @@
+/* Fiche off */
+
+
+.catLiens{
+    padding:10px;
+}
+
+.gen, .gen a, .catLiens a{
+  color:#fff;
+  text-decoration:none;
+}
+
+.row1 .gen, .row2 .gen, .row1 .gen a, .row2 .gen a, .row1 .gen a:hover, .row1 .gend a:visited, .row2 .gen a:hover, .row2 .gen a:visited{
+  color:#090B00;
+}
+
+.gen a:hover, .gen a:visited, .catLiens a:visited, .catLiens a:hover{
+  color:#B5A162;
+}
+
+.officiel .bas, .presentation .bas{
+    color:#bcbcbc;
+}
+
+.officiel h1, .presentation h1, .infosgen .avatar span, .presentation h4{
+    background-color:#fff;
+  color:#252C06;
+  font-family: 'Smythe', cursive;
+  
+}
+
+.officiel h2{
+    color:#14653C;
+  text-shadow:#14653C 0px 0px 3px;
+}
+
+.officiel h3, .presentation h2, .infosgen .avatar b, .infosgen .avatar strong{
+  color:#2D6C3D;
+}
+
+.officiel h4{
+  color:#3D7939;
+}
+
+.postbody{
+  padding:15px;
+}
+
+.infosgen .avatar b, .infosgen .avatar strong{
+    color:#0088B9;
+}
+
+.presentation .haut, .officiel .haut, .officiel .bas, .presentation .bas, .bloc-pres, .contour {
+    background-image:url('https://i.servimg.com/u/f30/19/45/51/53/header11.png');
+}
+
+************************* FICHE OFFICIELLE PAR KOALAVOLANT ********************/
+
+.officiel{
+ width:500px;
+  margin:0 auto;
+    border-left:1px dotted;
+    border-right: 1px dotted;
+      -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.off-cont{
+  padding:20px;
+}
+
+
+.officiel .haut, .presentation .haut{
+  background-size:100%;
+  width:100%;
+  height:200px;
+  position:relative;
+}
+
+
+.officiel .bas, .presentation .bas{
+  background-size:100%;
+  background-position:bottom;
+  width:100%;
+  height:40px;
+  text-align:center;
+  padding-top:25px;
+}
+
+.officiel h1{
+  padding:5px;
+  width:400px;
+  text-align:center;
+  display:block;
+  position:absolute;
+ top:35%;
+  font-size:32px;
+  line-height:34px;
+  left:50px;
+}
+
+.officiel .img{
+  display:block;
+  width:400px;
+  margin:0 auto;
+  padding:3px;
+    border:#2695B5 1px solid;
+}
+
+.officiel h2{
+  font-size:16px;
+  line-height:18px;
+  text-align:center;
+  font-style:italic;
+}
+
+.officiel h3{
+  margin-top:-10px;
+  padding:5px;
+  margin:0;
+  font-size:22px;
+  line-height:24px;
+}
+
+.officiel h4{
+  text-align:center;
+  margin:0;
+  font-size:25px;
+  line-height:27px;
+}
+
+.officiel h2:before, .presentation h2:before{  content:'«' }
+
+.officiel h2:after, .presentation h2:after{  content:'»' }
+
+/******************************* FIN FICHE OFFICIEL ************************/
+
+/********************* FICHE DE PRESENTATION PAR KOALA VOLANT ***********/
+
+.presentation{
+  width:520px;
+  margin:0 auto;
+  background-color:#fff;
+}
+
+.presentation h1{
+  position:absolute;
+  bottom:-30px;
+  left:50px;
+  padding:10px;
+  font-size:32px;
+  text-align:center;
+  width:400px;
+  z-index:7;
+}
+
+.presentation h2{
+  width:400px;
+  font-size:15px;
+  z-index:13;
+    text-align:center;
+}
+
+.infosgen{
+  width:100%;
+  display:flex;
+  margin-top:25px;
+}
+
+.infosgen .avatar{
+  background-size:200px 320px;
+  width:200px;
+  height:320px;
+  overflow:hidden;
+}
+
+.infosgen .avatar span{
+  display:block;
+  width:200px;
+  height:50px;
+  text-align:center;
+  padding-top:10px;
+  margin-top:320px;
+  -webkit-transition: all 500ms ease;
+-moz-transition: all 500ms ease;
+-ms-transition: all 500ms ease;
+-o-transition: all 500ms ease;
+transition: all 500ms ease;
+}
+
+.infosgen .avatar:hover span{
+  margin-top:250px;
+}
+
+.infosgen .avatar b, .infosgen .avatar strong{
+  font-size:15px;
+}
+
+.infosgen .avatar u{
+  font-size:23px;
+  font-weight:bold;
+  text-decoration:none;
+}
+
+.infosgen .infos{
+  margin-left:5px;
+  width:310px;
+  height:300px;
+  padding:15px;
+  overflow:auto;
+}
+
+.bloc-pres{
+width:470px;
+  overflow:auto;
+  padding:25px;
+}
+
+.bloc-pres span{
+  background-color:#fff;
+  padding:15px;
+  display:block;
+}
+  
+.presentation h4{
+  font-size:25px;
+  margin:0;
+  text-align:center;
+  padding:5px;
+}
+
+.histoire{
+  padding:25px;
+}
+
+.anecdote{
+  height:250px;
+}
+
+.image{
+  width:100%;
+  background-size:cover;
+  height:200px;
+}
+
+.officiel .img, .presentation .img{
+  width:400px;
+  height:150px;
+  object-fit:cover;
+      border:#2695B5 1px solid;
+    margin:0 auto;
+  padding:3px;
+  display:block;
+}

@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Ribeye&display=swap');
+@import url('https://coderps.xyz/codesrps/pisraleglobal.css');
+
+.minminsign{ position:relative; width:300px; display:flex; align-items:center; justify-content:space-between; }
+
+.minminsign .minmintxt{ 
+width:60%; }
+.minminsign .minmintxt .titresign{
+    font-family:Ribeye; 
+    text-align:center;
+    font-size:18px; 
+    width:100%;
+    display:block;
+    color:#764F30;
+    background:rgba(255,255,255,0.13);
+    padding:5px;
+}
+.minminsign .minmintxt .txtsign{ 
+display:block;
+text-align:center;
+    font-family:Verdana;
+font-size:11px;
+line-height:12px;
+padding-top:5px;}
+
+.minminsign .minminimg{
+    width:39%; 
+    display:flex;
+}
+
+.minminsign .minminimg img{ 
+border-radius:50%; 
+width:100px; 
+height:100px;
+margin:0 5px;
+position:relative; z-index:10; }
+
+
+.minminsign:after{
+    content:'';
+    width:300px;
+    position:absolute;
+    top:36px;
+    height:3px;
+    background:url('https://i.servimg.com/u/f30/19/45/51/53/come-b10.jpg');
+    z-index:1;
+}

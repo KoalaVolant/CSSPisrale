@@ -1,0 +1,76 @@
+@import url('https://coderps.xyz/codesrps/pisraleglobal.css');
+@font-face {font-family: 'Morgenlicht';src:url('https://dl.dropbox.com/s/59bmz17nhy5s3di/morgenlicht.otf');format("truetype");}
+:root{
+    --color-contour-sunshine1:linear-gradient(0deg, rgba(234,129,255,1) 0%, rgba(76,8,142,1) 100%);
+}
+.sunshinerp1 {
+    width:500px; 
+    margin:0 auto;
+    display:flex;
+}
+
+.sunshinerp1 .sunshineimg{
+    width:25%;
+}
+
+.sunshinerp1 .sunshineimg img{ 
+border-radius:60px; height:100px; width:100%; object-fit:cover; 
+transform:rotate(10deg); position:relative;
+border:1px solid #f0f0f0; padding:5px; margin:5px 0px; }
+
+.sunshinerp1 .sunshineimg:before{ 
+content:' '; 
+position:absolute; 
+width:100px; 
+height:150px; 
+    top:8%;
+left:22%; 
+    border:10px solid; 
+          border-image-source: var(--color-contour-sunshine1);
+  border-image-slice: 30 30;
+    border-radius:50%;
+ }
+
+.sunshinerp1 .sunshineimg h4{ 
+font-size:11px; letter-spacing:-1px; font-family:Verdana; 
+margin:0; font-weight:normal; text-align:center; }
+
+.sunshinerp1 .sunshinecontent {
+    width:74%;
+    padding:12px; 
+    font-family:verdana;
+    font-size:13px;
+    line-height:1.6em;
+}
+
+.sunshinerp1 .sunshinecontent span{  display:inline-block; text-align:justify; }
+
+.sunshinerp1 .sunshinecontent h2{ 
+font-family: 'Morgenlicht'; color:rgb(136,82,162);
+font-size:28px; margin:0px; }
+
+.sunshinesign1{ width:300px; margin:0 auto; }
+.sunshinesign1 .sunshinesignimg1 { display:flex; }
+.sunshinesign1 .sunshinesignimg1 img{ border-radius:60px; height:80px; width:100%; object-fit:cover; 
+transform:rotate(10deg); position:relative;
+border:1px solid #f0f0f0; padding:5px; margin:5px 0px; }
+
+.sunshinesign1 .sunshinesignimg1:before{ 
+content:' '; 
+position:absolute; 
+width:200px; 
+height:100px; 
+    top:28%;
+left:50%; 
+    transform:translateX(-50%);
+    border:8px solid; 
+          border-image-source: var(--color-contour-sunshine1);
+  border-image-slice: 30 30;
+    border-radius:50%;
+ }
+
+.sunshinesign1 h4{
+    font-family: 'Morgenlicht'; color:rgb(136,82,162);
+font-size:28px; margin:0px; text-align:center;
+    background:#dedede; position:relative; top:-20px; 
+}

@@ -1,0 +1,11 @@
+/* Fiche RP Chase également */ 
+
+.chaserp2{ width:450px; margin:0 auto; }
+.chaserp2 *{ box-sizing:border-box; }
+
+.entchase{ display:flex; justify-content:space-between; border-top:15px solid #79a3b1; padding:5px;  } 
+.entchase img{ width:48%; height:100px; object-fit:cover; padding:3px; border:1px solid #456268;}
+.chaserp2 h1{ text-align:center; font-family: 'Abril Fatface', cursive; font-size:17px; background-color:#79a3b1; color:#fff; margin:0 auto; font-weight:normal; } 
+.chaserp2 h2{ font-size:8px; color:#777; text-align:center; margin:0px; letter-spacing:4px; font-family:Verdana; text-transform:uppercase; font-weight:normal; }
+
+.contchase{ text-align:justify; font-family:Verdana; font-size:12px; line-height:15px; }

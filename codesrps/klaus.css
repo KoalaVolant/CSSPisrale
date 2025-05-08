@@ -1,0 +1,24 @@
+.bleu{
+  width:480px;
+  -webkit-border-top-left-radius: 80px;
+-webkit-border-top-right-radius: 80px;
+-moz-border-radius-topleft: 80px;
+-moz-border-radius-topright: 80px;
+border-top-left-radius: 80px;
+border-top-right-radius: 80px;
+  border-top:15px #233C61 solid; 
+}
+
+.klaus{
+  width:400px;
+  padding:25px;
+  font-size:12px;
+  line-height:13px;
+  margin-top:-5px;
+  text-align:justify;
+  border-left:15px #233C61 double;
+  border-right:15px #233C61 double;
+  border-bottom:5px #233C61 solid;
+  background-color:#142236;
+  color:#D3D3D3;
+}

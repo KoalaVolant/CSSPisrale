@@ -1,0 +1,79 @@
+  
+  /* COLORS */
+
+:root{
+ 
+  --font1:'Encode Sans', sans-serif;
+  --font2:'Fjalla One', sans-serif;
+ 
+  --fond:#1c1c1c;
+  --fond2:#666464;
+  --text: #959494;
+  --black:#000;
+    --colorp:#9860b1;
+  --degrade:linear-gradient(90deg, #5e3172 0%, #000 100%);
+  --degrade-hover:linear-gradient( #000,#5e3172);
+ 
+  --bg-img:url('https://i.imgur.com/x5JsKHa.png');
+  }
+
+.lienntos, .lienntos *, .lien2ntos, .lien2ntos *{ box-sizing:border-box; }
+.lienntos, .lien2ntos{ width:600px; margin:0 auto; position:relative; }
+.lienntos .imagehautntos{ position:relative; display:block; }
+.lienntos .imagehautntos img{ width:100%; height:130px; object-fit:cover;  }
+.lienntos .imagehautntos:before{ content:' '; position:absolute; top:0; left:0; width:100%; height:130px;
+background:var(--fond); opacity:0.5; }
+.lienntos .infosntos{ position:absolute; width:84%; margin:0 auto; left:50%; transform:translateX(-50%); top:120px; display:flex; justify-content:space-between; }
+.lienntos .infosntos img{ width:160px; height:256px; object-fit:cover; }
+.lienntos .infosntos .infogenntos{ width:63%; position:relative;  }
+.lienntos .infosntos .infogenntos br{  display:none; }
+.lienntos .infosntos .prenomnom{ color:white; font-family:var(--font2);
+    font-size:22px; display:block; text-align:left; text-transform:uppercase;  }
+.lienntos .infosntos .titre1{ display:block; margin-top:20px; background:var(--degrade); color:var(--text);
+    font-family:var(--font1); padding:5px; font-size:15px; text-transform:uppercase; letter-spacing:4px; font-weight:600; }
+.lienntos .infosntos .textentos{ color:var(--text); font-size:13px; line-height:20px; text-align:justify; background:var(--fond); display:block;
+height:187px; overflow:auto; padding:15px;}
+
+/* INFOS ET ANECDOTES */
+
+.lienntos .lienflex.lienone{ margin-top:200px; }
+.lienntos .lienflex{ display:flex; flex-direction:row-reverse; justify-content:space-between; align-items:center; }
+.lienntos .lienflex.reverse{ flex-direction:row;}
+
+.lienntos .lienflex .titre1{ display:block; background:var(--degrade);
+    color:var(--text); font-family:var(--font1); padding:5px; font-size:15px;
+    text-transform:uppercase; letter-spacing:4px; font-weight:600; }
+.lienntos .lienflex > img{ width:160px; height:256px; object-fit:cover; }
+.lienntos .lienflex .textentos img{ width:auto; height:auto; }
+.lienntos .lienflex div{ width:80%; }
+.lienntos .lienflex div br{ display:none; }
+.lienntos .lienflex .textentos br{ display:block; }
+.lienntos .lienflex .textentos{ background:var(--fond); color:var(--text); display:block; padding:15px; height:200px; overflow:auto; }
+.lienntos .lienflex .textentos strong, .lienntos .lienflex .textentos b{ font-family:var(--font1);
+color:var(--colorp); font-size:15px; letter-spacing:2px; }
+
+/* IMAGE DE FIN */
+
+.lienntos .imagefin{ width:100%; height:130px; object-fit:cover;}
+
+/* LIENS */
+.lien2ntos{ width:450px; }
+.lien2ntos br{ display:none; }
+.lien2ntos .lien2titre{ margin-bottom:20px;background:var(--degrade); font-size:22px; padding:5px; text-align:center;
+color:var(--text); font-family:var(--font1); text-transform:uppercase; font-weight:600;
+letter-spacing:2px; }
+.lien2ntos .lien2ntosc{ position:relative; }
+.lien2ntos .lien2ntosc .fondimage img{  width:100%; height:130px; object-fit:cover;}
+.lien2ntos .lien2ntosc .fondimage:before{ content:' '; position:absolute; top:0; left:0; width:100%; height:130px;
+background:var(--fond); opacity:0.5; }
+.lien2ntos .lien2ntosc .lien2ntosc2{ width:90%; margin:0 auto; display:flex; justify-content:space-between; position:relative; top:-30px; }
+.lien2ntos .lien2ntosc .lien2ntosc2.reverse{ flex-direction:row-reverse; }
+.lien2ntos .lien2ntosc .lien2ntosc2 .avatarimage{  width:160px; height:256px; object-fit:cover; position:relative; top:-15px; }
+.lien2ntos .lien2ntosc .lien2ntosc2 .liennom{ width:58%; }
+.lien2ntos .lien2ntosc .lien2ntosc2 .liennom .nominfos{ color:white; font-family:var(--font2);
+    font-size:20px; display:block; text-align:left; text-transform:uppercase;}
+.lien2ntos .lien2ntosc .lien2ntosc2 .liennom .lien2descr{ margin-top:22px; height:200px;
+    overflow:auto; background:var(--fond); color:var(--text); padding:10px;}
+.lien2ntos .lien2ntosc .lien2ntosc2.reverse .liennom .nominfos{ text-align:right; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

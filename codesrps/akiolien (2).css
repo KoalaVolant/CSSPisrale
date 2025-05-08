@@ -1,0 +1,48 @@
+.linka{
+  width:600px;
+  margin:0 auto;
+  background-color:#dedede;
+}
+
+.linka img{
+  width:240px;
+  height:150px;
+  padding:2px; 
+  float:left;
+  border:1px solid #B90000;
+}
+
+.linka h1{
+font-family: 'Rubik', sans-serif;
+color:#000;
+font-size:18px;
+  text-transform:uppercase;
+}
+
+.linka h1 i, .linka h1 em{
+  color:#B90000;
+  font-weight:normal;
+  font-size:16px;
+}
+
+.linka div{
+  background-color:#fff;
+  padding:15px;
+  float:left;
+  margin-top:-10px;
+  width:240px;
+  height:150px;
+  font-size:11px;
+  line-height:12px;
+  color:#3A3A3A;
+  margin-left:10px;
+  margin-right:10px;
+}
+
+.linka span{  
+  overflow:auto;
+  display:block;
+  height:100px;
+  padding:5px;
+  text-align:justify;
+}

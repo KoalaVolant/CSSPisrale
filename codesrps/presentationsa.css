@@ -1,0 +1,47 @@
+.presa1{
+border-right: 1px dotted; 
+border-left: 1px dotted; 
+width: 500px; 
+text-align: left; 
+background-color: #191817; 
+color: #EBEBEB; 
+border-radius: 40px 40px 40px 40px;
+}
+
+.presa2{
+width: 500px; 
+border-radius: 40px 40px 40px 40px; 
+height: 250px;
+}
+
+.presa1 h1{
+font-size: 24px; 
+font-family: Times New Roman; 
+color: #FFFFFF; 
+letter-spacing: 5px;
+}
+
+.histoirepresa{
+border-top: 1px dotted; 
+width: 475px; 
+font-size: 12px; 
+text-align: left; 
+margin-left: 10px; 
+margin-right: 10px; 
+color: #AC9AC85; 
+border-bottom: 1px dotted; 
+height: 250px;
+}
+
+.hspresa{
+border-bottom: 1px solid; 
+width: 475px; 
+font-size: 12px; 
+text-align: left; 
+margin-left: 10px; 
+margin-right: 10px; 
+height: 150px; 
+overflow: auto;
+}
+
+

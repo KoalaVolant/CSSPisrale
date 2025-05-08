@@ -1,0 +1,31 @@
+.lyslien{
+  display:flex;
+}
+
+.lyslien img{
+  width:120px;
+  height:120px;
+  object-fit:cover;
+  border-radius:20px;
+  border:#488663 3px solid;
+  padding:3px;
+}
+
+.lyslien div{
+  width:350px;
+  height:150px;
+  overflow:auto;
+   background-color:#fff;
+  padding:15px;
+  border-top:#488663 4px solid;
+  border-bottom:#488663 4px solid;
+  font-size:11px;
+  line-height:13px;
+  box-sizing:border-box;
+  color:#5F5F5F;
+}
+
+.lyslien h1{
+  font-size:18px;
+  line-height:22px;
+}

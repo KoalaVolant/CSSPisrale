@@ -1,0 +1,97 @@
+.rptony{
+  width:450px;
+  margin:0 auto;
+  padding:15px;
+  background-color:#fff;
+ border-left-width: 25px;
+  border-right-width: 15px;
+    border-style: solid;
+    -webkit-border-image: 
+      -webkit-gradient(linear, 0 0, 0 100%, from(#882222), to(#D2AB33)) 1 100%;
+    -webkit-border-image: 
+      -webkit-linear-gradient(#882222, #D2AB33) 1 100%;
+    -moz-border-image:
+      -moz-linear-gradient(#882222, #D2AB33) 1 100%;    
+    -o-border-image:
+      -o-linear-gradient(#882222, #D2AB33) 1 100%;
+    border-image:
+      linear-gradient(to bottom, #882222, #D2AB33) 1 100%;
+  padding-top:0px;
+-webkit-border-top-left-radius: 40px;
+-webkit-border-bottom-right-radius: 40px;
+-moz-border-radius-topleft: 40px;
+-moz-border-radius-bottomright: 40px;
+border-top-left-radius: 40px;
+border-bottom-right-radius: 40px;
+text-align:justify;
+color:#333;
+}
+
+.rptony *{
+  box-sizing:border-box;
+}
+
+.rptony b, .rptony strong{
+  color:#882222;
+}
+
+
+.rptony span{
+  display:block;
+  margin-left:-115px;
+  position:relative;
+  margin-top:-15px;
+}
+
+.rptony h1{
+  font-family: 'Playfair Display', serif;
+  color:#3098D6;
+  font-size:24px;
+  line-height:28px;
+  text-align:right;
+}
+
+.rptony span h2{
+  font-size:18px;
+  text-transform:uppercase;
+  color:#fff;
+  width:200px;
+  position:absolute;
+  font-weight:normal;
+  z-index:15;
+  top:90px;
+  left:45px;
+  font-family:Impact;
+  opacity:0;
+  transition:800ms;
+}
+
+.rptony:hover span h2{
+  opacity:1;
+}
+
+.rptony span img{
+  -webkit-border-radius: 50px;
+-moz-border-radius: 50px;
+border-radius: 50px;
+  border:#3098D6 2px solid;
+  padding:3px;
+  float:left;
+  margin:10px;
+  width:200px;
+  position:relative;
+  z-index:7;
+  height:200px;
+  object-fit:cover;
+  -moz-transform: rotate(-5deg);
+-webkit-transform: rotate(-5deg);
+-o-transform: rotate(-5deg);
+-ms-transform: rotate(-5deg);
+transform: rotate(-5deg);
+  transition:500ms;
+}
+
+.rptony:hover span img{
+  filter: grayscale(80%) contrast(40%);
+-webkit-filter: grayscale(80%) contrast(40%);
+}

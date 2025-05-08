@@ -1,0 +1,13 @@
+/* Signature SamSam */ 
+
+.samsamsign{ width:470px; margin:0 auto; }
+.samsamsign *{ box-sizing:border-box; }
+
+.samsamsign h1{ text-align:center; font-family: 'Oswald', sans-serif; font-size:12px; margin:2px 0px; font-weight:normal; text-transform:uppercase; }
+.samsamsign b{ color:#E2C51D; }
+.samsamimg{ display:flex; justify-content:center; }
+.samsamimg img{ width:38%; }
+
+.samsamimg .sam1{ clip-path: polygon(25% 0%, 94% 0%, 75% 100%, 0% 100%); margin-right: -31px; }
+.samsamimg .sam2{ clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
+.samsamimg .sam3{ clip-path: polygon(9px 0, 75% 0, 100% 100%, 25% 100%); margin-left: -31px;}

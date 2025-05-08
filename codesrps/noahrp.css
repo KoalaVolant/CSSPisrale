@@ -1,0 +1,28 @@
+.noahrp{
+  width:500px;
+  margin:0 auto;
+background-image:url('http://theartmad.com/wp-content/uploads/Light-Grey-Background-Design-3.jpg');
+    border:#5D5D5D 2px solid;
+}
+
+.noahrp .gneuh{
+    background-image:url('https://i.pinimg.com/564x/16/15/41/16154101ac0c2fe5134722030b820030.jpg');
+  background-size:100%;
+  width:500px;
+padding:0px 0px 15px 0px;
+}
+
+.noahrp .gneuh img{
+  width:220px;
+  height:150px;
+}
+
+.noahrp .contentrp{
+  padding:0px 25px 25px 25px;
+  font-size:12px;
+  line-height:14px;
+  margin:0 auto;
+  text-align:justify;
+  color:#353535;
+
+}

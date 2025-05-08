@@ -1,0 +1,45 @@
+.signlu{
+  background-image:url('http://i419.photobucket.com/albums/pp277/Arinanna/fire.gif');
+  width:420px;
+  height:118px;
+  margin:0 auto;
+  background-size:100%;
+  background-position:center center;
+}
+
+.lusign h1 {
+    color:#fff;
+  background-color:#000;
+  font-size:18px;
+  padding:10px;
+  letter-spacing:1px;
+  width:400px;
+  margin:0 auto;
+  text-transform:uppercase;
+  text-align:center;
+font-family: 'Kalam', cursive;
+}
+
+.two{
+  display:none;
+  font-size:20px;
+}
+
+.lucign{
+  width:400px;
+  margin:0 auto;
+}
+
+.lucign:hover .one{
+  display:none;
+}
+
+.lucign:hover .two{
+  display:block;
+}
+  
+.signlu img{
+  width:120px;
+  height:120px;
+  margin-top:-20px;
+}

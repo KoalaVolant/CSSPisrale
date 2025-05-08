@@ -1,0 +1,15 @@
+/* Fiche RP Chloe */ 
+
+.chloerp{ width:400px; margin:0 auto; text-align:justify; font-family:Verdana; font-size:12px; line-height:14px; position:relative; margin-top:15px; }
+.chloerp *{ box-sizing:border-box; } 
+
+.chloerp h1{ text-align:right; padding:5px; font-size:14px; line-height:18px;  font-weight:normal; color:#fff;
+background: rgb(207,201,124); background: linear-gradient(90deg, rgba(207,201,124,1) 0%, rgba(137,109,138,1) 50%, rgba(148,148,148,1) 100%); margin-bottom:25px; 
+margin:5px 0px; font-family: 'Fredericka the Great', cursive; padding-left:120px; } 
+.chloerp > div{ margin-top:9px; }
+.chloerp .chloeimg{ width:100px; height:100px; object-fit:cover; border: 3px solid white;
+    border-radius: 100px; position:absolute; top:-37px; 
+    margin: 5px;} 
+.chloerp div span{ padding-left: 120px; }
+.baschloe{ width:100%; height:20px; display:block; background: rgb(207,201,124); 
+  background: linear-gradient(90deg, rgba(207,201,124,1) 0%, rgba(137,109,138,1) 50%, rgba(148,148,148,1) 100%); }

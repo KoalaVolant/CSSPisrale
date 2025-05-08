@@ -1,0 +1,54 @@
+:root{ 
+--mathis1-titre:#e8c4d6; 
+--mathis1-fondtext:#f0f0f0;
+--mathis1-colortext:#222;}
+
+.mathis{
+  width:490px;
+  margin:0 auto;
+  background-image:url('https://s-media-cache-ak0.pinimg.com/originals/b0/2f/12/b02f12d14b88297841f356f453eccd24.jpg');
+padding:25px;
+background-size:100%;
+}
+
+.mathis .mathisflex{ display:flex; align-items:center;}
+
+.mathis .mathisflex img:first-child{
+  width:220px;
+  height:150px;
+    object-fit:cover;
+transform: rotate(-5deg);
+  padding:3px;
+    position:relative; left:-10px; 
+    margin-bottom:-20px;
+}
+
+.mathis h1{
+  font-size:28px;
+  line-height:278x;
+  width:360px;
+font-family: 'Reenie Beanie', cursive;
+  color:var(--mathis1-titre);
+  text-align:right;
+  padding:3px;
+  border-bottom:2px dotted;
+border-color:var(--mathis1-titre);
+}
+
+.mathis .mathiscontent{
+  background-color:var(--mathis1-fondtext);
+  color:var(--mathis1-colortext)
+  clear:both;
+  padding:25px;
+    font-family:verdana; 
+    font-size:13px; 
+    line-height:1.6em; 
+text-align:justify;
+    border-radius:3px;
+}
+
+.mathis b, .mathis strong{
+  color:#52869A;
+}
+
+.mathisrp.koala{ display:flex; justify-content:center; font-size:8px; letter-spacing:5px;}

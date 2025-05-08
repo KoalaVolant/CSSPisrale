@@ -1,0 +1,77 @@
+ .koala{ text-align:center; display:block; letter-spacing:9px; font-size:7px; } 
+
+.anslist{
+  width:480px;
+  padding:0px 20px 20px 20px;
+  margin:0 auto;
+  background-color:#fff;
+  -moz-box-shadow: 2px 2px 5px 0px #c0c0c0;
+-webkit-box-shadow: 2px 2px 5px 0px #c0c0c0;
+-o-box-shadow: 2px 2px 5px 0px #c0c0c0;
+box-shadow: 2px 2px 5px 0px #c0c0c0;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#c0c0c0, Direction=134, Strength=5);
+}
+
+.anslist, .anslist *{ box-sizing:border-box; }
+
+.anslist img{
+  width:300px; height:180px; object-fit:cover;
+  padding:5px;
+  border:#9F9F9F 2px dotted;
+margin:0 auto;
+  display:block; position:relative; top:-30px; 
+  -moz-transform: rotate(5deg);
+-webkit-transform: rotate(5deg);
+-o-transform: rotate(5deg);
+-ms-transform: rotate(5deg);
+transform: rotate(5deg);
+  z-index:1;
+  position:relative;
+}
+
+.anslist h1{
+font-family: 'Roboto Condensed', sans-serif;
+  color:#4B4B4B;
+  font-size:22px;
+  position:relative;
+  z-index:4;
+  line-height:24px;
+    left:50px;
+  width:275px;
+  letter-spacing:3px; 
+  margin-top:-10px;
+  background-color:#fff;
+  padding:7px;
+  margin-top:-100px;
+  text-transform:uppercase;
+  text-align:center;
+}
+
+.anslist h2{
+  font-family: 'Roboto Condensed', sans-serif;
+    letter-spacing:3px; 
+   font-size:20px;
+  position:relative;
+  z-index:4; margin-top:35px; 
+  color:#88A97E;
+  line-height:22px;
+-moz-transform: rotate(1deg);
+-webkit-transform: rotate(1deg);
+-o-transform: rotate(1deg);
+-ms-transform: rotate(1deg);
+transform: rotate(1deg);
+}
+
+.anslist br{ display:none; }
+
+.listans{
+  background-color:#F2F2F2;
+  padding:10px;
+  margin-top:px;
+  -webkit-border-radius: 30px;
+-moz-border-radius: 30px;
+border-radius: 30px;
+  border:#DADADA dotted 1px; 
+}
+
+.listans br{ display:block; }

@@ -1,0 +1,67 @@
+/* Fiche RP Chrichri */ 
+
+.chrichri{
+  width:500px;
+  margin:0 auto;
+  background-color:#fff;
+  -moz-box-shadow: 2px 2px 5px 0px #656565;
+-webkit-box-shadow: 2px 2px 5px 0px #656565;
+-o-box-shadow: 2px 2px 5px 0px #656565;
+box-shadow: 2px 2px 5px 0px #656565;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=5);
+  padding:15px;
+}
+
+.chrichri img{
+  width:235px; 
+  height:150px;
+  padding:3px;
+  border:#666 1px dotted; /* Cette ligne est vraiment ironique */
+}
+
+.chrichri img+img{
+  margin-left:10px;
+}
+
+.chrichri h1{
+  font-family: 'Cinzel', serif;
+  color:#868686; 
+  font-size:22px;
+  lien-height:26px;
+  font-weight:normal;
+  text-align:center;
+}
+
+.chrichri h2{
+  color:#6E6E6E;
+  margin-top:-35px;
+  font-size:11px;
+  text-align:center;
+  letter-spacing:0px;
+  font-family: 'Sanchez', serif;
+  border-bottom:#A2A2A2 1px dotted;
+  padding:3px;
+  margin-bottom:-15px;
+}
+
+.chrichri span{
+  padding:15px;
+  width:420px;
+  margin:0 auto;
+  display:block;
+  font-size:11px;
+  line-height:12px;
+  text-align:justify;
+  color:#6B6B6B;
+}
+
+.chrichri span::first-letter{
+  font-weight:bolder;
+  color:#2A2A2A;
+  font-size:20px;
+    font-family: 'Cinzel', serif;
+}
+
+.chrichri span b, .chrichri span strong{
+  color:#2A2A2A;
+}

@@ -1,0 +1,16 @@
+.orphirp{ width:400px; margin:0 auto;  border-bottom:20px solid; border-image: url('https://i.servimg.com/u/f30/19/45/51/53/fond10.jpg') 40 round;} 
+.orphirp *{ box-sizing:border-box; } 
+
+.orphimg{ display:flex; justify-content:center;}
+.orphimg img{ width:106px; height:90px; object-fit:cover; }
+.orphimg img:nth-of-type(1){ clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+.orphimg img:nth-of-type(2){ clip-path: polygon(50% 100%, 0 0, 100% 0); position:relative; left:-43px; }
+
+.orphirp h1{ margin:0; font-size:15px; line-height:15px; padding:3px; letter-spacing:3px; text-transform:uppercase; background-image:url('https://i.servimg.com/u/f30/19/45/51/53/fond10.jpg');  
+  background-position:bottom; color:#EE3C40; font-family: 'Neuton', serif; text-align:center; }
+.orphirp h2{ font-family: 'Kreon', serif; font-size:14px; letter-spacing:0px; color:#666; background-image:url('https://i.servimg.com/u/f30/19/45/51/53/95e2fb10.jpg'); margin:0px; padding:5px; font-weight:normal; } 
+.orphirp h2:before{ content:'«'; padding:0px 10px; position:relative; top:3px;  color:#EE3C40; font-size:25px; font-family: 'Kreon', serif; }
+.orphirp h2:after{ content:'»'; padding:0px 10px; position:relative; top:3px;  color:#EE3C40; font-size:25px; font-family: 'Kreon', serif; }
+
+.orphirp .orphicontent{ font-family: 'Enriqueta', serif; font-size:13px; line-height:1.6em; text-align:justify; background-color:#F5F5F5; color:#000; padding:15px; position:relative; top:-20px;   
+  border:2px solid; border-image: url('https://i.servimg.com/u/f30/19/45/51/53/3017d610.jpg') 1 round; border-top:none; border-bottom:none; margin-bottom:-20px;}

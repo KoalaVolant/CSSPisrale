@@ -1,0 +1,43 @@
+.signredio1{
+  width:470px;
+  margin:0 auto;
+}
+
+.signredio1 img{
+  width:210px;
+  height:140px;
+  margin-left:10px;
+  border:#fff 5px solid;
+    -webkit-box-shadow: 2px 2px 5px 0px rgba(50, 50, 50, 0.4);
+-moz-box-shadow:    2px 2px 5px 0px rgba(50, 50, 50, 0.4);
+box-shadow:         2px 2px 5px 0px rgba(50, 50, 50, 0.4);
+  position:relative;
+  z-index:8;
+}
+
+.signredio1 h1{
+  font-family: 'Saira Extra Condensed', sans-serif;
+  font-size:14px;
+  line-height:15px;
+  border:#BDBBBB 1px dotted;
+  padding:5px;
+  display:block;
+  background-color:#fff;
+  color:#504E4E;
+  text-align:center;
+  margin-top:-10px;
+  font-weight:normal;
+  position:relative;
+  z-index:13;
+}
+
+
+koala{
+  font-size:9px;
+  font-family:century gothic;
+  letter-spacing:4px;
+  text-align:center;
+  margin-top:-25px;
+  display:block;
+  color:#AAAAAA;
+}

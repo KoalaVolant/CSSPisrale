@@ -1,0 +1,15 @@
+/* Fiche rp Peter Cadwalder */ 
+
+.petercrp{ width:450px; margin:0 auto; }
+.petercrp *{ box-sizing:border-box; } 
+
+.petercrp .peterctete{ width:450px; min-height:150px; background-size:cover; position:relative; border:5px solid #fff; }
+.petercrp .peterctete h1{ font-family: 'Open Sans Condensed', sans-serif; font-size:18px; line-height:21px; text-align:left;
+  text-align:justify; background-color:#fff; position:absolute; right:25px; top:50%; transform:translateY(-50%); opacity:0.5; color:#35989F; margin:0; width:87%; padding:5px; transition:500ms;  } 
+.petercrp:hover .peterctete h1{ opacity:1; }
+
+.petercrp .peterccontent{ background-color:#fff; margin-top:10px; padding:15px; font-size:12px; font-family:Verdana; line-height:1.4em; text-align:justify; 
+  color:#222; border:1px solid #93D2DD; } 
+.petercrp .peterccontent h2{ font-family: 'David Libre', serif; text-align:center; font-size:12px; line-height:12px; font-weight:normal; color:#C8C8C7; width:100%; margin:0px; 
+  margin-bottom:10px;  }
+.petercrp .peterccontent .peterva{ float:right; border:1px solid #35989F; padding:8px; width:100px; margin:5px 5px 5px 10px; } 

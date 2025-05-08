@@ -1,0 +1,436 @@
+<style>/* Mettre CSS là */
+
+/* STAFF */
+  
+  #staff{
+  margin:0px !important;
+  padding:0px 0px 0px 20px !important;
+  }
+
+          #staff img, ul#concours li img.mini {
+             -webkit-mask: url(http://henrynicolas.be/fow/pa-madiix/mask.svg) top left / cover;
+             -moz-mask: url(http://henrynicolas.be/fow/pa-madiix/mask.svg) top left / cover;
+             -ms-mask: url(http://henrynicolas.be/fow/pa-madiix/mask.svg) top left / cover;
+             -o-mask: url(http://henrynicolas.be/fow/pa-madiix/mask.svg) top left / cover;
+             mask: url(http://henrynicolas.be/fow/pa-madiix/mask.svg) top left / cover;
+          }
+  
+  #staff img{
+  width:45px;
+  height:45px;
+  }
+
+  #staff ul{
+  padding:0px !important;
+  list-style-type:none;
+  }
+          #staff li {
+             display: inline-block;
+             width: 45px; max-width: 45px;
+          }
+
+          #staff li:hover {
+             cursor: help;
+          }
+
+          .staff .p{
+             padding: 10px 0 10px !important;
+  background-color:#fff;
+  display:block;
+  width:240px;
+  margin-left:20px;
+  margin-right:10px;
+  margin-bottom:5px;
+  font-size:12px;
+          }
+  
+  /* Titres divers du contenu du staff */
+  .staff h1{ /* Prénom nom */
+  font-family:courier new;
+  font-size:15px;
+  margin:-7px 0px 0px 0px;
+}
+  
+  .staff h2{ /* DC */ 
+  font-family:verdana;
+  font-size:11px;
+  color:#D6D6D6;
+  margin:-15px 0px 0px 0px;
+  }
+  
+  .staff h3{ /* L'animal */
+  color:#AE4D64;
+  font-size:12px;
+  font-family:Comic Sans MS;
+    margin:-3px 0px 0px 0px;
+  }
+  
+  .staff h4, .staff h5{
+  font-size:12px;
+  font-family:Verdana;
+    margin:-3px 0px 0px 0px;
+  }
+  
+  .staff h4{
+  color:#000;
+  }
+  
+  .staff h1, .staff h5{
+  color:#D0D39D;
+  }
+
+          .staff{
+             text-align: center;
+          }
+
+          .staff .pseudo
+          {
+             display: inline-block;
+             color: #d74e77;
+          }
+  
+  .staffbloc{
+  width:280px;
+  padding:0px;
+  }
+
+  /* Bloc général */
+
+  .wrappa{
+  background-color:#E4E7B8;
+  padding:15px;
+  width:781px;
+  height:400px;
+  }
+  
+  .left_pa, .middle_pa, .right_pa{
+  float:left;
+  }
+  
+  .left_pa{
+  margin-right:15px;
+  }
+  
+.blocpa{
+background-color:#EFF1D4;
+border-top:3px solid #D0D39D;
+    border-bottom:3px solid #D0D39D;
+  border-left:1px solid #D0D39D;
+  border-right:1px solid #D0D39D;
+  padding:2px;
+}
+
+  /* Contexte */
+
+.contxt{
+width:266px;
+height:195px;
+  padding:0px 15px 0px 15px;
+}
+
+.contxt h1{
+font-size:20px;
+text-align:center;
+color:#fff;
+  margin-top:-0px;
+font-family:Comic Sans MS;
+text-shadow: -3px 1px 0px rgba(227, 16, 80, 1);
+}
+
+.contnt_context{
+padding:5px;
+font-size:10px;
+  margin-top:-10px;
+font-family:Courier New;
+color:#CDCDCD;
+background-color:#fff;
+  height:145px;
+  text-align:justify;
+  overflow:auto;
+}
+
+  /* Prédéfinis */
+
+.predef{
+  margin-top:20px;
+width:275px;
+  padding:5px 10px 5px 10px;
+}
+
+.predef img{
+width:45px;
+}
+
+  /* Top sites et credits */
+
+.topsite, .creditpa{
+width:275px;
+}
+
+.topsite{
+color:#D0D39D;
+font-size:20px; 
+  margin-top:20px;
+background-color:#A11D41;
+  padding:5px;
+  text-align:center;
+}
+
+.topsite h2{
+color:#fff;
+  margin:0px 0px -5px 0px;
+  padding:0px;
+  font-size:15px;
+font-family:Comic Sans MS; 
+}
+
+
+.creditpa{
+font-size:11px;
+background-color:#fff;
+color:#999999;
+line-height:13px;
+margin-top:10px;
+
+  /* Membre du mois */ 
+
+.membre_mois{
+width:100px !important;
+}
+
+  /* News */ 
+
+  .newspa{
+  width:100px !important;
+  }
+  
+  .right_pa{
+  width:100px !important;
+  }
+  
+  #mdm1, #mdm2{
+  width:100px !important;
+  }
+  
+  .mdm{
+  width:100px !important;
+  }
+  
+  .mdmdm{
+  width:100px !important;
+  }
+  
+</style>
+<div class="wrappa"><div class="left_pa">
+  <div class="blocpa contxt"><h1>Contexte</h1>
+  <div class="contnt_context"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis rutrum risus quam, vitae euismod justo viverra ut. Nunc pharetra viverra dolor, id gravida lacus ullamcorper ut. Nunc vulputate non libero vitae bibendum. Nullam sollicitudin risus non metus ornare cursus. Quisque consequat eros at turpis condimentum molestie ac id felis. In in fermentum dui. Proin nec nisl euismod, semper massa vel, fringilla erat. Phasellus bibendum consectetur mauris, id aliquet diam porta non. Integer vel feugiat augue. Curabitur accumsan leo ut ex luctus elementum.
+
+Integer sit amet purus dignissim, auctor urna eu, congue ipsum. Sed sit amet porta arcu, sollicitudin porttitor libero. Duis fermentum porta eleifend. Ut nec lacus ac justo auctor suscipit vitae sit amet purus. Maecenas iaculis mi tempus nunc convallis tempor. Cras fermentum mattis placerat. Ut id dolor ultrices nisl euismod facilisis non non ipsum.
+
+    Sed sagittis vehicula ex non rhoncus. Curabitur et dui ut diam venenatis convallis vel at orci. Donec sollicitudin sem justo. Vivamus fringilla lectus nibh, nec feugiat nunc commodo in. Nam blandit molestie justo, id pretium diam eleifend sit amet. Praesent blandit sem bibendum, egestas dolor vel, lacinia lectus. Aenean faucibus augue neque, id condimentum eros tincidunt non. Cras vel congue urna. Etiam pellentesque orci libero, nec fermentum ante bibendum in. </div></div>
+  
+  <div class="blocpa predef">
+    <center><a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+    <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+    <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+    <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+    <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+    <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+    <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+    <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+    <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a>
+      <a href=""><img src="http://img15.hostingpics.net/pics/551484Alecen100100.png"></a></center></div></div>
+  <div class="middle_pa">
+      <div class="blocpa staffbloc">
+    <ul id="staff">
+                         <li onMouseOver="javascript:staff1()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                         <li onMouseOver="javascript:staff2()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                         <li onMouseOver="javascript:staff3()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                         <li onMouseOver="javascript:staff4()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                      <li onMouseOver="javascript:staff5()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li></ul>
+                   <div class="staff">
+                      <div id="staff1">
+                        <div class="p"><h1>Koala Volant</h1>
+                          <br><h2>DC : Lui et lui là-bas</h2>
+                            <h3>Le koala volant</h3>
+                            <h4>Codeur</h4>
+                            <h5>Présentation - Profil</h5></div>
+                      </div>
+
+                      <div id="staff2" style="display:none;">
+                         <div class="p"><h1>Koala Volant</h1>
+                          <br><h2>DC : Lui et lui là-bas</h2>
+                            <h3>Le koala volant</h3>
+                            <h4>Codeur</h4>
+                            <h5>Présentation - Profil</h5></div>
+                      </div>
+
+                      <div id="staff3" style="display:none;">
+                         <div class="p"><h1>Koala Volant</h1>
+                          <br><h2>DC : Lui et lui là-bas</h2>
+                            <h3>Le koala volant</h3>
+                            <h4>Codeur</h4>
+                            <h5>Présentation - Profil</h5></div>
+                      </div>
+
+                      <div id="staff4" style="display:none;">
+                        <div class="p"><h1>Koala Volant</h1>
+                          <br><h2>DC : Lui et lui là-bas</h2>
+                            <h3>Le koala volant</h3>
+                            <h4>Codeur</h4>
+                            <h5>Présentation - Profil</h5></div>
+                      </div>
+
+                      <div id="staff5" style="display:none;">
+                         <div class="p"><h1>Koala Volant</h1>
+                          <br><h2>DC : Lui et lui là-bas</h2>
+                            <h3>Le koala volant</h3>
+                            <h4>Codeur</h4>
+                            <h5>Présentation - Profil</h5></div>
+                      </div>
+                     
+                     <div id="staff6" style="display:none;">
+                         <div class="p"><h1>Koala Volant</h1>
+                          <br><h2>DC : Lui et lui là-bas</h2>
+                            <h3>Le koala volant</h3>
+                            <h4>Codeur</h4>
+                            <h5>Présentation - Profil</h5></div>
+                      </div>
+                     
+                     <div id="staff7" style="display:none;">
+                         <div class="p"><h1>Koala Volant</h1>
+                          <br><h2>DC : Lui et lui là-bas</h2>
+                            <h3>Le koala volant</h3>
+                            <h4>Codeur</h4>
+                            <h5>Présentation - Profil</h5></div>
+                      </div>
+                     
+                     <div id="staff8" style="display:none;">
+                         <div class="p"><h1>Koala Volant</h1>
+                          <br><h2>DC : Lui et lui là-bas</h2>
+                            <h3>Le koala volant</h3>
+                            <h4>Codeur</h4>
+                            <h5>Présentation - Profil</h5></div>
+                      </div>
+                   </div>
+                           <ul id="staff">
+                         <center><li onMouseOver="javascript:staff6()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                         <li onMouseOver="javascript:staff7()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                         <li onMouseOver="javascript:staff8()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                           </center>
+                      </ul>
+    </div>
+      <div class="topsite">♫ ♫ ♫ ♫ ♫ ♫
+        <h2>Merci ! Gros keur sur vous !</h2></div>
+      <div class="blocpa creditpa">Codes produits par Koala Volant + Never Utopia (Henrykiki) 
+        Blablablablabla lalalalalalalalala</div></div>
+  <div class="right_pa">
+    <div class="blocpa newspa">
+    <h3>xx/xx/xx</h3>
+    Blablablabla
+    <h3>xx/xx/xx</h3>
+    Blablablabla
+    <h3>xx/xx/xx</h3>
+    Blablablabla
+    </div>
+   <div class="membre_mois blocpa" > <ul id="staff">
+                         <li onMouseOver="javascript:mdm1()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                         <li onMouseOver="javascript:mdm2()"><img src="http://i39.servimg.com/u/f39/19/07/10/81/staff11.png" alt=""></li>
+                      </ul>
+                   <div class="mdmdm" width="100px">
+                      <div id="mdm1">
+                         <div class="mdm">Lorem ipsugwwgfm dolor sit amet, consectetur adipisicing elit. Incidunt, sapiente, quos, qui corporis soluta optio aspernatur harum minus asperiores ipsum repudiandae placeat ipsam.
+    <div class="pseudo">PSEUDO</div> • <a href="">PROFIL</a> • <a href="">MP</a></div>
+                      </div>
+
+                      <div id="mdm2" width="100px">
+                         <div class="mdm">Lorem ipsum dolor sit amekokokonsectetur adipisicing elit. Hic, aliquid, laudantium, neque eius nemo amet dolores velit esse voluptas dicta quisquam quos consequuntur provident
+                         <div class="pseudo">PSEUDO</div> • <a href="">PROFIL</a> • <a href="">MP</a></div>
+                      </div>
+                   </div></div>
+      </div></div>
+      
+       <script>
+          $(function(){
+           $("#ticker01").liScroll();
+       });
+
+       function staff1() {
+             document.getElementById('staff1').style.display='block';
+             document.getElementById('staff2').style.display='none';
+             document.getElementById('staff3').style.display='none';
+             document.getElementById('staff4').style.display='none';
+             document.getElementById('staff5').style.display='none';
+          document.getElementById('staff6').style.display='none';
+             document.getElementById('staff7').style.display='none';
+         document.getElementById('staff8').style.display='none';}
+          function staff2() {
+             document.getElementById('staff1').style.display='none';
+             document.getElementById('staff2').style.display='block';
+             document.getElementById('staff3').style.display='none';
+             document.getElementById('staff4').style.display='none';
+             document.getElementById('staff5').style.display='none';
+         document.getElementById('staff6').style.display='none';
+             document.getElementById('staff7').style.display='none';
+         document.getElementById('staff8').style.display='none';}
+          function staff3() {
+             document.getElementById('staff1').style.display='none';
+             document.getElementById('staff2').style.display='none';
+             document.getElementById('staff3').style.display='block';
+             document.getElementById('staff4').style.display='none';
+             document.getElementById('staff5').style.display='none';
+         document.getElementById('staff6').style.display='none';
+             document.getElementById('staff7').style.display='none';
+         document.getElementById('staff8').style.display='none';}
+          function staff4() {
+             document.getElementById('staff1').style.display='none';
+             document.getElementById('staff2').style.display='none';
+             document.getElementById('staff3').style.display='none';
+             document.getElementById('staff4').style.display='block';
+             document.getElementById('staff5').style.display='none';
+         document.getElementById('staff6').style.display='none';
+             document.getElementById('staff7').style.display='none';
+         document.getElementById('staff8').style.display='none';}
+          function staff5() {
+             document.getElementById('staff1').style.display='none';
+             document.getElementById('staff2').style.display='none';
+             document.getElementById('staff3').style.display='none';
+             document.getElementById('staff4').style.display='none';
+             document.getElementById('staff5').style.display='block';
+         document.getElementById('staff6').style.display='none';
+             document.getElementById('staff7').style.display='none';
+         document.getElementById('staff8').style.display='none';}
+         function staff6() {
+             document.getElementById('staff1').style.display='none';
+             document.getElementById('staff2').style.display='none';
+             document.getElementById('staff3').style.display='none';
+             document.getElementById('staff4').style.display='none';
+             document.getElementById('staff5').style.display='none';
+         document.getElementById('staff6').style.display='block';
+             document.getElementById('staff7').style.display='none';
+         document.getElementById('staff8').style.display='none';}
+         function staff7() {
+             document.getElementById('staff1').style.display='none';
+             document.getElementById('staff2').style.display='none';
+             document.getElementById('staff3').style.display='none';
+             document.getElementById('staff4').style.display='none';
+             document.getElementById('staff5').style.display='none';
+         document.getElementById('staff6').style.display='none';
+             document.getElementById('staff7').style.display='block';
+         document.getElementById('staff8').style.display='none';}
+         function staff8() {
+             document.getElementById('staff1').style.display='none';
+             document.getElementById('staff2').style.display='none';
+             document.getElementById('staff3').style.display='none';
+             document.getElementById('staff4').style.display='none';
+             document.getElementById('staff5').style.display='none';
+         document.getElementById('staff6').style.display='none';
+             document.getElementById('staff7').style.display='none';
+         document.getElementById('staff8').style.display='block';}
+           function mdm1() {
+             document.getElementById('mdm1').style.display='block';
+             document.getElementById('mdm2').style.display='none';}
+function mdm2() {
+             document.getElementById('mdm1').style.display='none';
+             document.getElementById('mdm2').style.display='block';}
+       </script>

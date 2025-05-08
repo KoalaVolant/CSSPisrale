@@ -1,0 +1,182 @@
+/* Links d'ABS */
+
+.alaslink{
+  width:500px;
+  margin:0 auto;
+}
+
+.link{
+  width:240px;
+  height:170px;
+  overflow:hidden;
+  background-color:#6F3737;
+  float:left;
+  margin-right:10px;
+  margin-bottom:10px;
+}
+
+.link .test{
+  position:relative;
+  z-index:999;
+  width:240px;
+  height:170px;
+}
+
+.link h1{
+  z-index:999;
+  position:relative;
+  color:#fff;
+  font-family: 'Gloria Hallelujah', cursive;
+  font-size:20px;
+  padding-right:10px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 1);
+  text-align:right;
+  margin-bottom:10px;
+}
+
+.link div{
+  z-index:45;
+  background-color:#333333;
+}
+
+
+.link span{
+  display:block;
+  margin-top:-10px;
+  height:100px;
+  padding:15px;
+  overflow:auto;
+  font-size:11px;
+  line-height:13px;
+  color:#c4c4c4;
+  text-align:justify;
+}
+
+.link span h2{
+  margin:0;
+  margin-bottom:-10px;
+  font-size:13px;
+  line-height:15px;
+  text-transform:uppercase;
+  font-family: 'Gloria Hallelujah', cursive;
+  color:#dedede;
+}
+
+/* Animations */
+
+.link:hover .test{
+  margin-top:-500px;
+}
+
+.link:hover .test, .link .test{
+-webkit-transition: all 1300ms ease;
+-moz-transition: all 1300ms ease;
+-ms-transition: all 1300ms ease;
+-o-transition: all 1300ms ease;
+transition: all 1300ms ease;
+}
+
+
+/* Entete Lien ABS */
+
+.abslink, .wrp{
+  width:500px;
+  margin:0 auto;
+}
+
+.abslink .img{
+  width:500px;
+  margin:0 auto;
+  height:200px;
+  background-size:cover;
+  background-image:url('http://24.media.tumblr.com/d3d5fc66ef20b3bd66e7895b9a9e20ab/tumblr_mg0lsmsaUl1s1fr7po1_500.gif');
+  -webkit-border-top-left-radius: 100px;
+-webkit-border-top-right-radius: 100px;
+-moz-border-radius-topleft: 100px;
+-moz-border-radius-topright: 100px;
+border-top-left-radius: 100px;
+border-top-right-radius: 100px;
+}
+
+.abslink:hover .img{
+    background-image:url('https://dreamgifs5.files.wordpress.com/2016/06/untitled-430.gif?w=760'); 
+background-position:bottom;
+  }
+  
+.abslink .img, .abslink:hover img{
+-webkit-transition: all 500ms ease;
+-moz-transition: all 500ms ease;
+-ms-transition: all 500ms ease;
+-o-transition: all 500ms ease;
+transition: all 500ms ease;
+  }
+  
+.abslink h1{
+  background-color:#C4C4C4;
+  color:#C11111;
+  font-family: 'Gloria Hallelujah', cursive;
+  padding:5px;
+  text-align:center;
+  font-size:22px;
+  line-height:24px;
+  border-bottom:1px #C11111 dotted;
+  -webkit-border-bottom-right-radius: 100px;
+-webkit-border-bottom-left-radius: 100px;
+-moz-border-radius-bottomright: 100px;
+-moz-border-radius-bottomleft: 100px;
+border-bottom-right-radius: 100px;
+border-bottom-left-radius: 100px;
+  margin-top:-15px;
+}
+
+.abslink h2{
+    font-family: 'Gloria Hallelujah', cursive;
+  color:#8F2323;
+  font-size:18px;
+  margin-bottom:-35px;
+}
+
+.gauche, .droite{
+  float:left;
+  width:210px;
+    background-color:#D8D8D8;
+  padding:15px;
+    border-solid:1px #C11111 dotted;
+  text-align:justify;
+  height:250px;
+  overflow:auto;
+}
+
+.gauche{
+  -moz-transform: rotate(-2deg);
+-webkit-transform: rotate(-2deg);
+-o-transform: rotate(-2deg);
+-ms-transform: rotate(-2deg);
+transform: rotate(-2deg);
+-webkit-border-radius: 30px;
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius: 30px;
+-moz-border-radius-bottomright: 0;
+border-radius: 30px;
+border-bottom-right-radius: 0;
+  border-left:#722C2C double 4px;
+}
+
+
+.droite{
+  margin-left:10px;
+  -moz-transform: rotate(2deg);
+-webkit-transform: rotate(2deg);
+-o-transform: rotate(2deg);
+-ms-transform: rotate(2deg);
+transform: rotate(2deg);
+-webkit-border-radius: 30px;
+-webkit-border-bottom-left-radius: 0;
+-moz-border-radius: 30px;
+-moz-border-radius-bottomleft: 0;
+border-radius: 30px;
+border-bottom-left-radius: 0;
+    border-right:#722C2C double 4px;
+}

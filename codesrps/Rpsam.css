@@ -1,0 +1,60 @@
+.wrap_sam{
+background-image:url('http://www.motox1wallpaper.com/wp-content/1HD/Wood/FTP2/1920x1080/Wood%20pattern%20wallpaper%2003%201920x1080.jpg');
+width:500px;
+padding:25px 25px 25px 25px;
+}
+
+.gifsam{
+width:400px;
+}
+
+.gifsam img{
+width:400px;
+-webkit-border-radius: 80px;
+-moz-border-radius: 80px;
+border-radius: 80px;
+padding:5px;
+border:#898989 solid 1px;
+-moz-box-shadow: 3px 3px 5px 0px #656565;
+-webkit-box-shadow: 3px 3px 5px 0px #656565;
+-o-box-shadow: 3px 3px 5px 0px #656565;
+box-shadow: 3px 3px 5px 0px #656565;
+position:relative;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=135, Strength=5);
+background-image:url('http://www.designbolts.com/wp-content/uploads/2013/02/Free-Seamless-Wood-Textures-Patterns-For-3D-Mapping-2.jpg');
+z-index:1;
+}
+
+.titresam{
+background-image:url('http://www.designbolts.com/wp-content/uploads/2013/02/Free-Seamless-Wood-Textures-Patterns-For-3D-Mapping-2.jpg');
+margin-top:-25px;
+position:relative;
+z-index:2;
+-webkit-border-radius: 100px;
+-moz-border-radius: 100px;
+border-radius: 100px;
+padding:10px;
+font-size:15px;
+margin-left:10px;
+text-align:center;
+-moz-box-shadow:  0px 0px 10px 0px #656565;
+-webkit-box-shadow:  0px 0px 10px 0px #656565;
+-o-box-shadow: 0px 0px 10px 0px #656565;
+box-shadow: 0px 0px 10px 0px #656565;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=NaN, Strength=10);
+font-family: 'Bitter', serif;
+border-bottom:#fff 1px dotted;
+font-weight:bolder;
+  color:#1F120C;
+}
+
+.wrap_sam p{
+background-image:url('http://www.designbolts.com/wp-content/uploads/2013/02/Free-Seamless-Wood-Textures-Patterns-For-3D-Mapping-2.jpg');
+padding:25px;
+  width:400px;
+  margin:0 auto;
+  color:#000;
+font-size:13px;
+text-align:justify;
+line-height:16px;
+}

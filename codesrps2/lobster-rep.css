@@ -1,0 +1,10 @@
+.rpls42fi{ width:400px; margin:0 auto; }
+.rpls42fi, .rpls42fi *{ box-sizing:border-box; }
+
+.rpls42{ width:100%; background-color:#FFF; height:130px; padding:15px; display:flex; justify-content:center;}
+.rpls42 img{ width:170px; height:100px; object-fit:cover; }
+.rpls42 img+img{ margin-left:10px; }
+.rpls42fi .rpls42title{ text-shadow:#757575 1px 0px 4px; color:#fff;  padding:5px; margin-top:-5px; font-size:24px; font-family: 'Lobster', cursive; display:flex; text-align:center; }
+.rpls42fi .rpls42content{ width:100%; text-align:justify; background-color:#FFF; box-shadow:#898989 1px 0px 3px; padding:30px; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }

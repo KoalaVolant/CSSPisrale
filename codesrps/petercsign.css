@@ -1,0 +1,15 @@
+/* Sign Peter */ 
+
+.petercsign{ width:220px; margin:0 auto; position:relative; }
+.petercsign *{ box-sizing:border-box; }
+.petercsign img{ width:200px; } 
+.petercsign h1{ width:200px; margin:0px; position:relative; left:30px; font-family: 'Lora', serif;  font-size:11px; line-height:11px; text-align:justify; 
+  padding-bottom:5px; border-bottom:3px solid #7D5757; margin-top:5px; }
+.petercsign h1 em{ color:#EC5D54; }
+.petercsign div{ width:20px; height:20px; position:absolute; background-color:#87463E; left:0px; bottom:30px; 
+-webkit-transition: all 700ms ease-out;
+-moz-transition: all 700ms ease-out;
+-ms-transition: all 700ms ease-out;
+-o-transition: all 700ms ease-out;
+transition: all 700ms ease-out;} 
+.petercsign:hover div{ bottom:0px; background-color:#EC5D54; }

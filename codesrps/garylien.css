@@ -1,0 +1,122 @@
+.wragary{
+  width:520px;
+  margin:0 auto;
+}
+
+.wragary strong{
+  display:block;
+  width:150px;
+  height:200px;
+  background-size:cover;
+}
+
+.i{
+background-size:200px 150px;
+}
+
+.wragary strong, .wragary p{
+  float:left;
+}
+
+.wragary p{
+  width:200px;
+  height:200px;
+  background-color:#0B5C66;
+  padding:10px;
+  margin-top:-10px;
+}
+
+.wragary p b, .lienga b{
+  font-size:29px;
+  line-height:31px;
+  color:#fff;
+  font-family: 'Roboto Slab', serif;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.wragary p b{
+  text-align:center;
+}
+
+
+.lienga b{
+  font-size:20px !important;
+}
+
+.wragary p i{
+  font-size:10px;
+  line-height:11px;
+  margin-top:5px;
+  text-align:justify;
+  text-decoration:none;
+  color:#dedede;
+}
+
+.lienga{
+  width:500px;
+  clear:both;
+  background-color:#0D717B;
+  margin:0 auto;
+  padding:10px;
+
+}
+
+.lienga p{
+  color:#8CE8E9;
+}
+.garysutton{
+  padding:15px;
+  background-color:#0D717B; 
+}
+
+.titregary{
+  font-size:20px;
+  background-color:#0B5C66;
+    font-family: 'Roboto Slab', serif;
+  color:#8CE8F2;
+  text-align:center;
+  font-weight:bolder;
+  padding:10px;
+}
+  
+.wragary{
+  margin:0 auto;
+}
+
+.imgperso{ 
+  display:block; 
+  width:200px; 
+  height:150px; 
+  position:relative; 
+  z-index:999;
+  background-size:200px 150px;
+}
+.broumbroum{ 
+  display:block; 
+  width:180px; 
+ height:130px; 
+  padding:10px; 
+  margin-top:-168px;
+  overflow:auto; 
+  background-color:#dedede; 
+  position:relative; 
+  font-size:11px;
+  color:#0B5C66;
+  text-align:justify;
+  line-height:13px;
+  z-index:2; 
+  margin-left:50px; 
+  transition:400ms;}
+
+.wragary:hover .broumbroum{
+  margin-left:200px; 
+  transition:400ms;
+  width:250px;
+}
+
+.wragary h1{
+  font-size:22px;
+  color:#fff;
+  font-family: 'Roboto Slab', serif;
+}

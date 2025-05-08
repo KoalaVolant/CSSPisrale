@@ -1,0 +1,61 @@
+:root{ --tomoko-title:"Fredoka", sans-serif;
+--tomoko-txt:"Nunito", sans-serif;
+
+--tomoko-white:#fff;
+--tomoko-black:#5e5e5e;
+--tomoko-grey:#8f8f8f;
+--tomoko-color1:#222;
+--tomoko-color2:#CA808B;
+--tomoko-deg:linear-gradient(90deg,rgba(162, 221, 237, 1) 0%, rgba(251, 195, 198, 1) 100%);
+
+}
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+.tomokorp, .tomokorp *{ box-sizing:border-box; }
+.tomokorp{ width:500px; margin:0 auto; background:var(--tomoko-white);
+border-bottom:10px solid var(--tomoko-grey);
+font-family:var(--tomoko-txt);}
+.tomokorp br{ display:none; }
+.tomokorp img{ object-fit:cover; }
+
+.tomokorp .tomokocont{ display:flex; position:relative;
+   align-items:center; background:var(--tomoko-deg);
+height:100px; padding-left:140px;}
+.tomokorp .tomokocont img{ width:100px; height:160px;
+border-top-left-radius: 50px; outline:1px solid var(--tomoko-white);
+   outline-offset:5px; position:absolute; left:20px;
+   top:20px;border-top-right-radius: 50px;}
+.tomokorp .tomokocont .tomokotitre{ font-size:24px; line-height:25px;
+   color:var(--tomoko-white);
+font-family:var(--tomoko-title);}
+
+.tomokorp .tomokoquote{ margin-left:130px; padding:10px; font-size:11px;
+line-height:12px; color:var(--tomoko-grey);  }
+.tomokorp .tomokoquote br{ display:inline-block; content:none; }
+.tomokorp .tomokoquote em{ color:var(--tomoko-color2); }
+
+.tomokorp .tomokocontent{ padding:15px 0px; margin:25px 20px;
+   border-top:1px solid var(--tomoko-grey); padding-bottom:0;
+line-height:1.5em; text-align:justify; font-size:14px; }
+.tomokorp .tomokocontent br{ display:inline-block; content:none; }
+
+.tomokorp .tomokodiag{ display:flex; margin:10px 0 0 0;
+   justify-content:space-between; align-items:center; }
+.tomokorp .tomokodiag div{ width:80px; height:80px; border-radius:50%; border-width: 1px; padding:5px;
+  border-image: var(--tomoko-deg) 30 stretch; /* ou round selon le besoin */
+position:relative;}
+.tomokorp .tomokodiag div::before {
+  content: " ";
+  position: absolute;
+  top:2px;
+  left: 2px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--tomoko-deg); 
+  z-index: 1;
+  pointer-events: none;
+}
+.tomokorp .tomokodiag div img{ z-index:2; 
+	position:relative; width:100%; min-width:100%; height:100%; border-radius:50%;
+background:var(--tomoko-white); padding:3px;}
+.tomokorp .tomokodiag span{ width:78%; }

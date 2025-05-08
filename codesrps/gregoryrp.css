@@ -1,0 +1,74 @@
+/* Greg RP */ 
+
+.gregoryrp{
+  width:500px;
+  background-image:url('http://www.wallpaperup.com/uploads/wallpapers/2014/04/03/321089/43489360b517546ef02d232a10a528e1.jpg');
+  padding:25px;
+  background-size:200%;
+  background-position:top;
+  border:1px solid #000;
+}
+
+.gregoryrp:hover{
+  background-position:bottom;
+}
+
+.gregoryrp, .gregoryrp:hover{
+-webkit-transition: all 2s;
+-moz-transition: all 2s;
+-ms-transition: all 2s;
+-o-transition: all 2s;
+transition: all 2s;
+}
+
+.gregoryrp img{
+  width:500px;
+  margin:0 auto; 
+  height:200px; 
+  border-bottom:#fff double 5px; 
+} 
+
+.gregoryrp h1{
+  font-family: 'Teko', sans-serif;
+  background-color:#000;
+  color:#fff;
+  text-align:center;
+  padding;5px;
+  margin-top:5px;
+  font-size:25px;
+  line-height:26px;
+  text-transform:uppercase;
+}
+
+.gregoryrp h2{
+  background-color:#C0C0C0;
+  padding:5px;
+  text-align:center;
+  text-transform:uppercase;
+  color:#000;
+  margin-top:-30px;
+  font-size:10px;
+  line-height:11px;
+  font-weight:normal;
+}
+
+.gregoryrp .contenu{
+  padding:25px;
+  font-size:12px;
+  background-color:#fff;
+
+  background-size:150%;
+  text-shadow: 0px 0px 10px #fff;
+    color:#000;
+    border-left:#000 double 3px;
+  border-right:#000 double 3px; 
+  line-height:13px;
+  text-align:justify;
+}
+
+koala{
+  letter-spacing:5px;
+  font-size:9px;
+  color:#dedede;
+  text-align:center;
+}

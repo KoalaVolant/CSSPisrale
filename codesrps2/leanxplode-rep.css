@@ -1,0 +1,13 @@
+/* Leander Sign */ 
+
+.leandersign{ display:flex; justify-content:space-between; flex-wrap:wrap; width:300px; margin:0 auto; }
+.leandersign *{ box-sizing:border-box; }
+
+.leandersign img{ width:100px; height:100px; object-fit:cover; position:relative;} 
+.leandersign .onelean{clip-path: polygon(0 50%, 100% 0, 100% 100%);     left: 41px;    height: 86px; top:5px;}
+.leandersign .twolean{ z-index:13; 
+  clip-path: polygon(46% 0%, 24% 19%, 0% 13%, 11% 39%, 0% 50%, 14% 63%, 0 96%, 22% 87%, 30% 99%, 63% 81%, 99% 90%, 83% 58%, 100% 49%, 82% 25%, 98% 10%, 66% 12%); }
+.leandersign .threelean{ clip-path: polygon(100% 50%, 0 0, 0 100%); z-index:7;      left: -47px;      height: 80px; top:5px; }
+
+.leandersign span{ padding:5px; width:100%; margin:0 auto; display:block; font-size:10px; line-height:11px; font-family:Verdana; text-align:center; }
+.leandersign b{ font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#D88914; }

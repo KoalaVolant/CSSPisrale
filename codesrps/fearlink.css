@@ -1,0 +1,128 @@
+.wraplienfear{
+  width:445px;
+  margin:0 auto;
+}
+
+.avatlien, .lienrecherch, .avatlien img{
+  width:215px;
+}
+
+.avatlien, .lienrecherch{
+  float:left;
+}
+
+.avatlien img{
+  position:relative;
+  z-index:7;
+  opacity: 1;
+}
+
+.avatlien:hover img{
+opacity: 0.00;
+}
+
+.avatlien span{
+  width:185px;
+  height:315px;
+  overflow:auto;
+  background-color:#18314E;
+  padding:15px;
+  display:block;
+  color:#C0C0C0;
+  margin-top:-345px;
+  font-size:11px;
+  line-height:12px;
+}
+
+.avatlien h1{
+  color:#fff;
+  font-family: 'Anton', sans-serif;
+  font-size:22px;
+  position:relative;
+  z-index:13;
+  text-align:center;
+  margin-bottom:-30px;
+  text-transform:uppercase;
+  font-weight:normal;
+  border-bottom:1px dotted #fff;
+  padding-bottom:3px;
+  opacity: 1;
+}
+
+.avatlien:hover h1{
+opacity: 0.00;
+}
+
+.avatlien span img{
+  width:190px;
+  margin-bottom:-5px;
+opacity: 0.00;
+
+}
+
+.avatlien:hover span img{
+  opacity: 1;
+}
+
+.avatlien img, .avatlien:hover img, .avatlien span, .avatlien:hover span, .avatlien span img, .avatlien:hover span img, .avatlien h1, .avatlien:hover h1{
+  -webkit-transition: all 800ms ease;
+-moz-transition: all 800ms ease;
+-ms-transition: all 800ms ease;
+-o-transition: all 800ms ease;
+transition: all 800ms ease;
+}
+
+.lienrecherch{
+  margin-left:10px;
+  height:345px;
+  background-color:#0F1F31;
+  color:#C0C0C0;
+  margin-top:5px;
+}
+
+.lienrecherch h2{
+    color:#fff;
+  font-family: 'Anton', sans-serif;
+  font-size:22px;
+  margin-top:10px;
+  margin-bottom:-15px;
+  text-align:center;
+  text-transform:uppercase;
+  font-weight:normal;
+  border-bottom:1px dotted #fff;
+  padding-bottom:3px;
+}
+
+.lienrecherch span{
+  padding:15px;
+  height:270px;
+  overflow:auto;
+  display:block;
+  margin-top:-10px;
+}
+
+.wrapliens{
+  width:680px;
+  margin:0 auto;
+}
+.wrapliens .avatlien h1{
+  background-color:#000;
+}
+
+.wrapliens .avatlien span b{
+      color:#fff;
+  font-family: 'Anton', sans-serif;
+  font-size:16px;
+  line-height:17px;
+  margin-top:20px;
+  text-align:center;
+  text-transform:uppercase;
+  font-weight:normal;
+  letter-spacing:1px;
+  padding-bottom:3px;
+}
+
+.wrapliens .avatlien span img{
+  margin:0;
+  margin-bottom:5px;
+}

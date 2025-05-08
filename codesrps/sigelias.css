@@ -1,0 +1,47 @@
+#el{
+  width:440px;
+  margin:0 auto;
+  height:140px;
+  background-image:url('http://cdn.mysitemyway.com/etc-mysitemyway/webtreats/assets/posts/973/full/tileable-dark-wood-textures-5.jpg');
+    border-left:solid 5px #C3C3C3;
+    border-right:solid 5px #C3C3C3;
+}
+
+#el img{
+  height:140px; 
+  float:left;
+}
+
+#ias{
+  float:left;
+  margin-left:15px;
+  margin-top:5px;
+}
+
+#ias p{
+background-color:#DFDFDF;
+  width:180px;
+  font-size:10px;
+  line-height:12px;
+  color:#414141;
+  text-align:justify;
+  margin-top:-15px;
+  padding:10px 20px 10px 20px;
+  -webkit-border-top-left-radius: 50px;
+-webkit-border-bottom-right-radius: 50px;
+-moz-border-radius-topleft: 50px;
+-moz-border-radius-bottomright: 50px;
+border-top-left-radius: 50px;
+border-bottom-right-radius: 50px;
+  
+}
+
+#ias h1{
+  padding:5px;
+  color:#A7A7A7;
+  font-size:25px;
+  margin-left:30px;
+  text-shadow:#000 0px 0px 5px;
+  font-family: 'Slabo 27px', serif;
+  
+}

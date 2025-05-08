@@ -1,0 +1,46 @@
+:root{
+    --ls46-1:#535353;
+    --ls46-2:#6481a8;
+    --ls46-3:#0e085c;
+}
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.ls46, .ls46 *{ box-sizing:border-box; }
+.ls46 img{ object-fit:cover; }
+.ls46 br{ display:none; }
+.ls46{ width:500px; margin:0 auto;  font-family: "Montserrat", sans-serif;}
+
+.ls46-entete{ position:relative; width:100%; height:150px; overflow:hidden; border-radius:20px 20px 0 0; }
+.ls46-entete:after{ content:' '; position:absolute; z-index:5; display:block; top:0; left:0; width:100%; height:100%;
+    background:linear-gradient(180deg, rgba(230,113,127,0) 0%, rgba(255,255,255,0) 48%, rgba(255,255,255,1) 100%);}
+.ls46-entete img{ width:100%; height:100%; }
+.ls46-entete span{ display:block; position:absolute; z-index:10; bottom:0; padding:10px;  font-size:20px;
+    color:var(--ls46-1); font-weight:300;}
+
+.ls46-txt{ background:#fff; padding:15px; text-align:justify; font-size:13px; line-height:1.5em; }
+.ls46-txt .ls46-date{ margin-bottom:10px; position:relative; }
+.ls46-txt .ls46-date:before{ position:absolute; content:' '; display:block; z-index:2;
+height:1px; width:100%; top:50%; left:0; background:var(--ls46-2); }
+.ls46-txt .ls46-date div{ color:var(--ls46-2); font-size:15px; display:inline-block; 
+    background:#fff; padding:5px; z-index:4; position:relative; padding-right:10px;}
+.ls46-txt .ls46-date span{ color:var(--ls46-3); font-weight:600; }
+
+/**** SIGNATURE ****/
+
+.ls143, .ls143 *{ box-sizing:border-box; }
+.ls143 img{ object-fit:cover; }
+.ls143 br{ display:none; }
+.ls143{ width:300px; margin:0 auto;  font-family: "Montserrat", sans-serif; position:relative;}
+
+.ls143-entete{ position:relative; width:100%; height:60px; overflow:hidden; border-radius:20px 20px 0 0; }
+.ls143-entete:after{ content:' '; position:absolute; z-index:5; display:block; top:0; left:0; width:100%; 
+    height:100%; color:var(--ls46-1);
+    background:linear-gradient(180deg, rgba(230,113,127,0) 0%, rgba(255,255,255,0) 48%, rgba(255,255,255,1) 100%);}
+.ls143-entete img{ width:100%; height:100%; }
+.ls143-entete span{ display:block; position:absolute; z-index:10; bottom:0; padding:10px;  font-size:20px;
+    color:var(--ls46-1); font-weight:500;}
+.ls143-quote{ background:#fff; color:#555; padding:10px; padding-right:40px; 
+    font-size:11px; line-height:11px;text-align:justify;}
+.ls143-img{ display:block; border-radius:50%; border:6px solid #fff; width:80px; height:80px;
+position:absolute; top:20px; right:-40px; z-index:20;}

@@ -1,0 +1,150 @@
+/* Fiche RP Quetzal */
+
+.quetzal{
+  width:600px;
+  margin:0 auto;
+  background-image:url('http://cdn.pcwallart.com/images/dark-pattern-backgrounds-wallpaper-4.jpg');
+  padding:15px;
+}
+
+.cadre{
+  width:600px;
+}
+
+.cadre img, .cadre div{
+  float:left;
+    height:150px;
+}
+
+.cadre img{
+  width:200px;
+
+}
+
+.cadre div{
+  width:180px;
+  overflow:auto;
+  padding:10px;
+}
+
+.cadre h1{
+  font-size:22px;
+  line-height:24px;
+  font-family: 'Lobster Two', cursive;
+  text-align:center;
+  color:#fff;
+}
+
+.cadre h2{
+  font-size:14px;
+  line-height:15px;
+  color:#dedede;
+  text-align:center;
+  font-family: 'News Cycle', sans-serif;
+}
+
+.quetzal .feat{
+  width:480px;
+  clear:both;
+  text-align:center;
+  padding:5px;
+  font-size:14px;
+  font-weight:bolder;
+  margin:0 auto;
+  background-color:#000;
+  color:#fff;
+    font-family: 'News Cycle', sans-serif;
+}
+
+.quetzal .content{
+  padding:25px;
+  background-color:#fff;
+border:#000 5px solid;
+  color:#000;
+  font-size:12px;
+  width:500px;
+  margin:0 auto;
+  line-height:14px;
+}
+
+.quetzal .piou{
+  height:20px;
+}
+
+/* Animations */ 
+
+.cadre:hover img{
+  -webkit-filter: saturate(2.1);
+filter: saturate(2.1);
+}
+
+.quetzal:hover .cadre h1{
+  color:#41A923;
+}
+
+.quetzal:hover .cadre h2{
+  color:#C69F06;
+}
+
+.quetzal:hover .content{
+  border:#3C97F2 5px solid;
+}
+
+.quetzal:hover .feat{
+  background-color:#B50404;
+}
+
+.quetzal:hover{
+  background-image:url('https://www.walldevil.com/wallpapers/w01/android-abstract-black-color-spectrum-dark-wallpaper.jpg');
+  background-size:100%;
+    background-position:center;
+}
+/* Transitions */
+
+.cadre:hover img, .cadre img{
+-webkit-transition: all 500ms ease;
+-moz-transition: all 500ms ease;
+-ms-transition: all 500ms ease;
+-o-transition: all 500ms ease;
+transition: all 500ms ease;
+}
+
+.quetzal:hover .cadre h1, .quetzal .cadre h1{
+-webkit-transition: all 500ms ease;
+-moz-transition: all 500ms ease;
+-ms-transition: all 500ms ease;
+-o-transition: all 500ms ease;
+transition: all 500ms ease;
+}
+
+.quetzal:hover .cadre h2, .quetzal .cadre h2{
+-webkit-transition: all 1100ms ease;
+-moz-transition: all 1100ms ease;
+-ms-transition: all 1100ms ease;
+-o-transition: all 1100ms ease;
+transition: all 1100ms ease;
+}
+
+.quetzal:hover .content, .quetzal .content{
+-webkit-transition: all 1500ms ease;
+-moz-transition: all 1500ms ease;
+-ms-transition: all 1500ms ease;
+-o-transition: all 1500ms ease;
+transition: all 1500ms ease;
+}
+
+.quetzal:hover .feat, .quetzal .feat{
+-webkit-transition: all 1900ms ease;
+-moz-transition: all 1900ms ease;
+-ms-transition: all 1900ms ease;
+-o-transition: all 1900ms ease;
+transition: all 1900ms ease;
+}
+
+.quetzal, .quetzal:hover{
+  -webkit-transition: all 2500ms ease;
+-moz-transition: all 2500ms ease;
+-ms-transition: all 2500ms ease;
+-o-transition: all 2500ms ease;
+transition: all 2500ms ease;
+}

@@ -1,0 +1,38 @@
+<style>
+.aleksi, .alektxt{
+width:470px;
+margin:0 auto;
+}
+
+.aleksi img, .aleksi .galek{
+width:150px; 
+height:avoir;
+}
+
+.aleksi .galek{
+margin:0px 5px 0px 5px;
+background-image:url('');
+}
+
+.aleksi:hover .galek{
+background-image:url('');
+}
+
+.alektxt h1{
+font-size:20px;
+line-height:22px;
+}
+
+.aleksi:hover .one, .aleksi .two{
+display:none;
+}
+
+.aleksi .one, .aleksi:hover .two{
+display:block;
+}
+</style>
+
+
+<div class="aleksi"><img src=""><div class="galek"></div><img src="">
+<div class="alekxt"><h1 class="one">You'll be my best friend, for one second, and after...</h1>
+<h1 class="two">And you. You'll be... I dunno. Who knows ?</h1></div></div>

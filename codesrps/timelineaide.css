@@ -1,0 +1,44 @@
+/* Fiche de Timeline - KoalaVolant */ 
+
+.timelinerpgr{ width:500px; margin:0 auto; font-size:12px; line-height:16px; }
+.timelinerpgr *{ box-sizing:border-box; } 
+
+/* Couleurs */ 
+
+.timelinerpgr{ background-color:#fff; color:#222; font-family:Verdana;  }
+.timelinerpgr h1{ background-image:url('https://i.servimg.com/u/f30/19/45/51/53/timeli14.jpg'); background-size:100%; background-position:center; background-repeat:no-repeat; 
+  color:#222; font-family: 'Taviraj', serif; }
+.timelinerpgr h1 strong{ color:#5E5E5B; }
+
+.listrpgre a{ background-color:#E1E1E1; color:#3C3C39; border:1px solid #C8C8C6; font-family: 'Kumbh Sans', sans-serif;  }
+.listrpgre a:hover{ background-color:#3C3C39; color:#e1e1e1; text-decoration:none !important; }
+.timelinerpgr h2, .timelinerpgr h3{ font-family: 'Kumbh Sans', sans-serif; color:#3C3C39;   background: rgb(194,164,58);  background: -moz-radial-gradient(circle, rgba(194,164,58,1) 0%, rgba(118,106,84,1) 100%);
+background: -webkit-radial-gradient(circle, rgba(194,164,58,1) 0%, rgba(118,106,84,1) 100%);
+background: radial-gradient(circle, rgba(194,164,58,1) 0%, rgba(118,106,84,1) 100%);
+            -webkit-background-clip: text !important; 
+  background-clip:text !important;
+            -webkit-text-fill-color: transparent; 
+  text-fill-color:transparent;
+          -webkit-font-smoothing: antialiased; 
+}
+.droitemois span{ border:#C8C8C7 1px solid; }
+/* Structure */ 
+
+.timelinerpgr h1{ text-align:center; padding:10px; font-size:35px; line-height:37px;  margin:0; font-weight:normal; }
+.timelinerpgr h1 strong{ text-transform:uppercase; }
+.timelinerpgr h2, .timelinerpgr h3{ font-size:18px; text-transform:uppercase; margin:0; letter-spacing:5px; padding:5px 0px 0px 0px;}
+.timelinerpgr h3{ font-size:15px; margin-top:10px;  }
+.moisline{ margin:10px; display:flex; justify-content:space-between; }
+
+.gaucheline{     display: flex;  flex-direction: column; }
+.gaucheline img{ min-width:140px; max-width:140px; height:130px; object-fit:cover; }
+.gaucheline img:first-child{ height:170px; margin-bottom:5px; }
+
+.droitemois span{ display:block; padding:10px; overflow:auto; max-height:120px; }
+
+.listrpgre{ max-height:133px; overflow:auto; }
+  .listrpgre a{ display:block; padding:5px; font-size:13px; width:100%; margin:5px 0px; transition:500ms; }
+
+.moisline.reversemois{ flex-direction: row-reverse; }
+.reversemois .gaucheline{ flex-direction:column-reverse; }
+.reversemois .gaucheline img:first-child{ margin-bottom:0px; margin-top:5px; }
