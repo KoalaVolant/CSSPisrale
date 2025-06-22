@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <span>Mettez la classe pour faire le code pratique direct :</span><br>
+        <input type="text" v-model="classe"><br><br><span style="font-weight:bold;">Votre code à mettre :</span><br><br>
+        {{classe}}, {{classe}} *{ box-sizing:border-box;  }<br>
+        {{classe}}{ margin:0 auto; width:450px;  }<br>
+        {{classe}} br{ display:none; }<br>
+        {{classe}} img{ object-fit:cover; }<br>
+    </div>
+    <script>
+        app = Vue.createApp({
+            data(){
+                return{
+                    classe: 'nomClasse'
+                }
+            }
+        });
+        app.mount("#app");
+    </script>
+</body>
+</html>
