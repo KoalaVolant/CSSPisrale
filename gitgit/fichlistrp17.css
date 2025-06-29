@@ -16,12 +16,12 @@ padding:15px; }
 .listrp17 .listrp17-infos img{ width:29%;}
 .listrp17 .listrp17-infos .listrp17-droite{ width: 69%; margin-top:10px; }
 .listrp17 .listrp17-title{ color:var(--solocolorgav); 
-	text-transform:uppercase; font-weight:900; display:block; font-size:35px; }
+	text-transform:uppercase; font-weight:900; display:block; font-size:35px; line-height:27px; }
 .listrp17 .listrp17-flex{ display:flex; align-items:center; 
 margin:20px 0;}
 .listrp17 .listrp17-flex .listrp17-fleft{ width:49%; height:150px; overflow:auto; }
 .listrp17 .listrp17-flex .listrp17-fright{ width:49%; padding:5px;
-background:#f0f0f0; height:140px; }
+background:#f0f0f0; height:140px; overflow:auto;}
 .listrp17 .listrp17-flex .listrp17-fright span{ color:var(--solocolorgav); 
 font-weight:bold; font-size:16px; line-height:19px; }
 .listrp17 .listrp17-flex .listrp17-fleft br, .listrp17 .listrp17-flex .listrp17-fright br{ content:none; display:inline-block; }
