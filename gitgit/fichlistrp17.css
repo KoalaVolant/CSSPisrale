@@ -9,7 +9,7 @@
 
 .listrp17{  font-family: 'Poppins', sans-serif; }
 
-.listrp17 .listrp17-infos, .listrp17 .listrp17-rpi{ display:flex; justify-content: space-between; 
+.listrp17 .listrp17-infos, .listrp17 .listrp17-rpi{ display:flex; justify-content: space-between; align-items:center;
 background:#fff; border-radius: 10px; 
 padding:15px; }
 
