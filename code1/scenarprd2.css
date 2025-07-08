@@ -1,0 +1,53 @@
+.scenarprd, .scenarprd *{ box-sizing:border-box; }
+.scenarprd{ margin:0 auto; width:450px; font-family:var(--font-scenarprd); }
+.scenarprd br{ display:none; }
+.scenarprd img{ object-fit:cover; }
+
+/* ROOT */ 
+:root{
+    --fond-scenarprd:#dedede;
+    --border-scenarprd:#939393; 
+    --colorlink-scenarprd:#6a60be;
+    --font-scenarprd:"Poppins", sans-serif;
+    --title-scenarprd:#3D348B;
+}
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+/* INFOS FORUM */ 
+.scenarprd-info{ background:var(--fond-scenarprd); padding:15px; }
+.scenarprd-infotitle{ font-size:23px; font-weight:900; line-height:25px; 
+    color:var(--title-scenarprd); } 
+.scenarprd-infotxt{ text-align:justify; margin:10px 0; }
+.scenarprd-tab{  column-count: 2; width:100%; text-align:center; }
+.scenarprd-tab a{display:block; margin:5px; padding:5px; border:1px solid var(--border-scenarprd); 
+color:var(--colorlink-scenarprd) !important; margin-bottom:10px;
+transition:500ms;}
+.scenarprd-tab a:first-of-type{ margin-top:0px; }
+.scenarprd-tab a:hover{ background:#fff; border-color:#fff;
+transition:500ms;}
+.scenarprd-infosinfos{ font-size:12px; font-style:italic; 
+    color:var(--colorlink-scenarprd);}
+
+.scenarprd-info > a{ text-decoration:underline; transition:500ms;
+    color:var(--title-scenarprd) !important; }
+.scenarprd-info > a:hover{ letter-spacing:1px; transition:500ms;}
+
+/* PERSO */ 
+.scenarprd-perso{ background:var(--fond-scenarprd); margin-top:20px; padding:10px;
+    }
+.scenarprd-perso > div{ margin-bottom:10px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; }
+.scenarprd-perso [class*="scenaprd-ct"]{ width:69%; padding:10px 5px;}
+.scenarprd-perso img{ width:29%; }
+
+.scenarprd-perso [class*="scenaprd-ct"] div:first-child{ font-weight:900;
+ font-size:32px; line-height:32px; color:var(--title-scenarprd)}
+.scenarprd-perso [class*="scenaprd-ct"] div:last-child br{ display:inline-block;
+content:none;}
+.scenarprd-perso [class*="scenaprd-ct"] div:last-child{ text-align:justify;
+height:250px; overflow:auto; padding-right:10px; }
+
+.scenarprd-perso .scenaprd-ct2 div:last-child{ height:130px; }
+.scenarprd-perso .scenarprd-fl2{ margin-bottom:0; }
+
+.scenarprd-perso.scenarprd-right [class*="scenarprd-fl"]{ 
+    flex-direction:row-reverse;}
