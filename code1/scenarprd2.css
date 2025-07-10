@@ -46,8 +46,21 @@ content:none;}
 .scenarprd-perso [class*="scenaprd-ct"] div:last-child{ text-align:justify;
 height:250px; overflow:auto; padding-right:10px; }
 
-.scenarprd-perso .scenaprd-ct2 div:last-child{ height:130px; }
+.scenarprd-perso .scenaprd-ct2 div:last-child{ height:85px; }
 .scenarprd-perso .scenarprd-fl2{ margin-bottom:0; }
 
 .scenarprd-perso.scenarprd-right [class*="scenarprd-fl"]{ 
     flex-direction:row-reverse;}
+
+.scenarprd-perso [class*="scenaprd-ct"] .scenarprdlink{
+    font-size:11px; line-height:11px; margin-bottom:10px;
+    display:block; font-weight:600; 
+    color:var(--colorlink-scenarprd); 
+transition:500ms; letter-spacing:0;}
+
+}
+
+.scenarprd-perso [class*="scenaprd-ct"] .scenarprdlink:hover{
+    letter-spacing:2px; transition:500ms;
+}
+  
