@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To do later</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+       <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+    <div id="app">
+
+        <div class="todolater">
+            <h1>To do later</h1>
+
+            <div class="buttonsTodo">
+                <input type="text" v-model="infoTodo" @keyup.enter="ajoutTodo" autofocus> 
+                <button @click="ajoutTodo">Ajouter</button>
+                <button @click="supprTodo">Supprimer</button>
+                <br> <button class="randomButton" @click="aleatoireTodo">Aléatoire</button>
+            </div>
+
+            <div class="randomTodo" v-if="randomTo">
+                La tâche aléatoire choisie est là :
+                <span>{{randomInfo}}</span>
+            </div>
+
+            <ul>
+                <li v-for="td in listTodo">
+                    <input type="checkbox" v-model="td.caseTodo">
+                    {{ td.nomTodo }}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        app = Vue.createApp({
+  data(){
+    return{
+      infoTodo: '',
+      listTodo: [],
+      randomTo: false,
+      randomInfo: '',
+      apiUrl: 'TON_URL_APPS_SCRIPT_ICI' // Remplace par ton URL déployée
+    }
+  },
+  mounted(){
+    this.loadTodos();
+  },
+  methods:{
+    async loadTodos(){
+      try {
+        const res = await fetch(this.apiUrl);
+        this.listTodo = await res.json();
+      } catch(e) {
+        console.error('Erreur chargement', e);
+      }
+    },
+    async saveTodos(){
+      try {
+        await fetch(this.apiUrl, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(this.listTodo)
+        });
+      } catch(e) {
+        console.error('Erreur sauvegarde', e);
+      }
+    },
+    async ajoutTodo(){
+      if(!this.infoTodo.trim()) return;
+      this.listTodo.push({
+        caseTodo: false,
+        nomTodo: this.infoTodo.trim()
+      });
+      this.infoTodo = '';
+      await this.saveTodos();
+    },
+    async supprTodo(){
+      this.listTodo = this.listTodo.filter(item => !item.caseTodo);
+      await this.saveTodos();
+    },
+    aleatoireTodo(){
+      if (this.listTodo.length === 0) return;
+      this.randomTo = true;
+      const idx = Math.floor(Math.random() * this.listTodo.length);
+      this.randomInfo = this.listTodo[idx].nomTodo;
+    },
+  },
+  watch: {
+    listTodo: {
+      deep: true,
+      handler() {
+        this.saveTodos();
+      }
+    }
+  }
+});
+    </script>
+</body>
+</html>
