@@ -23,7 +23,7 @@ width:130px; height:130px; border-radius:50%; padding:5px; border:15px solid var
 	margin-top:8px; background:#dedede; }
 .roryRp1 .roryContent{ text-align:justify; border:2px solid #dedede;
 	border-left:15px solid var(--rory-rose); margin-left:55px; padding:20px; 
-background:white; }
+background:white; color:#222; }
 .roryRp1 .roryContent br{ display:block; }
 .roryRp1 .roryContent span{ color:var(--rory-snd); text-align:right; font-size:11px; display:block; margin-bottom:10px; 
 background:#f5f5f5; padding:5px; line-height:11px;}
