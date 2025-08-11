@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+
+         /* VARIABLE DU MODE PAR DEFAUT */
+    :root {
+    
+      --color-deg:linear-gradient(90deg, #9F7A8C 0%, #B6505A 100%);
+  --color-deg2:linear-gradient(90deg, var(--color-sur-bg) 0%, var(--span-color-light-more) 100%);
+  --color-sur-bg:#443240;
+  --span-color:hsl(0,0%,90%);
+	--span-color-light:linear-gradient(90deg, #E8D0D8 0%, #E7C5C8 100%);
+  --span-color-light-more:hsl(0,0%,90%);
+  --color-contraste:#968188;
+    --color-contraste2:#8F979C;
+  
+      --h3-before-light:#779CB2;
+  --bodya:#B6505A;
+  
+  --filter:brightness(0) saturate(100%);
+  /* https://angel-rs.github.io/css-color-filter-generator/ */
+  
+  --white:#f0f0f0; 
+  --whitesb:#fff;
+  --blacksb:#222;
+      --black:#222;
+  --blackdblack:#222;
+  
+  --font-1:"Oswald", sans-serif;
+  --font-2:'Poppins', sans-serif;
+  
+    }
+        .duokoala{ font-size:16px; text-align:center; padding:10px; border-radius:10px; 
+    line-height:1.5em; font-family:var(--font-2);
+    border:1px solid var(--color-contraste); }
+.duokoala a{ font-weight:800; }
+     .duokoala a{ border:1px solid var(--span-color); padding:5px; display:inline-flex;
+justify-content:center; align-items:center; }
+.duokoala a img{ width:70px; height:40px; margin-right:10px; object-fit:cover;}
+.duokoala a:hover{ background:var(--whitesb); }
+
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Remplir duo Pisrale</h1>
+
+        <label>Lien du code :</label> <input type="text" v-model="nouveauLien"><br>
+        <label>Image du code :</label> <input type="text" v-model="nouveauImg"><br>
+        <label>Nom du code :</label> <input type="text" v-model="nouveauNom"><br>
+        <button @click="nouvxInfos">Ajouter</button>
+
+        <h2>Résultat</h2>
+
+        <div>
+            <div class="duokoala" >Ce code possède aussi un/une :
+<div v-for="duo in duolien"><a :href="duo.lien" target="_blank"><img :src="duo.imgsrc"> <span>{{ duo.nom }}</span></a></div>
+</div>
+        </div>
+    </div>
+    <script>
+        app = Vue.createApp({
+            data(){
+                return{
+                  duolien: [{ lien: '', imgsrc: 'https://i.goopics.net/e5uoxr.jpg', nom: '' }],
+                  nouveauLien: '',
+                  nouveauImg: '',
+                  nouveauNom: ''
+                }
+            }, 
+            methods:{
+                nouvxInfos(){
+                    this.duolien.push({
+                lien: this.nouveauLien,
+                imgsrc: this.nouveauImg,
+                nom: this.nouveauNom
+            });
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>
