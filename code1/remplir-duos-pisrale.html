@@ -49,43 +49,69 @@ justify-content:center; align-items:center; }
     </style>
 </head>
 <body>
-    <div id="app">
-        <h1>Remplir duo Pisrale</h1>
+  <div id="app">
+    <h1>Remplir duo Pisrale</h1>
 
-        <label>Lien du code :</label> <input type="text" v-model="nouveauLien"><br>
-        <label>Image du code :</label> <input type="text" v-model="nouveauImg"><br>
-        <label>Nom du code :</label> <input type="text" v-model="nouveauNom"><br>
-        <button @click="nouvxInfos">Ajouter</button>
+    <label>Lien du code :</label> 
+    <input type="text" v-model="nouveauLien"><br>
+    <label>Image du code :</label> 
+    <input type="text" v-model="nouveauImg"><br>
+    <label>Nom du code :</label> 
+    <input type="text" v-model="nouveauNom"><br>
+    <button @click="nouvxInfos">Ajouter</button>
 
-        <h2>Résultat</h2>
-
-        <div>
-            <div class="duokoala" >Ce code possède aussi un/une :
-<div v-for="duo in duolien"><a :href="duo.lien" target="_blank"><img :src="duo.imgsrc"> <span>{{ duo.nom }}</span></a></div>
-</div>
-        </div>
+    <h2>Résultat</h2>
+    <!-- ✅ ajout ref="bloc" -->
+    <div class="duokoala" ref="bloc">
+      Ce code possède aussi un/une :
+      <div v-for="duo in duolien" :key="duo.lien">
+        <a :href="duo.lien" target="_blank">
+          <img :src="duo.imgsrc"> 
+          <span>{{ duo.nom }}</span>
+        </a>
+      </div>
     </div>
-    <script>
-        app = Vue.createApp({
-            data(){
-                return{
-                  duolien: [{ lien: '', imgsrc: 'https://i.goopics.net/e5uoxr.jpg', nom: '' }],
-                  nouveauLien: '',
-                  nouveauImg: '',
-                  nouveauNom: ''
-                }
-            }, 
-            methods:{
-                nouvxInfos(){
-                    this.duolien.push({
-                lien: this.nouveauLien,
-                imgsrc: this.nouveauImg,
-                nom: this.nouveauNom
-            });
-                }
-            }
-        });
-        app.mount('#app');
-    </script>
+
+    <button @click="recupCode">📋 Récupérer le code généré</button>
+
+    <h2>Code généré</h2>
+    <pre><code>{{ codeGenere }}</code></pre>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data(){
+        return{
+          duolien: [ ],
+          nouveauLien: '',
+          nouveauImg: '',
+          nouveauNom: '',
+          codeGenere: ''
+        }
+      },
+      methods:{
+        nouvxInfos(){
+          this.duolien.push({
+            lien: this.nouveauLien,
+            imgsrc: this.nouveauImg,
+            nom: this.nouveauNom
+          });
+          this.nouveauLien = '';
+          this.nouveauImg = '';
+          this.nouveauNom = '';
+        },
+        recupCode(){
+          // ✅ utilisation de ref
+          const bloc = this.$refs.bloc;
+          if (bloc) {
+            this.codeGenere = bloc.outerHTML;
+          } else {
+            this.codeGenere = "⚠️ Aucun bloc trouvé";
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
 </body>
 </html>
