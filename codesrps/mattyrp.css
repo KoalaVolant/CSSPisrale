@@ -19,7 +19,7 @@ border-image-slice: 1;  border-width:2px;
 border:1px solid #000;  border-image-slice: 1;  
     border-width:5px;    
     border-image-source: var(--mattyrp-deg1);  padding:20px;  position:relative; }
-.mattyrp h1{ font-family: 'Unica One', cursive; position:absolute; 
+.mattyrp h1{ font-family: 'Unica One', cursive; position:absolute; border:none !important;
     font-size:25px; color:var(--mattyrp-color1);top: -37px; left: 50%;  transform: translateX(-50%);
 text-shadow: 2px 2px 0 var(--mattyrp-white), 2px -2px 0 var(--mattyrp-white), -2px 2px 0 var(--mattyrp-white), -2px -2px 0 var(--mattyrp-white), 2px 0px 0 var(--mattyrp-white), 0px 2px 0 var(--mattyrp-white), -2px 0px 0 var(--mattyrp-white), 0px -2px 0 var(--mattyrp-white);
     text-shadow: 2px 2px 0 var(--mattyrp-white), 2px -2px 0 var(--mattyrp-white), -2px 2px 0 var(--mattyrp-white), -2px -2px 0 var(--mattyrp-white), 2px 0px 0 var(--mattyrp-white), 0px 2px 0 var(--mattyrp-white), -2px 0px 0 var(--mattyrp-white), 0px -2px 0 var(--mattyrp-white);}
