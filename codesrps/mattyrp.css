@@ -1,11 +1,26 @@
 /* Fiche rp Matthew Ward */ 
 
+:root{
+    --mattyrp-deg1:linear-gradient(to bottom, #5BBB44, #A8A6A6);
+    --mattyrp-color1:#5BBB44;
+    --mattyrp-white:#fff;
+}
+
 .mattyrp{ width:400px; margin:0 auto; } 
 .mattyrp *{ box-sizing:border-box; } 
-.mattyrp .mattymg{ width:44%; display:block;height:100px; object-fit:cover; padding:5px; border:1px solid #969696;  margin-left:5px;
-border-image-slice: 1;  border-width:2px;    border-image-source: linear-gradient(to bottom, #5BBB44, #A8A6A6); }
-.mattyrp div{ text-align:justify; font-family:Verdana; font-size:12px; line-height:17px; margin-top:5px; margin-bottom:5px; border-radius:40px; 
-border:1px solid #000;  border-image-slice: 1;  border-width:5px;    border-image-source: linear-gradient(to left, #5BBB44, #969696);  padding:20px;  position:relative; }
-.mattyrp h1{ font-family: 'Unica One', cursive; position:absolute; font-size:25px; color:#5BBB44;top: -37px;    left: 50%;    transform: translateX(-50%);
-text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;text-shadow: 2px 2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, -2px -2px 0 #fff, 2px 0px 0 #fff, 0px 2px 0 #fff, -2px 0px 0 #fff, 0px -2px 0 #fff;}
+.mattyrp .mattymg{ width:44%; display:block;
+    height:100px; object-fit:cover; padding:5px; 
+    border:1px solid #969696;  margin-left:5px;
+border-image-slice: 1;  border-width:2px;    
+    border-image-source:var(--mattyrp-deg1);  }
+.mattyrp div{ text-align:justify; font-family:Verdana; font-size:12px; 
+    line-height:17px; margin-top:5px; margin-bottom:5px; 
+    border-radius:40px; 
+border:1px solid #000;  border-image-slice: 1;  
+    border-width:5px;    
+    border-image-source: var(--mattyrp-deg1);  padding:20px;  position:relative; }
+.mattyrp h1{ font-family: 'Unica One', cursive; position:absolute; 
+    font-size:25px; color:var(--mattyrp-color1);top: -37px; left: 50%;  transform: translateX(-50%);
+text-shadow: 2px 2px 0 var(--mattyrp-white), 2px -2px 0 var(--mattyrp-white), -2px 2px 0 var(--mattyrp-white), -2px -2px 0 var(--mattyrp-white), 2px 0px 0 var(--mattyrp-white), 0px 2px 0 var(--mattyrp-white), -2px 0px 0 var(--mattyrp-white), 0px -2px 0 var(--mattyrp-white);
+    text-shadow: 2px 2px 0 var(--mattyrp-white), 2px -2px 0 var(--mattyrp-white), -2px 2px 0 var(--mattyrp-white), -2px -2px 0 var(--mattyrp-white), 2px 0px 0 var(--mattyrp-white), 0px 2px 0 var(--mattyrp-white), -2px 0px 0 var(--mattyrp-white), 0px -2px 0 var(--mattyrp-white);}
 .mattyflex{ width:100%; display:flex; justify-content:center; }
