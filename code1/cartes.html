@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  
+
+    <style>
+        :root{
+    --fond-body:#fff;
+    --fond-nav:#d7e5e8;
+    --border1:#75969E; 
+}
+
+body{ background:var(--fond-body);   margin:0; padding:0; text-align:center;}
+body, body *{ font-family: "Poppins", sans-serif; }
+body button{ cursor:pointer; }
+
+body h1{ font-size:45px; }
+
+body button{ margin:0 10px; background:var(--border1); font-size:18px; border:none; border-radius:15px; padding:10px; color:#fff;}
+
+body ul{ display:flex; justify-content:center; }
+body ul li{ list-style-type: none; padding:20px 10px; border:1px solid #dedede; border-radius:15px; margin:0 5px;
+font-size:20px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+    <h1>Faire du sport</h1>
+    
+    <div class="buttons">
+        <button @click="aleatoireSport">Tirer 5 exercices</button>
+        <button @click="aleatoireType">Tirer un type d'entraînement</button>
+        <button @click="goLien">Allez sur le site</button> 
+    </div>
+<br>
+   <div v-if="randomClick">
+        <span>N'oublie pas que ça se fait en x2</span>
+        <ul>
+            <li v-for="sport in sportsTires" :key="sport">
+                {{ sport }}
+            </li>
+        </ul>
+        <p v-if="typeTire">Type d'entraînement : <strong>{{ typeTire }}</strong></p>
+    </div>
+</div>
+    <script>
+        app = Vue.createApp({
+            data(){
+                return{
+                  sports: ["Football drill", "Jumping jack", "High knees alterné", "Wall sprint", "Demi burpee (planche et saut)", "Mountain Climber", "Plank jump twist", "Planche à la position squat bas", "Split jump", "Squat jump", "Thruster", "Speed skater", "Jump au-dessus d'un banc", "Reverse lunge jump", "Burpee", "Corde à danser simple ou double", "Sumo deadlift high pull", "Knee tuck", "Kick through", "Split squat jump kick", "Burpee Toe Touch", "Ciseaux", "Bicycle crunch", "Crunch de côté", "Élévation des jambes", "Crunch au sol", "Knee crunch", "Planche de côté", "Position V-crunch", "Planche abdominale", "Planche tape épaules", "Position crunch touche talons alterné", "Russian twist", "Pallof press", "Hollow rock", "Levée verticale des jambes", "Crunch inversé", "Planche à 1 jambe et 1 bras", "V-Crunch", "Animal flow", "Glute side raise", "Abducteurs couché", "Abducteurs debout", "Abducteurs en demi-squat", "Levée arrière des jambes", "Good morning", "Levée arrière à 1 jambe", "Hip thrust au sol", "Sumo squat", "Abducteurs en chaise au mur", "Sumo deadlift", "Hip thrust à 1 jambe", "Deadlift à 1 jambe", "Leg curl inversé", "Leg curl à 1 ou 2 jambes", "Leg curl au sol", "Air squat", "Chaise au mur 1 ou 2 jambes", "Goblet Squat", "Lunge avant", "Step up avant", "Squat avec élastique", "Side squat", "Sissy squat", "Split squat", "Squat 1 jambe", "Lunge arrière", "Step up croisé", "Bulgarian squat", "Hockey squat (croisé)", "Pistol squat", "Bulgarian split jump", "Knee jump", "Shoulder press", "Shoulder press 1 bras moitié à genou", "Tirage au menton", "Élévation frontale", "Élévation latérale", "Ouverture latérale des bras", "Downward dog à 1 ou 2 bras", "Pike push up", "Planche monte-descend, coude-mains", "Planche à downward dog, à 1 bras", "Handstand hold", "Handstand push up", "Wall climber", "Tirage avant prise neutre", "Rowing à 1-2 bras à l'horizontal", "Tirage avant prise large", "Tirage vertical prise neutre", "High row", "Pull down", "Tirage vertical prise large", "Bent-over row à 1 bras", "Bent-over row prise neutre", "Rowing à 1 bras sur banc", "Back extension au sol", "Rowing inversé", "Press horizontal", "Fly sur banc", "Bench press", "Push up (mains larges)", "Push up avec élastique", "Push up allongé", "Spiderman push up", "Clap push up", "Triceps push down 1-2 bras", "Triceps extension couché", "Extension au-dessus de la tête, 1-2 bras", "Triceps extension, corps penché", "Triceps kick back, 1-2 bras", "Triceps kick back sur banc", "Push up largeur des épaules", "Push up diamond", "Triceps dip sur banc", "Biceps curl 1-2 bras", "Bicep curl incliné", "Biceps curl prise hammer", "Reverse curl 1-2 bras", "Bicep curl concentré", "Bicep curl à 1 bras couché", "Deep squat biceps curl"],
+                  typesEntrainement: ["1 exercice x2 puis le suivant", "Chaque exercice puis x2"],
+                   randomClick: false,
+            sportsTires: [],
+            typeTire: ""
+                }
+            }, methods:{
+                aleatoireSport() {
+            this.randomClick = true;
+            this.sportsTires = [...this.sports]
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 5);
+        },
+        aleatoireType() {
+            this.typeTire = this.typesEntrainement[
+                Math.floor(Math.random() * this.typesEntrainement.length)
+            ];
+        },
+                goLien(){
+                    window.open('https://femme.fitness/exercices-maison/', '_blank');
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>
