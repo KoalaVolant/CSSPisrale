@@ -1,6 +1,7 @@
-/* Fiche rp yo */ 
+/* Fiche rp */ 
 
 .fichrp1{ width: 450px;    margin: 0 auto; position:relative; }
+.fichrp1 br{ display:none;}
 .fichrp1 *{ box-sizing:border-box; }
 .fichrp1 .fichrpimg img{ width:203px; height:140px; object-fit:cover; clip-path: polygon(0 6%, 100% 0%, 100% 100%, 0 100%); }
 .fichrp1 h1{     background-color: #1687a7;   border:none; padding: 10px;    color: #fff !important;    font-size: 14px;    font-weight: 600 !important;
@@ -9,3 +10,4 @@
     margin-top: 16px;  text-align: center;     transform: rotate(-1deg); margin-left: 44px;}
 .fichrp1 .fichrptxt{     padding: 20px;    text-align: justify;    color: #222;    font-size: 13px;    line-height: 19px;
     font-family: 'Montserrat', sans-serif;    background-color: #f6f5f5; } 
+.fichrp1 .fichrptxt br{ display:inline-block; content:none; }
