@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"><link href="https://coderps.xyz/code1/scenarprd2.css" rel="stylesheet" type="text/css" />
+    <style>/* COULEURS */ :root{    --fond-scenarprd:#dedede;    --border-scenarprd:#939393;     --colorlink-scenarprd:#6a60be;    --font-scenarprd:"Poppins", sans-serif;    --title-scenarprd:#3D348B; }
+        .scenarprd-perso{ width:30%; }
+    </style>
+</head>
+<body>
+    <div id="app">
+            <h1>Remplir scénario</h1>
+            
+            <div class="inputflex">
+                <label>Mettre image à droite :</label> <input type="checkbox" v-model="leftrightscenar"><br>
+                <label>Identifiant :</label> <input v-model="idscenar" type="text" name="" id=""><br>
+                <br>
+                <label>Lien avatar :</label> <input v-model="avascenar" type="text" name="" id=""><br>
+                <label>Lien icon / gif :</label> <input v-model="gifscenar" type="text" name="" id=""><br>
+                <br>
+                <label>Nom :</label> <input v-model="nomscenar" type="text" name="" id=""><br>
+                <label>Lien scénario :</label> <input v-model="lienscenar" type="text" name="" id=""><br>
+                <label>Informations :</label> <textarea v-model="infoscenar"></textarea><br>
+                <label>Informations liens :</label> <textarea v-model="infolienscenar"></textarea>
+                <br>
+            </div>
+
+          <button @click="recupCode">📋 Récupérer le code généré</button>
+    <button @click="copier" :disabled="!codeGenere">📎 Copier</button>
+    <button @click="resetForm">Reset</button>
+
+    <h2>Code généré</h2>
+    <pre><code v-text="codeGenere"></code></pre>
+
+    <!-- Le bloc dont on récupère l'outerHTML -->
+    <div class="scenarprd-perso" :class="{ 'scenarprd-right': leftrightscenar }" :id="idscenar" ref="bloc">
+      <div class="scenarprd-fl1">
+        <!-- AVATAR -->
+        <img :src="avascenar" alt="avatar">
+        <div class="scenaprd-ct1">
+          <!-- NOM PERSO -->
+          <div>{{ nomscenar }} <a :href="lienscenar" target="_blank" class="scenarprdlink">découvrir le scénario</a></div>
+          <!-- TEXTE PERSO -->
+          <div>{{ infoscenar }}</div>
+        </div>
+      </div>
+
+      <div class="scenarprd-fl2">
+        <!-- ICON -->
+        <img :src="gifscenar" alt="gif">
+        <div class="scenaprd-ct2">
+          <!-- NOM LIENS -->
+          <div>Liens</div>
+          <!-- TEXTE LIENS -->
+          <div>{{ infolienscenar }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <script>
+    // ✅ Définie en dehors de Vue pour l'utiliser dans data() et resetForm()
+    function getDefaultData() {
+      return {
+        leftrightscenar: false,
+        idscenar: '',
+        avascenar: '',
+        gifscenar: '',
+        nomscenar: '',
+        lienscenar: '',
+        infoscenar: 'informations',
+        infolienscenar: 'informations liens',
+        codeGenere: ''
+      }
+    }
+
+    const app = Vue.createApp({
+      data() {
+        return getDefaultData()
+      },
+      methods: {
+        recupCode() {
+          const bloc = this.$refs.bloc;
+          this.codeGenere = bloc ? bloc.outerHTML : '⚠️ Aucun bloc trouvé';
+        },
+        copier() {
+          if (!this.codeGenere) return;
+          navigator.clipboard.writeText(this.codeGenere)
+            .then(() => alert('Code copié ✅'))
+            .catch(() => alert('Impossible de copier'));
+        },
+        resetForm() {
+          // ✅ Remet toutes les valeurs de data à leur état initial
+          Object.assign(this.$data, getDefaultData());
+        }
+      }
+    });
+
+    app.mount('#app');
+  </script>
+</body>
+</html>
