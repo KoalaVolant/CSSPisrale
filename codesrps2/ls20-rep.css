@@ -30,6 +30,7 @@ line-height:14px;
 background-color:#46646C;
   text-align:right;
     margin-bottom:10px;
+  border:none !important;
 }
 
 .lsrp20 h1, .lsrp20 h2{
@@ -48,6 +49,8 @@ margin:0 auto;
   padding:25px;
 border:#7AA35C 1px dotted;
 padding:20px;
+  font-size:14px; line-height:1.5em; 
+  font-family:verdana; 
   text-align:justify;
   background-color:#fff;
   color:#272727;
