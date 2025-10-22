@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://coderps.xyz/codesrps3/tomokorp.css" rel="stylesheet" type="text/css" />
+
+    <style>.tomomo{ display:flex; flex-wrap:wrap; }.tomomo img{ width:50px; }
+    .pre{ width:50%;} textarea{ display:block; margin:10px 0; width:400px; height:150px;}
+        :root{ --tomoko-title:"Fredoka", sans-serif;
+--tomoko-txt:"Nunito", sans-serif;
+
+--tomoko-white:#fff;
+--tomoko-black:#5e5e5e;
+--tomoko-grey:#8f8f8f;
+--tomoko-color1:#222;
+--tomoko-color2:#CA808B;
+--tomoko-deg:linear-gradient(90deg,rgba(162, 221, 237, 1) 0%, rgba(251, 195, 198, 1) 100%);
+
+}
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+.tomokorp, .tomokorp *{ box-sizing:border-box; }
+.tomokorp{ width:500px; margin:0 auto; background:var(--tomoko-white);
+border-bottom:10px solid var(--tomoko-grey);
+font-family:var(--tomoko-txt);}
+.tomokorp br{ display:none; }
+.tomokorp img{ object-fit:cover; }
+
+.tomokorp .tomokocont{ display:flex; position:relative;
+   align-items:center; background:var(--tomoko-deg);
+height:100px; padding-left:140px;}
+.tomokorp .tomokocont img{ width:100px; height:160px;
+border-top-left-radius: 50px; outline:1px solid var(--tomoko-white);
+   outline-offset:5px; position:absolute; left:20px;
+   top:20px;border-top-right-radius: 50px;}
+.tomokorp .tomokocont .tomokotitre{ font-size:24px; line-height:25px;
+   color:var(--tomoko-white);
+font-family:var(--tomoko-title);}
+
+.tomokorp .tomokoquote{ margin-left:130px; padding:10px; font-size:11px;
+line-height:12px; color:var(--tomoko-grey);  }
+.tomokorp .tomokoquote br{ display:inline-block; content:none; }
+.tomokorp .tomokoquote em{ color:var(--tomoko-color2); }
+
+.tomokorp .tomokocontent{ padding:15px 0px; margin:25px 20px;
+   border-top:1px solid var(--tomoko-grey); padding-bottom:0;
+line-height:1.5em; text-align:justify; font-size:14px; }
+.tomokorp .tomokocontent br{ display:inline-block; content:none; }
+
+.tomokorp .tomokodiag{ display:flex; margin:10px 0 0 0;
+   justify-content:space-between; align-items:center; }
+.tomokorp .tomokodiag div{ width:80px; height:80px; border-radius:50%; border-width: 1px; padding:5px;
+  border-image: var(--tomoko-deg) 30 stretch; /* ou round selon le besoin */
+position:relative;}
+.tomokorp .tomokodiag div::before {
+  content: " ";
+  position: absolute;
+  top:2px;
+  left: 2px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--tomoko-deg); 
+  z-index: 1;
+  pointer-events: none;
+}
+.tomokorp .tomokodiag div img{ z-index:2; 
+	position:relative; width:100%; min-width:100%; height:100%; border-radius:50%;
+background:var(--tomoko-white); padding:3px;}
+.tomokorp .tomokodiag span{ width:78%; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Remplir dialogue</h1>
+        <label>Dialogue</label><textarea autofocus v-model="txtTomoko"></textarea><br>
+        <label>Choisis une image</label>
+        <button @click="iconOpen = !iconOpen">{{ iconOpen ? 'Fermer icons' : 'Ouvrir icons' }}</button>
+        <div v-if="iconOpen" class="tomomo">
+        <div v-for="img in imagesTomoko">
+            <input type="radio" :value="img.imgLink" v-model="imgTomoko" > 
+            <img :src="img.imgLink">
+        </div>
+    </div>
+<br><br>
+            <button @click="newsInfos">Valider pour le code</button>
+
+    <h1>Le code qui apparaît</h1>
+    <div class="tomokodiag" v-for="infos in infosTomoko"><div><img :src="infos.imgDiag"></div><span>{{ infos.infoDiag }} </span></div>
+ <pre><code>{{ codeGenere }}</code></pre>
+
+
+</div>
+    <script>
+        app = Vue.createApp({
+            data(){
+                return{
+                    codeGenere:'',
+                    infosTomoko: [],
+                    txtTomoko: '',
+                    imgTomoko: '',
+                    iconOpen: false,
+                  imagesTomoko:[
+  { radioImg: false, imgLink: "https://i.postimg.cc/4ynZ1PKq/Koyko1.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/QCPDY71t/Koyko2.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/4d2Rnc85/Kyoko10.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/HnJDMLRC/Kyoko11.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/Zn1kxSzv/Kyoko12.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/66SNXd46/Kyoko13.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/PrwnrP1W/Kyoko14.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/jSY0WthG/Kyoko15.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/QdgL1w4V/Kyoko16.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/d0JbB6p6/Kyoko17.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/W4SQfrPv/Kyoko18.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/LXXrdXHZ/Kyoko19.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/9MnschMg/Kyoko20.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/BbPk6VPS/Kyoko21.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/w3KPsQDh/Kyoko22.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/VsSknsj6/Kyoko24.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/ZY1KckcL/Kyoko27.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/VLnsZ7ZP/Kyoko29.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/ryYqwB3k/Kyoko3.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/2SYks4gb/Kyoko30.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/fbTwLMzM/Kyoko31.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/BnCS4jGh/Kyoko32.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/wBf9RnML/Kyoko33.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/1t8sGMVT/Kyoko35.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/zB450Wnf/Kyoko36.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/x8HQ7CR3/Kyoko38.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/Vsbz5G80/Kyoko39.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/m2zBzdWF/Kyoko4.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/BQ94FTSY/Kyoko40.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/FsymVY19/Kyoko41.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/4NDZzzX2/Kyoko5.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/htVnMfjD/Kyoko6.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/Pqhj7Tpm/Kyoko7.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/s2crdq7b/Kyoko8.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/RFZzMdTh/Kyoko9.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/wxJd91Xh/Skip-Beat1.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/26ZgjtZz/Skip-Beat11.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/6qxg8hrC/Skip-Beat12.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/rsGbxtj3/Skip-Beat13.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/kMWLkkCs/Skip-Beat15.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/fTZ1ZBTN/Skip-Beat16.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/gkDQ08n6/Skip-Beat17.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/dVVXZ3yN/Skip-Beat18.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/Mp3L7w06/Skip-Beat19.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/ncGbQNwr/Skip-Beat2.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/W4DHSySM/Skip-Beat20.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/Zq1DQLDX/Skip-Beat22.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/MTVrJjCH/Skip-Beat23.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/cCWkxLWm/Skip-Beat24.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/gjKSnbkP/Skip-Beat26.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/Wb2YxzXp/Skip-Beat27.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/8kdnyMdn/Skip-Beat28.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/rFQZTTP1/Skip-Beat29.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/13Rx0MLH/Skip-Beat3.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/FHzWs6M2/Skip-Beat30.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/hPBRvKsN/Skip-Beat4.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/fR8G8msh/Skip-Beat6.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/1z4L2XRV/Skip-Beat7.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/Bvyd03tY/Skip-Beat8.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/NGn3WkPn/kyoko1.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/GtT5c6S5/kyoko10.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/3ry84RsP/kyoko11.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/CMWFj0Yd/kyoko12.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/bNkqg5Ng/kyoko13.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/52JbRmXV/kyoko14.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/JzQMVBXB/kyoko15.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/258mz8d9/kyoko16.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/W4WVtLXN/kyoko17.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/50XVC7Rw/kyoko18.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/RF2zQ7k2/kyoko19.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/jdJpKnpS/kyoko2.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/0jm1t6xj/kyoko20.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/bY2PY5bP/kyoko21.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/nc4tBQ0w/kyoko22.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/yY4HDTXZ/kyoko23.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/t49G5CcR/kyoko24.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/52BDQdNc/kyoko3.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/T3MZPYxq/kyoko4.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/q7QYQs3j/kyoko5.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/sXXLLMPy/kyoko6.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/W4sCMWhd/kyoko7.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/DZMN375G/kyoko8.jpg" },
+  { radioImg: false, imgLink: "https://i.postimg.cc/23pX3Ts8/kyoko9.jpg" }
+]
+                }
+            }, methods:{
+                    iconOpenFnc(){
+                        this.iconOpen = true;
+                    },
+newsInfos(){
+  if(this.txtTomoko && this.imgTomoko){ 
+    this.infosTomoko.push({
+      infoDiag: this.txtTomoko,
+      imgDiag: this.imgTomoko
+    });
+
+    // Générer le code depuis les données
+    let html = "";
+    this.infosTomoko.forEach(info => {
+      html += `<div class="tomokodiag"><div><img src="${info.imgDiag}"></div><span>${info.infoDiag}</span></div>\n`;
+    });
+
+    this.codeGenere = html;
+
+    // reset inputs
+    this.txtTomoko = '';
+    this.imgTomoko = '';
+  } else {
+    alert('Y manque des trucs bouuuh');
+  }
+}
+
+                }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>
