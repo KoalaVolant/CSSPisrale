@@ -1,0 +1,33 @@
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.sign23, .sign23 *{ box-sizing:border-box; }
+.sign23{ margin:0 auto; width:400px; position:relative; font-family:var(--s23-fnt); }
+.sign23 br{ display:none; }
+.sign23 img{ object-fit:cover; }
+
+:root{
+    --s23-fnt: "Elsie Swash Caps", serif;
+    --s23-filtre: #fff;
+    --s23-border:#FEE41D;
+}
+
+.sign23-fnd{ width:100%; height:35px; position:relative;}
+.sign23-fnd:after{ content:' '; width:400px; height:35px; 
+    background:var(--s23-filtre); opacity:0.4; display:block; }
+
+.sign23-title{ text-align:center; font-weight:bold; font-size:19px; 
+padding:5px; border:1px solid var(--s23-border); width:80%; position:relative;
+top:-18px; left:50%; transform:translateX(-50%); }
+
+.sign23-quote{ width:90%; text-align:center; margin:0 auto;
+    font-size:11px; line-height:14px; position:relative; top:-10px;}
+.sign23-quote:before{ content:'“'; font-size:30px; font-weight:bold; margin-right:5px;
+position:relative; top:5px; left:-10px;}
+.sign23-quote:after{ content:'”'; font-size:30px; font-weight:bold; margin-right:5px;
+ top:10px; position:absolute;  right:-25px; }
+
+.sign23-imgs{ display:flex; width:100%; justify-content:center; position:relative;
+top:-10px;}
+.sign23-imgs img{ width: width:80px; height:80px; margin:0 10px;
+border-radius:50%; border:1px solid var(--s23-border); 
+padding:5px; border-left:none; border-right:none;}
