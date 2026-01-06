@@ -1,0 +1,41 @@
+:root{
+  --ft-title:"IM Fell French Canon", serif;
+  --ft-txt:"Lato", sans-serif;
+  
+  --fich999-fnd:url('https://i64.servimg.com/u/f64/11/66/37/71/nick-n10.jpg');
+  --fich999-blc: #f0f0f0;
+  --fich999-main:rgba(137, 59,59,0.8);
+  --fich999-nr:rgba(0,0,0,0.5);
+}
+
+.fichrp999{ width:500px; margin:0 auto; overflow:hidden; }
+.fichrp999 img{ object-fit:cover; }
+.fichrp999, .fichrp999 *{ box-sizing:border-box; }
+.fichrp999 br{ display:none; }
+
+.fichrp999-title br, .fichrp999-txt br{ content:none; display:inline-block; }
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.fichrp999{ padding:15px; background:var(--fich999-fnd); background-size:cover; position:relative; }
+.fichrp999 .fichrp999-img{ border-radius:50%; width:120px; height:120px; 
+    margin:0 auto; margin-top:5px; position:relative;}
+.fichrp999 .fichrp999-img:before{ content:' '; background:var(--fich999-main); 
+position:absolute; top:-8px; left:-5px; width:130%; height:130%; border-radius:50%; 
+z-index:1;}
+.fichrp999 .fichrp999-img img{ border-radius:50%; position:relative; z-index:2; filter: grayscale(100%) brightness(65%);
+transition:500ms; }
+.fichrp999:hover .fichrp999-img img{ filter: grayscale(40%) brightness(100%); }
+
+.fichrp999-lines{ position:relative; z-index:1; top:120px; left:-20px;}
+.fichrp999-lines div{ position:absolute; height:1px; background:var(--fich999-blc); width:109%; }
+.fichrp999-lines div:nth-child(1){ transform:rotate(-5deg); top:15px;}
+.fichrp999-lines div:nth-child(2){ transform:rotate(10deg);}
+
+.fichrp999-title{ color:var(--fich999-blc); font-family:var(--ft-title); font-size:17px; line-height:15px; text-align:center;
+width:60%; margin:0 auto; position:relative; top:-45px; z-index:5;  }
+
+.fichrp999-txt{ text-align:justify; width:90%; margin:0px auto; color:var(--fich999-blc); 
+background:var(--fich999-nr); padding:20px; position:relative; top:-15px;}
+.fichrp999-quote{ color:var(--fich999-blc); position:relative; bottom:30px;
+font-family:var(--ft-title); background:var(--fich999-main); display:inline-block; 
+    left:100px; }
