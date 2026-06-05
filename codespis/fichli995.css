@@ -16,7 +16,7 @@ padding:15px; display:flex; align-items:center; max-width:550px;
     justify-content:space-between; 
 font-family:var(--fli995txt); }
 .fichlien995 > img{ width:150px; height:240px; }
-.fichlien995 .fichlien995infos{ width:65%;
+.fichlien995 .fichlien995infos{ width:65%; margin-left:20px; 
 font-size:14px; line-height:1.5em; color:var(--fli995txt) !important;}
 .fichlien995 .fichlien995infos div:nth-child(2){ font-family:var(--fli995tt); 
 font-size:34px; }
