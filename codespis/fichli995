@@ -1,0 +1,54 @@
+.fichlien995, .fichlien995links{ margin:0 auto; 
+    width:550px; }
+.fichlien995 br, .fichlien995links br{ display:none; }
+.fichlien995 img, .fichlien995links img{ object-fit:cover; }
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+:root{ 
+--fli995deg:linear-gradient(90deg,rgba(255, 246, 222, 1) 0%, rgba(139, 223, 221, 1) 50%);
+--fli995deg2:linear-gradient(177deg,rgba(125, 227, 174, 1) 0%, rgba(240, 218, 236, 1) 50%);;
+    --fli995tt:"Style Script", cursive;
+--fli995txt:"Fredoka", sans-serif;
+--fli995txtc:#222; }
+
+.fichlien995{ background:var(--fli995deg); border-radius:15px;
+padding:15px; display:flex; align-items:center;
+    justify-content:space-between; 
+font-family:var(--fli995txt); }
+.fichlien995 > img{ width:150px; height:240px; }
+.fichlien995 .fichlien995infos{ width:65%;
+font-size:14px; line-height:1.5em; color:var(--fli995txt) !important;}
+.fichlien995 .fichlien995infos div:nth-child(2){ font-family:var(--fli995tt); 
+font-size:34px; }
+.fichlien995 .fichlien995infos div:nth-child(4){ text-align:justify; max-height:130px;
+overflow:auto;}
+.fichlien995 .fichlien995infos div:nth-child(4) br{ display:inline; content:none; }
+.fichlien995 .fichlien995-url{ display:flex;
+margin-top:10px;}
+.fichlien995 .fichlien995-url a{ display:block; 
+background:white; border:white 1px solid; 
+    transition:500ms; border-radius:5px; padding:5px; 
+font-size:12px; margin-right:5px;color:var(--fli995txt) !important; }
+.fichlien995 .fichlien995-url a:hover{ background:none; 
+transition:500ms;}
+
+.fichlien995links{ display:flex; flex-wrap:wrap;
+justify-content:space-between; font-family:var(--fli995txt); }
+.fichlien995titre{ background:var(--fli995deg); 
+border-radius:10px; font-family:var(--fli995tt); 
+font-size:40px; padding:5px; width:100%; 
+margin-bottom:15px; }
+.fichlien995link{ display:flex; padding:5px; 
+width:49%; background:var(--fli995deg2); margin-bottom:10px;
+border-radius:10px; align-items:center;}
+.fichlien995link > img{ width:25%; height:130px;
+margin-right:10px; }
+.fichlien995linkinfo div:nth-child(1){  font-family:var(--fli995tt);
+font-size:25px;}
+.fichlien995linkinfo div:nth-child(3){  max-height:50px; overflow:auto;}
+.fichlien995linkinfo a{ background:white; padding:3px;
+margin-top:5px; display:inline-block; font-size:11px;
+    border-radius:10px; border:1px solid white;
+    color:var(--fli995txtc) !important; }
+.fichlien995linkinfo a:hover{ background:none; 
+transition:500ms;}
