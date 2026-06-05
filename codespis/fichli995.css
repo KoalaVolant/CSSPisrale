@@ -6,8 +6,8 @@
 
 :root{ 
 --fli995deg:linear-gradient(90deg,rgba(255, 246, 222, 1) 0%, rgba(139, 223, 221, 1) 50%);
---fli995deg2:linear-gradient(177deg,rgba(125, 227, 174, 1) 0%, rgba(240, 218, 236, 1) 50%);;
-    --fli995tt:"Style Script", cursive;
+--fli995deg2:linear-gradient(177deg,rgba(125, 227, 174, 1) 0%, rgba(240, 218, 236, 1) 50%);
+--fli995tt:"Style Script", cursive;
 --fli995txt:"Fredoka", sans-serif;
 --fli995txtc:#222; }
 
