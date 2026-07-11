@@ -1,0 +1,47 @@
+:root{ 
+--ipiurp-deg1:linear-gradient(180deg,rgba(232, 188, 227, 1) 0%, rgba(239, 213, 194, 1) 100%); 
+--ipiurp-white:#fff;
+--ipiurp-title:'Intel One Mono'; 
+--ipiurp-txt:'Roboto';
+--ipiurp-txt1:rgb(166,47,153);
+--ipiurp-txt2:#868686;
+}
+.ipiurp, .ipiurp *{ box-sizing:border-box; }
+.ipiurp{ margin:0 auto; width:530px; overflow:hidden;}
+.ipiurp br{ display:none; }
+.ipiurp img{ object-fit:cover; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.ipiurp{ background:var(--ipiurp-deg1); }
+.ipiurp .ipiuflex{ position:relative; }
+.ipiurp .ipiu-title{ background:var(--ipiurp-white); font-family:var(--ipiurp-title); 
+width:105%; padding:15px 10px; left:-3px; position:relative;
+font-size:18px; line-height:20px; z-index:10; color:var(--ipiurp-txt1); transform:rotate(-3deg);}
+.ipiurp .ipiuflex img{ width:170px; height:170px; z-index:5; position:absolute;
+border:10px solid var(--ipiurp-white); border-radius:50%;
+right:-20px; top:-40px;}
+.ipiurp .ipiuflex span{ position:absolute; color:var(--ipiurp-white); 
+font-family:var(--ipiurp-title); right:170px; top:30px;
+font-size:15px;}
+.ipiurp .ipiucont{ margin:90px 8% 40px 8%; text-align:justify; 
+position:relative; z-index:15; background:var(--ipiurp-white);
+padding:25px; font-family:var(--ipiurp-txt); font-size:14px; 
+    line-height:1.5em;}
+.ipiurp .ipiucont br{ display:inline-block; content:none;}
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.ipiusign, .ipiusign *{ box-sizing:border-box; }
+.ipiusign{ margin:0 auto; width:350px; position:relative; }
+.ipiusign br{ display:none; }
+.ipiusign img{ object-fit:cover; }
+.ipiusign{ display:flex; align-items:center; }
+.ipiusign .ipiuflex{    font-family:var(--ipiurp-title);}
+.ipiusign .ipiuflex div{ margin-bottom:-2px; font-size:17px;
+color:var(--ipiurp-txt2); }
+.ipiusign .ipiuflex span{ color:var(--ipiurp-txt1);}
+.ipiusign img{ width:130px; height:130px; right:-20px;
+    position:absolute; border-radius:50%; border:10px solid var(--ipiurp-white);}
+.ipiusign .ipiuflex span{ background:var(--ipiurp-deg1); 
+display:block; font-size:11px; padding:5px; line-height:11px; 
+text-align:justify;width:100%; padding-right:115px;}
