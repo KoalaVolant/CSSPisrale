@@ -1,0 +1,29 @@
+:root{
+    --signbichro:"Rubik Dirt", system-ui;
+    --signbichro2:"Train One", system-ui;
+}
+
+.signnbb, .signnbb *{ box-sizing:border-box; }
+.signnbb{ margin:0 auto; width:400px; }
+.signnbb br{ display:none; }
+.signnbb img{ object-fit:cover; }
+
+.signnbb{ background:#222; position:relative; margin-bottom:30px;}
+.signbbquote{ margin:0 30px; font-size:25px; 
+    color:#fff; 
+    padding-top:15px; padding-bottom:75px;
+text-align:center; border-left:3px solid white;
+ border-right:3px solid white;
+position:relative; }
+.signbbquote span:nth-child(1){ font-family:var(--signbichro); }
+.signbbquote span:nth-child(2){ font-family:var(--signbichro2);
+position:absolute; left:50%; transform:translateX(-50%);
+    top:23px; font-size:18px;}
+.signnbb div:nth-child(2){ position:absolute;
+    display:flex; justify-content:center; 
+width:100%; bottom:-40px;}
+.signnbb div:nth-child(2) img{ width:27%;
+height:70px; border:3px solid white; 
+filter: grayscale(100%);}
+.signnbb div:nth-child(2) img:hover{ filter: grayscale(0%);}
+.signnbb div:nth-child(2) img:nth-child(2){ margin:0 15px;}
