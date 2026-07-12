@@ -1,0 +1,146 @@
+:root{
+    --mimit-font1:"Gabarito", sans-serif;
+    --mimit-font2:"Poppins", sans-serif;
+    --mimit-deg1: linear-gradient(180deg,rgba(187, 7, 14, 1) 0%, rgba(44, 142, 171, 1) 100%);
+    --mimit-txt1:#2C8EAB;
+    
+    --mimit-border:#f0f0f0; 
+    --mimit-fini:rgb(215,5,5);
+    --mimit-aban:rgb(143,92,41);
+}
+
+.mimit-frp, .mimit-frp *{ box-sizing:border-box; }
+.mimit-frp{ margin:0 auto; width:550px; 
+font-family:var(--mimit-font2); }
+.mimit-frp br{ display:none; }
+.mimit-frp img{ object-fit:cover; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.mimit-frpfl{ display:flex; align-items:center;
+justify-content:space-between; }
+.mimit-frpfl img{ width:150px; height:150px; border:10px solid white; 
+border-radius:10px; transform:rotate(-5deg); 
+box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);}
+.mimit-frpfl div{ font-family:var(--mimit-font1); 
+margin-left:15px; font-size:24px; line-height:21px; 
+    text-align:right;text-transform:uppercase; transform:rotate(3deg);
+font-weight:bold;
+  background:var(--mimit-deg1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}
+.mimit-frpqu{ font-size:10px; padding:11px; 
+    width:70%; line-height:11px; margin-top:10px;
+}
+.mimit-frpct{ text-align:justify; font-size:13px; line-height:1.5em; }
+.mimit-frpct br, .mimit-frpqu br{ display:inline-block; content:none; }
+
+.mimit-si{ display:flex; justify-content:space-between; }
+.mimit-si, .mimit-si *{ box-sizing:border-box; }
+.mimit-si{ margin:0 auto; width:350px; }
+.mimit-si br{ display:none; }
+.mimit-si img{ object-fit:cover; }
+
+.mimit-si img{ width:80px; height:80px; border:5px solid white; 
+transform:rotate(-5deg); box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
+    border-radius:10px; transition:500ms;}
+.mimit-si img:hover{ transform:rotate(5deg); transition:500ms;}
+.mimit-si img:nth-child(2){ margin-left:10px; margin-top:10px;}
+
+.mimit-si div{ align-self:self-end; margin-left:10px; font-size:11px; 
+line-height:11px;  background:var(--mimit-deg1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; font-family:var(--mimit-font1);  }
+
+
+.mimil-ent, .mimil-ent *{ box-sizing:border-box; }
+.mimil-ent{ margin:0 auto; width:550px; font-family:var(--mimit-font2);}
+.mimil-ent br{ display:none; }
+.mimil-ent img{ object-fit:cover; }
+
+.mimil-ent1{ display:flex; align-items:center; justify-content:center; }
+.mimil-ent1 img{  width:150px; height:150px; border:10px solid white; 
+border-radius:10px; transform:rotate(-5deg); 
+box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1); margin-right:15px;}
+.mimil-infos{ font-family:var(--mimit-font1); 
+transform:rotate(3deg); }
+.mimil-infos div{ text-transform:uppercase; font-weight:bold;
+font-size:22px;
+  background:var(--mimit-deg1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}
+.mimil-infos span br{ content:none; display:inline-block;}
+.mimil-infos span{ font-size:13px; line-height:11px;
+color:var(--mimit-txt1); }
+
+.mimil-ent2 div{ margin-top:20px; 
+    transform:rotate(-2deg); text-transform:uppercase; font-weight:bold;
+font-size:22px;
+  background:var(--mimit-deg1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}
+.mimil-ent2 span{ display:block; text-align:justify; 
+    font-size:13px; line-height:1.5em; max-height:300px;
+overflow:auto; margin-top:10px;}
+
+.mimil-liens, .mimil-liens *{ box-sizing:border-box; }
+.mimil-liens{ margin:0 auto; width:550px; }
+.mimil-liens br{ display:none; }
+.mimil-liens img{ object-fit:cover; }
+
+.mimil-liens{ display:flex; flex-wrap:wrap; justify-content:space-between; }
+.mimil-lien{ width:48%;  margin-bottom:10px; }
+
+.mimil-lin{ display:flex; justify-content:space-between;
+font-family:var(--mimit-font1); align-items:center; }
+.mimil-lin img{ width:30%; border:5px solid white; 
+transform:rotate(-5deg); box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
+    border-radius:10px; transition:500ms; }
+.mimil-lin .mimil-nom{ width:69%; transform:rotate(-3deg);
+margin-left:10px; }
+.mimil-lin .mimil-nom div{text-transform:uppercase; font-weight:bold;
+font-size:18px;
+  background:var(--mimit-deg1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}
+.mimil-lin .mimil-nom span{ color:var(--mimit-txt1); }
+.mimil-infosl{ font-family:var(--mimit-font2); text-align:justify;
+font-size:13px; line-height:16px; margin-top:5px; 
+height:100px;overflow:auto; padding-right:5px;}
+
+.mimil-lien:nth-of-type(even) .mimil-lin{ flex-direction:row-reverse;}
+.mimil-lien:nth-of-type(even) .mimil-lin .mimil-nom{ text-align:right;}
+
+
+.mimilrp, .mimilrp *{ box-sizing:border-box; }
+.mimilrp{ margin:0 auto; width:550px; }
+.mimilrp br{ display:none; }
+.mimilrp img{ object-fit:cover; }
+
+.mimilrp-date{ display:flex; justify-content:-space-between;
+margin-bottom:20px; position:relative;
+font-family:var(--mimit-font2); }
+.mimilrp-date .mimilrp-l{ width:100px; }
+.mimilrp-date .mimilrp-r{ width:445px; margin-left:10px;
+font-size:14px; line-height:18px;}
+.mimilrp-date .mimilrp-l img{ width:100px; height:100px;
+position:relative; z-index:5; border:5px solid white; 
+transform:rotate(-3deg); border-radius:10px; 
+box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1); }
+.mimilrp-date .mimilrp-l:before{ content:' '; width:2px; 
+height:100%; position:absolute; left:50px; 
+background:var(--mimit-deg1); z-index:1;}
+.mimilrp-date .mimilrp-r .mimilrp-title{ transform:rotate(-2deg); text-transform:uppercase; font-weight:bold;
+font-size:22px; font-family:var(--mimit-font1); 
+  background:var(--mimit-deg1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; margin-bottom:20px;}
+.mimilrp-rp{ border:1px solid var(--mimit-border); border-radius:10px; 
+padding:10px; margin-bottom:10px; }
+.mimilrp-rp .cours, .mimilrp-rp .fini, .mimilrp-rp .aban{ font-family:var(--mimit-font1); 
+font-size:16px;}
+.mimilrp-rp .cours{ color:var(--mimit-txt1); }
+.mimilrp-rp .fini{ color:var(--mimit-fini); }
+.mimilrp-rp .aban{ color:var(--mimit-aban); }
+.mimilrp-rp div{ text-align:justify; margin-top:5px; 
+padding-right:5px;}
