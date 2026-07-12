@@ -18,10 +18,10 @@ position:relative; }
 .signbbquote span:nth-child(1){ font-family:var(--signbichro); }
 .signbbquote span:nth-child(2){ font-family:var(--signbichro2);
 position:absolute; left:50%; transform:translateX(-50%);
-    top:23px; font-size:18px;}
+    top:23px; font-size:18px; line-height:18px;}
 .signnbb div:nth-child(2){ position:absolute;
     display:flex; justify-content:center; 
-width:100%; bottom:-30px;}
+width:100%; bottom:-40px;}
 .signnbb div:nth-child(2) img{ width:27%;
 height:70px; border:3px solid white; 
 filter: grayscale(100%);}
