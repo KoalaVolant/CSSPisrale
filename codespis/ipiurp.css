@@ -21,7 +21,7 @@ font-size:18px; line-height:20px; z-index:10; color:var(--ipiurp-txt1); transfor
 .ipiurp .ipiuflex img{ width:170px; height:170px; z-index:5; position:absolute;
 border:10px solid var(--ipiurp-white); border-radius:50%;
 right:-20px; top:-40px;}
-.ipiurp .ipiuflex span{ position:absolute; color:var(--ipiurp-white); 
+.ipiurp .ipiuflex span{ position:absolute; color:var(--ipiurp-white) !important; 
 font-family:var(--ipiurp-title); right:170px; top:30px;
 font-size:15px;}
 .ipiurp .ipiucont{ margin:90px 8% 40px 8%; text-align:justify; 
