@@ -1,0 +1,31 @@
+:root{
+    --photorpf-title:"Allura", cursive;
+    --photorpf-citation:"Belleza", sans-serif;
+    --photorpf-content:"Open Sans", sans-serif; 
+}
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.photorpf, .photorpf *{ box-sizing:border-box; }
+.photorpf{ width:500px; margin:0 auto; }
+.photorpf br{ display:none; }
+.photorpf img{ object-fit:cover; }
+
+.photorpf > div{ padding:10px; color:#222;
+    background:#fbfbfb;}
+.photorpf-images{ display:flex; padding:10px;
+    justify-content:center; flex-wrap:wrap; 
+border-bottom:none;}
+.photorpf-images img{ width:28%; margin:10px;}
+.photorpf-title{ padding-top:0px !important; 
+    font-family:var(--photorpf-title); 
+text-align:center; font-size:40px; line-height:35px;}
+.photorpf-title span{ font-size:12px; line-height:12px;
+font-family:var(--photorpf-citation); }
+
+.photorpf-quote{ padding:20px !important; text-align:justify;
+text-align:center; font-size:12px; line-height:12px;
+font-family:var(--photorpf-citation); margin:20px 0;}
+.photorpf-quote br, .photorpf-content br{ content:none; display:inline-block; }
+.photorpf-content{ padding:20px !important; text-align:justify;
+font-family:var(--photorpf-content); font-size:13px; line-height:1.5em; }
