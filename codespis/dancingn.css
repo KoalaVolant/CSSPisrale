@@ -1,0 +1,38 @@
+:root{ --dancingn-fnd:url('https://i64.servimg.com/u/f64/11/66/37/71/image11.jpg');
+    --dancingn-fnd2:#313131; position:relative;
+--dancingn-bd:#FADF97;
+--dancingn-wh:#f0f0f0;
+--dancingn-fndm:#364E67;
+    
+--dancingn-tit:"Parisienne", cursive;
+--dancingn-txt:"EB Garamond", serif;}
+
+.dancingn, .dancingn *{ box-sizing:border-box; }
+.dancingn{ margin:0 auto; width:500px; }
+.dancingn br{ display:none; }
+.dancingn img{ object-fit:cover; }
+
+.dancingn{ background:var(--dancingn-fnd); 
+background-size:cover; padding-top:30px;}
+.dancingn-t{ border-top-left-radius: 220px;
+border-top-right-radius: 220px; margin:0 auto; width:85%;
+background:var(--dancingn-fnd2); 
+position:relative;}
+.dancingn-img{ display:flex; justify-content:center;
+border-radius:50%; }
+.dancingn-img img{ border-radius:50%; width:100px; 
+height:100px; margin-top:40px; }
+.dancingn-img:after{ content:' ';
+    border:1px solid var(--dancingn-bd); position:absolute; 
+width:90px; height:90px; border-radius:50%;
+top:52px; left:48%; transform:translateX(-50%); }
+
+.dancingn-title{ text-align:center; color:var(--dancingn-wh); 
+font-family:var(--dancingn-tit); font-size:40px;font-weight:500; letter-spacing:-2px;
+background:var(--dancingn-fndm); width:80%;
+margin:0 auto; margin-top:15px; }
+.dancingn-ct{ color:var(--dancingn-wh); padding:25px 35px;
+text-align:justify; }
+.dancingn-ct br{ content:none; display:inline-block; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
