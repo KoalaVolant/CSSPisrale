@@ -40,6 +40,7 @@ padding:25px; font-family:var(--ipiurp-txt); font-size:14px; color:var(--ipiurp-
 .ipiusign .ipiuflex div{ margin-bottom:-2px; font-size:17px;
 color:var(--ipiurp-txt2); }
 .ipiusign .ipiuflex span{ color:var(--ipiurp-txt1);}
+.ipiusign .ipiuflex span br{ content:none; display:inline-block; } 
 .ipiusign img{ width:130px; height:130px; right:-20px;
     position:absolute; border-radius:50%; border:10px solid var(--ipiurp-white);}
 .ipiusign .ipiuflex span{ background:var(--ipiurp-deg1); 
