@@ -11,8 +11,13 @@
 .polasign1 > img{ width:80%; height:100px;
     object-position:var(--polabdpositionimg);
   border:5px solid var(--polabdfnd);  
-    margin:0 auto; display:block;
+    margin:0 auto; display:block; transition:500ms;
+    filter: grayscale(100%);
 }
+.polasign1 > img:nth-child(1){ border-bottom:none;}
+.polasign1 > img:nth-child(3){ border-top:none;}
+.polasign1:hover > img{ filter: grayscale(0%);
+transition:500ms;}
 .polasign1 div{ background:var(--polabdfnd); 
 font-family:"Allura", cursive; color:var(--polabdtxt);
     text-align:center;
