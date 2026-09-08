@@ -19,7 +19,7 @@
 .polasign1:hover > img{ filter: grayscale(0%);
 transition:500ms;}
 .polasign1 div{ background:var(--polabdfnd); 
-font-family:"Allura", cursive; color:var(--polabdtxt);
+font-family: "Belleza", sans-serif; color:var(--polabdtxt);
     text-align:center;
 font-size:25px; padding:10px; line-height:15px;}
 
