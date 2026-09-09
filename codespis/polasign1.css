@@ -1,6 +1,8 @@
 :root{ 
 --polabdfnd:#fbfbfb;
 --polabdtxt:#222;
+    --polabdsbfnd:#fbfbfb;
+--polabdsbtxt:#222;
 --polabdpositionimg:0% 30%;}
 
 .polasign1, .polasign1 *{ box-sizing:border-box; }
@@ -14,6 +16,9 @@
     margin:0 auto; display:block; transition:500ms;
     filter: grayscale(100%);
 }
+
+
+
 .polasign1 > img:nth-child(1){ border-bottom:none;}
 .polasign1 > img:nth-child(3){ border-top:none;}
 .polasign1:hover > img{ filter: grayscale(0%);
@@ -22,5 +27,8 @@ transition:500ms;}
 font-family: "Belleza", sans-serif; color:var(--polabdtxt);
     text-align:justify;
 font-size:13px; padding:10px; line-height:12px;}
+
+.polasign1.polasignsb > img{ background:var(--polabdsbfnd); }
+.polasign1.polasignsb div{ background:var(--polabdsbfnd); color:var(--polabdsbtxt);}
 
 .koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
