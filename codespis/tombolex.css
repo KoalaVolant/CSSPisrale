@@ -1,0 +1,30 @@
+:root{
+  --tombolex-title:"Single Day", cursive;;
+    --tombolex-font:"Montserrat", sans-serif;
+    --tombolex-bd:rgb(255,165,165);
+    --tombolex-fntitle:linear-gradient(264deg,rgb(246,105,105) 0%, rgba(226, 226, 68, 1) 100%);
+}
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
+.tombolex, .tombolex *{ box-sizing:border-box; }
+.tombolex{ width:500px; margin:0 auto; }
+.tombolex br{ display:none; }
+.tombolex img{ object-fit:cover; }
+
+.tombolex{ background:#fff;
+    border-left:5px solid var(--tombolex-bd);
+    border-right:5px solid var(--tombolex-bd);
+    font-family:var(--tombolex-font); text-align:justify;
+}
+.tombolex .tombol-titre{ font-family:var(--tombolex-title);
+font-size:35px; letter-spacing:-2px; text-align:center;
+line-height:35px; padding:10px; background:var(--tombolex-fntitle);
+  background-clip: text;
+  color: transparent;}
+.tombolex .tombol-float{ color:#222; font-size:14px;
+    line-height:1.5em;
+    margin:10px; padding:10px; }
+.tombolex .tombol-float br{ display:inline-block; content:none; }
+.tombolex .tombol-float img{ float:right;
+width:130px; height:130px; margin-left:10px; }
