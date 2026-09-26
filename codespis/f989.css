@@ -1,0 +1,38 @@
+/******** FICHE RP **********/ 
+
+.koala{display:flex; margin-top:20px;justify-content:center; font-size:8px; letter-spacing:5px; }
+
+:root{ 
+--f989f1:"Poppins", sans-serif;
+--f989f2: "Inter", sans-serif;
+    
+--f989-mc:linear-gradient(90deg,rgba(246, 211, 25, 1) 0%, rgba(186, 139, 9, 1) 100%);
+}
+
+.fichrp989, .fichrp989 *{ box-sizing:border-box; }
+.fichrp989{ margin:0 auto; width:450px; }
+.fichrp989 br{ display:none; }
+.fichrp989 img{ object-fit:cover; }
+
+.fichrp989{ position:relative; margin-top:30px;}
+
+.fichrp989-circ{ border-radius:50%; width:350px; 
+    height:350px; background:var(--f989-mc); 
+position:absolute; z-index:1; 
+top:-75px; left:50%;     transform:translateX(-50%);}
+.fichrp989 > img{ border-radius:20px; width:120px; height:120px; 
+position:absolute; top:-35px; left:50%; 
+    transform:translateX(-50%);
+z-index:3; }
+.fichrp989-cnt{ background:#f0f0f0; padding:25px; 
+text-align:justify; font-size:14px; line-height:1.5em; 
+font-family:var(--f989f1); border-radius:20px; 
+padding-top:100px; position:relative; z-index:2; }
+.fichrp989-cnt br{ display:inline-block; content:none; }
+
+.fichrp989-feat{ font-weight:900; 
+font-family:var(--f989f2); letter-spacing:-2px; 
+font-size:25px; position:absolute; z-index:4;
+bottom:-10px; right:10px; background:var(--f989-mc);
+  background-clip: text;
+  color: transparent;}
