@@ -1,0 +1,46 @@
+:root{
+    --l988-fntit:'playfair display', serif;
+    --l988-fntxt:'google sans', sans-serif;
+    --l988-deg:linear-gradient(to right, #3b8d99, #6b6b83, #aa4b6b);
+    --l988-forme:polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+
+.links988, .links988 *{ box-sizing:border-box; }
+.links988{ margin:0 auto; width:450px; }
+.links988 br{ display:none; }
+.links988 img{ object-fit:cover; }
+
+.links988.links988-ent{ text-align:center; position:relative; 
+opacity:1;}
+.links988.links988-ent .links988img img{ width:250px;height:250px;
+clip-path:var(--l988-forme);  }
+.links988.links988-ent .links988img div{ border-radius:50%; position:absolute;
+width:250px; height:250px;   background:var(--l988-deg);
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+          mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+left:60%; transform:translateX(-50%) ; top:0px;}
+
+.links988 .links988nom{ font-size:50px; font-family:var(--l988-fntit); 
+line-height:30px; letter-spacing:-3px; position:relative; top:-25px;
+font-weight:900; }
+.links988 .links988cnt{ text-align:justify; font-size:12px; line-height:1.5em;
+position:relative; top:-15px;}
+
+.link988{ position:relative; display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+.link988 img{ width:120px;height:120px; clip-path:var(--l988-forme);
+transform:rotate(3deg); }
+.link988 .circ988{ border-radius:50%; position:absolute;
+width:120px; height:120px;   background:var(--l988-deg);
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+          mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+left:0%; top:30px; }
+.link988 .l988-cnt{ width:100%; margin-bottom:20px;}
+.link988 .l988-cnt span{ font-size:28px; font-family:var(--l988-fntit); 
+line-height:28px; letter-spacing:-2px; font-weight:900; }
+.link988 .l988-cnt div{ text-align:justify; font-size:13px; line-height:1.5em; 
+height:150px; overflow:auto; }
+
+.link988 .l988-cnt div br,
+.links988 .links988cnt br{ content:none; display:inline-block; }
+
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
