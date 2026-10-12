@@ -59,9 +59,11 @@ function loadData() {
 }
 
 function loadUi() {
-  const defaults = { dashboardOpen: true, filtersOpen: false };
+  const defaults = { dashboardOpen: true, filtersOpen: false, tab: '' };
   try {
-    return Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
+    const ui = Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
+    if (!TABS.some(t => t.id === ui.tab)) ui.tab = '';   // onglet inconnu -> aucun
+    return ui;
   } catch (e) {
     return defaults;
   }
@@ -98,7 +100,8 @@ const app = createApp({
       try { localStorage.setItem(UI_KEY, JSON.stringify(ui)); } catch (e) { /* stockage indisponible */ }
     }, { deep: true });
 
-    const view = ref('');   // onglet ouvert sous le tableau de bord ('' = aucun)
+    // Onglet ouvert sous le tableau de bord ('' = aucun) : mémorisé avec les autres préférences
+    const view = computed({ get: () => ui.tab, set: v => { ui.tab = v; } });
     function toggleTab(id) { view.value = view.value === id ? '' : id; }
     const today = ref(todayStr());
     setInterval(() => { today.value = todayStr(); }, 60 * 1000);
