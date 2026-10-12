@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Todo Quest</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app" v-cloak>
+
+  <!-- ============ EN-TÊTE ============ -->
+  <header class="app-header">
+    <h1 class="app-title">Todo Quest</h1>
+
+    <div class="sync-box">
+      <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
+      <template v-if="firebaseReady">
+        <button type="button" class="sync-signin" v-if="!user" @click="signIn">Se connecter avec Google</button>
+        <template v-else>
+          <span class="sync-user">{{ user.email }}</span>
+          <button type="button" class="sync-signout" @click="signOut">Se déconnecter</button>
+        </template>
+      </template>
+    </div>
+
+    <div class="points-box">
+      <div class="points-balance">⭐ <strong>{{ balance }}</strong> pts</div>
+      <div class="points-next" v-if="nextReward">
+        <span>Il te reste <strong>{{ nextReward.cost - balance }} pts</strong> avant {{ nextReward.icon }} {{ nextReward.name }}</span>
+        <progress :value="Math.max(0, balance)" :max="nextReward.cost"></progress>
+      </div>
+      <div class="points-next" v-else-if="data.rewards.length">
+        <span>🎉 Tu peux t'offrir toutes tes récompenses !</span>
+      </div>
+    </div>
+
+    <nav class="app-nav">
+      <button type="button" v-for="tab in tabs" :key="tab.id"
+              :class="{ active: view === tab.id }" @click="view = tab.id">
+        {{ tab.label }}
+      </button>
+    </nav>
+  </header>
+
+  <p class="toast" v-if="toast">{{ toast }}</p>
+
+  <main class="app-main">
+
+    <!-- ============ FORMULAIRE TÂCHE (ajout / édition) ============ -->
+    <section class="form-panel task-form" v-if="taskForm.open">
+      <h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
+      <form @submit.prevent="saveTask">
+        <label>Titre
+          <input type="text" v-model="taskForm.title" required placeholder="Ex : Ranger le bureau">
+        </label>
+        <label>Catégorie
+          <input type="text" v-model="taskForm.category" list="category-list" placeholder="Ex : Maison">
+          <datalist id="category-list">
+            <option v-for="c in categories" :key="c" :value="c"></option>
+          </datalist>
+        </label>
+        <label>Points à gagner
+          <input type="number" min="0" v-model.number="taskForm.points">
+        </label>
+        <label>Statut
+          <select v-model="taskForm.status">
+            <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
+          </select>
+        </label>
+        <label>Projet
+          <select v-model="taskForm.projectId">
+            <option value="">— Aucun —</option>
+            <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+          </select>
+        </label>
+        <label>Date butoir
+          <input type="date" v-model="taskForm.due">
+        </label>
+        <div class="form-actions">
+          <button type="submit">Enregistrer</button>
+          <button type="button" @click="taskForm.open = false">Annuler</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ BARRE DE FILTRES (Aujourd'hui / À venir / Toutes) ============ -->
+    <section class="filters" v-if="['today', 'upcoming', 'all'].includes(view)">
+      <div class="filters-row">
+        <button type="button" class="btn-add" @click="openTaskForm()">＋ Ajouter une tâche</button>
+      </div>
+      <div class="filters-row">
+        <input type="search" v-model="filters.search" placeholder="Rechercher…">
+
+        <select v-model="filters.category">
+          <option value="">Toutes catégories</option>
+          <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+        </select>
+
+        <select v-model="filters.status">
+          <option value="">Tous statuts</option>
+          <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
+        </select>
+
+        <select v-model="filters.project">
+          <option value="">Tous projets</option>
+          <option value="__none">Sans projet</option>
+          <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+        </select>
+
+        <select v-model="filters.sort">
+          <option value="due">Trier : date butoir</option>
+          <option value="points-desc">Trier : points ↓</option>
+          <option value="points-asc">Trier : points ↑</option>
+          <option value="title">Trier : titre A→Z</option>
+        </select>
+
+        <label class="filters-check">
+          <input type="checkbox" v-model="filters.showDone"> Afficher les terminées
+        </label>
+
+        <button type="button" @click="resetFilters">Réinitialiser</button>
+      </div>
+    </section>
+
+    <!-- ============ VUE : AUJOURD'HUI ============ -->
+    <section class="view view-today" v-if="view === 'today'">
+      <h2>Aujourd'hui <small>({{ todayTasks.length }})</small></h2>
+      <p class="hint">Tâches dont la date butoir est aujourd'hui ou déjà dépassée.</p>
+      <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui 🎉</p>
+      <div class="task-list">
+        <task-row v-for="t in todayTasks" :key="t.id"
+                  :task="t" :project-label="projectName(t.projectId)"
+                  :statuses="statuses" :today="today"
+                  @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+      </div>
+    </section>
+
+    <!-- ============ VUE : À VENIR ============ -->
+    <section class="view view-upcoming" v-if="view === 'upcoming'">
+      <h2>À venir <small>({{ upcomingTasks.length }})</small></h2>
+      <p class="hint">Tâches dont la date butoir est dans le futur.</p>
+      <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
+      <div class="task-list">
+        <task-row v-for="t in upcomingTasks" :key="t.id"
+                  :task="t" :project-label="projectName(t.projectId)"
+                  :statuses="statuses" :today="today"
+                  @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+      </div>
+    </section>
+
+    <!-- ============ VUE : TOUTES LES TÂCHES ============ -->
+    <section class="view view-all" v-if="view === 'all'">
+      <h2>Toutes les tâches <small>({{ allTasks.length }})</small></h2>
+      <p class="hint">Y compris celles sans date butoir.</p>
+      <p class="empty" v-if="!allTasks.length">Aucune tâche.</p>
+      <div class="task-list">
+        <task-row v-for="t in allTasks" :key="t.id"
+                  :task="t" :project-label="projectName(t.projectId)"
+                  :statuses="statuses" :today="today"
+                  @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+      </div>
+    </section>
+
+    <!-- ============ VUE : PROJETS ============ -->
+    <section class="view view-projects" v-if="view === 'projects'">
+      <h2>Projets <small>({{ data.projects.length }})</small></h2>
+
+      <button type="button" class="btn-add" @click="openProjectForm()">＋ Nouveau projet</button>
+
+      <!-- Formulaire projet -->
+      <div class="form-panel project-form" v-if="projectForm.open">
+        <h3>{{ projectForm.id ? 'Modifier le projet' : 'Nouveau projet' }}</h3>
+        <form @submit.prevent="saveProject">
+          <label>Nom du projet
+            <input type="text" v-model="projectForm.name" required>
+          </label>
+          <label>Description
+            <textarea v-model="projectForm.description" rows="2"></textarea>
+          </label>
+
+          <fieldset v-if="!projectForm.id">
+            <legend>Tâches du projet</legend>
+            <div class="draft-task" v-for="(d, i) in projectForm.tasks" :key="i">
+              <input type="text" v-model="d.title" placeholder="Titre de la tâche">
+              <input type="text" v-model="d.category" list="category-list" placeholder="Catégorie">
+              <input type="number" min="0" v-model.number="d.points" title="Points">
+              <input type="date" v-model="d.due" title="Date butoir">
+              <button type="button" @click="projectForm.tasks.splice(i, 1)">✕</button>
+            </div>
+            <button type="button" @click="addDraftTask">＋ Ajouter une tâche</button>
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="submit">Enregistrer</button>
+            <button type="button" @click="projectForm.open = false">Annuler</button>
+          </div>
+        </form>
+      </div>
+
+      <p class="empty" v-if="!data.projects.length">Aucun projet pour l'instant.</p>
+
+      <article class="project" v-for="p in data.projects" :key="p.id">
+        <header class="project-header">
+          <h3 class="project-name">{{ p.name }}</h3>
+          <p class="project-desc" v-if="p.description">{{ p.description }}</p>
+          <div class="project-progress">
+            <progress :value="projectStats(p).done" :max="Math.max(1, projectStats(p).total)"></progress>
+            <span>{{ projectStats(p).done }} / {{ projectStats(p).total }} tâches · {{ projectStats(p).points }} pts à gagner</span>
+          </div>
+          <div class="project-actions">
+            <button type="button" @click="openTaskForm(null, p.id)">＋ Tâche</button>
+            <button type="button" @click="openProjectForm(p)">Modifier</button>
+            <button type="button" @click="deleteProject(p)">Supprimer</button>
+          </div>
+        </header>
+
+        <div class="task-list">
+          <p class="empty" v-if="!projectTasks(p).length">Pas encore de tâche dans ce projet.</p>
+          <task-row v-for="t in projectTasks(p)" :key="t.id"
+                    :task="t" :project-label="''"
+                    :statuses="statuses" :today="today"
+                    @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============ VUE : RÉCOMPENSES ============ -->
+    <section class="view view-rewards" v-if="view === 'rewards'">
+      <h2>Récompenses</h2>
+      <p class="balance-line">Solde : <strong>{{ balance }} pts</strong>
+        <small>(gagnés : {{ earned }} · dépensés : {{ data.spent }})</small></p>
+
+      <button type="button" class="btn-add" @click="openRewardForm()">＋ Nouvelle récompense</button>
+
+      <!-- Formulaire récompense -->
+      <div class="form-panel reward-form" v-if="rewardForm.open">
+        <h3>{{ rewardForm.id ? 'Modifier la récompense' : 'Nouvelle récompense' }}</h3>
+        <form @submit.prevent="saveReward">
+          <label>Icône (emoji)
+            <input type="text" v-model="rewardForm.icon" maxlength="4">
+          </label>
+          <label>Nom
+            <input type="text" v-model="rewardForm.name" required>
+          </label>
+          <label>Coût (pts)
+            <input type="number" min="1" v-model.number="rewardForm.cost" required>
+          </label>
+          <div class="form-actions">
+            <button type="submit">Enregistrer</button>
+            <button type="button" @click="rewardForm.open = false">Annuler</button>
+          </div>
+        </form>
+      </div>
+
+      <p class="empty" v-if="!data.rewards.length">Aucune récompense. Ajoutes-en une !</p>
+
+      <div class="reward-list">
+        <article class="reward" v-for="r in sortedRewards" :key="r.id" :class="{ affordable: balance >= r.cost }">
+          <div class="reward-icon">{{ r.icon }}</div>
+          <div class="reward-body">
+            <h3 class="reward-name">{{ r.name }}</h3>
+            <p class="reward-cost">{{ r.cost }} pts</p>
+            <progress :value="Math.min(Math.max(0, balance), r.cost)" :max="r.cost"></progress>
+            <p class="reward-status" v-if="balance >= r.cost">✅ Dispo ! Tu peux la réclamer.</p>
+            <p class="reward-status" v-else>Il te reste <strong>{{ r.cost - balance }} pts</strong> avant d'avoir ça.</p>
+          </div>
+          <div class="reward-actions">
+            <button type="button" :disabled="balance < r.cost" @click="claimReward(r)">Réclamer</button>
+            <button type="button" @click="openRewardForm(r)">Modifier</button>
+            <button type="button" @click="deleteReward(r)">Supprimer</button>
+          </div>
+        </article>
+      </div>
+
+      <!-- Inventaire -->
+      <h2 class="inventory-title">🎒 Inventaire <small>({{ data.inventory.length }})</small></h2>
+      <p class="empty" v-if="!data.inventory.length">Tu n'as encore rien gagné.</p>
+
+      <div class="inventory-list">
+        <article class="inventory-item" v-for="item in data.inventory" :key="item.id" :class="{ used: item.used }">
+          <template v-if="invForm.id === item.id">
+            <form class="inventory-edit" @submit.prevent="saveInv">
+              <input type="text" v-model="invForm.icon" maxlength="4">
+              <input type="text" v-model="invForm.name" required>
+              <button type="submit">OK</button>
+              <button type="button" @click="invForm.id = null">Annuler</button>
+            </form>
+          </template>
+          <template v-else>
+            <div class="inventory-icon">{{ item.icon }}</div>
+            <div class="inventory-body">
+              <h3 class="inventory-name">{{ item.name }}</h3>
+              <p class="inventory-meta">Gagnée le {{ formatDate(item.date) }} · {{ item.cost }} pts</p>
+            </div>
+            <label class="inventory-used">
+              <input type="checkbox" v-model="item.used"> Utilisée
+            </label>
+            <div class="inventory-actions">
+              <button type="button" @click="startEditInv(item)">Modifier</button>
+              <button type="button" @click="deleteInv(item)">Supprimer</button>
+              <button type="button" @click="refundInv(item)">Supprimer + rembourser</button>
+            </div>
+          </template>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ VUE : DONNÉES ============ -->
+    <section class="view view-data" v-if="view === 'data'">
+      <h2>Sauvegarde</h2>
+      <p v-if="user">Tes données sont synchronisées dans ton cloud Firebase ({{ user.email }}) et copiées sur cet appareil.</p>
+      <p v-else>Tes données sont stockées dans ce navigateur. Connecte-toi avec Google (en haut) pour les synchroniser entre tes appareils.</p>
+      <p>Tu peux aussi faire une sauvegarde manuelle en JSON, par précaution.</p>
+      <div class="data-actions">
+        <button type="button" @click="exportData">📤 Exporter (JSON)</button>
+        <label class="file-button">📥 Importer (JSON)
+          <input type="file" accept="application/json,.json" @change="importData">
+        </label>
+        <button type="button" @click="resetAll">🗑️ Tout effacer</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ TEMPLATE : LIGNE DE TÂCHE (réutilisée partout) ============ -->
+<template id="task-row-template">
+  <article class="task" :class="['status-' + task.status, { overdue: isOverdue }]">
+    <div class="task-main">
+      <h3 class="task-title">{{ task.title }}</h3>
+      <div class="task-meta">
+        <span class="task-category" v-if="task.category">🏷️ {{ task.category }}</span>
+        <span class="task-project" v-if="projectLabel">📁 {{ projectLabel }}</span>
+        <span class="task-points">⭐ {{ task.points }} pts</span>
+        <span class="task-late" v-if="isOverdue">⚠️ En retard</span>
+      </div>
+    </div>
+    <div class="task-controls">
+      <select class="task-status-select" :value="task.status"
+              @change="$emit('status', task, $event.target.value)">
+        <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
+      </select>
+      <input class="task-due-input" type="date" :value="task.due"
+             @change="$emit('due', task, $event.target.value)" title="Date butoir">
+      <button type="button" @click="$emit('edit', task)">Modifier</button>
+      <button type="button" @click="$emit('delete', task)">Supprimer</button>
+    </div>
+  </article>
+</template>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
