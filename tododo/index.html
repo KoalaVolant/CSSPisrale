@@ -122,6 +122,14 @@
     <!-- Formulaire "To do rapide" (plusieurs tâches d'un coup) -->
     <section class="form-panel quick-form" v-if="quickForm.open">
       <h2>To do rapide</h2>
+
+      <div class="quick-modes">
+        <button type="button" :class="{ active: quickForm.mode === 'rows' }" @click="quickForm.mode = 'rows'">Ligne par ligne</button>
+        <button type="button" :class="{ active: quickForm.mode === 'paste' }" @click="quickForm.mode = 'paste'">Coller une liste</button>
+      </div>
+
+      <!-- Mode 1 : ligne par ligne -->
+      <template v-if="quickForm.mode === 'rows'">
       <p class="hint">Un nom, des points et une date butoir par ligne (la date est optionnelle). Entrée dans un nom = nouvelle ligne. Les lignes sans nom sont ignorées.</p>
       <form @submit.prevent="saveQuick">
         <div class="quick-row" v-for="(row, i) in quickForm.rows" :key="i">
@@ -140,6 +148,46 @@
           <button type="button" @click="quickForm.open = false">Annuler</button>
         </div>
       </form>
+      </template>
+
+      <!-- Mode 2 : coller une liste -->
+      <template v-else>
+        <p class="hint">Colle ta liste : une tâche par ligne, avec ou sans puce (* - • 1.). Une ligne d'intro placée avant les puces est reconnue comme titre. Les mêmes points, catégorie et date butoir sont appliqués à toutes les tâches.</p>
+        <form @submit.prevent="savePaste">
+          <label>Liste à coller
+            <textarea class="paste-text" v-model="quickForm.paste.text" rows="8"
+                      placeholder="Titre (optionnel)&#10;* Première tâche&#10;* Deuxième tâche"></textarea>
+          </label>
+          <label>Points par tâche
+            <input type="number" min="0" v-model.number="quickForm.paste.points">
+          </label>
+          <label>Catégorie
+            <input type="text" v-model="quickForm.paste.category" list="category-list" placeholder="Ex : Illustré">
+          </label>
+          <label>Date butoir
+            <input type="date" v-model="quickForm.paste.due">
+          </label>
+          <label>Projet
+            <select v-model="quickForm.paste.project">
+              <option value="">— Aucun —</option>
+              <option value="__header" v-if="pastePreview.header">Nouveau projet : {{ pastePreview.header }}</option>
+              <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </select>
+          </label>
+
+          <div class="paste-preview" v-if="pastePreview.items.length">
+            <p class="paste-count">{{ pastePreview.items.length }} tâche(s) détectée(s)<template v-if="pastePreview.header"> · titre : « {{ pastePreview.header }} »</template></p>
+            <ol class="paste-list">
+              <li v-for="(item, i) in pastePreview.items" :key="i">{{ item }}</li>
+            </ol>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" :disabled="!pastePreview.items.length">Créer {{ pastePreview.items.length }} tâche(s)</button>
+            <button type="button" @click="quickForm.open = false">Annuler</button>
+          </div>
+        </form>
+      </template>
     </section>
 
     <!-- ============ 6. ONGLETS ============ -->
