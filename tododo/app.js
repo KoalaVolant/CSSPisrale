@@ -36,13 +36,14 @@ function defaultData() {
   return {
     tasks: [],        // { id, title, category, points, status, projectId, due }
     projects: [],     // { id, name, description }
-    rewards: [        // { id, name, cost }
+    rewards: [        // { id, name, category, cost }
       { id: uid(), name: 'Un bon café',           cost: 20 },
       { id: uid(), name: 'Une soirée jeux vidéo', cost: 100 },
       { id: uid(), name: 'Un resto',              cost: 300 },
     ],
-    inventory: [],    // { id, name, cost, date, used }
+    inventory: [],    // { id, name, category, cost, date, used }
     spent: 0,         // total de points dépensés en récompenses
+    adjust: 0,        // ajustement manuel du solde (peut être négatif)
   };
 }
 
@@ -98,10 +99,57 @@ const app = createApp({
     /* ---------- Points ---------- */
     const earned = computed(() =>
       data.tasks.filter(t => t.status === 'done').reduce((s, t) => s + (Number(t.points) || 0), 0));
-    const balance = computed(() => earned.value - data.spent);
+    const balance = computed(() => earned.value - data.spent + (Number(data.adjust) || 0));
 
-    const sortedRewards = computed(() => [...data.rewards].sort((a, b) => a.cost - b.cost));
-    const nextReward = computed(() => sortedRewards.value.find(r => r.cost > balance.value) || null);
+    // Modification manuelle du solde : on règle "adjust" pour tomber pile sur la valeur voulue
+    const balanceForm = reactive({ open: false, value: 0 });
+    function openBalanceForm() {
+      balanceForm.value = balance.value;
+      balanceForm.open = !balanceForm.open;
+    }
+    function applyBalance() {
+      const target = Number(balanceForm.value);
+      if (!Number.isFinite(target)) return;
+      data.adjust = Math.round(target) - (earned.value - data.spent);
+      balanceForm.open = false;
+      notify(`Solde réglé à ${Math.round(target)} pts`);
+    }
+    function resetBalance() {
+      if (!confirm('Remettre le solde de points à 0 ?')) return;
+      data.adjust = -(earned.value - data.spent);
+      balanceForm.open = false;
+      notify('Solde remis à 0');
+    }
+
+    const rewardsByCost = computed(() => [...data.rewards].sort((a, b) => a.cost - b.cost));
+    const nextReward = computed(() => rewardsByCost.value.find(r => r.cost > balance.value) || null);
+
+    // Filtre / tri des récompenses (le filtre de catégorie s'applique aussi à l'inventaire)
+    const rewardFilters = reactive({ category: '', sort: 'cost-asc' });
+
+    const rewardCategories = computed(() =>
+      [...new Set([...data.rewards, ...data.inventory].map(r => r.category).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b)));
+
+    function matchesRewardCategory(item) {
+      const c = rewardFilters.category;
+      if (!c) return true;
+      if (c === '__none') return !item.category;
+      return item.category === c;
+    }
+
+    const visibleRewards = computed(() => {
+      const list = data.rewards.filter(matchesRewardCategory);
+      switch (rewardFilters.sort) {
+        case 'cost-desc': list.sort((a, b) => b.cost - a.cost); break;
+        case 'name':      list.sort((a, b) => a.name.localeCompare(b.name)); break;
+        case 'category':  list.sort((a, b) => (a.category || '\uffff').localeCompare(b.category || '\uffff') || a.cost - b.cost); break;
+        default:          list.sort((a, b) => a.cost - b.cost);
+      }
+      return list;
+    });
+
+    const visibleInventory = computed(() => data.inventory.filter(matchesRewardCategory));
 
     /* ---------- Filtres & tris ---------- */
     const filters = reactive({ search: '', category: '', status: '', project: '', sort: 'due', showDone: false });
@@ -191,10 +239,8 @@ const app = createApp({
 
     function openQuickForm() {
       taskForm.open = false;
-      quickForm.rows = [
-        { title: '', points: 10 }, { title: '', points: 10 }, { title: '', points: 10 },
-      ];
       quickForm.due = today.value;
+      quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value }));
       quickForm.open = true;
       focusLastQuickRow(0);
     }
@@ -209,13 +255,18 @@ const app = createApp({
 
     function addQuickRow() {
       const last = quickForm.rows[quickForm.rows.length - 1];
-      quickForm.rows.push({ title: '', points: last ? last.points : 10 });
+      quickForm.rows.push({ title: '', points: last ? last.points : 10, due: last ? last.due : '' });
       focusLastQuickRow();
     }
 
     function removeQuickRow(i) {
       quickForm.rows.splice(i, 1);
-      if (!quickForm.rows.length) quickForm.rows.push({ title: '', points: 10 });
+      if (!quickForm.rows.length) quickForm.rows.push({ title: '', points: 10, due: quickForm.due });
+    }
+
+    // Applique la date "pour toutes" à chaque ligne
+    function applyQuickDue() {
+      quickForm.rows.forEach(r => { r.due = quickForm.due; });
     }
 
     function saveQuick() {
@@ -227,7 +278,7 @@ const app = createApp({
         points: Math.max(0, Number(r.points) || 0),
         status: 'todo',
         projectId: '',
-        due: quickForm.due || '',
+        due: r.due || '',
       }));
       notify(rows.length ? `${rows.length} tâche(s) ajoutée(s)` : 'Aucune tâche à ajouter');
       quickForm.open = false;
@@ -320,18 +371,18 @@ const app = createApp({
     }
 
     /* ---------- Récompenses ---------- */
-    const rewardForm = reactive({ open: false, id: null, name: '', cost: 50 });
+    const rewardForm = reactive({ open: false, id: null, name: '', cost: 50, category: '' });
 
     function openRewardForm(reward = null) {
-      if (reward) Object.assign(rewardForm, { id: reward.id, name: reward.name, cost: reward.cost });
-      else Object.assign(rewardForm, { id: null, name: '', cost: 50 });
+      if (reward) Object.assign(rewardForm, { id: reward.id, name: reward.name, cost: reward.cost, category: reward.category || '' });
+      else Object.assign(rewardForm, { id: null, name: '', cost: 50, category: '' });
       rewardForm.open = true;
     }
 
     function saveReward() {
       const name = rewardForm.name.trim();
       if (!name) return;
-      const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1) };
+      const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1), category: rewardForm.category.trim() };
       if (rewardForm.id) {
         const r = data.rewards.find(x => x.id === rewardForm.id);
         if (r) Object.assign(r, payload);
@@ -350,22 +401,23 @@ const app = createApp({
       if (balance.value < reward.cost) return;
       data.spent += reward.cost;
       data.inventory.unshift({
-        id: uid(), name: reward.name, cost: reward.cost, date: todayStr(), used: false,
+        id: uid(), name: reward.name, category: reward.category || '', cost: reward.cost, date: todayStr(), used: false,
       });
       notify(`Récompense gagnée : ${reward.name} !`);
     }
 
     /* ---------- Inventaire ---------- */
-    const invForm = reactive({ id: null, name: '' });
+    const invForm = reactive({ id: null, name: '', category: '' });
 
     function startEditInv(item) {
-      Object.assign(invForm, { id: item.id, name: item.name });
+      Object.assign(invForm, { id: item.id, name: item.name, category: item.category || '' });
     }
 
     function saveInv() {
       const item = data.inventory.find(i => i.id === invForm.id);
       if (item && invForm.name.trim()) {
         item.name = invForm.name.trim();
+        item.category = invForm.category.trim();
       }
       invForm.id = null;
     }
@@ -408,6 +460,7 @@ const app = createApp({
           data.rewards = json.rewards;
           data.inventory = json.inventory;
           data.spent = Number(json.spent) || 0;
+          data.adjust = Number(json.adjust) || 0;
           notify('Import réussi');
         } catch (e) {
           alert("Fichier invalide : ce n'est pas une sauvegarde Todo Quest.");
@@ -466,6 +519,7 @@ const app = createApp({
       data.rewards   = Array.isArray(remote.rewards) ? remote.rewards : [];
       data.inventory = Array.isArray(remote.inventory) ? remote.inventory : [];
       data.spent     = Number(remote.spent) || 0;
+      data.adjust    = Number(remote.adjust) || 0;
       lastSyncedJson = JSON.stringify(data);   // évite de renvoyer ce qu'on vient de recevoir
     }
 
@@ -565,11 +619,12 @@ const app = createApp({
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
       // points
-      earned, balance, sortedRewards, nextReward,
+      earned, balance, nextReward, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      rewardFilters, rewardCategories, visibleRewards, visibleInventory,
       // filtres
       filters, resetFilters, categories, todayTasks, upcomingTasks, allTasks,
       // tâches
-      quickForm, openQuickForm, addQuickRow, removeQuickRow, saveQuick,
+      quickForm, openQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick,
       taskForm, openTaskForm, saveTask, deleteTask, changeStatus, changeDue, projectName,
       // projets
       projectForm, openProjectForm, addDraftTask, saveProject, deleteProject, projectTasks, projectStats,
