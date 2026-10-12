@@ -1,0 +1,17 @@
+/* ============================================================
+   Todo Quest — CSS minimal : à toi de jouer !
+   Classes utiles : .app-header .points-box .app-nav .task .task-title
+   .task-meta .overdue .status-todo/doing/paused/done .project .reward
+   .reward.affordable .inventory-item .inventory-item.used .toast .form-panel
+   ============================================================ */
+
+/* Indispensable : cache l'appli tant que Vue n'est pas chargé */
+[v-cloak] { display: none; }
+
+/* Quelques bases pour que ce soit utilisable avant ton propre CSS */
+.app-nav button.active { font-weight: bold; text-decoration: underline; }
+.task.status-done .task-title { text-decoration: line-through; opacity: 0.6; }
+.task.overdue .task-late { color: crimson; }
+.inventory-item.used { opacity: 0.5; }
+.toast { position: fixed; bottom: 1rem; right: 1rem; padding: 0.75rem 1rem; background: #222; color: #fff; border-radius: 6px; }
+.form-panel label { display: block; margin-bottom: 0.5rem; }
