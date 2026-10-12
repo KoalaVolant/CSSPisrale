@@ -20,6 +20,25 @@ const TABS = [
   { id: 'data',     label: 'Sauvegarde' },
 ];
 
+// Découpe une liste collée en tâches.
+// - Une ligne = une tâche, avec ou sans puce (* - – — • 1. 1) ...)
+// - Les lignes placées AVANT la première puce forment un titre (header)
+const BULLET_RE = /^\s*(?:(?:[*\-–—]|\d+[.)])\s+|[•▪●◦·]\s*)(.*\S)\s*$/;
+function parsePastedList(text) {
+  const lines = String(text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const firstBullet = lines.findIndex(l => BULLET_RE.test(l));
+  let header = '';
+  let body = lines;
+  if (firstBullet > 0) {
+    header = lines.slice(0, firstBullet).join(' ').trim();
+    body = lines.slice(firstBullet);
+  }
+  const items = body
+    .map(l => { const m = l.match(BULLET_RE); return (m ? m[1] : l).trim(); })
+    .filter(Boolean);
+  return { header, items };
+}
+
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
 function todayStr() {
@@ -266,10 +285,16 @@ const app = createApp({
     }
 
     /* ---------- To do rapide (plusieurs tâches d'un coup) ---------- */
-    const quickForm = reactive({ open: false, due: '', rows: [] });
+    const quickForm = reactive({
+      open: false, mode: 'rows', due: '', rows: [],
+      paste: { text: '', points: 10, category: '', due: '', project: '' },
+    });
+    const pastePreview = computed(() => parsePastedList(quickForm.paste.text));
 
     function openQuickForm() {
       taskForm.open = false;
+      quickForm.mode = 'rows';
+      quickForm.paste = { text: '', points: 10, category: '', due: today.value, project: '' };
       quickForm.due = today.value;
       quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value }));
       quickForm.open = true;
@@ -312,6 +337,30 @@ const app = createApp({
         due: r.due || '',
       }));
       notify(rows.length ? `${rows.length} tâche(s) ajoutée(s)` : 'Aucune tâche à ajouter');
+      quickForm.open = false;
+    }
+
+    function savePaste() {
+      const { header, items } = pastePreview.value;
+      if (!items.length) { notify('Aucune tâche détectée'); return; }
+
+      let projectId = quickForm.paste.project;
+      if (projectId === '__header') {
+        if (header) {
+          const project = { id: uid(), name: header, description: '' };
+          data.projects.push(project);
+          projectId = project.id;
+        } else {
+          projectId = '';
+        }
+      }
+
+      const points = Math.max(0, Number(quickForm.paste.points) || 0);
+      const category = quickForm.paste.category.trim();
+      items.forEach(title => data.tasks.push({
+        id: uid(), title, category, points, status: 'todo', projectId, due: quickForm.paste.due || '',
+      }));
+      notify(`${items.length} tâche(s) ajoutée(s)`);
       quickForm.open = false;
     }
 
@@ -655,7 +704,7 @@ const app = createApp({
       // filtres
       filters, resetFilters, activeFilterCount, categories, todayTasks, upcomingTasks, allTasks,
       // tâches
-      quickForm, openQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick,
+      quickForm, openQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
       taskForm, openTaskForm, saveTask, deleteTask, changeStatus, changeDue, projectName,
       // projets
       projectForm, openProjectForm, addDraftTask, saveProject, deleteProject, projectTasks, projectStats,
