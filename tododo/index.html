@@ -153,7 +153,6 @@
 
     <section class="view view-today">
       <h2>Aujourd'hui <small>({{ todayTasks.length }})</small></h2>
-      <p class="hint">Tâches dont la date butoir est aujourd'hui ou déjà dépassée.</p>
       <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui.</p>
       <div class="task-list">
         <task-row v-for="t in todayTasks" :key="t.id"
@@ -165,7 +164,6 @@
 
     <section class="view view-upcoming">
       <h2>À venir <small>({{ upcomingTasks.length }})</small></h2>
-      <p class="hint">Tâches dont la date butoir est dans le futur.</p>
       <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
       <div class="task-list">
         <task-row v-for="t in upcomingTasks" :key="t.id"
