@@ -17,6 +17,9 @@
 .quick-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
 .quick-name { flex: 1; }
 .quick-points { width: 5rem; }
+ 
+/* To do rapide : date sur chaque ligne */
+.quick-due { width: 9.5rem; }
 
 :root{
    --main-color:#dedede;
