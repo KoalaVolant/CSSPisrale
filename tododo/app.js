@@ -1,4 +1,4 @@
-const { createApp, reactive, ref, computed, watch } = Vue;
+const { createApp, reactive, ref, computed, watch, nextTick } = Vue;
 
 /* ============================================================
    Constantes & utilitaires
@@ -13,8 +13,6 @@ const STATUSES = [
 ];
 
 const TABS = [
-  { id: 'today',    label: "Aujourd'hui" },
-  { id: 'upcoming', label: 'À venir' },
   { id: 'all',      label: 'Toutes' },
   { id: 'projects', label: 'Projets' },
   { id: 'rewards',  label: 'Récompenses' },
@@ -38,12 +36,12 @@ function defaultData() {
   return {
     tasks: [],        // { id, title, category, points, status, projectId, due }
     projects: [],     // { id, name, description }
-    rewards: [        // { id, name, cost, icon }
-      { id: uid(), name: 'Un bon café',          cost: 20,  icon: '☕' },
-      { id: uid(), name: 'Une soirée jeux vidéo', cost: 100, icon: '🎮' },
-      { id: uid(), name: 'Un resto',              cost: 300, icon: '🍽️' },
+    rewards: [        // { id, name, cost }
+      { id: uid(), name: 'Un bon café',           cost: 20 },
+      { id: uid(), name: 'Une soirée jeux vidéo', cost: 100 },
+      { id: uid(), name: 'Un resto',              cost: 300 },
     ],
-    inventory: [],    // { id, name, icon, cost, date, used }
+    inventory: [],    // { id, name, cost, date, used }
     spent: 0,         // total de points dépensés en récompenses
   };
 }
@@ -83,7 +81,8 @@ const app = createApp({
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible */ }
     }, { deep: true });
 
-    const view = ref('today');
+    const view = ref('');   // onglet ouvert sous le tableau de bord ('' = aucun)
+    function toggleTab(id) { view.value = view.value === id ? '' : id; }
     const today = ref(todayStr());
     setInterval(() => { today.value = todayStr(); }, 60 * 1000);
 
@@ -153,9 +152,10 @@ const app = createApp({
       } else {
         Object.assign(taskForm, {
           id: null, title: '', category: '', points: 10, status: 'todo', projectId,
-          due: view.value === 'today' ? today.value : '',
+          due: today.value,
         });
       }
+      quickForm.open = false;
       taskForm.open = true;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -176,14 +176,61 @@ const app = createApp({
         if (t) {
           const wasDone = t.status === 'done';
           Object.assign(t, payload);
-          if (!wasDone && t.status === 'done') notify(`🎉 +${t.points} pts !`);
+          if (!wasDone && t.status === 'done') notify(`+${t.points} pts !`);
         }
       } else {
         const t = { id: uid(), ...payload };
         data.tasks.push(t);
-        if (t.status === 'done') notify(`🎉 +${t.points} pts !`);
+        if (t.status === 'done') notify(`+${t.points} pts !`);
       }
       taskForm.open = false;
+    }
+
+    /* ---------- To do rapide (plusieurs tâches d'un coup) ---------- */
+    const quickForm = reactive({ open: false, due: '', rows: [] });
+
+    function openQuickForm() {
+      taskForm.open = false;
+      quickForm.rows = [
+        { title: '', points: 10 }, { title: '', points: 10 }, { title: '', points: 10 },
+      ];
+      quickForm.due = today.value;
+      quickForm.open = true;
+      focusLastQuickRow(0);
+    }
+
+    function focusLastQuickRow(index) {
+      nextTick(() => {
+        const inputs = document.querySelectorAll('.quick-name');
+        const el = inputs[index === undefined ? inputs.length - 1 : index];
+        if (el) el.focus();
+      });
+    }
+
+    function addQuickRow() {
+      const last = quickForm.rows[quickForm.rows.length - 1];
+      quickForm.rows.push({ title: '', points: last ? last.points : 10 });
+      focusLastQuickRow();
+    }
+
+    function removeQuickRow(i) {
+      quickForm.rows.splice(i, 1);
+      if (!quickForm.rows.length) quickForm.rows.push({ title: '', points: 10 });
+    }
+
+    function saveQuick() {
+      const rows = quickForm.rows.filter(r => r.title.trim());
+      rows.forEach(r => data.tasks.push({
+        id: uid(),
+        title: r.title.trim(),
+        category: '',
+        points: Math.max(0, Number(r.points) || 0),
+        status: 'todo',
+        projectId: '',
+        due: quickForm.due || '',
+      }));
+      notify(rows.length ? `${rows.length} tâche(s) ajoutée(s)` : 'Aucune tâche à ajouter');
+      quickForm.open = false;
     }
 
     function deleteTask(task) {
@@ -194,7 +241,7 @@ const app = createApp({
     function changeStatus(task, newStatus) {
       const old = task.status;
       task.status = newStatus;
-      if (old !== 'done' && newStatus === 'done') notify(`🎉 +${task.points} pts !`);
+      if (old !== 'done' && newStatus === 'done') notify(`+${task.points} pts !`);
       if (old === 'done' && newStatus !== 'done') notify(`−${task.points} pts (tâche rouverte)`);
     }
 
@@ -273,18 +320,18 @@ const app = createApp({
     }
 
     /* ---------- Récompenses ---------- */
-    const rewardForm = reactive({ open: false, id: null, name: '', cost: 50, icon: '🎁' });
+    const rewardForm = reactive({ open: false, id: null, name: '', cost: 50 });
 
     function openRewardForm(reward = null) {
-      if (reward) Object.assign(rewardForm, { id: reward.id, name: reward.name, cost: reward.cost, icon: reward.icon });
-      else Object.assign(rewardForm, { id: null, name: '', cost: 50, icon: '🎁' });
+      if (reward) Object.assign(rewardForm, { id: reward.id, name: reward.name, cost: reward.cost });
+      else Object.assign(rewardForm, { id: null, name: '', cost: 50 });
       rewardForm.open = true;
     }
 
     function saveReward() {
       const name = rewardForm.name.trim();
       if (!name) return;
-      const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1), icon: rewardForm.icon.trim() || '🎁' };
+      const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1) };
       if (rewardForm.id) {
         const r = data.rewards.find(x => x.id === rewardForm.id);
         if (r) Object.assign(r, payload);
@@ -303,23 +350,22 @@ const app = createApp({
       if (balance.value < reward.cost) return;
       data.spent += reward.cost;
       data.inventory.unshift({
-        id: uid(), name: reward.name, icon: reward.icon, cost: reward.cost, date: todayStr(), used: false,
+        id: uid(), name: reward.name, cost: reward.cost, date: todayStr(), used: false,
       });
-      notify(`${reward.icon} Récompense gagnée : ${reward.name} !`);
+      notify(`Récompense gagnée : ${reward.name} !`);
     }
 
     /* ---------- Inventaire ---------- */
-    const invForm = reactive({ id: null, name: '', icon: '' });
+    const invForm = reactive({ id: null, name: '' });
 
     function startEditInv(item) {
-      Object.assign(invForm, { id: item.id, name: item.name, icon: item.icon });
+      Object.assign(invForm, { id: item.id, name: item.name });
     }
 
     function saveInv() {
       const item = data.inventory.find(i => i.id === invForm.id);
       if (item && invForm.name.trim()) {
         item.name = invForm.name.trim();
-        item.icon = invForm.icon.trim() || '🎁';
       }
       invForm.id = null;
     }
@@ -362,7 +408,7 @@ const app = createApp({
           data.rewards = json.rewards;
           data.inventory = json.inventory;
           data.spent = Number(json.spent) || 0;
-          notify('Import réussi ✅');
+          notify('Import réussi');
         } catch (e) {
           alert("Fichier invalide : ce n'est pas une sauvegarde Todo Quest.");
         } finally {
@@ -390,8 +436,8 @@ const app = createApp({
       local:     'Mode local (cloud non configuré)',
       signedout: 'Non connecté : données sur cet appareil uniquement',
       syncing:   'Synchronisation…',
-      synced:    'Synchronisé ☁️✓',
-      error:     'Erreur de synchro ⚠️',
+      synced:    'Synchronisé',
+      error:     'Erreur de synchro',
     }[syncState.value]));
 
     const clientId = uid();           // identifie cet onglet / appareil
@@ -438,7 +484,7 @@ const app = createApp({
           if (!remote) {                                    // 1re connexion : on envoie les données locales
             lastSyncedJson = JSON.stringify(data);
             pushToCloud();
-            notify('☁️ Données envoyées dans le cloud');
+            notify('Données envoyées dans le cloud');
             return;
           }
           const localHasData = data.tasks.length || data.projects.length || data.inventory.length;
@@ -449,7 +495,7 @@ const app = createApp({
           }
           applyRemote(remote);
           syncState.value = 'synced';
-          notify('☁️ Données synchronisées');
+          notify('Données synchronisées');
           return;
         }
 
@@ -515,7 +561,7 @@ const app = createApp({
 
     return {
       // état
-      data, view, today, toast, tabs: TABS, statuses: STATUSES,
+      data, view, toggleTab, today, toast, tabs: TABS, statuses: STATUSES,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
       // points
@@ -523,6 +569,7 @@ const app = createApp({
       // filtres
       filters, resetFilters, categories, todayTasks, upcomingTasks, allTasks,
       // tâches
+      quickForm, openQuickForm, addQuickRow, removeQuickRow, saveQuick,
       taskForm, openTaskForm, saveTask, deleteTask, changeStatus, changeDue, projectName,
       // projets
       projectForm, openProjectForm, addDraftTask, saveProject, deleteProject, projectTasks, projectStats,
