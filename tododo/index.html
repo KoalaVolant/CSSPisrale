@@ -10,7 +10,7 @@
 
 <div id="app" v-cloak>
 
-  <!-- ============ EN-TÊTE ============ -->
+  <!-- ============ EN-TÊTE : 1. titre, 2. synchro, 3. points ============ -->
   <header class="app-header">
     <h1 class="app-title">Todo Quest</h1>
 
@@ -35,20 +35,54 @@
         <span>Tu peux t'offrir toutes tes récompenses !</span>
       </div>
     </div>
-
-    <nav class="app-nav">
-      <button type="button" v-for="tab in tabs" :key="tab.id"
-              :class="{ active: view === tab.id }" @click="toggleTab(tab.id)">
-        {{ tab.label }}
-      </button>
-    </nav>
   </header>
 
   <p class="toast" v-if="toast">{{ toast }}</p>
 
   <main class="app-main">
 
-    <!-- ============ FORMULAIRE TÂCHE (ajout / édition) ============ -->
+    <!-- ============ 4. AUJOURD'HUI / À VENIR (masquable, choix mémorisé) ============ -->
+    <section class="dashboard-section">
+      <button type="button" class="dashboard-toggle" :aria-expanded="ui.dashboardOpen"
+              @click="ui.dashboardOpen = !ui.dashboardOpen">
+        {{ ui.dashboardOpen ? 'Masquer' : 'Afficher' }} Aujourd'hui / À venir
+        <small v-if="!ui.dashboardOpen">({{ todayTasks.length }} aujourd'hui · {{ upcomingTasks.length }} à venir)</small>
+      </button>
+
+      <div class="dashboard" v-if="ui.dashboardOpen">
+
+        <section class="view view-today">
+          <h2>Aujourd'hui <small>({{ todayTasks.length }})</small></h2>
+          <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui.</p>
+          <div class="task-list">
+            <task-row v-for="t in todayTasks" :key="t.id"
+                      :task="t" :project-label="projectName(t.projectId)"
+                      :statuses="statuses" :today="today"
+                      @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+          </div>
+        </section>
+
+        <section class="view view-upcoming">
+          <h2>À venir <small>({{ upcomingTasks.length }})</small></h2>
+          <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
+          <div class="task-list">
+            <task-row v-for="t in upcomingTasks" :key="t.id"
+                      :task="t" :project-label="projectName(t.projectId)"
+                      :statuses="statuses" :today="today"
+                      @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+          </div>
+        </section>
+
+      </div>
+    </section>
+
+    <!-- ============ 5. AJOUTER UNE TÂCHE / TO DO RAPIDE ============ -->
+    <section class="actions">
+      <button type="button" class="btn-add" @click="openTaskForm()">＋ Ajouter une tâche</button>
+      <button type="button" class="btn-quick" @click="openQuickForm()">＋ To do rapide</button>
+    </section>
+
+    <!-- Formulaire tâche (ajout / édition) -->
     <section class="form-panel task-form" v-if="taskForm.open">
       <h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
       <form @submit.prevent="saveTask">
@@ -85,7 +119,7 @@
       </form>
     </section>
 
-    <!-- ============ FORMULAIRE "TO DO RAPIDE" (plusieurs tâches d'un coup) ============ -->
+    <!-- Formulaire "To do rapide" (plusieurs tâches d'un coup) -->
     <section class="form-panel quick-form" v-if="quickForm.open">
       <h2>To do rapide</h2>
       <p class="hint">Un nom, des points et une date butoir par ligne (la date est optionnelle). Entrée dans un nom = nouvelle ligne. Les lignes sans nom sont ignorées.</p>
@@ -108,75 +142,60 @@
       </form>
     </section>
 
-    <!-- ============ BARRE DE FILTRES (Aujourd'hui / À venir / Toutes) ============ -->
-    <section class="filters">
-      <div class="filters-row">
-        <button type="button" class="btn-add" @click="openTaskForm()">＋ Ajouter une tâche</button>
-        <button type="button" class="btn-quick" @click="openQuickForm()">＋ To do rapide</button>
-      </div>
-      <div class="filters-row">
-        <input type="search" v-model="filters.search" placeholder="Rechercher…">
+    <!-- ============ 6. ONGLETS ============ -->
+    <nav class="app-nav">
+      <button type="button" v-for="tab in tabs" :key="tab.id"
+              :class="{ active: view === tab.id }" @click="toggleTab(tab.id)">
+        {{ tab.label }}
+      </button>
+    </nav>
 
-        <select v-model="filters.category">
-          <option value="">Toutes catégories</option>
-          <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
-        </select>
+    <!-- ============ 7. TRI / FILTRE (affichés seulement si besoin) ============ -->
+    <section class="filters-section">
+      <button type="button" class="filters-toggle" :aria-expanded="ui.filtersOpen"
+              @click="ui.filtersOpen = !ui.filtersOpen">
+        Filtres / tri <small v-if="activeFilterCount">({{ activeFilterCount }} actif{{ activeFilterCount > 1 ? 's' : '' }})</small>
+      </button>
 
-        <select v-model="filters.status">
-          <option value="">Tous statuts</option>
-          <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
-        </select>
+      <div class="filters" v-if="ui.filtersOpen">
+        <div class="filters-row">
+          <input type="search" v-model="filters.search" placeholder="Rechercher…">
 
-        <select v-model="filters.project">
-          <option value="">Tous projets</option>
-          <option value="__none">Sans projet</option>
-          <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
-        </select>
+          <select v-model="filters.category">
+            <option value="">Toutes catégories</option>
+            <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+          </select>
 
-        <select v-model="filters.sort">
-          <option value="due">Trier : date butoir</option>
-          <option value="points-desc">Trier : points ↓</option>
-          <option value="points-asc">Trier : points ↑</option>
-          <option value="title">Trier : titre A→Z</option>
-        </select>
+          <select v-model="filters.status">
+            <option value="">Tous statuts</option>
+            <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
+          </select>
 
-        <label class="filters-check">
-          <input type="checkbox" v-model="filters.showDone"> Afficher les terminées
-        </label>
+          <select v-model="filters.project">
+            <option value="">Tous projets</option>
+            <option value="__none">Sans projet</option>
+            <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+          </select>
 
-        <button type="button" @click="resetFilters">Réinitialiser</button>
-      </div>
-    </section>
+          <select v-model="filters.sort">
+            <option value="due">Trier : date butoir</option>
+            <option value="points-desc">Trier : points ↓</option>
+            <option value="points-asc">Trier : points ↑</option>
+            <option value="title">Trier : titre A→Z</option>
+          </select>
 
-    <!-- ============ TABLEAU DE BORD : Aujourd'hui + À venir (toujours visibles) ============ -->
-    <div class="dashboard">
+          <label class="filters-check">
+            <input type="checkbox" v-model="filters.showDone"> Afficher les terminées
+          </label>
 
-    <section class="view view-today">
-      <h2>Aujourd'hui <small>({{ todayTasks.length }})</small></h2>
-      <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui.</p>
-      <div class="task-list">
-        <task-row v-for="t in todayTasks" :key="t.id"
-                  :task="t" :project-label="projectName(t.projectId)"
-                  :statuses="statuses" :today="today"
-                  @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+          <button type="button" @click="resetFilters">Réinitialiser</button>
+        </div>
       </div>
     </section>
 
-    <section class="view view-upcoming">
-      <h2>À venir <small>({{ upcomingTasks.length }})</small></h2>
-      <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
-      <div class="task-list">
-        <task-row v-for="t in upcomingTasks" :key="t.id"
-                  :task="t" :project-label="projectName(t.projectId)"
-                  :statuses="statuses" :today="today"
-                  @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
-      </div>
-    </section>
+    <!-- ============ CONTENU DE L'ONGLET OUVERT ============ -->
 
-    </div>
-    <!-- ============ FIN TABLEAU DE BORD ============ -->
-
-    <!-- ============ VUE (onglet) : TOUTES LES TÂCHES ============ -->
+    <!-- Toutes les tâches -->
     <section class="view view-all" v-if="view === 'all'">
       <h2>Toutes les tâches <small>({{ allTasks.length }})</small></h2>
       <p class="hint">Y compris celles sans date butoir.</p>
@@ -189,7 +208,7 @@
       </div>
     </section>
 
-    <!-- ============ VUE : PROJETS ============ -->
+    <!-- Projets -->
     <section class="view view-projects" v-if="view === 'projects'">
       <h2>Projets <small>({{ data.projects.length }})</small></h2>
 
@@ -252,7 +271,7 @@
       </article>
     </section>
 
-    <!-- ============ VUE : RÉCOMPENSES ============ -->
+    <!-- Récompenses -->
     <section class="view view-rewards" v-if="view === 'rewards'">
       <h2>Récompenses</h2>
       <p class="balance-line">Solde : <strong>{{ balance }} pts</strong>
@@ -367,7 +386,7 @@
       </div>
     </section>
 
-    <!-- ============ VUE : DONNÉES ============ -->
+    <!-- Sauvegarde -->
     <section class="view view-data" v-if="view === 'data'">
       <h2>Sauvegarde</h2>
       <p v-if="user">Tes données sont synchronisées dans ton cloud Firebase ({{ user.email }}) et copiées sur cet appareil.</p>
