@@ -26,19 +26,19 @@
     </div>
 
     <div class="points-box">
-      <div class="points-balance">⭐ <strong>{{ balance }}</strong> pts</div>
+      <div class="points-balance"><strong>{{ balance }}</strong> pts</div>
       <div class="points-next" v-if="nextReward">
-        <span>Il te reste <strong>{{ nextReward.cost - balance }} pts</strong> avant {{ nextReward.icon }} {{ nextReward.name }}</span>
+        <span>Il te reste <strong>{{ nextReward.cost - balance }} pts</strong> avant « {{ nextReward.name }} »</span>
         <progress :value="Math.max(0, balance)" :max="nextReward.cost"></progress>
       </div>
       <div class="points-next" v-else-if="data.rewards.length">
-        <span>🎉 Tu peux t'offrir toutes tes récompenses !</span>
+        <span>Tu peux t'offrir toutes tes récompenses !</span>
       </div>
     </div>
 
     <nav class="app-nav">
       <button type="button" v-for="tab in tabs" :key="tab.id"
-              :class="{ active: view === tab.id }" @click="view = tab.id">
+              :class="{ active: view === tab.id }" @click="toggleTab(tab.id)">
         {{ tab.label }}
       </button>
     </nav>
@@ -85,10 +85,33 @@
       </form>
     </section>
 
+    <!-- ============ FORMULAIRE "TO DO RAPIDE" (plusieurs tâches d'un coup) ============ -->
+    <section class="form-panel quick-form" v-if="quickForm.open">
+      <h2>To do rapide</h2>
+      <p class="hint">Un nom et des points par ligne. Entrée dans un nom = nouvelle ligne. Les lignes vides sont ignorées.</p>
+      <form @submit.prevent="saveQuick">
+        <div class="quick-row" v-for="(row, i) in quickForm.rows" :key="i">
+          <input class="quick-name" type="text" v-model="row.title" placeholder="Nom de la tâche"
+                 @keydown.enter.prevent="addQuickRow">
+          <input class="quick-points" type="number" min="0" v-model.number="row.points" title="Points">
+          <button type="button" @click="removeQuickRow(i)" title="Retirer cette ligne">Retirer</button>
+        </div>
+        <button type="button" @click="addQuickRow">＋ Ajouter une ligne</button>
+        <label>Date butoir pour toutes (optionnel)
+          <input type="date" v-model="quickForm.due">
+        </label>
+        <div class="form-actions">
+          <button type="submit">Créer les tâches</button>
+          <button type="button" @click="quickForm.open = false">Annuler</button>
+        </div>
+      </form>
+    </section>
+
     <!-- ============ BARRE DE FILTRES (Aujourd'hui / À venir / Toutes) ============ -->
-    <section class="filters" v-if="['today', 'upcoming', 'all'].includes(view)">
+    <section class="filters">
       <div class="filters-row">
         <button type="button" class="btn-add" @click="openTaskForm()">＋ Ajouter une tâche</button>
+        <button type="button" class="btn-quick" @click="openQuickForm()">＋ To do rapide</button>
       </div>
       <div class="filters-row">
         <input type="search" v-model="filters.search" placeholder="Rechercher…">
@@ -124,11 +147,13 @@
       </div>
     </section>
 
-    <!-- ============ VUE : AUJOURD'HUI ============ -->
-    <section class="view view-today" v-if="view === 'today'">
+    <!-- ============ TABLEAU DE BORD : Aujourd'hui + À venir (toujours visibles) ============ -->
+    <div class="dashboard">
+
+    <section class="view view-today">
       <h2>Aujourd'hui <small>({{ todayTasks.length }})</small></h2>
       <p class="hint">Tâches dont la date butoir est aujourd'hui ou déjà dépassée.</p>
-      <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui 🎉</p>
+      <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui.</p>
       <div class="task-list">
         <task-row v-for="t in todayTasks" :key="t.id"
                   :task="t" :project-label="projectName(t.projectId)"
@@ -137,8 +162,7 @@
       </div>
     </section>
 
-    <!-- ============ VUE : À VENIR ============ -->
-    <section class="view view-upcoming" v-if="view === 'upcoming'">
+    <section class="view view-upcoming">
       <h2>À venir <small>({{ upcomingTasks.length }})</small></h2>
       <p class="hint">Tâches dont la date butoir est dans le futur.</p>
       <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
@@ -150,7 +174,10 @@
       </div>
     </section>
 
-    <!-- ============ VUE : TOUTES LES TÂCHES ============ -->
+    </div>
+    <!-- ============ FIN TABLEAU DE BORD ============ -->
+
+    <!-- ============ VUE (onglet) : TOUTES LES TÂCHES ============ -->
     <section class="view view-all" v-if="view === 'all'">
       <h2>Toutes les tâches <small>({{ allTasks.length }})</small></h2>
       <p class="hint">Y compris celles sans date butoir.</p>
@@ -187,7 +214,7 @@
               <input type="text" v-model="d.category" list="category-list" placeholder="Catégorie">
               <input type="number" min="0" v-model.number="d.points" title="Points">
               <input type="date" v-model="d.due" title="Date butoir">
-              <button type="button" @click="projectForm.tasks.splice(i, 1)">✕</button>
+              <button type="button" @click="projectForm.tasks.splice(i, 1)">Retirer</button>
             </div>
             <button type="button" @click="addDraftTask">＋ Ajouter une tâche</button>
           </fieldset>
@@ -238,9 +265,6 @@
       <div class="form-panel reward-form" v-if="rewardForm.open">
         <h3>{{ rewardForm.id ? 'Modifier la récompense' : 'Nouvelle récompense' }}</h3>
         <form @submit.prevent="saveReward">
-          <label>Icône (emoji)
-            <input type="text" v-model="rewardForm.icon" maxlength="4">
-          </label>
           <label>Nom
             <input type="text" v-model="rewardForm.name" required>
           </label>
@@ -258,12 +282,11 @@
 
       <div class="reward-list">
         <article class="reward" v-for="r in sortedRewards" :key="r.id" :class="{ affordable: balance >= r.cost }">
-          <div class="reward-icon">{{ r.icon }}</div>
           <div class="reward-body">
             <h3 class="reward-name">{{ r.name }}</h3>
             <p class="reward-cost">{{ r.cost }} pts</p>
             <progress :value="Math.min(Math.max(0, balance), r.cost)" :max="r.cost"></progress>
-            <p class="reward-status" v-if="balance >= r.cost">✅ Dispo ! Tu peux la réclamer.</p>
+            <p class="reward-status" v-if="balance >= r.cost">Dispo ! Tu peux la réclamer.</p>
             <p class="reward-status" v-else>Il te reste <strong>{{ r.cost - balance }} pts</strong> avant d'avoir ça.</p>
           </div>
           <div class="reward-actions">
@@ -275,21 +298,19 @@
       </div>
 
       <!-- Inventaire -->
-      <h2 class="inventory-title">🎒 Inventaire <small>({{ data.inventory.length }})</small></h2>
+      <h2 class="inventory-title">Inventaire <small>({{ data.inventory.length }})</small></h2>
       <p class="empty" v-if="!data.inventory.length">Tu n'as encore rien gagné.</p>
 
       <div class="inventory-list">
         <article class="inventory-item" v-for="item in data.inventory" :key="item.id" :class="{ used: item.used }">
           <template v-if="invForm.id === item.id">
             <form class="inventory-edit" @submit.prevent="saveInv">
-              <input type="text" v-model="invForm.icon" maxlength="4">
               <input type="text" v-model="invForm.name" required>
               <button type="submit">OK</button>
               <button type="button" @click="invForm.id = null">Annuler</button>
             </form>
           </template>
           <template v-else>
-            <div class="inventory-icon">{{ item.icon }}</div>
             <div class="inventory-body">
               <h3 class="inventory-name">{{ item.name }}</h3>
               <p class="inventory-meta">Gagnée le {{ formatDate(item.date) }} · {{ item.cost }} pts</p>
@@ -314,11 +335,11 @@
       <p v-else>Tes données sont stockées dans ce navigateur. Connecte-toi avec Google (en haut) pour les synchroniser entre tes appareils.</p>
       <p>Tu peux aussi faire une sauvegarde manuelle en JSON, par précaution.</p>
       <div class="data-actions">
-        <button type="button" @click="exportData">📤 Exporter (JSON)</button>
-        <label class="file-button">📥 Importer (JSON)
+        <button type="button" @click="exportData">Exporter (JSON)</button>
+        <label class="file-button">Importer (JSON)
           <input type="file" accept="application/json,.json" @change="importData">
         </label>
-        <button type="button" @click="resetAll">🗑️ Tout effacer</button>
+        <button type="button" @click="resetAll">Tout effacer</button>
       </div>
     </section>
 
@@ -331,10 +352,10 @@
     <div class="task-main">
       <h3 class="task-title">{{ task.title }}</h3>
       <div class="task-meta">
-        <span class="task-category" v-if="task.category">🏷️ {{ task.category }}</span>
-        <span class="task-project" v-if="projectLabel">📁 {{ projectLabel }}</span>
-        <span class="task-points">⭐ {{ task.points }} pts</span>
-        <span class="task-late" v-if="isOverdue">⚠️ En retard</span>
+        <span class="task-category" v-if="task.category">{{ task.category }}</span>
+        <span class="task-project" v-if="projectLabel">{{ projectLabel }}</span>
+        <span class="task-points">{{ task.points }} pts</span>
+        <span class="task-late" v-if="isOverdue">En retard</span>
       </div>
     </div>
     <div class="task-controls">
