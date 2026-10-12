@@ -20,6 +20,10 @@
  
 /* To do rapide : date sur chaque ligne */
 .quick-due { width: 9.5rem; }
+ 
+/* Zones repliables : bouton "Masquer / Afficher Aujourd'hui / À venir" et "Filtres / tri" */
+.dashboard-toggle, .filters-toggle { cursor: pointer; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
 :root{
    --main-color:#dedede;
