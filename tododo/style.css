@@ -35,11 +35,3 @@
 /* To do rapide : choix du mode + collage de liste */
 .quick-modes button.active { font-weight: bold; text-decoration: underline; }
 .paste-text { width: 100%; box-sizing: border-box; }
-
-:root{
-   --main-color:#dedede;
-   --fnt:'Poppins';  
-}
-
-body{ padding:20px; font-family:var(--fnt) !important; }
-body *{ font-family:var(--fnt) !important;}
