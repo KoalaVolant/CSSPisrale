@@ -88,17 +88,18 @@
     <!-- ============ FORMULAIRE "TO DO RAPIDE" (plusieurs tâches d'un coup) ============ -->
     <section class="form-panel quick-form" v-if="quickForm.open">
       <h2>To do rapide</h2>
-      <p class="hint">Un nom et des points par ligne. Entrée dans un nom = nouvelle ligne. Les lignes vides sont ignorées.</p>
+      <p class="hint">Un nom, des points et une date butoir par ligne (la date est optionnelle). Entrée dans un nom = nouvelle ligne. Les lignes sans nom sont ignorées.</p>
       <form @submit.prevent="saveQuick">
         <div class="quick-row" v-for="(row, i) in quickForm.rows" :key="i">
           <input class="quick-name" type="text" v-model="row.title" placeholder="Nom de la tâche"
                  @keydown.enter.prevent="addQuickRow">
           <input class="quick-points" type="number" min="0" v-model.number="row.points" title="Points">
+          <input class="quick-due" type="date" v-model="row.due" title="Date butoir">
           <button type="button" @click="removeQuickRow(i)" title="Retirer cette ligne">Retirer</button>
         </div>
         <button type="button" @click="addQuickRow">＋ Ajouter une ligne</button>
-        <label>Date butoir pour toutes (optionnel)
-          <input type="date" v-model="quickForm.due">
+        <label>Même date butoir pour toutes les lignes
+          <input type="date" v-model="quickForm.due" @change="applyQuickDue">
         </label>
         <div class="form-actions">
           <button type="submit">Créer les tâches</button>
@@ -257,7 +258,22 @@
     <section class="view view-rewards" v-if="view === 'rewards'">
       <h2>Récompenses</h2>
       <p class="balance-line">Solde : <strong>{{ balance }} pts</strong>
-        <small>(gagnés : {{ earned }} · dépensés : {{ data.spent }})</small></p>
+        <small>(gagnés : {{ earned }} · dépensés : {{ data.spent }}<template v-if="data.adjust"> · ajustement manuel : {{ data.adjust > 0 ? '+' : '' }}{{ data.adjust }}</template>)</small></p>
+
+      <div class="balance-adjust">
+        <button type="button" @click="openBalanceForm">Modifier le solde</button>
+        <form class="form-panel balance-form" v-if="balanceForm.open" @submit.prevent="applyBalance">
+          <label>Nouveau solde (pts)
+            <input type="number" v-model.number="balanceForm.value" required>
+          </label>
+          <div class="form-actions">
+            <button type="submit">Appliquer</button>
+            <button type="button" @click="resetBalance">Remettre à 0</button>
+            <button type="button" @click="balanceForm.open = false">Annuler</button>
+          </div>
+          <p class="hint">Règle le solde exactement à cette valeur, sans toucher à tes tâches ni à ton inventaire.</p>
+        </form>
+      </div>
 
       <button type="button" class="btn-add" @click="openRewardForm()">＋ Nouvelle récompense</button>
 
@@ -271,6 +287,12 @@
           <label>Coût (pts)
             <input type="number" min="1" v-model.number="rewardForm.cost" required>
           </label>
+          <label>Catégorie
+            <input type="text" v-model="rewardForm.category" list="reward-category-list" placeholder="Ex : Nourriture">
+            <datalist id="reward-category-list">
+              <option v-for="c in rewardCategories" :key="c" :value="c"></option>
+            </datalist>
+          </label>
           <div class="form-actions">
             <button type="submit">Enregistrer</button>
             <button type="button" @click="rewardForm.open = false">Annuler</button>
@@ -278,12 +300,29 @@
         </form>
       </div>
 
+      <div class="filters reward-filters">
+        <select v-model="rewardFilters.category">
+          <option value="">Toutes catégories</option>
+          <option value="__none">Sans catégorie</option>
+          <option v-for="c in rewardCategories" :key="c" :value="c">{{ c }}</option>
+        </select>
+        <select v-model="rewardFilters.sort">
+          <option value="cost-asc">Trier : coût ↑</option>
+          <option value="cost-desc">Trier : coût ↓</option>
+          <option value="name">Trier : nom A→Z</option>
+          <option value="category">Trier : catégorie</option>
+        </select>
+        <button type="button" @click="rewardFilters.category = ''; rewardFilters.sort = 'cost-asc'">Réinitialiser</button>
+      </div>
+
       <p class="empty" v-if="!data.rewards.length">Aucune récompense. Ajoutes-en une !</p>
+      <p class="empty" v-else-if="!visibleRewards.length">Aucune récompense dans cette catégorie.</p>
 
       <div class="reward-list">
-        <article class="reward" v-for="r in sortedRewards" :key="r.id" :class="{ affordable: balance >= r.cost }">
+        <article class="reward" v-for="r in visibleRewards" :key="r.id" :class="{ affordable: balance >= r.cost }">
           <div class="reward-body">
             <h3 class="reward-name">{{ r.name }}</h3>
+            <p class="reward-category" v-if="r.category">{{ r.category }}</p>
             <p class="reward-cost">{{ r.cost }} pts</p>
             <progress :value="Math.min(Math.max(0, balance), r.cost)" :max="r.cost"></progress>
             <p class="reward-status" v-if="balance >= r.cost">Dispo ! Tu peux la réclamer.</p>
@@ -298,14 +337,16 @@
       </div>
 
       <!-- Inventaire -->
-      <h2 class="inventory-title">Inventaire <small>({{ data.inventory.length }})</small></h2>
+      <h2 class="inventory-title">Inventaire <small>({{ visibleInventory.length }})</small></h2>
       <p class="empty" v-if="!data.inventory.length">Tu n'as encore rien gagné.</p>
+      <p class="empty" v-else-if="!visibleInventory.length">Rien dans cette catégorie.</p>
 
       <div class="inventory-list">
-        <article class="inventory-item" v-for="item in data.inventory" :key="item.id" :class="{ used: item.used }">
+        <article class="inventory-item" v-for="item in visibleInventory" :key="item.id" :class="{ used: item.used }">
           <template v-if="invForm.id === item.id">
             <form class="inventory-edit" @submit.prevent="saveInv">
               <input type="text" v-model="invForm.name" required>
+              <input type="text" v-model="invForm.category" list="reward-category-list" placeholder="Catégorie">
               <button type="submit">OK</button>
               <button type="button" @click="invForm.id = null">Annuler</button>
             </form>
@@ -313,7 +354,7 @@
           <template v-else>
             <div class="inventory-body">
               <h3 class="inventory-name">{{ item.name }}</h3>
-              <p class="inventory-meta">Gagnée le {{ formatDate(item.date) }} · {{ item.cost }} pts</p>
+              <p class="inventory-meta"><span class="inventory-category" v-if="item.category">{{ item.category }} · </span>Gagnée le {{ formatDate(item.date) }} · {{ item.cost }} pts</p>
             </div>
             <label class="inventory-used">
               <input type="checkbox" v-model="item.used"> Utilisée
