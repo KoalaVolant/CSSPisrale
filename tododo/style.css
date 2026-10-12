@@ -1,7 +1,7 @@
    @import url(https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
 /* Indispensable : cache l'appli tant que Vue n'est pas chargé */
 [v-cloak] { display: none; }
-
+ 
 /* Quelques bases pour que ce soit utilisable avant ton propre CSS */
 .app-nav button.active { font-weight: bold; text-decoration: underline; }
 .task.status-done .task-title { text-decoration: line-through; opacity: 0.6; }
@@ -9,6 +9,14 @@
 .inventory-item.used { opacity: 0.5; }
 .toast { position: fixed; bottom: 1rem; right: 1rem; padding: 0.75rem 1rem; background: #222; color: #fff; border-radius: 6px; }
 .form-panel label { display: block; margin-bottom: 0.5rem; }
+ 
+/* Tableau de bord : Aujourd'hui + À venir côte à côte (une colonne sur petit écran) */
+.dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+ 
+/* To do rapide : une ligne = nom + points */
+.quick-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+.quick-name { flex: 1; }
+.quick-points { width: 5rem; }
 
 :root{
    --main-color:#dedede;
