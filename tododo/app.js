@@ -4,6 +4,7 @@ const { createApp, reactive, ref, computed, watch, nextTick } = Vue;
    Constantes & utilitaires
    ============================================================ */
 const STORAGE_KEY = 'todo-quest-v1';
+const UI_KEY = 'todo-quest-ui';   // préférences d'affichage (propres à chaque appareil)
 
 const STATUSES = [
   { value: 'todo',   label: 'Pas commencé' },
@@ -57,6 +58,15 @@ function loadData() {
   }
 }
 
+function loadUi() {
+  const defaults = { dashboardOpen: true, filtersOpen: false };
+  try {
+    return Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
+  } catch (e) {
+    return defaults;
+  }
+}
+
 /* ============================================================
    Composant : ligne de tâche (template dans index.html)
    ============================================================ */
@@ -80,6 +90,12 @@ const app = createApp({
     const data = reactive(loadData());
     watch(data, () => {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible */ }
+    }, { deep: true });
+
+    /* ---------- Préférences d'affichage (mémorisées) ---------- */
+    const ui = reactive(loadUi());
+    watch(ui, () => {
+      try { localStorage.setItem(UI_KEY, JSON.stringify(ui)); } catch (e) { /* stockage indisponible */ }
     }, { deep: true });
 
     const view = ref('');   // onglet ouvert sous le tableau de bord ('' = aucun)
@@ -157,6 +173,18 @@ const app = createApp({
     function resetFilters() {
       Object.assign(filters, { search: '', category: '', status: '', project: '', sort: 'due', showDone: false });
     }
+
+    // Nombre de filtres actifs (affiché sur le bouton "Filtres / tri" quand le panneau est replié)
+    const activeFilterCount = computed(() => {
+      let n = 0;
+      if (filters.search.trim()) n++;
+      if (filters.category) n++;
+      if (filters.status) n++;
+      if (filters.project) n++;
+      if (filters.sort !== 'due') n++;
+      if (filters.showDone) n++;
+      return n;
+    });
 
     const categories = computed(() =>
       [...new Set(data.tasks.map(t => t.category).filter(Boolean))].sort((a, b) => a.localeCompare(b)));
@@ -615,14 +643,14 @@ const app = createApp({
 
     return {
       // état
-      data, view, toggleTab, today, toast, tabs: TABS, statuses: STATUSES,
+      data, ui, view, toggleTab, today, toast, tabs: TABS, statuses: STATUSES,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
       // points
       earned, balance, nextReward, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, rewardCategories, visibleRewards, visibleInventory,
       // filtres
-      filters, resetFilters, categories, todayTasks, upcomingTasks, allTasks,
+      filters, resetFilters, activeFilterCount, categories, todayTasks, upcomingTasks, allTasks,
       // tâches
       quickForm, openQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick,
       taskForm, openTaskForm, saveTask, deleteTask, changeStatus, changeDue, projectName,
