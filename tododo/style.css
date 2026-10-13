@@ -23,7 +23,8 @@
 .toast { position: fixed; bottom: 1rem; right: 1rem; z-index: 200; }
 
 /* ---------- Tâches : case + contenu, tags à la suite ---------- */
-.task { display: flex; gap: 0.5rem; }
+.task { display: flex; gap: 0.5rem; cursor: pointer; }
+.task.selected { outline: 2px solid; }   /* la case à cocher n'existe plus : c'est le bloc qui se surligne */
 .task-main { flex: 1; }
 .task-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 
@@ -44,10 +45,10 @@
 .quick-name, .project-task-title { flex: 1; }
 
 /* ---------- Classes disponibles pour ton style ----------
-   Haut : .app-header .app-title .points-box .points-badge .sync-box
+   Haut : .app-header .app-brand (titre + synchro) .app-title .sync-box   .points-box .points-badge
    Menu : .sidebar .app-nav (button.active)
    Page : .page-header .page-title .page-actions .filters
-   Accueil : .stat-card .view-today .view-upcoming .list-points
+   Accueil : .next-reward .next-reward-label  .view-today .view-upcoming .list-points
    Tâches : .task (.selected .overdue .status-todo/doing/paused/done)
             .task-toolbar .tag .tag-category .tag-project .tag-status .tag-points .tag-due .tag-late
    Projets : .project .project-task   Récompenses : .reward (.affordable) .inventory-item (.used)
