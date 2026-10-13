@@ -5,15 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="stylekoala.css">
 </head>
 <body>
 
 <div id="app" v-cloak>
 
-  <!-- ============ EN-TÊTE : 1. titre, 2. synchro, 3. points ============ -->
+  <!-- ============ BARRE DU HAUT : titre | points | synchro ============ -->
   <header class="app-header">
     <h1 class="app-title">Todo Quest</h1>
+
+    <div class="points-box">
+      <div class="points-badge" title="Solde de points">{{ balance }}</div>
+      <div class="points-info">
+        <template v-if="nextReward">
+          <span class="points-label">Encore <strong>{{ nextReward.cost - balance }} pts</strong> avant « {{ nextReward.name }} »</span>
+          <progress :value="Math.max(0, balance)" :max="nextReward.cost"></progress>
+        </template>
+        <span class="points-label" v-else-if="data.rewards.length">Toutes tes récompenses sont accessibles !</span>
+        <span class="points-label" v-else>pts</span>
+      </div>
+    </div>
 
     <div class="sync-box">
       <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
@@ -25,66 +36,86 @@
         </template>
       </template>
     </div>
-
-    <div class="points-box">
-      <div class="points-balance"><strong>{{ balance }}</strong> pts</div>
-      <div class="points-next" v-if="nextReward">
-        <span>Il te reste <strong>{{ nextReward.cost - balance }} pts</strong> avant « {{ nextReward.name }} »</span>
-        <progress :value="Math.max(0, balance)" :max="nextReward.cost"></progress>
-      </div>
-      <div class="points-next" v-else-if="data.rewards.length">
-        <span>Tu peux t'offrir toutes tes récompenses !</span>
-      </div>
-    </div>
   </header>
 
   <p class="toast" v-if="toast">{{ toast }}</p>
 
-  <main class="app-main">
+  <div class="layout">
 
-    <!-- ============ 4. AUJOURD'HUI / À VENIR (masquable, choix mémorisé) ============ -->
-    <section class="dashboard-section">
-      <button type="button" class="dashboard-toggle" :aria-expanded="ui.dashboardOpen"
-              @click="ui.dashboardOpen = !ui.dashboardOpen">
-        {{ ui.dashboardOpen ? 'Masquer' : 'Afficher' }} Aujourd'hui / À venir
-        <small v-if="!ui.dashboardOpen">({{ todayTasks.length }} aujourd'hui · {{ upcomingTasks.length }} à venir)</small>
-      </button>
+    <!-- ============ MENU DE GAUCHE ============ -->
+    <aside class="sidebar">
+      <nav class="app-nav">
+        <button type="button" v-for="tab in tabs" :key="tab.id"
+                :class="{ active: view === tab.id }" @click="setTab(tab.id)">
+          {{ tab.label }}
+        </button>
+      </nav>
+    </aside>
 
-      <div class="dashboard" v-if="ui.dashboardOpen">
+    <!-- ============ CONTENU (à droite) ============ -->
+    <main class="app-main">
 
-        <section class="view view-today">
-          <h2>Aujourd'hui <small>({{ todayTasks.length }})</small></h2>
-          <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui.</p>
-          <div class="task-list">
-            <task-row v-for="t in todayTasks" :key="t.id"
-                      :task="t" :project-label="projectName(t.projectId)"
-                      :statuses="statuses" :today="today"
-                      @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
-          </div>
-        </section>
-
-        <section class="view view-upcoming">
-          <h2>À venir <small>({{ upcomingTasks.length }})</small></h2>
-          <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
-          <div class="task-list">
-            <task-row v-for="t in upcomingTasks" :key="t.id"
-                      :task="t" :project-label="projectName(t.projectId)"
-                      :statuses="statuses" :today="today"
-                      @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
-          </div>
-        </section>
-
+      <!-- En-tête de page : titre + boutons d'action -->
+      <div class="page-header">
+        <h2 class="page-title">{{ pageTitle }}</h2>
+        <div class="page-actions">
+          <template v-if="view === 'home' || view === 'all'">
+            <button type="button" class="btn-add" @click="toggleTaskForm">＋ Ajouter une tâche</button>
+            <button type="button" class="btn-quick" @click="toggleQuickForm">＋ To do rapide</button>
+            <button type="button" class="filters-toggle" :class="{ active: ui.filtersOpen }" :aria-expanded="ui.filtersOpen"
+                    @click="ui.filtersOpen = !ui.filtersOpen">
+              Filtres / tri <small v-if="activeFilterCount">({{ activeFilterCount }})</small>
+            </button>
+          </template>
+          <template v-else-if="view === 'projects'">
+            <button type="button" class="btn-add" @click="openProjectForm()">＋ Nouveau projet</button>
+          </template>
+          <template v-else-if="view === 'rewards'">
+            <button type="button" class="btn-add" @click="openRewardForm()">＋ Nouvelle récompense</button>
+            <button type="button" @click="openBalanceForm">Modifier le solde</button>
+          </template>
+        </div>
       </div>
-    </section>
 
-    <!-- ============ 5. AJOUTER UNE TÂCHE / TO DO RAPIDE ============ -->
-    <section class="actions">
-      <button type="button" class="btn-add" @click="openTaskForm()">＋ Ajouter une tâche</button>
-      <button type="button" class="btn-quick" @click="openQuickForm()">＋ To do rapide</button>
-    </section>
+      <!-- Tri / filtre des tâches (Accueil et Toutes les tâches) -->
+      <section class="filters" v-if="ui.filtersOpen && (view === 'home' || view === 'all')">
+        <div class="filters-row">
+          <input type="search" v-model="filters.search" placeholder="Rechercher…">
 
-    <!-- Formulaire tâche (ajout / édition) -->
-    <section class="form-panel task-form" v-if="taskForm.open">
+          <select v-model="filters.category">
+            <option value="">Toutes catégories</option>
+            <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+          </select>
+
+          <select v-model="filters.status">
+            <option value="">Tous statuts</option>
+            <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
+          </select>
+
+          <select v-model="filters.project">
+            <option value="">Tous projets</option>
+            <option value="__none">Sans projet</option>
+            <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+          </select>
+
+          <select v-model="filters.sort">
+            <option value="due">Trier : date butoir</option>
+            <option value="points-desc">Trier : points ↓</option>
+            <option value="points-asc">Trier : points ↑</option>
+            <option value="title">Trier : titre A→Z</option>
+          </select>
+
+          <label class="filters-check">
+            <input type="checkbox" v-model="filters.showDone"> Afficher les terminées
+          </label>
+
+          <button type="button" @click="resetFilters">Réinitialiser</button>
+        </div>
+      </section>
+
+    <!-- Popup : ajouter / modifier une tâche -->
+    <div class="modal-backdrop" v-if="taskForm.open" @click.self="taskForm.open = false">
+    <section class="form-panel modal task-form" role="dialog" aria-modal="true">
       <h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
       <form @submit.prevent="saveTask">
         <label>Titre
@@ -119,9 +150,50 @@
         </div>
       </form>
     </section>
+    </div>
+
+    <!-- Popup : modifier plusieurs tâches cochées d'un coup -->
+    <div class="modal-backdrop" v-if="bulkForm.open" @click.self="bulkForm.open = false">
+      <section class="form-panel modal bulk-form" role="dialog" aria-modal="true">
+        <h2>Modifier {{ bulkForm.ids.length }} tâches</h2>
+        <p class="hint">Seuls les champs remplis sont appliqués à toutes les tâches cochées.</p>
+        <form @submit.prevent="saveBulk">
+          <label>Catégorie
+            <input type="text" v-model="bulkForm.category" list="category-list" placeholder="(inchangée)">
+          </label>
+          <label>Points
+            <input type="number" min="0" v-model.number="bulkForm.points" placeholder="(inchangés)">
+          </label>
+          <label>Statut
+            <select v-model="bulkForm.status">
+              <option value="">(inchangé)</option>
+              <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
+            </select>
+          </label>
+          <label>Projet
+            <select v-model="bulkForm.projectId">
+              <option value="__keep">(inchangé)</option>
+              <option value="">Aucun projet</option>
+              <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </select>
+          </label>
+          <label>Date butoir
+            <input type="date" v-model="bulkForm.due" :disabled="bulkForm.clearDue">
+          </label>
+          <label class="bulk-clear-due">
+            <input type="checkbox" v-model="bulkForm.clearDue"> Retirer la date butoir
+          </label>
+          <div class="form-actions">
+            <button type="submit">Appliquer</button>
+            <button type="button" @click="bulkForm.open = false">Annuler</button>
+          </div>
+        </form>
+      </section>
+    </div>
 
     <!-- Formulaire "To do rapide" (plusieurs tâches d'un coup) -->
-    <section class="form-panel quick-form" v-if="quickForm.open">
+    <div class="modal-backdrop" v-if="quickForm.open" @click.self="quickForm.open = false">
+    <section class="form-panel modal modal-wide quick-form" role="dialog" aria-modal="true">
       <h2>To do rapide</h2>
 
       <div class="quick-modes">
@@ -190,81 +262,82 @@
         </form>
       </template>
     </section>
+    </div>
 
-    <!-- ============ 6. ONGLETS ============ -->
-    <nav class="app-nav">
-      <button type="button" v-for="tab in tabs" :key="tab.id"
-              :class="{ active: view === tab.id }" @click="toggleTab(tab.id)">
-        {{ tab.label }}
-      </button>
-    </nav>
+    <!-- ============ ACCUEIL : cartes + Aujourd'hui / À venir ============ -->
+    <section class="view view-home" v-if="view === 'home'">
 
-    <!-- ============ 7. TRI / FILTRE (affichés seulement si besoin) ============ -->
-    <section class="filters-section">
-      <button type="button" class="filters-toggle" :aria-expanded="ui.filtersOpen"
-              @click="ui.filtersOpen = !ui.filtersOpen">
-        Filtres / tri <small v-if="activeFilterCount">({{ activeFilterCount }} actif{{ activeFilterCount > 1 ? 's' : '' }})</small>
-      </button>
+      <div class="stat-cards">
+        <article class="stat-card stat-balance">
+          <h3>Solde</h3>
+          <p class="stat-value">{{ balance }} <small>pts</small></p>
+        </article>
+        <article class="stat-card">
+          <h3>Aujourd'hui</h3>
+          <p class="stat-value">{{ todayTasks.length }} <small>tâche{{ todayTasks.length > 1 ? 's' : '' }}</small> <span class="stat-pill">{{ todayPoints }} pts à gagner</span></p>
+        </article>
+        <article class="stat-card">
+          <h3>À venir</h3>
+          <p class="stat-value">{{ upcomingTasks.length }} <small>tâche{{ upcomingTasks.length > 1 ? 's' : '' }}</small> <span class="stat-pill">{{ upcomingPoints }} pts à gagner</span></p>
+        </article>
+        <article class="stat-card">
+          <h3>En cours</h3>
+          <p class="stat-value">{{ stats.doing }} <small>tâche{{ stats.doing > 1 ? 's' : '' }}</small></p>
+        </article>
+        <article class="stat-card">
+          <h3>Terminées</h3>
+          <p class="stat-value">{{ stats.done }} <small>tâche{{ stats.done > 1 ? 's' : '' }}</small> <span class="stat-pill">{{ earned }} pts gagnés</span></p>
+        </article>
+        <article class="stat-card" :class="{ 'stat-alert': stats.overdue }">
+          <h3>En retard</h3>
+          <p class="stat-value">{{ stats.overdue }} <small>tâche{{ stats.overdue > 1 ? 's' : '' }}</small></p>
+        </article>
+      </div>
 
-      <div class="filters" v-if="ui.filtersOpen">
-        <div class="filters-row">
-          <input type="search" v-model="filters.search" placeholder="Rechercher…">
+      <div class="dashboard">
 
-          <select v-model="filters.category">
-            <option value="">Toutes catégories</option>
-            <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
-          </select>
+        <section class="view view-today">
+          <h2>Aujourd'hui <small>({{ todayTasks.length }})</small> <small class="list-points">{{ todayPoints }} pts à gagner</small></h2>
+          <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui.</p>
+          <div class="task-list">
+            <task-list :tasks="todayTasks" :projects="data.projects" :statuses="statuses" :today="today" :selected="selection"
+                       @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
+                       @edit-selected="editSelected" @delete-selected="deleteSelected"
+                       @status="changeStatus" @points="changePoints" @due="changeDue"></task-list>
+          </div>
+        </section>
 
-          <select v-model="filters.status">
-            <option value="">Tous statuts</option>
-            <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
-          </select>
+        <section class="view view-upcoming">
+          <h2>À venir <small>({{ upcomingTasks.length }})</small> <small class="list-points">{{ upcomingPoints }} pts à gagner</small></h2>
+          <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
+          <div class="task-list">
+            <task-list :tasks="upcomingTasks" :projects="data.projects" :statuses="statuses" :today="today" :selected="selection"
+                       @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
+                       @edit-selected="editSelected" @delete-selected="deleteSelected"
+                       @status="changeStatus" @points="changePoints" @due="changeDue"></task-list>
+          </div>
+        </section>
 
-          <select v-model="filters.project">
-            <option value="">Tous projets</option>
-            <option value="__none">Sans projet</option>
-            <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
-          </select>
-
-          <select v-model="filters.sort">
-            <option value="due">Trier : date butoir</option>
-            <option value="points-desc">Trier : points ↓</option>
-            <option value="points-asc">Trier : points ↑</option>
-            <option value="title">Trier : titre A→Z</option>
-          </select>
-
-          <label class="filters-check">
-            <input type="checkbox" v-model="filters.showDone"> Afficher les terminées
-          </label>
-
-          <button type="button" @click="resetFilters">Réinitialiser</button>
-        </div>
       </div>
     </section>
 
-    <!-- ============ CONTENU DE L'ONGLET OUVERT ============ -->
-
-    <!-- Toutes les tâches -->
+    <!-- ============ TOUTES LES TÂCHES ============ -->
     <section class="view view-all" v-if="view === 'all'">
-      <h2>Toutes les tâches <small>({{ allTasks.length }})</small></h2>
-      <p class="hint">Y compris celles sans date butoir.</p>
+      <p class="hint">{{ allTasks.length }} tâche{{ allTasks.length > 1 ? 's' : '' }}, y compris celles sans date butoir.</p>
       <p class="empty" v-if="!allTasks.length">Aucune tâche.</p>
       <div class="task-list">
-        <task-row v-for="t in allTasks" :key="t.id"
-                  :task="t" :project-label="projectName(t.projectId)"
-                  :statuses="statuses" :today="today"
-                  @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+        <task-list :tasks="allTasks" :projects="data.projects" :statuses="statuses" :today="today" :selected="selection"
+                       @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
+                       @edit-selected="editSelected" @delete-selected="deleteSelected"
+                       @status="changeStatus" @points="changePoints" @due="changeDue"></task-list>
       </div>
     </section>
 
     <!-- Projets -->
     <section class="view view-projects" v-if="view === 'projects'">
-      <h2>Projets <small>({{ data.projects.length }})</small></h2>
-
-      <button type="button" class="btn-add" @click="openProjectForm()">＋ Nouveau projet</button>
-
       <!-- Formulaire projet -->
-      <div class="form-panel project-form" v-if="projectForm.open">
+      <div class="modal-backdrop" v-if="projectForm.open" @click.self="projectForm.open = false">
+      <div class="form-panel modal modal-wide project-form" role="dialog" aria-modal="true">
         <h3>{{ projectForm.id ? 'Modifier le projet' : 'Nouveau projet' }}</h3>
         <form @submit.prevent="saveProject">
           <label>Nom du projet
@@ -292,6 +365,7 @@
           </div>
         </form>
       </div>
+      </div>
 
       <p class="empty" v-if="!data.projects.length">Aucun projet pour l'instant.</p>
 
@@ -312,23 +386,23 @@
 
         <div class="task-list">
           <p class="empty" v-if="!projectTasks(p).length">Pas encore de tâche dans ce projet.</p>
-          <task-row v-for="t in projectTasks(p)" :key="t.id"
-                    :task="t" :project-label="''"
-                    :statuses="statuses" :today="today"
-                    @status="changeStatus" @due="changeDue" @edit="openTaskForm" @delete="deleteTask"></task-row>
+          <div class="project-task" v-for="t in projectTasks(p)" :key="t.id">
+            <span class="project-task-title">{{ t.title }}</span>
+            <span class="project-task-points">{{ t.points }} pts</span>
+            <button type="button" @click="openTaskForm(t)">Modifier</button>
+            <button type="button" @click="deleteTask(t)">Supprimer</button>
+          </div>
         </div>
       </article>
     </section>
 
     <!-- Récompenses -->
     <section class="view view-rewards" v-if="view === 'rewards'">
-      <h2>Récompenses</h2>
       <p class="balance-line">Solde : <strong>{{ balance }} pts</strong>
         <small>(gagnés : {{ earned }} · dépensés : {{ data.spent }}<template v-if="data.adjust"> · ajustement manuel : {{ data.adjust > 0 ? '+' : '' }}{{ data.adjust }}</template>)</small></p>
 
-      <div class="balance-adjust">
-        <button type="button" @click="openBalanceForm">Modifier le solde</button>
-        <form class="form-panel balance-form" v-if="balanceForm.open" @submit.prevent="applyBalance">
+      <div class="modal-backdrop" v-if="balanceForm.open" @click.self="balanceForm.open = false">
+        <form class="form-panel modal balance-form" @submit.prevent="applyBalance">
           <label>Nouveau solde (pts)
             <input type="number" v-model.number="balanceForm.value" required>
           </label>
@@ -341,10 +415,9 @@
         </form>
       </div>
 
-      <button type="button" class="btn-add" @click="openRewardForm()">＋ Nouvelle récompense</button>
-
       <!-- Formulaire récompense -->
-      <div class="form-panel reward-form" v-if="rewardForm.open">
+      <div class="modal-backdrop" v-if="rewardForm.open" @click.self="rewardForm.open = false">
+      <div class="form-panel modal reward-form" role="dialog" aria-modal="true">
         <h3>{{ rewardForm.id ? 'Modifier la récompense' : 'Nouvelle récompense' }}</h3>
         <form @submit.prevent="saveReward">
           <label>Nom
@@ -364,6 +437,7 @@
             <button type="button" @click="rewardForm.open = false">Annuler</button>
           </div>
         </form>
+      </div>
       </div>
 
       <div class="filters reward-filters">
@@ -451,31 +525,78 @@
     </section>
 
   </main>
+  </div>
 </div>
 
-<!-- ============ TEMPLATE : LIGNE DE TÂCHE (réutilisée partout) ============ -->
+<!-- ============ TEMPLATE : LIGNE DE TÂCHE (réutilisée dans Aujourd'hui / À venir / Toutes) ============ -->
 <template id="task-row-template">
-  <article class="task" :class="['status-' + task.status, { overdue: isOverdue }]">
+  <article class="task" :class="['status-' + task.status, { overdue: isOverdue, selected: selected }]">
+    <input class="task-check" type="checkbox" :checked="selected" @change="$emit('toggle')" title="Sélectionner">
+
     <div class="task-main">
       <h3 class="task-title">{{ task.title }}</h3>
-      <div class="task-meta">
-        <span class="task-category" v-if="task.category">{{ task.category }}</span>
-        <span class="task-project" v-if="projectLabel">{{ projectLabel }}</span>
-        <span class="task-points">{{ task.points }} pts</span>
-        <span class="task-late" v-if="isOverdue">En retard</span>
+
+      <div class="task-tags">
+        <span class="tag tag-category" v-if="task.category">{{ task.category }}</span>
+        <span class="tag tag-project" v-if="projectLabel">{{ projectLabel }}</span>
+
+        <!-- Statut : un tag qui est aussi un menu déroulant -->
+        <label class="tag tag-status" :class="'status-' + task.status">
+          <select :value="task.status" @change="$emit('status', task, $event.target.value)">
+            <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
+          </select>
+        </label>
+
+        <!-- Points : un tag qui est aussi un champ -->
+        <label class="tag tag-points">
+          <input class="tag-points-input" type="number" min="0" :value="task.points"
+                 title="Cliquer pour modifier les points"
+                 @change="onPoints" @keydown.enter="$event.target.blur()"> pts
+        </label>
+
+        <!-- Date butoir : un tag qui ouvre le calendrier (rien d'affiché s'il n'y a pas de date) -->
+        <label class="tag tag-due" v-if="task.due">
+          <span class="tag-due-text">{{ dueLabel }}</span>
+          <input class="tag-due-input" type="date" :value="task.due"
+                 title="Cliquer pour changer la date butoir"
+                 @click="openPicker" @change="onDue">
+        </label>
+
+        <span class="tag tag-late" v-if="isOverdue">En retard</span>
       </div>
     </div>
-    <div class="task-controls">
-      <select class="task-status-select" :value="task.status"
-              @change="$emit('status', task, $event.target.value)">
-        <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
-      </select>
-      <input class="task-due-input" type="date" :value="task.due"
-             @change="$emit('due', task, $event.target.value)" title="Date butoir">
-      <button type="button" @click="$emit('edit', task)">Modifier</button>
-      <button type="button" @click="$emit('delete', task)">Supprimer</button>
-    </div>
   </article>
+</template>
+
+<!-- ============ TEMPLATE : LISTE DE TÂCHES (barre d'actions + lignes) ============ -->
+<template id="task-list-template">
+  <div class="task-list-box">
+    <div class="task-toolbar" v-if="tasks.length">
+      <button type="button" @click="$emit('select-all', allIds)" :disabled="allSelected">Tout cocher</button>
+      <button type="button" @click="$emit('clear', allIds)" :disabled="!selectedIds.length">Tout désélectionner</button>
+      <template v-if="selectedIds.length">
+        <span class="task-toolbar-count">{{ selectedIds.length }} sélectionnée{{ selectedIds.length > 1 ? 's' : '' }}</span>
+        <button type="button" class="task-toolbar-edit" @click="$emit('edit-selected', selectedIds)">Modifier</button>
+        <button type="button" class="task-toolbar-delete" @click="$emit('delete-selected', selectedIds)">Supprimer</button>
+      </template>
+    </div>
+
+    <task-row v-for="t in tasks" :key="t.id" v-bind="$attrs"
+              :task="t" :project-label="projectLabel(t)"
+              :statuses="statuses" :today="today"
+              :selected="selected.includes(t.id)"
+              @toggle="$emit('toggle', t.id)"></task-row>
+  </div>
+</template>
+
+    <!-- Autre tri (points, titre) : liste simple, la date est alors affichée sur chaque tâche -->
+    <template v-else>
+      <task-row v-for="t in tasks" :key="t.id" v-bind="$attrs"
+                :task="t" :project-label="projectLabel(t)"
+                :statuses="statuses" :today="today" :show-due="true"></task-row>
+    </template>
+
+  </div>
 </template>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js"></script>
