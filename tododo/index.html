@@ -11,32 +11,29 @@
 
 <div id="app" v-cloak>
 
-  <!-- ============ BARRE DU HAUT : titre | points | synchro ============ -->
+  <!-- ============ BARRE DU HAUT : titre + synchro | points ============ -->
   <header class="app-header">
-    <h1 class="app-title">Todo Quest</h1>
 
-    <div class="points-box">
-      <div class="points-badge" title="Solde de points">{{ balance }}</div>
-      <div class="points-info">
-        <template v-if="nextReward">
-          <span class="points-label">Encore <strong>{{ nextReward.cost - balance }} pts</strong> avant « {{ nextReward.name }} »</span>
-          <progress :value="Math.max(0, balance)" :max="nextReward.cost"></progress>
+    <div class="app-brand">
+      <h1 class="app-title">Todo Quest</h1>
+
+      <div class="sync-box">
+        <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
+        <template v-if="firebaseReady">
+          <button type="button" class="sync-signin" v-if="!user" @click="signIn">Se connecter avec Google</button>
+          <template v-else>
+            <span class="sync-user">{{ user.email }}</span>
+            <button type="button" class="sync-signout" @click="signOut">Se déconnecter</button>
+          </template>
         </template>
-        <span class="points-label" v-else-if="data.rewards.length">Toutes tes récompenses sont accessibles !</span>
-        <span class="points-label" v-else>pts</span>
       </div>
     </div>
 
-    <div class="sync-box">
-      <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
-      <template v-if="firebaseReady">
-        <button type="button" class="sync-signin" v-if="!user" @click="signIn">Se connecter avec Google</button>
-        <template v-else>
-          <span class="sync-user">{{ user.email }}</span>
-          <button type="button" class="sync-signout" @click="signOut">Se déconnecter</button>
-        </template>
-      </template>
+    <div class="points-box">
+      <div class="points-badge" title="Solde de points">{{ balance }}</div>
+      <span class="points-label">pts</span>
     </div>
+
   </header>
 
   <p class="toast" v-if="toast">{{ toast }}</p>
@@ -265,8 +262,17 @@
     </section>
     </div>
 
-    <!-- ============ ACCUEIL : cartes + Aujourd'hui / À venir ============ -->
+    <!-- ============ ACCUEIL : prochaine récompense + Aujourd'hui / À venir ============ -->
     <section class="view view-home" v-if="view === 'home'">
+
+      <!-- "Encore X pts avant…" : affiché uniquement ici -->
+      <div class="next-reward" v-if="data.rewards.length">
+        <template v-if="nextReward">
+          <span class="next-reward-label">Encore <strong>{{ nextReward.cost - balance }} pts</strong> avant « {{ nextReward.name }} »</span>
+          <progress :value="Math.max(0, balance)" :max="nextReward.cost"></progress>
+        </template>
+        <span class="next-reward-label" v-else>Toutes tes récompenses sont accessibles !</span>
+      </div>
 
       <div class="dashboard">
 
@@ -503,9 +509,11 @@
 </div>
 
 <!-- ============ TEMPLATE : LIGNE DE TÂCHE (réutilisée dans Aujourd'hui / À venir / Toutes) ============ -->
+<!-- Cliquer sur le bloc sélectionne / désélectionne la tâche (sauf clic sur un tag, un champ ou un bouton) -->
 <template id="task-row-template">
-  <article class="task" :class="['status-' + task.status, { overdue: isOverdue, selected: selected }]">
-    <input class="task-check" type="checkbox" :checked="selected" @change="$emit('toggle')" title="Sélectionner">
+  <article class="task" :class="['status-' + task.status, { overdue: isOverdue, selected: selected }]"
+           tabindex="0" @click="onRowClick"
+           @keydown.space.self.prevent="$emit('toggle')" @keydown.enter.self.prevent="$emit('toggle')">
 
     <div class="task-main">
       <h3 class="task-title">{{ task.title }}</h3>
@@ -560,16 +568,6 @@
               :statuses="statuses" :today="today"
               :selected="selected.includes(t.id)"
               @toggle="$emit('toggle', t.id)"></task-row>
-  </div>
-</template>
-
-    <!-- Autre tri (points, titre) : liste simple, la date est alors affichée sur chaque tâche -->
-    <template v-else>
-      <task-row v-for="t in tasks" :key="t.id" v-bind="$attrs"
-                :task="t" :project-label="projectLabel(t)"
-                :statuses="statuses" :today="today" :show-due="true"></task-row>
-    </template>
-
   </div>
 </template>
 
