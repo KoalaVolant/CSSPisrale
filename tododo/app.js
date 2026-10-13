@@ -14,7 +14,8 @@ const STATUSES = [
 ];
 
 const TABS = [
-  { id: 'all',      label: 'Toutes' },
+  { id: 'home',     label: 'Accueil' },
+  { id: 'all',      label: 'Toutes les tâches' },
   { id: 'projects', label: 'Projets' },
   { id: 'rewards',  label: 'Récompenses' },
   { id: 'data',     label: 'Sauvegarde' },
@@ -52,6 +53,12 @@ function formatDate(str) {
   return new Date(y, m - 1, d).toLocaleDateString('fr-FR');
 }
 
+function formatLongDate(str) {
+  if (!str) return '';
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
 function defaultData() {
   return {
     tasks: [],        // { id, title, category, points, status, projectId, due }
@@ -78,10 +85,10 @@ function loadData() {
 }
 
 function loadUi() {
-  const defaults = { dashboardOpen: true, filtersOpen: false, tab: '' };
+  const defaults = { filtersOpen: false, tab: 'home' };
   try {
     const ui = Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
-    if (!TABS.some(t => t.id === ui.tab)) ui.tab = '';   // onglet inconnu -> aucun
+    if (!TABS.some(t => t.id === ui.tab)) ui.tab = 'home';   // onglet inconnu -> accueil
     return ui;
   } catch (e) {
     return defaults;
@@ -93,11 +100,61 @@ function loadUi() {
    ============================================================ */
 const TaskRow = {
   template: '#task-row-template',
-  props: ['task', 'projectLabel', 'statuses', 'today'],
-  emits: ['status', 'due', 'edit', 'delete'],
+  props: ['task', 'projectLabel', 'statuses', 'today', 'selected'],
+  emits: ['toggle', 'status', 'points', 'due'],
   computed: {
     isOverdue() {
       return !!this.task.due && this.task.due < this.today && this.task.status !== 'done';
+    },
+    dueLabel() {
+      return formatLongDate(this.task.due);
+    },
+  },
+  methods: {
+    // Points modifiables directement dans le tag
+    onPoints(event) {
+      const raw = String(event.target.value).trim();
+      const n = Math.round(Number(raw));
+      const value = raw !== '' && Number.isFinite(n) && n >= 0 ? n : this.task.points;   // vide/invalide : on garde l'ancienne valeur
+      event.target.value = value;
+      this.$emit('points', this.task, value);
+    },
+    // Date butoir modifiable directement dans le tag
+    onDue(event) {
+      this.$emit('due', this.task, event.target.value);
+    },
+    openPicker(event) {
+      try { if (event.target.showPicker) event.target.showPicker(); } catch (e) { /* navigateur sans showPicker */ }
+    },
+  },
+};
+
+/* ============================================================
+   Composant : liste de tâches avec barre d'actions (cocher / modifier / supprimer)
+   Les événements status / points / due sont transmis aux lignes via $attrs.
+   ============================================================ */
+const TaskList = {
+  template: '#task-list-template',
+  components: { TaskRow },
+  inheritAttrs: false,
+  props: {
+    tasks:    { type: Array, default: () => [] },
+    projects: { type: Array, default: () => [] },
+    statuses: { type: Array, default: () => [] },
+    today:    { type: String, default: '' },
+    selected: { type: Array, default: () => [] },   // ids cochés (global)
+  },
+  emits: ['toggle', 'select-all', 'clear', 'edit-selected', 'delete-selected'],
+  computed: {
+    allIds()      { return this.tasks.map(t => t.id); },
+    selectedIds() { return this.tasks.filter(t => this.selected.includes(t.id)).map(t => t.id); },
+    allSelected() { return this.tasks.length > 0 && this.selectedIds.length === this.tasks.length; },
+  },
+  methods: {
+    projectLabel(task) {
+      if (!task.projectId) return '';
+      const p = this.projects.find(x => x.id === task.projectId);
+      return p ? p.name : '';
     },
   },
 };
@@ -121,7 +178,8 @@ const app = createApp({
 
     // Onglet ouvert sous le tableau de bord ('' = aucun) : mémorisé avec les autres préférences
     const view = computed({ get: () => ui.tab, set: v => { ui.tab = v; } });
-    function toggleTab(id) { view.value = view.value === id ? '' : id; }
+    function setTab(id) { view.value = id; }
+    const pageTitle = computed(() => view.value === 'home' ? 'Tableau de bord' : (TABS.find(t => t.id === view.value) || {}).label);
     const today = ref(todayStr());
     setInterval(() => { today.value = todayStr(); }, 60 * 1000);
 
@@ -222,7 +280,7 @@ const app = createApp({
         if (q && !t.title.toLowerCase().includes(q)) return false;
         return true;
       });
-      const byDue = (a, b) => (a.due || '9999').localeCompare(b.due || '9999') || b.points - a.points;
+      const byDue = (a, b) => (a.due || '9999').localeCompare(b.due || '9999');
       switch (filters.sort) {
         case 'points-desc': res.sort((a, b) => b.points - a.points || byDue(a, b)); break;
         case 'points-asc':  res.sort((a, b) => a.points - b.points || byDue(a, b)); break;
@@ -255,7 +313,17 @@ const app = createApp({
       }
       quickForm.open = false;
       taskForm.open = true;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Un 2e clic sur le bouton referme le formulaire (sauf si on est en train de modifier une tâche)
+    function toggleTaskForm() {
+      if (taskForm.open && !taskForm.id) taskForm.open = false;
+      else openTaskForm();
+    }
+
+    function toggleQuickForm() {
+      if (quickForm.open) quickForm.open = false;
+      else openQuickForm();
     }
 
     function saveTask() {
@@ -364,6 +432,82 @@ const app = createApp({
       quickForm.open = false;
     }
 
+    /* ---------- Sélection (cases à cocher) ---------- */
+    const selection = ref([]);   // ids des tâches cochées
+
+    function toggleSelect(id) {
+      const i = selection.value.indexOf(id);
+      if (i >= 0) selection.value.splice(i, 1); else selection.value.push(id);
+    }
+    function selectMany(ids) {
+      ids.forEach(id => { if (!selection.value.includes(id)) selection.value.push(id); });
+    }
+    function deselectMany(ids) {
+      selection.value = selection.value.filter(id => !ids.includes(id));
+    }
+
+    // "Modifier" sur la sélection : 1 tâche = popup complète, plusieurs = popup de modification groupée
+    const bulkForm = reactive({ open: false, ids: [], category: '', points: '', status: '', projectId: '__keep', due: '', clearDue: false });
+
+    function editSelected(ids) {
+      if (ids.length === 1) {
+        const t = data.tasks.find(x => x.id === ids[0]);
+        if (t) openTaskForm(t);
+        return;
+      }
+      Object.assign(bulkForm, { open: true, ids: [...ids], category: '', points: '', status: '', projectId: '__keep', due: '', clearDue: false });
+    }
+
+    function saveBulk() {
+      let gained = 0;
+      bulkForm.ids.forEach(id => {
+        const t = data.tasks.find(x => x.id === id);
+        if (!t) return;
+        if (bulkForm.category.trim()) t.category = bulkForm.category.trim();
+        if (bulkForm.points !== '' && bulkForm.points !== null && Number.isFinite(Number(bulkForm.points))) {
+          t.points = Math.max(0, Math.round(Number(bulkForm.points)));
+        }
+        if (bulkForm.status) {
+          if (t.status !== 'done' && bulkForm.status === 'done') gained += Number(t.points) || 0;
+          t.status = bulkForm.status;
+        }
+        if (bulkForm.projectId !== '__keep') t.projectId = bulkForm.projectId;
+        if (bulkForm.clearDue) t.due = '';
+        else if (bulkForm.due) t.due = bulkForm.due;
+      });
+      notify(gained ? `${bulkForm.ids.length} tâches modifiées · +${gained} pts !` : `${bulkForm.ids.length} tâches modifiées`);
+      bulkForm.open = false;
+    }
+
+    function deleteSelected(ids) {
+      if (!ids.length) return;
+      const msg = ids.length === 1 ? 'Supprimer la tâche sélectionnée ?' : `Supprimer les ${ids.length} tâches sélectionnées ?`;
+      if (!confirm(msg)) return;
+      data.tasks = data.tasks.filter(t => !ids.includes(t.id));
+    }
+
+    // On oublie les cases cochées dont la tâche n'existe plus
+    watch(() => data.tasks.length, () => {
+      selection.value = selection.value.filter(id => data.tasks.some(t => t.id === id));
+    });
+
+    // Échap ferme les popups
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      const popup = [bulkForm, taskForm, quickForm, projectForm, rewardForm, balanceForm].find(f => f.open);
+      if (popup) popup.open = false;
+    });
+
+    // Points à gagner dans les listes Aujourd'hui / À venir (tâches pas encore terminées)
+    const sumToEarn = list => list.filter(t => t.status !== 'done').reduce((s, t) => s + (Number(t.points) || 0), 0);
+    const stats = computed(() => ({
+      doing: data.tasks.filter(t => t.status === 'doing').length,
+      done: data.tasks.filter(t => t.status === 'done').length,
+      overdue: data.tasks.filter(t => t.due && t.due < today.value && t.status !== 'done').length,
+    }));
+    const todayPoints    = computed(() => sumToEarn(todayTasks.value));
+    const upcomingPoints = computed(() => sumToEarn(upcomingTasks.value));
+
     function deleteTask(task) {
       if (!confirm(`Supprimer la tâche « ${task.title} » ?`)) return;
       data.tasks = data.tasks.filter(t => t.id !== task.id);
@@ -376,8 +520,12 @@ const app = createApp({
       if (old === 'done' && newStatus !== 'done') notify(`−${task.points} pts (tâche rouverte)`);
     }
 
-    function changeDue(task, newDue) {
-      task.due = newDue || '';
+    function changePoints(task, value) {
+      task.points = Math.max(0, Number(value) || 0);
+    }
+
+    function changeDue(task, value) {
+      task.due = value || '';
     }
 
     function projectName(id) {
@@ -695,7 +843,7 @@ const app = createApp({
 
     return {
       // état
-      data, ui, view, toggleTab, today, toast, tabs: TABS, statuses: STATUSES,
+      data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, statuses: STATUSES,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
       // points
@@ -704,8 +852,10 @@ const app = createApp({
       // filtres
       filters, resetFilters, activeFilterCount, categories, todayTasks, upcomingTasks, allTasks,
       // tâches
-      quickForm, openQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
-      taskForm, openTaskForm, saveTask, deleteTask, changeStatus, changeDue, projectName,
+      quickForm, openQuickForm, toggleQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
+      taskForm, openTaskForm, toggleTaskForm, saveTask, deleteTask, changeStatus, changePoints, changeDue, projectName,
+      selection, toggleSelect, selectMany, deselectMany, editSelected, deleteSelected, bulkForm, saveBulk,
+      todayPoints, upcomingPoints, stats,
       // projets
       projectForm, openProjectForm, addDraftTask, saveProject, deleteProject, projectTasks, projectStats,
       // récompenses
@@ -720,5 +870,5 @@ const app = createApp({
   },
 });
 
-app.component('task-row', TaskRow);
+app.component('task-list', TaskList);
 app.mount('#app');
