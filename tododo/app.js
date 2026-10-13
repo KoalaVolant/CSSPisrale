@@ -119,6 +119,13 @@ const TaskRow = {
       event.target.value = value;
       this.$emit('points', this.task, value);
     },
+    // Clic sur le bloc = (dé)sélection, sauf si on clique sur un champ / tag / bouton, ou si on sélectionne du texte
+    onRowClick(event) {
+      if (event.target.closest('select, input, button, label, a, option, textarea')) return;
+      const selection = window.getSelection ? String(window.getSelection()) : '';
+      if (selection) return;
+      this.$emit('toggle');
+    },
     // Date butoir modifiable directement dans le tag
     onDue(event) {
       this.$emit('due', this.task, event.target.value);
