@@ -268,33 +268,6 @@
     <!-- ============ ACCUEIL : cartes + Aujourd'hui / À venir ============ -->
     <section class="view view-home" v-if="view === 'home'">
 
-      <div class="stat-cards">
-        <article class="stat-card stat-balance">
-          <h3>Solde</h3>
-          <p class="stat-value">{{ balance }} <small>pts</small></p>
-        </article>
-        <article class="stat-card">
-          <h3>Aujourd'hui</h3>
-          <p class="stat-value">{{ todayTasks.length }} <small>tâche{{ todayTasks.length > 1 ? 's' : '' }}</small> <span class="stat-pill">{{ todayPoints }} pts à gagner</span></p>
-        </article>
-        <article class="stat-card">
-          <h3>À venir</h3>
-          <p class="stat-value">{{ upcomingTasks.length }} <small>tâche{{ upcomingTasks.length > 1 ? 's' : '' }}</small> <span class="stat-pill">{{ upcomingPoints }} pts à gagner</span></p>
-        </article>
-        <article class="stat-card">
-          <h3>En cours</h3>
-          <p class="stat-value">{{ stats.doing }} <small>tâche{{ stats.doing > 1 ? 's' : '' }}</small></p>
-        </article>
-        <article class="stat-card">
-          <h3>Terminées</h3>
-          <p class="stat-value">{{ stats.done }} <small>tâche{{ stats.done > 1 ? 's' : '' }}</small> <span class="stat-pill">{{ earned }} pts gagnés</span></p>
-        </article>
-        <article class="stat-card" :class="{ 'stat-alert': stats.overdue }">
-          <h3>En retard</h3>
-          <p class="stat-value">{{ stats.overdue }} <small>tâche{{ stats.overdue > 1 ? 's' : '' }}</small></p>
-        </article>
-      </div>
-
       <div class="dashboard">
 
         <section class="view view-today">
