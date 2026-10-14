@@ -13,12 +13,30 @@ const STATUSES = [
   { value: 'done',   label: 'Terminé' },
 ];
 
+// label = texte du tag dans la liste, short = texte dans les formulaires
+const URGENCIES = [
+  { value: '',       label: 'Urgence',           short: 'Aucune' },
+  { value: 'low',    label: 'Urgence : basse',   short: 'Basse' },
+  { value: 'medium', label: 'Urgence : moyenne', short: 'Moyenne' },
+  { value: 'high',   label: 'Urgence : haute',   short: 'Haute' },
+];
+const DIFFICULTIES = [
+  { value: '',       label: 'Difficulté',            short: 'Aucune' },
+  { value: 'easy',   label: 'Difficulté : facile',   short: 'Facile' },
+  { value: 'medium', label: 'Difficulté : moyenne',  short: 'Moyenne' },
+  { value: 'hard',   label: 'Difficulté : difficile', short: 'Difficile' },
+];
+const RANK = { '': 0, low: 1, easy: 1, medium: 2, high: 3, hard: 3 };
+
 const TABS = [
-  { id: 'home',     label: 'Accueil' },
-  { id: 'all',      label: 'Toutes les tâches' },
-  { id: 'projects', label: 'Projets' },
-  { id: 'rewards',  label: 'Récompenses' },
-  { id: 'data',     label: 'Sauvegarde' },
+  { id: 'home',       label: 'Accueil' },
+  { id: 'all',        label: 'Toutes les tâches' },
+  { id: 'done',       label: 'Terminés' },
+  { id: 'projects',   label: 'Projets' },
+  { id: 'categories', label: 'Catégories' },
+  { id: 'rewards',    label: 'Récompenses' },
+  { id: 'inventory',  label: 'Inventaire' },
+  { id: 'data',       label: 'Sauvegarde' },
 ];
 
 // Découpe une liste collée en tâches.
@@ -59,10 +77,20 @@ function formatLongDate(str) {
   return new Date(y, m - 1, d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+// Une tâche complète avec toutes ses valeurs par défaut
+function newTask(fields = {}) {
+  return {
+    id: uid(), title: '', category: '', points: 10, status: 'todo', projectId: '', due: '',
+    urgency: '', difficulty: '', doneAt: '',
+    ...fields,
+  };
+}
+
 function defaultData() {
   return {
-    tasks: [],        // { id, title, category, points, status, projectId, due }
-    projects: [],     // { id, name, description }
+    tasks: [],        // { id, title, category, points, status, projectId, due, urgency, difficulty, doneAt }
+    projects: [],     // { id, name, description }  (l'ordre du tableau = l'ordre d'affichage)
+    categories: [],   // noms des catégories ("Sans catégorie" existe toujours, c'est la valeur '')
     rewards: [        // { id, name, category, cost }
       { id: uid(), name: 'Un bon café',           cost: 20 },
       { id: uid(), name: 'Une soirée jeux vidéo', cost: 100 },
@@ -71,6 +99,7 @@ function defaultData() {
     inventory: [],    // { id, name, category, cost, date, used }
     spent: 0,         // total de points dépensés en récompenses
     adjust: 0,        // ajustement manuel du solde (peut être négatif)
+    archived: 0,      // points de tâches terminées puis supprimées (conservés)
   };
 }
 
@@ -78,7 +107,9 @@ function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultData();
-    return Object.assign(defaultData(), JSON.parse(raw));
+    const d = Object.assign(defaultData(), JSON.parse(raw));
+    if (!Array.isArray(d.categories)) d.categories = [];
+    return d;
   } catch (e) {
     return defaultData();
   }
@@ -97,17 +128,27 @@ function loadUi() {
 
 /* ============================================================
    Composant : ligne de tâche (template dans index.html)
+   Tout est modifiable en cliquant directement sur le tag concerné.
    ============================================================ */
 const TaskRow = {
   template: '#task-row-template',
-  props: ['task', 'projectLabel', 'statuses', 'today', 'selected'],
-  emits: ['toggle', 'status', 'points', 'due'],
+  props: ['task', 'projects', 'categories', 'statuses', 'today', 'selected'],
+  emits: ['toggle', 'status', 'points', 'due', 'update'],
+  data() {
+    return { editingTitle: false, draft: '' };
+  },
   computed: {
     isOverdue() {
       return !!this.task.due && this.task.due < this.today && this.task.status !== 'done';
     },
     dueLabel() {
       return formatLongDate(this.task.due);
+    },
+    urgencyOptions()    { return URGENCIES; },
+    difficultyOptions() { return DIFFICULTIES; },
+    // catégorie de la tâche absente de la liste (ne devrait pas arriver) : on l'affiche quand même
+    categoryMissing() {
+      return !!this.task.category && !this.categories.includes(this.task.category);
     },
   },
   methods: {
@@ -133,35 +174,64 @@ const TaskRow = {
     openPicker(event) {
       try { if (event.target.showPicker) event.target.showPicker(); } catch (e) { /* navigateur sans showPicker */ }
     },
+    // Catégorie / projet / urgence / difficulté : un seul événement "update"
+    update(field, event) {
+      this.$emit('update', this.task, field, event.target.value);
+    },
+    // Renommer : double-clic sur le titre
+    startTitleEdit() {
+      this.draft = this.task.title;
+      this.editingTitle = true;
+      this.$nextTick(() => { const el = this.$refs.titleInput; if (el) { el.focus(); el.select(); } });
+    },
+    saveTitle() {
+      if (!this.editingTitle) return;
+      this.editingTitle = false;
+      const title = this.draft.trim();
+      if (title && title !== this.task.title) this.$emit('update', this.task, 'title', title);
+    },
+    cancelTitle() {
+      this.editingTitle = false;
+    },
   },
 };
 
 /* ============================================================
    Composant : liste de tâches avec barre d'actions (cocher / modifier / supprimer)
-   Les événements status / points / due sont transmis aux lignes via $attrs.
+   - group="doneAt" : les tâches sont rangées sous un titre par date de fin (onglet Terminés)
+   Les événements status / points / due / update sont transmis aux lignes via $attrs.
    ============================================================ */
 const TaskList = {
   template: '#task-list-template',
   components: { TaskRow },
   inheritAttrs: false,
   props: {
-    tasks:    { type: Array, default: () => [] },
-    projects: { type: Array, default: () => [] },
-    statuses: { type: Array, default: () => [] },
-    today:    { type: String, default: '' },
-    selected: { type: Array, default: () => [] },   // ids cochés (global)
+    tasks:      { type: Array, default: () => [] },
+    projects:   { type: Array, default: () => [] },
+    categories: { type: Array, default: () => [] },
+    statuses:   { type: Array, default: () => [] },
+    today:      { type: String, default: '' },
+    selected:   { type: Array, default: () => [] },   // ids cochés (global)
+    group:      { type: String, default: '' },
   },
   emits: ['toggle', 'select-all', 'clear', 'edit-selected', 'delete-selected'],
   computed: {
     allIds()      { return this.tasks.map(t => t.id); },
     selectedIds() { return this.tasks.filter(t => this.selected.includes(t.id)).map(t => t.id); },
     allSelected() { return this.tasks.length > 0 && this.selectedIds.length === this.tasks.length; },
-  },
-  methods: {
-    projectLabel(task) {
-      if (!task.projectId) return '';
-      const p = this.projects.find(x => x.id === task.projectId);
-      return p ? p.name : '';
+    // Groupes par date de fin, la plus récente d'abord ; ordre d'origine conservé dans chaque date
+    groups() {
+      if (this.group !== 'doneAt') return [];
+      const map = new Map();
+      this.tasks.forEach(t => {
+        const key = t.doneAt || '';
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push(t);
+      });
+      return [...map.keys()]
+        .sort((a, b) => (b || '').localeCompare(a || ''))     // récent -> ancien, "date inconnue" à la fin
+        .sort((a, b) => (a === '') - (b === ''))
+        .map(key => ({ key, label: key ? formatLongDate(key) : 'Date de fin inconnue', tasks: map.get(key) }));
     },
   },
 };
@@ -173,6 +243,18 @@ const app = createApp({
   setup() {
     /* ---------- Données + sauvegarde auto ---------- */
     const data = reactive(loadData());
+
+    // Toute catégorie utilisée par une tâche / récompense / objet doit exister dans la liste
+    function syncCategories() {
+      if (!Array.isArray(data.categories)) data.categories = [];
+      const known = new Set(data.categories);
+      [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => {
+        if (x.category && !known.has(x.category)) { known.add(x.category); data.categories.push(x.category); }
+      });
+    }
+    syncCategories();
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible */ }   // enregistre la migration tout de suite
+
     watch(data, () => {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible */ }
     }, { deep: true });
@@ -183,7 +265,7 @@ const app = createApp({
       try { localStorage.setItem(UI_KEY, JSON.stringify(ui)); } catch (e) { /* stockage indisponible */ }
     }, { deep: true });
 
-    // Onglet ouvert sous le tableau de bord ('' = aucun) : mémorisé avec les autres préférences
+    // Onglet ouvert : mémorisé avec les autres préférences
     const view = computed({ get: () => ui.tab, set: v => { ui.tab = v; } });
     function setTab(id) { view.value = id; }
     const pageTitle = computed(() => view.value === 'home' ? 'Tableau de bord' : (TABS.find(t => t.id === view.value) || {}).label);
@@ -199,9 +281,60 @@ const app = createApp({
       toastTimer = setTimeout(() => { toast.value = ''; }, 3000);
     }
 
+    /* ---------- Catégories ---------- */
+    const categories = computed(() => data.categories);
+
+    const categoryForm = reactive({ open: false, oldName: '', name: '' });
+
+    function openCategoryForm(name = null) {
+      Object.assign(categoryForm, { open: true, oldName: name || '', name: name || '' });
+    }
+
+    function saveCategory() {
+      const name = categoryForm.name.trim();
+      if (!name) return;
+      if (name.toLowerCase() === 'sans catégorie') { alert("« Sans catégorie » existe déjà : c'est la catégorie par défaut."); return; }
+      const clash = data.categories.some(c => c.toLowerCase() === name.toLowerCase() && c !== categoryForm.oldName);
+      if (clash) { alert('Cette catégorie existe déjà.'); return; }
+
+      if (categoryForm.oldName) {                       // renommer : on met à jour tout ce qui l'utilise
+        const old = categoryForm.oldName;
+        const i = data.categories.indexOf(old);
+        if (i >= 0) data.categories[i] = name;
+        [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => { if (x.category === old) x.category = name; });
+        if (filters.category === old) filters.category = name;
+        if (rewardFilters.category === old) rewardFilters.category = name;
+      } else {
+        data.categories.push(name);
+      }
+      categoryForm.open = false;
+    }
+
+    function categoryUsage(name) {
+      return {
+        tasks: data.tasks.filter(t => (t.category || '') === name).length,
+        rewards: data.rewards.filter(r => (r.category || '') === name).length,
+      };
+    }
+
+    function deleteCategory(name) {
+      const u = categoryUsage(name);
+      const used = u.tasks + u.rewards;
+      const msg = used
+        ? `Supprimer la catégorie « ${name} » ? ${u.tasks} tâche(s) et ${u.rewards} récompense(s) passeront en « Sans catégorie ».`
+        : `Supprimer la catégorie « ${name} » ?`;
+      if (!confirm(msg)) return;
+      [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => { if (x.category === name) x.category = ''; });
+      data.categories = data.categories.filter(c => c !== name);
+      if (filters.category === name) filters.category = '';
+      if (rewardFilters.category === name) rewardFilters.category = '';
+    }
+
     /* ---------- Points ---------- */
+    // Points des tâches terminées + points des tâches terminées puis supprimées
     const earned = computed(() =>
-      data.tasks.filter(t => t.status === 'done').reduce((s, t) => s + (Number(t.points) || 0), 0));
+      data.tasks.filter(t => t.status === 'done').reduce((s, t) => s + (Number(t.points) || 0), 0)
+      + (Number(data.archived) || 0));
     const balance = computed(() => earned.value - data.spent + (Number(data.adjust) || 0));
 
     // Modification manuelle du solde : on règle "adjust" pour tomber pile sur la valeur voulue
@@ -230,10 +363,6 @@ const app = createApp({
     // Filtre / tri des récompenses (le filtre de catégorie s'applique aussi à l'inventaire)
     const rewardFilters = reactive({ category: '', sort: 'cost-asc' });
 
-    const rewardCategories = computed(() =>
-      [...new Set([...data.rewards, ...data.inventory].map(r => r.category).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b)));
-
     function matchesRewardCategory(item) {
       const c = rewardFilters.category;
       if (!c) return true;
@@ -254,11 +383,12 @@ const app = createApp({
 
     const visibleInventory = computed(() => data.inventory.filter(matchesRewardCategory));
 
-    /* ---------- Filtres & tris ---------- */
-    const filters = reactive({ search: '', category: '', status: '', project: '', sort: 'due', showDone: false });
+    /* ---------- Filtres & tris des tâches ---------- */
+    const FILTER_DEFAULTS = { search: '', category: '', status: '', project: '', urgency: '', difficulty: '', sort: 'due' };
+    const filters = reactive({ ...FILTER_DEFAULTS });
 
     function resetFilters() {
-      Object.assign(filters, { search: '', category: '', status: '', project: '', sort: 'due', showDone: false });
+      Object.assign(filters, FILTER_DEFAULTS);
     }
 
     // Nombre de filtres actifs (affiché sur le bouton "Filtres / tri" quand le panneau est replié)
@@ -268,42 +398,51 @@ const app = createApp({
       if (filters.category) n++;
       if (filters.status) n++;
       if (filters.project) n++;
+      if (filters.urgency) n++;
+      if (filters.difficulty) n++;
       if (filters.sort !== 'due') n++;
-      if (filters.showDone) n++;
       return n;
     });
 
-    const categories = computed(() =>
-      [...new Set(data.tasks.map(t => t.category).filter(Boolean))].sort((a, b) => a.localeCompare(b)));
-
-    function applyFilters(list) {
+    function applyFilters(list, withSort = true) {
       const q = filters.search.trim().toLowerCase();
       const res = list.filter(t => {
-        if (!filters.showDone && !filters.status && t.status === 'done') return false;
         if (filters.status && t.status !== filters.status) return false;
-        if (filters.category && t.category !== filters.category) return false;
+        if (filters.category === '__none' && t.category) return false;
+        if (filters.category && filters.category !== '__none' && t.category !== filters.category) return false;
         if (filters.project === '__none' && t.projectId) return false;
         if (filters.project && filters.project !== '__none' && t.projectId !== filters.project) return false;
+        if (filters.urgency && (t.urgency || '') !== (filters.urgency === '__none' ? '' : filters.urgency)) return false;
+        if (filters.difficulty && (t.difficulty || '') !== (filters.difficulty === '__none' ? '' : filters.difficulty)) return false;
         if (q && !t.title.toLowerCase().includes(q)) return false;
         return true;
       });
+      if (!withSort) return res;
       const byDue = (a, b) => (a.due || '9999').localeCompare(b.due || '9999');
       switch (filters.sort) {
-        case 'points-desc': res.sort((a, b) => b.points - a.points || byDue(a, b)); break;
-        case 'points-asc':  res.sort((a, b) => a.points - b.points || byDue(a, b)); break;
-        case 'title':       res.sort((a, b) => a.title.localeCompare(b.title)); break;
-        default:            res.sort(byDue);
+        case 'points-desc':     res.sort((a, b) => b.points - a.points || byDue(a, b)); break;
+        case 'points-asc':      res.sort((a, b) => a.points - b.points || byDue(a, b)); break;
+        case 'urgency-desc':    res.sort((a, b) => RANK[b.urgency || ''] - RANK[a.urgency || ''] || byDue(a, b)); break;
+        case 'difficulty-desc': res.sort((a, b) => RANK[b.difficulty || ''] - RANK[a.difficulty || ''] || byDue(a, b)); break;
+        case 'title':           res.sort((a, b) => a.title.localeCompare(b.title)); break;
+        default:                res.sort(byDue);
       }
       return res;
     }
 
-    const todayTasks    = computed(() => applyFilters(data.tasks.filter(t => t.due && t.due <= today.value)));
-    const upcomingTasks = computed(() => applyFilters(data.tasks.filter(t => t.due && t.due > today.value)));
-    const allTasks      = computed(() => applyFilters(data.tasks));
+    // Les tâches terminées ne sont plus dans ces listes : elles sont dans l'onglet "Terminés"
+    const activeTasks   = computed(() => data.tasks.filter(t => t.status !== 'done'));
+    const todayTasks    = computed(() => applyFilters(activeTasks.value.filter(t => t.due && t.due <= today.value)));
+    const upcomingTasks = computed(() => applyFilters(activeTasks.value.filter(t => t.due && t.due > today.value)));
+    const allTasks      = computed(() => applyFilters(activeTasks.value));
+    // Terminées : triées par date de fin (la plus récente d'abord) ; les filtres s'appliquent aussi
+    const doneTasks     = computed(() => applyFilters(data.tasks.filter(t => t.status === 'done'), false)
+      .sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || '')));
 
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
       open: false, id: null, title: '', category: '', points: 10, status: 'todo', projectId: '', due: '',
+      urgency: '', difficulty: '', doneAt: '',
     });
 
     function openTaskForm(task = null, projectId = '') {
@@ -311,11 +450,12 @@ const app = createApp({
         Object.assign(taskForm, {
           id: task.id, title: task.title, category: task.category || '', points: task.points,
           status: task.status, projectId: task.projectId || '', due: task.due || '',
+          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '',
         });
       } else {
         Object.assign(taskForm, {
           id: null, title: '', category: '', points: 10, status: 'todo', projectId,
-          due: today.value,
+          due: today.value, urgency: '', difficulty: '', doneAt: '',
         });
       }
       quickForm.open = false;
@@ -333,43 +473,58 @@ const app = createApp({
       else openQuickForm();
     }
 
+    // Change le statut d'une tâche en gérant la date de fin (doneAt)
+    function setStatus(task, newStatus, doneAt = '') {
+      const old = task.status;
+      task.status = newStatus;
+      if (newStatus === 'done') task.doneAt = doneAt || (old === 'done' && task.doneAt) || today.value;
+      else task.doneAt = '';
+    }
+
     function saveTask() {
       const title = taskForm.title.trim();
       if (!title) return;
-      const payload = {
+      const fields = {
         title,
-        category: taskForm.category.trim(),
+        category: taskForm.category || '',
         points: Math.max(0, Number(taskForm.points) || 0),
-        status: taskForm.status,
         projectId: taskForm.projectId || '',
         due: taskForm.due || '',
+        urgency: taskForm.urgency || '',
+        difficulty: taskForm.difficulty || '',
       };
+      let becameDone = false;
+      let points = fields.points;
       if (taskForm.id) {
         const t = data.tasks.find(x => x.id === taskForm.id);
         if (t) {
-          const wasDone = t.status === 'done';
-          Object.assign(t, payload);
-          if (!wasDone && t.status === 'done') notify(`+${t.points} pts !`);
+          const was = t.status;
+          Object.assign(t, fields);
+          setStatus(t, taskForm.status, taskForm.doneAt);
+          becameDone = was !== 'done' && t.status === 'done';
+          points = t.points;
         }
       } else {
-        const t = { id: uid(), ...payload };
+        const t = newTask({ ...fields });
+        setStatus(t, taskForm.status, taskForm.doneAt);
         data.tasks.push(t);
-        if (t.status === 'done') notify(`+${t.points} pts !`);
+        becameDone = t.status === 'done';
       }
+      if (becameDone) notify(`+${points} pts ! Tâche déplacée dans Terminés`);
       taskForm.open = false;
     }
 
     /* ---------- To do rapide (plusieurs tâches d'un coup) ---------- */
     const quickForm = reactive({
       open: false, mode: 'rows', due: '', rows: [],
-      paste: { text: '', points: 10, category: '', due: '', project: '' },
+      paste: { text: '', points: 10, category: '', urgency: '', difficulty: '', due: '', project: '' },
     });
     const pastePreview = computed(() => parsePastedList(quickForm.paste.text));
 
     function openQuickForm() {
       taskForm.open = false;
       quickForm.mode = 'rows';
-      quickForm.paste = { text: '', points: 10, category: '', due: today.value, project: '' };
+      quickForm.paste = { text: '', points: 10, category: '', urgency: '', difficulty: '', due: today.value, project: '' };
       quickForm.due = today.value;
       quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value }));
       quickForm.open = true;
@@ -402,15 +557,11 @@ const app = createApp({
 
     function saveQuick() {
       const rows = quickForm.rows.filter(r => r.title.trim());
-      rows.forEach(r => data.tasks.push({
-        id: uid(),
+      rows.forEach(r => data.tasks.push(newTask({
         title: r.title.trim(),
-        category: '',
         points: Math.max(0, Number(r.points) || 0),
-        status: 'todo',
-        projectId: '',
         due: r.due || '',
-      }));
+      })));
       notify(rows.length ? `${rows.length} tâche(s) ajoutée(s)` : 'Aucune tâche à ajouter');
       quickForm.open = false;
     }
@@ -431,16 +582,19 @@ const app = createApp({
       }
 
       const points = Math.max(0, Number(quickForm.paste.points) || 0);
-      const category = quickForm.paste.category.trim();
-      items.forEach(title => data.tasks.push({
-        id: uid(), title, category, points, status: 'todo', projectId, due: quickForm.paste.due || '',
-      }));
+      items.forEach(title => data.tasks.push(newTask({
+        title, points, projectId,
+        category: quickForm.paste.category || '',
+        urgency: quickForm.paste.urgency || '',
+        difficulty: quickForm.paste.difficulty || '',
+        due: quickForm.paste.due || '',
+      })));
       notify(`${items.length} tâche(s) ajoutée(s)`);
       quickForm.open = false;
     }
 
-    /* ---------- Sélection (cases à cocher) ---------- */
-    const selection = ref([]);   // ids des tâches cochées
+    /* ---------- Sélection (clic sur le bloc d'une tâche) ---------- */
+    const selection = ref([]);   // ids des tâches sélectionnées
 
     function toggleSelect(id) {
       const i = selection.value.indexOf(id);
@@ -454,7 +608,11 @@ const app = createApp({
     }
 
     // "Modifier" sur la sélection : 1 tâche = popup complète, plusieurs = popup de modification groupée
-    const bulkForm = reactive({ open: false, ids: [], category: '', points: '', status: '', projectId: '__keep', due: '', clearDue: false });
+    // '__keep' = ne rien changer
+    const bulkForm = reactive({
+      open: false, ids: [], category: '__keep', points: '', status: '', projectId: '__keep',
+      urgency: '__keep', difficulty: '__keep', due: '', clearDue: false,
+    });
 
     function editSelected(ids) {
       if (ids.length === 1) {
@@ -462,7 +620,10 @@ const app = createApp({
         if (t) openTaskForm(t);
         return;
       }
-      Object.assign(bulkForm, { open: true, ids: [...ids], category: '', points: '', status: '', projectId: '__keep', due: '', clearDue: false });
+      Object.assign(bulkForm, {
+        open: true, ids: [...ids], category: '__keep', points: '', status: '', projectId: '__keep',
+        urgency: '__keep', difficulty: '__keep', due: '', clearDue: false,
+      });
     }
 
     function saveBulk() {
@@ -470,15 +631,17 @@ const app = createApp({
       bulkForm.ids.forEach(id => {
         const t = data.tasks.find(x => x.id === id);
         if (!t) return;
-        if (bulkForm.category.trim()) t.category = bulkForm.category.trim();
+        if (bulkForm.category !== '__keep') t.category = bulkForm.category;
         if (bulkForm.points !== '' && bulkForm.points !== null && Number.isFinite(Number(bulkForm.points))) {
           t.points = Math.max(0, Math.round(Number(bulkForm.points)));
         }
         if (bulkForm.status) {
           if (t.status !== 'done' && bulkForm.status === 'done') gained += Number(t.points) || 0;
-          t.status = bulkForm.status;
+          setStatus(t, bulkForm.status);
         }
         if (bulkForm.projectId !== '__keep') t.projectId = bulkForm.projectId;
+        if (bulkForm.urgency !== '__keep') t.urgency = bulkForm.urgency;
+        if (bulkForm.difficulty !== '__keep') t.difficulty = bulkForm.difficulty;
         if (bulkForm.clearDue) t.due = '';
         else if (bulkForm.due) t.due = bulkForm.due;
       });
@@ -486,14 +649,32 @@ const app = createApp({
       bulkForm.open = false;
     }
 
-    function deleteSelected(ids) {
-      if (!ids.length) return;
-      const msg = ids.length === 1 ? 'Supprimer la tâche sélectionnée ?' : `Supprimer les ${ids.length} tâches sélectionnées ?`;
-      if (!confirm(msg)) return;
-      data.tasks = data.tasks.filter(t => !ids.includes(t.id));
+    // Supprime des tâches. Les points des tâches TERMINÉES supprimées sont conservés (data.archived).
+    function removeTasks(ids) {
+      const set = new Set(ids);
+      data.tasks.filter(t => set.has(t.id) && t.status === 'done').forEach(t => {
+        data.archived = (Number(data.archived) || 0) + (Number(t.points) || 0);
+      });
+      data.tasks = data.tasks.filter(t => !set.has(t.id));
     }
 
-    // On oublie les cases cochées dont la tâche n'existe plus
+    function deleteSelected(ids) {
+      if (!ids.length) return;
+      const done = data.tasks.filter(t => ids.includes(t.id) && t.status === 'done');
+      const keep = done.reduce((s, t) => s + (Number(t.points) || 0), 0);
+      let msg = ids.length === 1 ? 'Supprimer la tâche sélectionnée ?' : `Supprimer les ${ids.length} tâches sélectionnées ?`;
+      if (done.length) msg += `\n\nLes ${keep} pts des tâches terminées sont conservés.`;
+      if (!confirm(msg)) return;
+      removeTasks(ids);
+    }
+
+    function deleteTask(task) {
+      const keep = task.status === 'done' ? `\n\nSes ${task.points} pts sont conservés.` : '';
+      if (!confirm(`Supprimer la tâche « ${task.title} » ?${keep}`)) return;
+      removeTasks([task.id]);
+    }
+
+    // On oublie les tâches sélectionnées qui n'existent plus
     watch(() => data.tasks.length, () => {
       selection.value = selection.value.filter(id => data.tasks.some(t => t.id === id));
     });
@@ -501,29 +682,20 @@ const app = createApp({
     // Échap ferme les popups
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
-      const popup = [bulkForm, taskForm, quickForm, projectForm, rewardForm, balanceForm].find(f => f.open);
+      const popup = [bulkForm, taskForm, quickForm, projectForm, categoryForm, rewardForm, balanceForm].find(f => f.open);
       if (popup) popup.open = false;
     });
 
-    // Points à gagner dans les listes Aujourd'hui / À venir (tâches pas encore terminées)
+    // Points à gagner dans les listes Aujourd'hui / À venir
     const sumToEarn = list => list.filter(t => t.status !== 'done').reduce((s, t) => s + (Number(t.points) || 0), 0);
-    const stats = computed(() => ({
-      doing: data.tasks.filter(t => t.status === 'doing').length,
-      done: data.tasks.filter(t => t.status === 'done').length,
-      overdue: data.tasks.filter(t => t.due && t.due < today.value && t.status !== 'done').length,
-    }));
     const todayPoints    = computed(() => sumToEarn(todayTasks.value));
     const upcomingPoints = computed(() => sumToEarn(upcomingTasks.value));
 
-    function deleteTask(task) {
-      if (!confirm(`Supprimer la tâche « ${task.title} » ?`)) return;
-      data.tasks = data.tasks.filter(t => t.id !== task.id);
-    }
-
     function changeStatus(task, newStatus) {
       const old = task.status;
-      task.status = newStatus;
-      if (old !== 'done' && newStatus === 'done') notify(`+${task.points} pts !`);
+      if (old === newStatus) return;
+      setStatus(task, newStatus);
+      if (old !== 'done' && newStatus === 'done') notify(`+${task.points} pts ! Tâche déplacée dans Terminés`);
       if (old === 'done' && newStatus !== 'done') notify(`−${task.points} pts (tâche rouverte)`);
     }
 
@@ -533,6 +705,16 @@ const app = createApp({
 
     function changeDue(task, value) {
       task.due = value || '';
+    }
+
+    // Modification directe depuis les tags : catégorie, projet, urgence, difficulté, titre
+    function updateTask(task, field, value) {
+      if (field === 'title') {
+        const v = String(value).trim();
+        if (v) task.title = v;
+      } else if (['category', 'projectId', 'urgency', 'difficulty'].includes(field)) {
+        task[field] = value || '';
+      }
     }
 
     function projectName(id) {
@@ -567,26 +749,24 @@ const app = createApp({
         data.projects.push(project);
         projectForm.tasks
           .filter(d => d.title.trim())
-          .forEach(d => data.tasks.push({
-            id: uid(),
+          .forEach(d => data.tasks.push(newTask({
             title: d.title.trim(),
-            category: (d.category || '').trim(),
+            category: d.category || '',
             points: Math.max(0, Number(d.points) || 0),
-            status: 'todo',
             projectId: project.id,
             due: d.due || '',
-          }));
+          })));
       }
       projectForm.open = false;
     }
 
     function deleteProject(project) {
-      const n = data.tasks.filter(t => t.projectId === project.id).length;
-      const msg = n
-        ? `Supprimer le projet « ${project.name} » et ses ${n} tâche(s) ?`
+      const ids = data.tasks.filter(t => t.projectId === project.id).map(t => t.id);
+      const msg = ids.length
+        ? `Supprimer le projet « ${project.name} » et ses ${ids.length} tâche(s) ? (Les points des tâches terminées sont conservés.)`
         : `Supprimer le projet « ${project.name} » ?`;
       if (!confirm(msg)) return;
-      data.tasks = data.tasks.filter(t => t.projectId !== project.id);
+      removeTasks(ids);
       data.projects = data.projects.filter(p => p.id !== project.id);
     }
 
@@ -605,6 +785,40 @@ const app = createApp({
       };
     }
 
+    // Réorganiser les projets : glisser-déposer (poignée) ou boutons monter / descendre
+    const dragProject = reactive({ from: -1, over: -1 });
+
+    function onProjectDragStart(event, index) {
+      dragProject.from = index;
+      try {
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', String(index));   // requis par Firefox
+        const card = event.target.closest('.project');
+        if (card && event.dataTransfer.setDragImage) event.dataTransfer.setDragImage(card, 20, 20);
+      } catch (e) { /* navigateur sans dataTransfer complet */ }
+    }
+    function onProjectDragOver(index) {
+      if (dragProject.from >= 0) dragProject.over = index;
+    }
+    function onProjectDrop(index) {
+      const from = dragProject.from;
+      if (from >= 0 && from !== index) {
+        const [moved] = data.projects.splice(from, 1);
+        data.projects.splice(index, 0, moved);
+      }
+      onProjectDragEnd();
+    }
+    function onProjectDragEnd() {
+      dragProject.from = -1;
+      dragProject.over = -1;
+    }
+    function moveProject(index, delta) {
+      const j = index + delta;
+      if (j < 0 || j >= data.projects.length) return;
+      const [moved] = data.projects.splice(index, 1);
+      data.projects.splice(j, 0, moved);
+    }
+
     /* ---------- Récompenses ---------- */
     const rewardForm = reactive({ open: false, id: null, name: '', cost: 50, category: '' });
 
@@ -617,7 +831,7 @@ const app = createApp({
     function saveReward() {
       const name = rewardForm.name.trim();
       if (!name) return;
-      const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1), category: rewardForm.category.trim() };
+      const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1), category: rewardForm.category || '' };
       if (rewardForm.id) {
         const r = data.rewards.find(x => x.id === rewardForm.id);
         if (r) Object.assign(r, payload);
@@ -638,7 +852,7 @@ const app = createApp({
       data.inventory.unshift({
         id: uid(), name: reward.name, category: reward.category || '', cost: reward.cost, date: todayStr(), used: false,
       });
-      notify(`Récompense gagnée : ${reward.name} !`);
+      notify(`Récompense gagnée : ${reward.name} ! Elle est dans l'Inventaire`);
     }
 
     /* ---------- Inventaire ---------- */
@@ -652,7 +866,7 @@ const app = createApp({
       const item = data.inventory.find(i => i.id === invForm.id);
       if (item && invForm.name.trim()) {
         item.name = invForm.name.trim();
-        item.category = invForm.category.trim();
+        item.category = invForm.category || '';
       }
       invForm.id = null;
     }
@@ -694,8 +908,11 @@ const app = createApp({
           data.projects = json.projects;
           data.rewards = json.rewards;
           data.inventory = json.inventory;
+          data.categories = Array.isArray(json.categories) ? json.categories : [];
           data.spent = Number(json.spent) || 0;
           data.adjust = Number(json.adjust) || 0;
+          data.archived = Number(json.archived) || 0;
+          syncCategories();
           notify('Import réussi');
         } catch (e) {
           alert("Fichier invalide : ce n'est pas une sauvegarde Todo Quest.");
@@ -708,7 +925,7 @@ const app = createApp({
 
     function resetAll() {
       const cloudNote = user.value ? ' Cela effacera aussi tes données dans le cloud.' : '';
-      if (!confirm('Tout effacer (tâches, projets, récompenses, inventaire) ?' + cloudNote + ' Pense à exporter avant !')) return;
+      if (!confirm('Tout effacer (tâches, projets, catégories, récompenses, inventaire) ?' + cloudNote + ' Pense à exporter avant !')) return;
       Object.assign(data, defaultData());
       notify('Données réinitialisées');
     }
@@ -749,12 +966,15 @@ const app = createApp({
     }
 
     function applyRemote(remote) {
-      data.tasks     = Array.isArray(remote.tasks) ? remote.tasks : [];
-      data.projects  = Array.isArray(remote.projects) ? remote.projects : [];
-      data.rewards   = Array.isArray(remote.rewards) ? remote.rewards : [];
-      data.inventory = Array.isArray(remote.inventory) ? remote.inventory : [];
-      data.spent     = Number(remote.spent) || 0;
-      data.adjust    = Number(remote.adjust) || 0;
+      data.tasks      = Array.isArray(remote.tasks) ? remote.tasks : [];
+      data.projects   = Array.isArray(remote.projects) ? remote.projects : [];
+      data.rewards    = Array.isArray(remote.rewards) ? remote.rewards : [];
+      data.inventory  = Array.isArray(remote.inventory) ? remote.inventory : [];
+      data.categories = Array.isArray(remote.categories) ? remote.categories : [];
+      data.spent      = Number(remote.spent) || 0;
+      data.adjust     = Number(remote.adjust) || 0;
+      data.archived   = Number(remote.archived) || 0;
+      syncCategories();
       lastSyncedJson = JSON.stringify(data);   // évite de renvoyer ce qu'on vient de recevoir
     }
 
@@ -851,20 +1071,24 @@ const app = createApp({
     return {
       // état
       data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, statuses: STATUSES,
+      urgencies: URGENCIES, difficulties: DIFFICULTIES,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
+      // catégories
+      categories, categoryForm, openCategoryForm, saveCategory, deleteCategory, categoryUsage,
       // points
       earned, balance, nextReward, balanceForm, openBalanceForm, applyBalance, resetBalance,
-      rewardFilters, rewardCategories, visibleRewards, visibleInventory,
+      rewardFilters, visibleRewards, visibleInventory,
       // filtres
-      filters, resetFilters, activeFilterCount, categories, todayTasks, upcomingTasks, allTasks,
+      filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, doneTasks,
       // tâches
       quickForm, openQuickForm, toggleQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
-      taskForm, openTaskForm, toggleTaskForm, saveTask, deleteTask, changeStatus, changePoints, changeDue, projectName,
+      taskForm, openTaskForm, toggleTaskForm, saveTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName,
       selection, toggleSelect, selectMany, deselectMany, editSelected, deleteSelected, bulkForm, saveBulk,
-      todayPoints, upcomingPoints, stats,
+      todayPoints, upcomingPoints,
       // projets
       projectForm, openProjectForm, addDraftTask, saveProject, deleteProject, projectTasks, projectStats,
+      dragProject, onProjectDragStart, onProjectDragOver, onProjectDrop, onProjectDragEnd, moveProject,
       // récompenses
       rewardForm, openRewardForm, saveReward, deleteReward, claimReward,
       // inventaire
