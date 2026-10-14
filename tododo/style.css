@@ -44,12 +44,29 @@
 .quick-row, .draft-task, .project-task { display: flex; gap: 0.4rem; }
 .quick-name, .project-task-title { flex: 1; }
 
+/* ---------- Projets : glisser-déposer ---------- */
+.drag-handle { cursor: grab; user-select: none; }
+.project.dragging { opacity: 0.4; }
+.project.drag-over { outline: 2px dashed; }
+.project-title-row { display: flex; align-items: center; gap: 0.5rem; }
+.project-name { flex: 1; }
+.project-task.status-done .project-task-title { text-decoration: line-through; }
+
+/* ---------- Tâches : titre en cours de renommage, tags vides, catégories ---------- */
+.task-title-input { width: 100%; }
+.tag-empty { opacity: 0.55; }
+.task-group-title { margin: 1rem 0 0.4rem; }
+.category-item { display: flex; align-items: center; gap: 0.8rem; }
+.category-name { flex: 1; }
+
 /* ---------- Classes disponibles pour ton style ----------
    Haut : .app-header .app-brand (titre + synchro) .app-title .sync-box   .points-box .points-badge
    Menu : .sidebar .app-nav (button.active)
    Page : .page-header .page-title .page-actions .filters
    Accueil : .next-reward .next-reward-label  .view-today .view-upcoming .list-points
    Tâches : .task (.selected .overdue .status-todo/doing/paused/done)
-            .task-toolbar .tag .tag-category .tag-project .tag-status .tag-points .tag-due .tag-late
-   Projets : .project .project-task   Récompenses : .reward (.affordable) .inventory-item (.used)
+            .task-toolbar .tag .tag-category .tag-project .tag-status .tag-points .tag-urgency .tag-difficulty .tag-due .tag-late .tag-empty
+            .task-group-title (titres de date dans Terminés)
+   Projets : .project (.dragging .drag-over) .drag-handle .project-task   Catégories : .category-item
+   Récompenses : .reward (.affordable)   Inventaire : .inventory-item (.used)
    ---------------------------------------------------------- */
