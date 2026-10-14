@@ -560,8 +560,8 @@
         <article class="reward" v-for="r in visibleRewards" :key="r.id" :class="{ affordable: balance >= r.cost }">
           <div class="reward-body">
             <h3 class="reward-name">{{ r.name }}</h3>
-            <p class="reward-category">{{ r.category || 'Sans catégorie' }}</p>
-            <p class="reward-cost">{{ r.cost }} pts</p>
+            <div class="reward-fl"><p class="reward-category">{{ r.category || 'Sans catégorie' }}</p>
+            <p class="reward-cost">{{ r.cost }} pts</p></div>
             <progress :value="Math.min(Math.max(0, balance), r.cost)" :max="r.cost"></progress>
             <p class="reward-status" v-if="balance >= r.cost">Dispo ! Tu peux la réclamer.</p>
             <p class="reward-status" v-else>Il te reste <strong>{{ r.cost - balance }} pts</strong> avant d'avoir ça.</p>
