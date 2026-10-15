@@ -79,8 +79,8 @@ button{ cursor:pointer;}
 
 .task-tags{ font-size:11px;  }
 .task-tags *{ border-color:var(--main-color); }
-.task-tags .tag-category{ background:var(--category); border:none; }
-.task-tags .tag-project{ background:var(--project); border:none; }
+.task-tags .tag-category{ border:none; }
+.task-tags .tag-project{ border:none; }
 
 .form-panel textarea{ width:100%;}
 
@@ -125,3 +125,5 @@ margin:5px; padding:10px; }
 .project-toolbar{ width:100%; }
 
 .project{ padding:10px; border:1px solid var(--main-color); margin:5px;}
+
+.view-today .task-list-box [class*="status"]{ width:100%; }
