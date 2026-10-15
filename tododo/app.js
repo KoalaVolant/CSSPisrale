@@ -1,4 +1,4 @@
-const { createApp, reactive, ref, computed, watch, nextTick } = Vue;
+const { createApp, reactive, ref, computed, watch, nextTick, provide } = Vue;
 
 /* ============================================================
    Constantes & utilitaires
@@ -13,20 +13,21 @@ const STATUSES = [
   { value: 'done',   label: 'Terminé' },
 ];
 
-// label = texte du tag dans la liste, short = texte dans les formulaires
-const URGENCIES = [
-  { value: '',       label: 'Urgence',           short: 'Aucune' },
-  { value: 'low',    label: 'Urgence : basse',   short: 'Basse' },
-  { value: 'medium', label: 'Urgence : moyenne', short: 'Moyenne' },
-  { value: 'high',   label: 'Urgence : haute',   short: 'Haute' },
+// Niveaux par défaut (modifiables dans l'onglet "Urgences & difficultés").
+// L'ordre = du plus faible au plus fort : il sert pour les tris.
+const DEFAULT_URGENCIES = [
+  { id: 'low',    name: 'Basse',   color: '#3b82f6' },
+  { id: 'medium', name: 'Moyenne', color: '#f59e0b' },
+  { id: 'high',   name: 'Haute',   color: '#ef4444' },
 ];
-const DIFFICULTIES = [
-  { value: '',       label: 'Difficulté',            short: 'Aucune' },
-  { value: 'easy',   label: 'Difficulté : facile',   short: 'Facile' },
-  { value: 'medium', label: 'Difficulté : moyenne',  short: 'Moyenne' },
-  { value: 'hard',   label: 'Difficulté : difficile', short: 'Difficile' },
+const DEFAULT_DIFFICULTIES = [
+  { id: 'easy',   name: 'Facile',    color: '#22c55e' },
+  { id: 'medium', name: 'Moyenne',   color: '#f59e0b' },
+  { id: 'hard',   name: 'Difficile', color: '#ef4444' },
 ];
-const RANK = { '': 0, low: 1, easy: 1, medium: 2, high: 3, hard: 3 };
+
+const PALETTE = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#a855f7', '#ec4899', '#84cc16'];
+const nextColor = i => PALETTE[Math.abs(i) % PALETTE.length];
 
 const TABS = [
   { id: 'home',       label: 'Accueil' },
@@ -34,10 +35,32 @@ const TABS = [
   { id: 'done',       label: 'Terminés' },
   { id: 'projects',   label: 'Projets' },
   { id: 'categories', label: 'Catégories' },
+  { id: 'levels',     label: 'Urgences & difficultés' },
   { id: 'rewards',    label: 'Récompenses' },
   { id: 'inventory',  label: 'Inventaire' },
   { id: 'data',       label: 'Sauvegarde' },
 ];
+
+const clone = o => JSON.parse(JSON.stringify(o));
+
+// Texte noir ou blanc selon la luminosité du fond (pour que les tags colorés restent lisibles)
+function readableText(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+  if (!m) return '';
+  const n = parseInt(m[1], 16);
+  // luminance perçue (formule WCAG, avec correction gamma)
+  const lin = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  const lum = 0.2126 * lin((n >> 16) & 255) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
+  return lum > 0.3 ? '#111111' : '#ffffff';
+}
+// Variables CSS utilisables dans ton style : var(--tag-bg) et var(--tag-fg)
+function tagStyle(color) {
+  return color ? { '--tag-bg': color, '--tag-fg': readableText(color) } : {};
+}
+
+// Valeur d'une tâche en points : positive (bonus) ou négative (malus)
+const taskValue = t => (t.malus ? -1 : 1) * (Number(t.points) || 0);
+const fmtPts = v => `${v < 0 ? '−' : '+'}${Math.abs(v)} pts`;
 
 // Découpe une liste collée en tâches.
 // - Une ligne = une tâche, avec ou sans puce (* - – — • 1. 1) ...)
@@ -80,17 +103,30 @@ function formatLongDate(str) {
 // Une tâche complète avec toutes ses valeurs par défaut
 function newTask(fields = {}) {
   return {
-    id: uid(), title: '', category: '', points: 10, status: 'todo', projectId: '', due: '',
+    id: uid(), title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
     urgency: '', difficulty: '', doneAt: '',
     ...fields,
   };
 }
 
+// Catégories : anciennes sauvegardes = liste de textes ; maintenant { name, color }
+function normalizeCategories(list) {
+  const seen = new Set();
+  const out = [];
+  (Array.isArray(list) ? list : []).forEach(c => {
+    const item = typeof c === 'string' ? { name: c, color: '' } : { name: String(c && c.name || ''), color: String(c && c.color || '') };
+    if (item.name && !seen.has(item.name)) { seen.add(item.name); out.push(item); }
+  });
+  return out;
+}
+
 function defaultData() {
   return {
-    tasks: [],        // { id, title, category, points, status, projectId, due, urgency, difficulty, doneAt }
-    projects: [],     // { id, name, description }  (l'ordre du tableau = l'ordre d'affichage)
-    categories: [],   // noms des catégories ("Sans catégorie" existe toujours, c'est la valeur '')
+    tasks: [],        // { id, title, category, points, malus, status, projectId, due, urgency, difficulty, doneAt }
+    projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
+    categories: [],   // { name, color }  ("Sans catégorie" existe toujours, c'est la valeur '')
+    urgencies: clone(DEFAULT_URGENCIES),       // { id, name, color }, du plus faible au plus fort
+    difficulties: clone(DEFAULT_DIFFICULTIES), // idem
     rewards: [        // { id, name, category, cost }
       { id: uid(), name: 'Un bon café',           cost: 20 },
       { id: uid(), name: 'Une soirée jeux vidéo', cost: 100 },
@@ -99,7 +135,7 @@ function defaultData() {
     inventory: [],    // { id, name, category, cost, date, used }
     spent: 0,         // total de points dépensés en récompenses
     adjust: 0,        // ajustement manuel du solde (peut être négatif)
-    archived: 0,      // points de tâches terminées puis supprimées (conservés)
+    archived: 0,      // points des tâches terminées puis supprimées (conservés)
   };
 }
 
@@ -108,7 +144,9 @@ function loadData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultData();
     const d = Object.assign(defaultData(), JSON.parse(raw));
-    if (!Array.isArray(d.categories)) d.categories = [];
+    d.categories = normalizeCategories(d.categories);
+    if (!Array.isArray(d.urgencies)) d.urgencies = clone(DEFAULT_URGENCIES);
+    if (!Array.isArray(d.difficulties)) d.difficulties = clone(DEFAULT_DIFFICULTIES);
     return d;
   } catch (e) {
     return defaultData();
@@ -116,10 +154,12 @@ function loadData() {
 }
 
 function loadUi() {
-  const defaults = { filtersOpen: false, tab: 'home' };
+  const defaults = { filtersOpen: false, tab: 'home', projectSort: 'manual', collapsedProjects: [] };
   try {
     const ui = Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
     if (!TABS.some(t => t.id === ui.tab)) ui.tab = 'home';   // onglet inconnu -> accueil
+    if (!Array.isArray(ui.collapsedProjects)) ui.collapsedProjects = [];
+    if (!['manual', 'urgency'].includes(ui.projectSort)) ui.projectSort = 'manual';
     return ui;
   } catch (e) {
     return defaults;
@@ -129,10 +169,12 @@ function loadUi() {
 /* ============================================================
    Composant : ligne de tâche (template dans index.html)
    Tout est modifiable en cliquant directement sur le tag concerné.
+   Les couleurs viennent des projets / catégories / urgences / difficultés.
    ============================================================ */
 const TaskRow = {
   template: '#task-row-template',
-  props: ['task', 'projects', 'categories', 'statuses', 'today', 'selected'],
+  props: ['task', 'projects', 'categories', 'statuses', 'today', 'selected', 'compact'],
+  inject: { appData: 'app-data' },
   emits: ['toggle', 'status', 'points', 'due', 'update'],
   data() {
     return { editingTitle: false, draft: '' };
@@ -144,14 +186,38 @@ const TaskRow = {
     dueLabel() {
       return formatLongDate(this.task.due);
     },
-    urgencyOptions()    { return URGENCIES; },
-    difficultyOptions() { return DIFFICULTIES; },
+    urgencyOptions() {
+      return [{ id: '', label: 'Urgence' }, ...this.appData.urgencies.map(u => ({ id: u.id, label: 'Urgence : ' + u.name }))];
+    },
+    difficultyOptions() {
+      return [{ id: '', label: 'Difficulté' }, ...this.appData.difficulties.map(d => ({ id: d.id, label: 'Difficulté : ' + d.name }))];
+    },
+    // un niveau supprimé ou inconnu est affiché comme "non défini"
+    urgencyValue()    { return this.appData.urgencies.some(u => u.id === this.task.urgency) ? this.task.urgency : ''; },
+    difficultyValue() { return this.appData.difficulties.some(d => d.id === this.task.difficulty) ? this.task.difficulty : ''; },
+    categoryColor() {
+      const c = this.appData.categories.find(x => x.name === this.task.category);
+      return c ? c.color : '';
+    },
+    projectColor() {
+      const p = this.appData.projects.find(x => x.id === this.task.projectId);
+      return p ? p.color || '' : '';
+    },
+    urgencyColor() {
+      const u = this.appData.urgencies.find(x => x.id === this.task.urgency);
+      return u ? u.color : '';
+    },
+    difficultyColor() {
+      const d = this.appData.difficulties.find(x => x.id === this.task.difficulty);
+      return d ? d.color : '';
+    },
     // catégorie de la tâche absente de la liste (ne devrait pas arriver) : on l'affiche quand même
     categoryMissing() {
       return !!this.task.category && !this.categories.includes(this.task.category);
     },
   },
   methods: {
+    styleFor(color) { return tagStyle(color); },
     // Points modifiables directement dans le tag
     onPoints(event) {
       const raw = String(event.target.value).trim();
@@ -174,7 +240,7 @@ const TaskRow = {
     openPicker(event) {
       try { if (event.target.showPicker) event.target.showPicker(); } catch (e) { /* navigateur sans showPicker */ }
     },
-    // Catégorie / projet / urgence / difficulté : un seul événement "update"
+    // Catégorie / projet / urgence / difficulté / bonus-malus : un seul événement "update"
     update(field, event) {
       this.$emit('update', this.task, field, event.target.value);
     },
@@ -197,8 +263,9 @@ const TaskRow = {
 };
 
 /* ============================================================
-   Composant : liste de tâches avec barre d'actions (cocher / modifier / supprimer)
+   Composant : liste de tâches avec barre d'actions (sélectionner / modifier / supprimer)
    - group="doneAt" : les tâches sont rangées sous un titre par date de fin (onglet Terminés)
+   - compact : n'affiche que la catégorie et le projet sur chaque tâche
    Les événements status / points / due / update sont transmis aux lignes via $attrs.
    ============================================================ */
 const TaskList = {
@@ -211,8 +278,9 @@ const TaskList = {
     categories: { type: Array, default: () => [] },
     statuses:   { type: Array, default: () => [] },
     today:      { type: String, default: '' },
-    selected:   { type: Array, default: () => [] },   // ids cochés (global)
+    selected:   { type: Array, default: () => [] },   // ids sélectionnés (global)
     group:      { type: String, default: '' },
+    compact:    { type: Boolean, default: false },
   },
   emits: ['toggle', 'select-all', 'clear', 'edit-selected', 'delete-selected'],
   computed: {
@@ -229,8 +297,8 @@ const TaskList = {
         map.get(key).push(t);
       });
       return [...map.keys()]
-        .sort((a, b) => (b || '').localeCompare(a || ''))     // récent -> ancien, "date inconnue" à la fin
-        .sort((a, b) => (a === '') - (b === ''))
+        .sort((a, b) => (b || '').localeCompare(a || ''))     // récent -> ancien
+        .sort((a, b) => (a === '') - (b === ''))              // "date inconnue" à la fin
         .map(key => ({ key, label: key ? formatLongDate(key) : 'Date de fin inconnue', tasks: map.get(key) }));
     },
   },
@@ -243,13 +311,17 @@ const app = createApp({
   setup() {
     /* ---------- Données + sauvegarde auto ---------- */
     const data = reactive(loadData());
+    provide('app-data', data);   // les lignes de tâches y lisent les couleurs et les niveaux
 
     // Toute catégorie utilisée par une tâche / récompense / objet doit exister dans la liste
     function syncCategories() {
-      if (!Array.isArray(data.categories)) data.categories = [];
-      const known = new Set(data.categories);
+      data.categories = normalizeCategories(data.categories);
+      const known = new Set(data.categories.map(c => c.name));
       [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => {
-        if (x.category && !known.has(x.category)) { known.add(x.category); data.categories.push(x.category); }
+        if (x.category && !known.has(x.category)) {
+          known.add(x.category);
+          data.categories.push({ name: x.category, color: '' });
+        }
       });
     }
     syncCategories();
@@ -258,6 +330,21 @@ const app = createApp({
     watch(data, () => {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible */ }
     }, { deep: true });
+
+    // Remplace toutes les données (import de fichier, synchro cloud)
+    function applyData(src) {
+      data.tasks        = Array.isArray(src.tasks) ? src.tasks : [];
+      data.projects     = Array.isArray(src.projects) ? src.projects : [];
+      data.rewards      = Array.isArray(src.rewards) ? src.rewards : [];
+      data.inventory    = Array.isArray(src.inventory) ? src.inventory : [];
+      data.categories   = normalizeCategories(src.categories);
+      data.urgencies    = Array.isArray(src.urgencies) ? src.urgencies : clone(DEFAULT_URGENCIES);
+      data.difficulties = Array.isArray(src.difficulties) ? src.difficulties : clone(DEFAULT_DIFFICULTIES);
+      data.spent        = Number(src.spent) || 0;
+      data.adjust       = Number(src.adjust) || 0;
+      data.archived     = Number(src.archived) || 0;
+      syncCategories();
+    }
 
     /* ---------- Préférences d'affichage (mémorisées) ---------- */
     const ui = reactive(loadUi());
@@ -281,34 +368,40 @@ const app = createApp({
       toastTimer = setTimeout(() => { toast.value = ''; }, 3000);
     }
 
-    /* ---------- Catégories ---------- */
-    const categories = computed(() => data.categories);
+    /* ---------- Catégories (avec couleur) ---------- */
+    const categories = computed(() => data.categories.map(c => c.name));   // noms, pour les menus déroulants
 
-    const categoryForm = reactive({ open: false, oldName: '', name: '' });
+    const categoryForm = reactive({ open: false, oldName: '', name: '', color: '#6366f1' });
 
     function openCategoryForm(name = null) {
-      Object.assign(categoryForm, { open: true, oldName: name || '', name: name || '' });
+      const found = name ? data.categories.find(c => c.name === name) : null;
+      Object.assign(categoryForm, {
+        open: true, oldName: name || '', name: name || '',
+        color: (found && found.color) || nextColor(data.categories.length),
+      });
     }
 
     function saveCategory() {
       const name = categoryForm.name.trim();
       if (!name) return;
       if (name.toLowerCase() === 'sans catégorie') { alert("« Sans catégorie » existe déjà : c'est la catégorie par défaut."); return; }
-      const clash = data.categories.some(c => c.toLowerCase() === name.toLowerCase() && c !== categoryForm.oldName);
+      const clash = data.categories.some(c => c.name.toLowerCase() === name.toLowerCase() && c.name !== categoryForm.oldName);
       if (clash) { alert('Cette catégorie existe déjà.'); return; }
 
       if (categoryForm.oldName) {                       // renommer : on met à jour tout ce qui l'utilise
         const old = categoryForm.oldName;
-        const i = data.categories.indexOf(old);
-        if (i >= 0) data.categories[i] = name;
+        const cat = data.categories.find(c => c.name === old);
+        if (cat) { cat.name = name; cat.color = categoryForm.color; }
         [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => { if (x.category === old) x.category = name; });
         if (filters.category === old) filters.category = name;
         if (rewardFilters.category === old) rewardFilters.category = name;
       } else {
-        data.categories.push(name);
+        data.categories.push({ name, color: categoryForm.color });
       }
       categoryForm.open = false;
     }
+
+    function setCategoryColor(cat, color) { cat.color = color; }
 
     function categoryUsage(name) {
       return {
@@ -325,15 +418,59 @@ const app = createApp({
         : `Supprimer la catégorie « ${name} » ?`;
       if (!confirm(msg)) return;
       [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => { if (x.category === name) x.category = ''; });
-      data.categories = data.categories.filter(c => c !== name);
+      data.categories = data.categories.filter(c => c.name !== name);
       if (filters.category === name) filters.category = '';
       if (rewardFilters.category === name) rewardFilters.category = '';
     }
 
+    /* ---------- Urgences & difficultés (niveaux modifiables, avec couleur) ---------- */
+    const newLevel = reactive({ urgencies: '', difficulties: '' });
+    const levelField = kind => (kind === 'urgencies' ? 'urgency' : 'difficulty');
+
+    function levelUsage(kind, id) {
+      return data.tasks.filter(t => t[levelField(kind)] === id).length;
+    }
+
+    function addLevel(kind) {
+      const name = newLevel[kind].trim();
+      if (!name) return;
+      if (data[kind].some(l => l.name.toLowerCase() === name.toLowerCase())) { alert('Ce niveau existe déjà.'); return; }
+      data[kind].push({ id: uid(), name, color: nextColor(data[kind].length) });
+      newLevel[kind] = '';
+    }
+
+    function renameLevel(level, event) {
+      const name = event.target.value.trim();
+      if (!name) { event.target.value = level.name; return; }
+      level.name = name;
+    }
+
+    function setLevelColor(level, color) { level.color = color; }
+
+    function moveLevel(kind, index, delta) {
+      const j = index + delta;
+      if (j < 0 || j >= data[kind].length) return;
+      const [moved] = data[kind].splice(index, 1);
+      data[kind].splice(j, 0, moved);
+    }
+
+    function deleteLevel(kind, level) {
+      const n = levelUsage(kind, level.id);
+      const msg = n ? `Supprimer « ${level.name} » ? ${n} tâche(s) n'auront plus de niveau.` : `Supprimer « ${level.name} » ?`;
+      if (!confirm(msg)) return;
+      data.tasks.forEach(t => { if (t[levelField(kind)] === level.id) t[levelField(kind)] = ''; });
+      data[kind] = data[kind].filter(l => l.id !== level.id);
+      const fkey = kind === 'urgencies' ? 'urgency' : 'difficulty';
+      if (filters[fkey] === level.id) filters[fkey] = '';
+    }
+
+    // Rang d'un niveau = sa position dans la liste (0 = non défini)
+    const levelRank = (list, id) => list.findIndex(l => l.id === id) + 1;
+
     /* ---------- Points ---------- */
-    // Points des tâches terminées + points des tâches terminées puis supprimées
+    // Points des tâches terminées (bonus en +, malus en −) + points des tâches terminées puis supprimées
     const earned = computed(() =>
-      data.tasks.filter(t => t.status === 'done').reduce((s, t) => s + (Number(t.points) || 0), 0)
+      data.tasks.filter(t => t.status === 'done').reduce((s, t) => s + taskValue(t), 0)
       + (Number(data.archived) || 0));
     const balance = computed(() => earned.value - data.spent + (Number(data.adjust) || 0));
 
@@ -384,7 +521,7 @@ const app = createApp({
     const visibleInventory = computed(() => data.inventory.filter(matchesRewardCategory));
 
     /* ---------- Filtres & tris des tâches ---------- */
-    const FILTER_DEFAULTS = { search: '', category: '', status: '', project: '', urgency: '', difficulty: '', sort: 'due' };
+    const FILTER_DEFAULTS = { search: '', category: '', status: '', project: '', urgency: '', difficulty: '', kind: '', sort: 'due' };
     const filters = reactive({ ...FILTER_DEFAULTS });
 
     function resetFilters() {
@@ -400,6 +537,7 @@ const app = createApp({
       if (filters.project) n++;
       if (filters.urgency) n++;
       if (filters.difficulty) n++;
+      if (filters.kind) n++;
       if (filters.sort !== 'due') n++;
       return n;
     });
@@ -414,16 +552,18 @@ const app = createApp({
         if (filters.project && filters.project !== '__none' && t.projectId !== filters.project) return false;
         if (filters.urgency && (t.urgency || '') !== (filters.urgency === '__none' ? '' : filters.urgency)) return false;
         if (filters.difficulty && (t.difficulty || '') !== (filters.difficulty === '__none' ? '' : filters.difficulty)) return false;
+        if (filters.kind === 'malus' && !t.malus) return false;
+        if (filters.kind === 'bonus' && t.malus) return false;
         if (q && !t.title.toLowerCase().includes(q)) return false;
         return true;
       });
       if (!withSort) return res;
       const byDue = (a, b) => (a.due || '9999').localeCompare(b.due || '9999');
       switch (filters.sort) {
-        case 'points-desc':     res.sort((a, b) => b.points - a.points || byDue(a, b)); break;
-        case 'points-asc':      res.sort((a, b) => a.points - b.points || byDue(a, b)); break;
-        case 'urgency-desc':    res.sort((a, b) => RANK[b.urgency || ''] - RANK[a.urgency || ''] || byDue(a, b)); break;
-        case 'difficulty-desc': res.sort((a, b) => RANK[b.difficulty || ''] - RANK[a.difficulty || ''] || byDue(a, b)); break;
+        case 'points-desc':     res.sort((a, b) => taskValue(b) - taskValue(a) || byDue(a, b)); break;
+        case 'points-asc':      res.sort((a, b) => taskValue(a) - taskValue(b) || byDue(a, b)); break;
+        case 'urgency-desc':    res.sort((a, b) => levelRank(data.urgencies, b.urgency) - levelRank(data.urgencies, a.urgency) || byDue(a, b)); break;
+        case 'difficulty-desc': res.sort((a, b) => levelRank(data.difficulties, b.difficulty) - levelRank(data.difficulties, a.difficulty) || byDue(a, b)); break;
         case 'title':           res.sort((a, b) => a.title.localeCompare(b.title)); break;
         default:                res.sort(byDue);
       }
@@ -441,20 +581,20 @@ const app = createApp({
 
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
-      open: false, id: null, title: '', category: '', points: 10, status: 'todo', projectId: '', due: '',
+      open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
       urgency: '', difficulty: '', doneAt: '',
     });
 
     function openTaskForm(task = null, projectId = '') {
       if (task) {
         Object.assign(taskForm, {
-          id: task.id, title: task.title, category: task.category || '', points: task.points,
+          id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus,
           status: task.status, projectId: task.projectId || '', due: task.due || '',
           urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '',
         });
       } else {
         Object.assign(taskForm, {
-          id: null, title: '', category: '', points: 10, status: 'todo', projectId,
+          id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId,
           due: today.value, urgency: '', difficulty: '', doneAt: '',
         });
       }
@@ -488,13 +628,14 @@ const app = createApp({
         title,
         category: taskForm.category || '',
         points: Math.max(0, Number(taskForm.points) || 0),
+        malus: !!taskForm.malus,
         projectId: taskForm.projectId || '',
         due: taskForm.due || '',
         urgency: taskForm.urgency || '',
         difficulty: taskForm.difficulty || '',
       };
       let becameDone = false;
-      let points = fields.points;
+      let value = 0;
       if (taskForm.id) {
         const t = data.tasks.find(x => x.id === taskForm.id);
         if (t) {
@@ -502,29 +643,30 @@ const app = createApp({
           Object.assign(t, fields);
           setStatus(t, taskForm.status, taskForm.doneAt);
           becameDone = was !== 'done' && t.status === 'done';
-          points = t.points;
+          value = taskValue(t);
         }
       } else {
         const t = newTask({ ...fields });
         setStatus(t, taskForm.status, taskForm.doneAt);
         data.tasks.push(t);
         becameDone = t.status === 'done';
+        value = taskValue(t);
       }
-      if (becameDone) notify(`+${points} pts ! Tâche déplacée dans Terminés`);
+      if (becameDone) notify(`${fmtPts(value)} · tâche déplacée dans Terminés`);
       taskForm.open = false;
     }
 
     /* ---------- To do rapide (plusieurs tâches d'un coup) ---------- */
     const quickForm = reactive({
       open: false, mode: 'rows', due: '', rows: [],
-      paste: { text: '', points: 10, category: '', urgency: '', difficulty: '', due: '', project: '' },
+      paste: { text: '', points: 10, malus: false, category: '', urgency: '', difficulty: '', due: '', project: '' },
     });
     const pastePreview = computed(() => parsePastedList(quickForm.paste.text));
 
     function openQuickForm() {
       taskForm.open = false;
       quickForm.mode = 'rows';
-      quickForm.paste = { text: '', points: 10, category: '', urgency: '', difficulty: '', due: today.value, project: '' };
+      quickForm.paste = { text: '', points: 10, malus: false, category: '', urgency: '', difficulty: '', due: today.value, project: '' };
       quickForm.due = today.value;
       quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value }));
       quickForm.open = true;
@@ -573,7 +715,7 @@ const app = createApp({
       let projectId = quickForm.paste.project;
       if (projectId === '__header') {
         if (header) {
-          const project = { id: uid(), name: header, description: '' };
+          const project = { id: uid(), name: header, description: '', color: nextColor(data.projects.length) };
           data.projects.push(project);
           projectId = project.id;
         } else {
@@ -584,6 +726,7 @@ const app = createApp({
       const points = Math.max(0, Number(quickForm.paste.points) || 0);
       items.forEach(title => data.tasks.push(newTask({
         title, points, projectId,
+        malus: !!quickForm.paste.malus,
         category: quickForm.paste.category || '',
         urgency: quickForm.paste.urgency || '',
         difficulty: quickForm.paste.difficulty || '',
@@ -610,7 +753,7 @@ const app = createApp({
     // "Modifier" sur la sélection : 1 tâche = popup complète, plusieurs = popup de modification groupée
     // '__keep' = ne rien changer
     const bulkForm = reactive({
-      open: false, ids: [], category: '__keep', points: '', status: '', projectId: '__keep',
+      open: false, ids: [], category: '__keep', points: '', kind: '__keep', status: '', projectId: '__keep',
       urgency: '__keep', difficulty: '__keep', due: '', clearDue: false,
     });
 
@@ -621,7 +764,7 @@ const app = createApp({
         return;
       }
       Object.assign(bulkForm, {
-        open: true, ids: [...ids], category: '__keep', points: '', status: '', projectId: '__keep',
+        open: true, ids: [...ids], category: '__keep', points: '', kind: '__keep', status: '', projectId: '__keep',
         urgency: '__keep', difficulty: '__keep', due: '', clearDue: false,
       });
     }
@@ -631,21 +774,21 @@ const app = createApp({
       bulkForm.ids.forEach(id => {
         const t = data.tasks.find(x => x.id === id);
         if (!t) return;
+        const was = t.status;
         if (bulkForm.category !== '__keep') t.category = bulkForm.category;
         if (bulkForm.points !== '' && bulkForm.points !== null && Number.isFinite(Number(bulkForm.points))) {
           t.points = Math.max(0, Math.round(Number(bulkForm.points)));
         }
-        if (bulkForm.status) {
-          if (t.status !== 'done' && bulkForm.status === 'done') gained += Number(t.points) || 0;
-          setStatus(t, bulkForm.status);
-        }
+        if (bulkForm.kind !== '__keep') t.malus = bulkForm.kind === 'malus';
+        if (bulkForm.status) setStatus(t, bulkForm.status);
+        if (was !== 'done' && t.status === 'done') gained += taskValue(t);
         if (bulkForm.projectId !== '__keep') t.projectId = bulkForm.projectId;
         if (bulkForm.urgency !== '__keep') t.urgency = bulkForm.urgency;
         if (bulkForm.difficulty !== '__keep') t.difficulty = bulkForm.difficulty;
         if (bulkForm.clearDue) t.due = '';
         else if (bulkForm.due) t.due = bulkForm.due;
       });
-      notify(gained ? `${bulkForm.ids.length} tâches modifiées · +${gained} pts !` : `${bulkForm.ids.length} tâches modifiées`);
+      notify(gained ? `${bulkForm.ids.length} tâches modifiées · ${fmtPts(gained)}` : `${bulkForm.ids.length} tâches modifiées`);
       bulkForm.open = false;
     }
 
@@ -653,7 +796,7 @@ const app = createApp({
     function removeTasks(ids) {
       const set = new Set(ids);
       data.tasks.filter(t => set.has(t.id) && t.status === 'done').forEach(t => {
-        data.archived = (Number(data.archived) || 0) + (Number(t.points) || 0);
+        data.archived = (Number(data.archived) || 0) + taskValue(t);
       });
       data.tasks = data.tasks.filter(t => !set.has(t.id));
     }
@@ -661,15 +804,15 @@ const app = createApp({
     function deleteSelected(ids) {
       if (!ids.length) return;
       const done = data.tasks.filter(t => ids.includes(t.id) && t.status === 'done');
-      const keep = done.reduce((s, t) => s + (Number(t.points) || 0), 0);
+      const keep = done.reduce((s, t) => s + taskValue(t), 0);
       let msg = ids.length === 1 ? 'Supprimer la tâche sélectionnée ?' : `Supprimer les ${ids.length} tâches sélectionnées ?`;
-      if (done.length) msg += `\n\nLes ${keep} pts des tâches terminées sont conservés.`;
+      if (done.length) msg += `\n\nLes points des tâches terminées (${fmtPts(keep)}) sont conservés.`;
       if (!confirm(msg)) return;
       removeTasks(ids);
     }
 
     function deleteTask(task) {
-      const keep = task.status === 'done' ? `\n\nSes ${task.points} pts sont conservés.` : '';
+      const keep = task.status === 'done' ? `\n\nSes points (${fmtPts(taskValue(task))}) sont conservés.` : '';
       if (!confirm(`Supprimer la tâche « ${task.title} » ?${keep}`)) return;
       removeTasks([task.id]);
     }
@@ -686,8 +829,8 @@ const app = createApp({
       if (popup) popup.open = false;
     });
 
-    // Points à gagner dans les listes Aujourd'hui / À venir
-    const sumToEarn = list => list.filter(t => t.status !== 'done').reduce((s, t) => s + (Number(t.points) || 0), 0);
+    // Points à gagner dans les listes Aujourd'hui / À venir (les malus comptent en négatif)
+    const sumToEarn = list => list.filter(t => t.status !== 'done').reduce((s, t) => s + taskValue(t), 0);
     const todayPoints    = computed(() => sumToEarn(todayTasks.value));
     const upcomingPoints = computed(() => sumToEarn(upcomingTasks.value));
 
@@ -695,8 +838,9 @@ const app = createApp({
       const old = task.status;
       if (old === newStatus) return;
       setStatus(task, newStatus);
-      if (old !== 'done' && newStatus === 'done') notify(`+${task.points} pts ! Tâche déplacée dans Terminés`);
-      if (old === 'done' && newStatus !== 'done') notify(`−${task.points} pts (tâche rouverte)`);
+      const v = taskValue(task);
+      if (old !== 'done' && newStatus === 'done') notify(`${fmtPts(v)} · tâche déplacée dans Terminés`);
+      if (old === 'done' && newStatus !== 'done') notify(`${fmtPts(-v)} (tâche rouverte)`);
     }
 
     function changePoints(task, value) {
@@ -707,11 +851,13 @@ const app = createApp({
       task.due = value || '';
     }
 
-    // Modification directe depuis les tags : catégorie, projet, urgence, difficulté, titre
+    // Modification directe depuis les tags : catégorie, projet, urgence, difficulté, bonus/malus, titre
     function updateTask(task, field, value) {
       if (field === 'title') {
         const v = String(value).trim();
         if (v) task.title = v;
+      } else if (field === 'malus') {
+        task.malus = value === true || value === 'true';
       } else if (['category', 'projectId', 'urgency', 'difficulty'].includes(field)) {
         task[field] = value || '';
       }
@@ -723,13 +869,19 @@ const app = createApp({
     }
 
     /* ---------- Projets ---------- */
-    const projectForm = reactive({ open: false, id: null, name: '', description: '', tasks: [] });
+    const projectForm = reactive({ open: false, id: null, name: '', description: '', color: '#6366f1', tasks: [] });
 
     function openProjectForm(project = null) {
       if (project) {
-        Object.assign(projectForm, { id: project.id, name: project.name, description: project.description || '', tasks: [] });
+        Object.assign(projectForm, {
+          id: project.id, name: project.name, description: project.description || '',
+          color: project.color || nextColor(data.projects.length), tasks: [],
+        });
       } else {
-        Object.assign(projectForm, { id: null, name: '', description: '', tasks: [{ title: '', category: '', points: 10, due: '' }] });
+        Object.assign(projectForm, {
+          id: null, name: '', description: '', color: nextColor(data.projects.length),
+          tasks: [{ title: '', category: '', points: 10, due: '' }],
+        });
       }
       projectForm.open = true;
     }
@@ -743,9 +895,9 @@ const app = createApp({
       if (!name) return;
       if (projectForm.id) {
         const p = data.projects.find(x => x.id === projectForm.id);
-        if (p) { p.name = name; p.description = projectForm.description.trim(); }
+        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color; }
       } else {
-        const project = { id: uid(), name, description: projectForm.description.trim() };
+        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color };
         data.projects.push(project);
         projectForm.tasks
           .filter(d => d.title.trim())
@@ -760,13 +912,10 @@ const app = createApp({
       projectForm.open = false;
     }
 
-    function deleteProject(project) {
-      const ids = data.tasks.filter(t => t.projectId === project.id).map(t => t.id);
-      const msg = ids.length
-        ? `Supprimer le projet « ${project.name} » et ses ${ids.length} tâche(s) ? (Les points des tâches terminées sont conservés.)`
-        : `Supprimer le projet « ${project.name} » ?`;
-      if (!confirm(msg)) return;
-      removeTasks(ids);
+    function setProjectColor(project, color) { project.color = color; }
+
+    function removeProject(project) {
+      removeTasks(data.tasks.filter(t => t.projectId === project.id).map(t => t.id));
       data.projects = data.projects.filter(p => p.id !== project.id);
     }
 
@@ -781,9 +930,76 @@ const app = createApp({
       return {
         total: list.length,
         done: list.filter(t => t.status === 'done').length,
-        points: list.reduce((s, t) => s + (Number(t.points) || 0), 0),
+        points: list.reduce((s, t) => s + taskValue(t), 0),
       };
     }
+
+    // Urgence d'un projet = la plus haute urgence parmi ses tâches pas encore terminées
+    function projectTopUrgency(project) {
+      let best = null;
+      let bestRank = 0;
+      data.tasks.forEach(t => {
+        if (t.projectId !== project.id || t.status === 'done') return;
+        const r = levelRank(data.urgencies, t.urgency);
+        if (r > bestRank) { bestRank = r; best = data.urgencies[r - 1]; }
+      });
+      return best;
+    }
+
+    // Tri des projets : ordre manuel (glisser-déposer) ou par urgence
+    const sortedProjects = computed(() => {
+      if (ui.projectSort !== 'urgency') return data.projects;
+      const rank = p => { const u = projectTopUrgency(p); return u ? levelRank(data.urgencies, u.id) : 0; };
+      return [...data.projects].sort((a, b) => rank(b) - rank(a));   // tri stable : à égalité, l'ordre manuel est gardé
+    });
+
+    // Replier / déplier les tâches d'un projet (mémorisé sur cet appareil)
+    const isProjectOpen = id => !ui.collapsedProjects.includes(id);
+    function toggleProjectOpen(id) {
+      const i = ui.collapsedProjects.indexOf(id);
+      if (i >= 0) ui.collapsedProjects.splice(i, 1); else ui.collapsedProjects.push(id);
+    }
+    function setAllProjectsOpen(open) {
+      ui.collapsedProjects = open ? [] : data.projects.map(p => p.id);
+    }
+
+    // Sélection des projets : Modifier / Supprimer n'apparaissent qu'une fois un projet sélectionné
+    const projectSelection = ref([]);
+
+    function toggleProjectSelect(id) {
+      const i = projectSelection.value.indexOf(id);
+      if (i >= 0) projectSelection.value.splice(i, 1); else projectSelection.value.push(id);
+    }
+    function onProjectClick(event, project) {
+      if (event.target.closest('select, input, button, label, a, option, textarea, .drag-handle, .project-task')) return;
+      if (window.getSelection && String(window.getSelection())) return;
+      toggleProjectSelect(project.id);
+    }
+    function selectAllProjects() { projectSelection.value = data.projects.map(p => p.id); }
+    function clearProjectSelection() { projectSelection.value = []; }
+
+    function editSelectedProject() {
+      if (projectSelection.value.length !== 1) return;
+      const p = data.projects.find(x => x.id === projectSelection.value[0]);
+      if (p) openProjectForm(p);
+    }
+
+    function deleteSelectedProjects() {
+      const projects = data.projects.filter(p => projectSelection.value.includes(p.id));
+      if (!projects.length) return;
+      const nTasks = data.tasks.filter(t => projects.some(p => p.id === t.projectId)).length;
+      const names = projects.length === 1 ? `le projet « ${projects[0].name} »` : `les ${projects.length} projets sélectionnés`;
+      const msg = nTasks
+        ? `Supprimer ${names} et ses ${nTasks} tâche(s) ? (Les points des tâches terminées sont conservés.)`
+        : `Supprimer ${names} ?`;
+      if (!confirm(msg)) return;
+      projects.forEach(removeProject);
+      projectSelection.value = [];
+    }
+
+    watch(() => data.projects.length, () => {
+      projectSelection.value = projectSelection.value.filter(id => data.projects.some(p => p.id === id));
+    });
 
     // Réorganiser les projets : glisser-déposer (poignée) ou boutons monter / descendre
     const dragProject = reactive({ from: -1, over: -1 });
@@ -802,7 +1018,7 @@ const app = createApp({
     }
     function onProjectDrop(index) {
       const from = dragProject.from;
-      if (from >= 0 && from !== index) {
+      if (from >= 0 && from !== index && ui.projectSort === 'manual') {
         const [moved] = data.projects.splice(from, 1);
         data.projects.splice(index, 0, moved);
       }
@@ -904,15 +1120,7 @@ const app = createApp({
           const ok = ['tasks', 'projects', 'rewards', 'inventory'].every(k => Array.isArray(json[k]));
           if (!ok) throw new Error('format');
           if (!confirm('Remplacer toutes les données actuelles par celles du fichier ?')) return;
-          data.tasks = json.tasks;
-          data.projects = json.projects;
-          data.rewards = json.rewards;
-          data.inventory = json.inventory;
-          data.categories = Array.isArray(json.categories) ? json.categories : [];
-          data.spent = Number(json.spent) || 0;
-          data.adjust = Number(json.adjust) || 0;
-          data.archived = Number(json.archived) || 0;
-          syncCategories();
+          applyData(json);
           notify('Import réussi');
         } catch (e) {
           alert("Fichier invalide : ce n'est pas une sauvegarde Todo Quest.");
@@ -966,15 +1174,7 @@ const app = createApp({
     }
 
     function applyRemote(remote) {
-      data.tasks      = Array.isArray(remote.tasks) ? remote.tasks : [];
-      data.projects   = Array.isArray(remote.projects) ? remote.projects : [];
-      data.rewards    = Array.isArray(remote.rewards) ? remote.rewards : [];
-      data.inventory  = Array.isArray(remote.inventory) ? remote.inventory : [];
-      data.categories = Array.isArray(remote.categories) ? remote.categories : [];
-      data.spent      = Number(remote.spent) || 0;
-      data.adjust     = Number(remote.adjust) || 0;
-      data.archived   = Number(remote.archived) || 0;
-      syncCategories();
+      applyData(remote);
       lastSyncedJson = JSON.stringify(data);   // évite de renvoyer ce qu'on vient de recevoir
     }
 
@@ -1070,12 +1270,13 @@ const app = createApp({
 
     return {
       // état
-      data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, statuses: STATUSES,
-      urgencies: URGENCIES, difficulties: DIFFICULTIES,
+      data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, statuses: STATUSES, tagStyle,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
       // catégories
-      categories, categoryForm, openCategoryForm, saveCategory, deleteCategory, categoryUsage,
+      categories, categoryForm, openCategoryForm, saveCategory, deleteCategory, categoryUsage, setCategoryColor,
+      // urgences & difficultés
+      newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
       earned, balance, nextReward, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, visibleInventory,
@@ -1087,7 +1288,9 @@ const app = createApp({
       selection, toggleSelect, selectMany, deselectMany, editSelected, deleteSelected, bulkForm, saveBulk,
       todayPoints, upcomingPoints,
       // projets
-      projectForm, openProjectForm, addDraftTask, saveProject, deleteProject, projectTasks, projectStats,
+      projectForm, openProjectForm, addDraftTask, saveProject, setProjectColor, projectTasks, projectStats, projectTopUrgency,
+      sortedProjects, isProjectOpen, toggleProjectOpen, setAllProjectsOpen,
+      projectSelection, onProjectClick, toggleProjectSelect, selectAllProjects, clearProjectSelection, editSelectedProject, deleteSelectedProjects,
       dragProject, onProjectDragStart, onProjectDragOver, onProjectDrop, onProjectDragEnd, moveProject,
       // récompenses
       rewardForm, openRewardForm, saveReward, deleteReward, claimReward,
