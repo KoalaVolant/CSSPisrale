@@ -59,6 +59,30 @@
 .category-item { display: flex; align-items: center; gap: 0.8rem; }
 .category-name { flex: 1; }
 
+/* ---------- Couleurs choisies (projets, catégories, urgences, difficultés) ----------
+   Les tags colorés reçoivent la classe .tag-colored et les variables --tag-bg (fond) / --tag-fg (texte lisible).
+   Les cartes de projets / catégories / niveaux reçoivent --item-color (bande à gauche ici, à toi de voir). */
+.tag-colored { background: var(--tag-bg); color: var(--tag-fg); border-color: var(--tag-bg); }
+.project, .category-item, .level-item { border-left: 4px solid var(--item-color, transparent); }
+
+/* ---------- Bonus / malus ---------- */
+.tag-sign { width: 1.6rem; }
+.tag-malus { color: crimson; }
+.is-malus .project-task-points, .project-task-points.is-malus { color: crimson; }
+
+/* ---------- Projets : sélection, repli, barre d'actions ---------- */
+.project { cursor: pointer; }
+.project.selected { outline: 2px solid; }
+.project-toolbar, .task-toolbar { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.project-color, .category-color, .level-color { width: 2rem; height: 2rem; padding: 0; border: none; background: none; cursor: pointer; }
+
+/* ---------- Urgences & difficultés ---------- */
+.levels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+.level-item { display: flex; align-items: center; gap: 0.5rem; }
+.level-name { flex: 1; min-width: 0; }
+.level-add { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+.level-add input { flex: 1; }
+
 /* ---------- Classes disponibles pour ton style ----------
    Haut : .app-header .app-brand (titre + synchro) .app-title .sync-box   .points-box .points-badge
    Menu : .sidebar .app-nav (button.active)
@@ -67,6 +91,7 @@
    Tâches : .task (.selected .overdue .status-todo/doing/paused/done)
             .task-toolbar .tag .tag-category .tag-project .tag-status .tag-points .tag-urgency .tag-difficulty .tag-due .tag-late .tag-empty
             .task-group-title (titres de date dans Terminés)
-   Projets : .project (.dragging .drag-over) .drag-handle .project-task   Catégories : .category-item
+   Projets : .project (.selected .dragging .drag-over) .project-toolbar .project-toggle .drag-handle .project-task   Catégories : .category-item
+   Niveaux : .levels-block .level-item .level-add   Couleurs : .tag-colored (--tag-bg, --tag-fg), --item-color   Malus : .is-malus .tag-malus .tag-sign
    Récompenses : .reward (.affordable)   Inventaire : .inventory-item (.used)
    ---------------------------------------------------------- */
