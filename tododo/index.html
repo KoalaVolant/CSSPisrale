@@ -67,6 +67,12 @@
           </template>
           <template v-else-if="view === 'projects'">
             <button type="button" class="btn-add" @click="openProjectForm()">＋ Nouveau projet</button>
+            <select class="project-sort" v-model="ui.projectSort" title="Ordre des projets">
+              <option value="manual">Ordre manuel</option>
+              <option value="urgency">Trier : urgence ↓</option>
+            </select>
+            <button type="button" @click="setAllProjectsOpen(false)">Tout replier</button>
+            <button type="button" @click="setAllProjectsOpen(true)">Tout déplier</button>
           </template>
           <template v-else-if="view === 'categories'">
             <button type="button" class="btn-add" @click="openCategoryForm()">＋ Nouvelle catégorie</button>
@@ -103,13 +109,19 @@
           <select v-model="filters.urgency">
             <option value="">Toutes urgences</option>
             <option value="__none">Sans urgence</option>
-            <option v-for="u in urgencies.slice(1)" :key="u.value" :value="u.value">{{ u.label }}</option>
+            <option v-for="u in data.urgencies" :key="u.id" :value="u.id">Urgence : {{ u.name }}</option>
           </select>
 
           <select v-model="filters.difficulty">
             <option value="">Toutes difficultés</option>
             <option value="__none">Sans difficulté</option>
-            <option v-for="d in difficulties.slice(1)" :key="d.value" :value="d.value">{{ d.label }}</option>
+            <option v-for="d in data.difficulties" :key="d.id" :value="d.id">Difficulté : {{ d.name }}</option>
+          </select>
+
+          <select v-model="filters.kind">
+            <option value="">Bonus et malus</option>
+            <option value="bonus">Bonus seulement</option>
+            <option value="malus">Malus seulement</option>
           </select>
 
           <select v-model="filters.sort" v-if="view !== 'done'">
@@ -133,23 +145,31 @@
         <label>Titre
           <input type="text" v-model="taskForm.title" required placeholder="Ex : Ranger le bureau">
         </label>
+        <label>Type
+          <select v-model="taskForm.malus">
+            <option :value="false">Bonus (gagne des points)</option>
+            <option :value="true">Malus (retire des points)</option>
+          </select>
+        </label>
+        <label>Points
+          <input type="number" min="0" v-model.number="taskForm.points">
+        </label>
         <label>Catégorie
           <select v-model="taskForm.category">
             <option value="">Sans catégorie</option>
             <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
           </select>
         </label>
-        <label>Points à gagner
-          <input type="number" min="0" v-model.number="taskForm.points">
-        </label>
         <label>Urgence
           <select v-model="taskForm.urgency">
-            <option v-for="u in urgencies" :key="u.value" :value="u.value">{{ u.short }}</option>
+            <option value="">Aucune</option>
+            <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
           </select>
         </label>
         <label>Difficulté
           <select v-model="taskForm.difficulty">
-            <option v-for="d in difficulties" :key="d.value" :value="d.value">{{ d.short }}</option>
+            <option value="">Aucune</option>
+            <option v-for="d in data.difficulties" :key="d.id" :value="d.id">{{ d.name }}</option>
           </select>
         </label>
         <label>Statut
@@ -183,6 +203,16 @@
         <h2>Modifier {{ bulkForm.ids.length }} tâches</h2>
         <p class="hint">Seuls les champs modifiés sont appliqués à toutes les tâches sélectionnées.</p>
         <form @submit.prevent="saveBulk">
+          <label>Type
+            <select v-model="bulkForm.kind">
+              <option value="__keep">(inchangé)</option>
+              <option value="bonus">Bonus</option>
+              <option value="malus">Malus</option>
+            </select>
+          </label>
+          <label>Points
+            <input type="number" min="0" v-model.number="bulkForm.points" placeholder="(inchangés)">
+          </label>
           <label>Catégorie
             <select v-model="bulkForm.category">
               <option value="__keep">(inchangée)</option>
@@ -190,19 +220,18 @@
               <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
-          <label>Points
-            <input type="number" min="0" v-model.number="bulkForm.points" placeholder="(inchangés)">
-          </label>
           <label>Urgence
             <select v-model="bulkForm.urgency">
               <option value="__keep">(inchangée)</option>
-              <option v-for="u in urgencies" :key="u.value" :value="u.value">{{ u.short }}</option>
+              <option value="">Aucune</option>
+              <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
             </select>
           </label>
           <label>Difficulté
             <select v-model="bulkForm.difficulty">
               <option value="__keep">(inchangée)</option>
-              <option v-for="d in difficulties" :key="d.value" :value="d.value">{{ d.short }}</option>
+              <option value="">Aucune</option>
+              <option v-for="d in data.difficulties" :key="d.id" :value="d.id">{{ d.name }}</option>
             </select>
           </label>
           <label>Statut
@@ -266,11 +295,17 @@
 
       <!-- Mode 2 : coller une liste -->
       <template v-else>
-        <p class="hint">Colle ta liste : une tâche par ligne, avec ou sans puce (* - • 1.). Une ligne d'intro placée avant les puces est reconnue comme titre. Les mêmes points, catégorie, urgence, difficulté et date butoir sont appliqués à toutes les tâches.</p>
+        <p class="hint">Colle ta liste : une tâche par ligne, avec ou sans puce (* - • 1.). Une ligne d'intro placée avant les puces est reconnue comme titre. Les mêmes points, type, catégorie, urgence, difficulté et date butoir sont appliqués à toutes les tâches.</p>
         <form @submit.prevent="savePaste">
           <label>Liste à coller
             <textarea class="paste-text" v-model="quickForm.paste.text" rows="8"
                       placeholder="Titre (optionnel)&#10;* Première tâche&#10;* Deuxième tâche"></textarea>
+          </label>
+          <label>Type
+            <select v-model="quickForm.paste.malus">
+              <option :value="false">Bonus</option>
+              <option :value="true">Malus</option>
+            </select>
           </label>
           <label>Points par tâche
             <input type="number" min="0" v-model.number="quickForm.paste.points">
@@ -283,12 +318,14 @@
           </label>
           <label>Urgence
             <select v-model="quickForm.paste.urgency">
-              <option v-for="u in urgencies" :key="u.value" :value="u.value">{{ u.short }}</option>
+              <option value="">Aucune</option>
+              <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
             </select>
           </label>
           <label>Difficulté
             <select v-model="quickForm.paste.difficulty">
-              <option v-for="d in difficulties" :key="d.value" :value="d.value">{{ d.short }}</option>
+              <option value="">Aucune</option>
+              <option v-for="d in data.difficulties" :key="d.id" :value="d.id">{{ d.name }}</option>
             </select>
           </label>
           <label>Date butoir
@@ -369,19 +406,19 @@
       </div>
     </section>
 
-    <!-- ============ TERMINÉS : rangés par date de fin ============ -->
+    <!-- ============ TERMINÉS : rangés par date de fin, seulement catégorie et projet ============ -->
     <section class="view view-done" v-if="view === 'done'">
-      <p class="hint">{{ doneTasks.length }} tâche{{ doneTasks.length > 1 ? 's' : '' }} terminée{{ doneTasks.length > 1 ? 's' : '' }}, de la plus récente à la plus ancienne. Supprimer une tâche terminée ne retire pas ses points.</p>
+      <p class="hint">{{ doneTasks.length }} tâche{{ doneTasks.length > 1 ? 's' : '' }} terminée{{ doneTasks.length > 1 ? 's' : '' }}, de la plus récente à la plus ancienne. Supprimer une tâche terminée ne retire pas ses points. Pour la rouvrir ou changer son statut : sélectionne-la puis « Modifier ».</p>
       <p class="empty" v-if="!doneTasks.length">Aucune tâche terminée pour l'instant.</p>
       <div class="task-list">
-        <task-list :tasks="doneTasks" group="doneAt" :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
+        <task-list :tasks="doneTasks" group="doneAt" compact :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
                    @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
                    @edit-selected="editSelected" @delete-selected="deleteSelected"
                    @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
       </div>
     </section>
 
-    <!-- ============ PROJETS (ordre modifiable par glisser-déposer) ============ -->
+    <!-- ============ PROJETS ============ -->
     <section class="view view-projects" v-if="view === 'projects'">
       <!-- Formulaire projet -->
       <div class="modal-backdrop" v-if="projectForm.open" @click.self="projectForm.open = false">
@@ -390,6 +427,9 @@
         <form @submit.prevent="saveProject">
           <label>Nom du projet
             <input type="text" v-model="projectForm.name" required>
+          </label>
+          <label>Couleur
+            <input type="color" v-model="projectForm.color">
           </label>
           <label>Description
             <textarea v-model="projectForm.description" rows="2"></textarea>
@@ -419,20 +459,41 @@
       </div>
 
       <p class="empty" v-if="!data.projects.length">Aucun projet pour l'instant.</p>
-      <p class="hint" v-else-if="data.projects.length > 1">Glisse un projet par sa poignée (⠿) ou utilise les flèches pour changer l'ordre.</p>
 
-      <article class="project" v-for="(p, i) in data.projects" :key="p.id"
-               :class="{ dragging: dragProject.from === i, 'drag-over': dragProject.over === i && dragProject.from !== i }"
+      <!-- Barre d'actions : Modifier / Supprimer n'apparaissent qu'une fois un projet sélectionné (clic sur le projet) -->
+      <div class="project-toolbar" v-if="data.projects.length">
+        <button type="button" @click="selectAllProjects" :disabled="projectSelection.length === data.projects.length">Tout sélectionner</button>
+        <button type="button" @click="clearProjectSelection" :disabled="!projectSelection.length">Tout désélectionner</button>
+        <template v-if="projectSelection.length">
+          <span class="project-toolbar-count">{{ projectSelection.length }} sélectionné{{ projectSelection.length > 1 ? 's' : '' }}</span>
+          <button type="button" class="project-toolbar-edit" v-if="projectSelection.length === 1" @click="editSelectedProject">Modifier</button>
+          <button type="button" class="project-toolbar-delete" @click="deleteSelectedProjects">Supprimer</button>
+        </template>
+      </div>
+      <p class="hint" v-if="data.projects.length > 1 && ui.projectSort === 'manual'">Glisse un projet par sa poignée (⠿) ou utilise les flèches pour changer l'ordre.</p>
+      <p class="hint" v-else-if="data.projects.length > 1">Projets triés par urgence (la plus haute urgence de leurs tâches en cours). Repasse en « Ordre manuel » pour les réorganiser.</p>
+
+      <article class="project" v-for="(p, i) in sortedProjects" :key="p.id" tabindex="0"
+               :class="{ selected: projectSelection.includes(p.id), dragging: dragProject.from === i, 'drag-over': dragProject.over === i && dragProject.from !== i }"
+               :style="p.color ? { '--item-color': p.color } : {}"
+               @click="onProjectClick($event, p)"
+               @keydown.space.self.prevent="toggleProjectSelect(p.id)" @keydown.enter.self.prevent="toggleProjectSelect(p.id)"
                @dragover.prevent="onProjectDragOver(i)" @drop.prevent="onProjectDrop(i)">
         <header class="project-header">
           <div class="project-title-row">
-            <span class="drag-handle" draggable="true" title="Glisser pour changer l'ordre"
+            <span class="drag-handle" v-if="ui.projectSort === 'manual'" draggable="true" title="Glisser pour changer l'ordre"
                   @dragstart="onProjectDragStart($event, i)" @dragend="onProjectDragEnd">⠿</span>
+            <input class="project-color" type="color" :value="p.color || '#888888'" title="Couleur du projet"
+                   @change="setProjectColor(p, $event.target.value)">
             <h3 class="project-name">{{ p.name }}</h3>
-            <span class="project-order-buttons">
+            <span class="tag tag-urgency tag-colored" v-if="projectTopUrgency(p)" :style="tagStyle(projectTopUrgency(p).color)">Urgence : {{ projectTopUrgency(p).name }}</span>
+            <span class="project-order-buttons" v-if="ui.projectSort === 'manual'">
               <button type="button" :disabled="i === 0" @click="moveProject(i, -1)" title="Monter">↑</button>
               <button type="button" :disabled="i === data.projects.length - 1" @click="moveProject(i, 1)" title="Descendre">↓</button>
             </span>
+            <button type="button" class="project-toggle" :aria-expanded="isProjectOpen(p.id)" @click="toggleProjectOpen(p.id)">
+              {{ isProjectOpen(p.id) ? 'Replier' : 'Déplier' }}
+            </button>
           </div>
           <p class="project-desc" v-if="p.description">{{ p.description }}</p>
           <div class="project-progress">
@@ -441,16 +502,14 @@
           </div>
           <div class="project-actions">
             <button type="button" @click="openTaskForm(null, p.id)">＋ Tâche</button>
-            <button type="button" @click="openProjectForm(p)">Modifier</button>
-            <button type="button" @click="deleteProject(p)">Supprimer</button>
           </div>
         </header>
 
-        <div class="task-list">
+        <div class="task-list" v-if="isProjectOpen(p.id)">
           <p class="empty" v-if="!projectTasks(p).length">Pas encore de tâche dans ce projet.</p>
           <div class="project-task" v-for="t in projectTasks(p)" :key="t.id" :class="'status-' + t.status">
             <span class="project-task-title">{{ t.title }}</span>
-            <span class="project-task-points">{{ t.points }} pts</span>
+            <span class="project-task-points" :class="{ 'is-malus': t.malus }">{{ t.malus ? '−' : '' }}{{ t.points }} pts</span>
             <button type="button" @click="openTaskForm(t)">Modifier</button>
             <button type="button" @click="deleteTask(t)">Supprimer</button>
           </div>
@@ -460,14 +519,17 @@
 
     <!-- ============ CATÉGORIES ============ -->
     <section class="view view-categories" v-if="view === 'categories'">
-      <p class="hint">Les catégories servent pour les tâches et les récompenses. « Sans catégorie » existe toujours.</p>
+      <p class="hint">Les catégories servent pour les tâches et les récompenses. « Sans catégorie » existe toujours. La couleur colore le tag des tâches.</p>
 
       <div class="modal-backdrop" v-if="categoryForm.open" @click.self="categoryForm.open = false">
         <div class="form-panel modal category-form" role="dialog" aria-modal="true">
-          <h3>{{ categoryForm.oldName ? 'Renommer la catégorie' : 'Nouvelle catégorie' }}</h3>
+          <h3>{{ categoryForm.oldName ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h3>
           <form @submit.prevent="saveCategory">
             <label>Nom
               <input type="text" v-model="categoryForm.name" required placeholder="Ex : Maison">
+            </label>
+            <label>Couleur
+              <input type="color" v-model="categoryForm.color">
             </label>
             <div class="form-actions">
               <button type="submit">Enregistrer</button>
@@ -483,14 +545,46 @@
           <span class="category-count">{{ categoryUsage('').tasks }} tâche(s) · {{ categoryUsage('').rewards }} récompense(s)</span>
         </article>
 
-        <article class="category-item" v-for="c in categories" :key="c">
-          <span class="category-name">{{ c }}</span>
-          <span class="category-count">{{ categoryUsage(c).tasks }} tâche(s) · {{ categoryUsage(c).rewards }} récompense(s)</span>
+        <article class="category-item" v-for="c in data.categories" :key="c.name" :style="c.color ? { '--item-color': c.color } : {}">
+          <input class="category-color" type="color" :value="c.color || '#888888'" title="Couleur"
+                 @change="setCategoryColor(c, $event.target.value)">
+          <span class="category-name">{{ c.name }}</span>
+          <span class="category-count">{{ categoryUsage(c.name).tasks }} tâche(s) · {{ categoryUsage(c.name).rewards }} récompense(s)</span>
           <span class="category-actions">
-            <button type="button" @click="openCategoryForm(c)">Renommer</button>
-            <button type="button" @click="deleteCategory(c)">Supprimer</button>
+            <button type="button" @click="openCategoryForm(c.name)">Renommer</button>
+            <button type="button" @click="deleteCategory(c.name)">Supprimer</button>
           </span>
         </article>
+      </div>
+    </section>
+
+    <!-- ============ URGENCES & DIFFICULTÉS ============ -->
+    <section class="view view-levels" v-if="view === 'levels'">
+      <p class="hint">Crée, renomme et colore tes niveaux. L'ordre va du plus faible (en haut) au plus fort (en bas) : il sert pour les tris. Pour renommer, modifie directement le nom.</p>
+
+      <div class="levels-grid">
+        <section class="levels-block" v-for="block in [{ key: 'urgencies', title: 'Urgences' }, { key: 'difficulties', title: 'Difficultés' }]" :key="block.key">
+          <h2>{{ block.title }}</h2>
+          <p class="empty" v-if="!data[block.key].length">Aucun niveau.</p>
+
+          <article class="level-item" v-for="(l, i) in data[block.key]" :key="l.id" :style="l.color ? { '--item-color': l.color } : {}">
+            <input class="level-color" type="color" :value="l.color || '#888888'" title="Couleur"
+                   @change="setLevelColor(l, $event.target.value)">
+            <input class="level-name" type="text" :value="l.name" title="Renommer"
+                   @change="renameLevel(l, $event)" @keydown.enter="$event.target.blur()">
+            <span class="level-count">{{ levelUsage(block.key, l.id) }} tâche(s)</span>
+            <span class="level-actions">
+              <button type="button" :disabled="i === 0" @click="moveLevel(block.key, i, -1)" title="Monter">↑</button>
+              <button type="button" :disabled="i === data[block.key].length - 1" @click="moveLevel(block.key, i, 1)" title="Descendre">↓</button>
+              <button type="button" @click="deleteLevel(block.key, l)">Supprimer</button>
+            </span>
+          </article>
+
+          <form class="level-add" @submit.prevent="addLevel(block.key)">
+            <input type="text" v-model="newLevel[block.key]" placeholder="Nouveau niveau…">
+            <button type="submit">Ajouter</button>
+          </form>
+        </section>
       </div>
     </section>
 
@@ -641,8 +735,9 @@
 
 <!-- ============ TEMPLATE : LIGNE DE TÂCHE ============ -->
 <!-- Clic sur le bloc = sélection. Clic sur un tag = modification directe. Double-clic sur le titre = renommer. -->
+<!-- Les tags catégorie / projet / urgence / difficulté prennent la couleur choisie (classe tag-colored + --tag-bg / --tag-fg). -->
 <template id="task-row-template">
-  <article class="task" :class="['status-' + task.status, { overdue: isOverdue, selected: selected }]"
+  <article class="task" :class="['status-' + task.status, { overdue: isOverdue, selected: selected, 'is-malus': task.malus }]"
            tabindex="0" @click="onRowClick"
            @keydown.space.self.prevent="$emit('toggle')" @keydown.enter.self.prevent="$emit('toggle')">
 
@@ -654,7 +749,7 @@
       <div class="task-tags">
 
         <!-- Catégorie -->
-        <label class="tag tag-category" :class="{ 'tag-empty': !task.category }">
+        <label class="tag tag-category" :class="{ 'tag-empty': !task.category, 'tag-colored': !!categoryColor }" :style="styleFor(categoryColor)">
           <select :value="task.category || ''" @change="update('category', $event)">
             <option value="">Sans catégorie</option>
             <option v-if="categoryMissing" :value="task.category">{{ task.category }}</option>
@@ -663,50 +758,59 @@
         </label>
 
         <!-- Projet -->
-        <label class="tag tag-project" :class="{ 'tag-empty': !task.projectId }">
+        <label class="tag tag-project" :class="{ 'tag-empty': !task.projectId, 'tag-colored': !!projectColor }" :style="styleFor(projectColor)">
           <select :value="task.projectId || ''" @change="update('projectId', $event)">
             <option value="">Sans projet</option>
             <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
         </label>
 
-        <!-- Statut -->
-        <label class="tag tag-status" :class="'status-' + task.status">
-          <select :value="task.status" @change="$emit('status', task, $event.target.value)">
-            <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
-          </select>
-        </label>
+        <!-- En mode compact (onglet Terminés) on s'arrête ici -->
+        <template v-if="!compact">
 
-        <!-- Points -->
-        <label class="tag tag-points">
-          <input class="tag-points-input" type="number" min="0" :value="task.points"
-                 title="Cliquer pour modifier les points"
-                 @change="onPoints" @keydown.enter="$event.target.blur()"> pts
-        </label>
+          <!-- Statut -->
+          <label class="tag tag-status" :class="'status-' + task.status">
+            <select :value="task.status" @change="$emit('status', task, $event.target.value)">
+              <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
+            </select>
+          </label>
 
-        <!-- Urgence -->
-        <label class="tag tag-urgency" :class="task.urgency ? 'urgency-' + task.urgency : 'tag-empty'">
-          <select :value="task.urgency || ''" @change="update('urgency', $event)">
-            <option v-for="u in urgencyOptions" :key="u.value" :value="u.value">{{ u.label }}</option>
-          </select>
-        </label>
+          <!-- Points : + (bonus) ou − (malus), puis le nombre -->
+          <label class="tag tag-points" :class="{ 'tag-malus': task.malus }">
+            <select class="tag-sign" :value="task.malus ? 'true' : 'false'" title="Bonus (+) ou malus (−)"
+                    @change="update('malus', $event)">
+              <option value="false">+</option>
+              <option value="true">−</option>
+            </select>
+            <input class="tag-points-input" type="number" min="0" :value="task.points"
+                   title="Cliquer pour modifier les points"
+                   @change="onPoints" @keydown.enter="$event.target.blur()"> pts
+          </label>
 
-        <!-- Difficulté -->
-        <label class="tag tag-difficulty" :class="task.difficulty ? 'difficulty-' + task.difficulty : 'tag-empty'">
-          <select :value="task.difficulty || ''" @change="update('difficulty', $event)">
-            <option v-for="d in difficultyOptions" :key="d.value" :value="d.value">{{ d.label }}</option>
-          </select>
-        </label>
+          <!-- Urgence -->
+          <label class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
+            <select :value="urgencyValue" @change="update('urgency', $event)">
+              <option v-for="u in urgencyOptions" :key="u.id" :value="u.id">{{ u.label }}</option>
+            </select>
+          </label>
 
-        <!-- Date butoir : ouvre le calendrier (rien d'affiché s'il n'y a pas de date) -->
-        <label class="tag tag-due" v-if="task.due">
-          <span class="tag-due-text">{{ dueLabel }}</span>
-          <input class="tag-due-input" type="date" :value="task.due"
-                 title="Cliquer pour changer la date butoir"
-                 @click="openPicker" @change="onDue">
-        </label>
+          <!-- Difficulté -->
+          <label class="tag tag-difficulty" :class="{ 'tag-empty': !difficultyValue, 'tag-colored': !!difficultyColor && !!difficultyValue }" :style="styleFor(difficultyValue ? difficultyColor : '')">
+            <select :value="difficultyValue" @change="update('difficulty', $event)">
+              <option v-for="d in difficultyOptions" :key="d.id" :value="d.id">{{ d.label }}</option>
+            </select>
+          </label>
 
-        <span class="tag tag-late" v-if="isOverdue">En retard</span>
+          <!-- Date butoir : ouvre le calendrier (rien d'affiché s'il n'y a pas de date) -->
+          <label class="tag tag-due" v-if="task.due">
+            <span class="tag-due-text">{{ dueLabel }}</span>
+            <input class="tag-due-input" type="date" :value="task.due"
+                   title="Cliquer pour changer la date butoir"
+                   @click="openPicker" @change="onDue">
+          </label>
+
+          <span class="tag tag-late" v-if="isOverdue">En retard</span>
+        </template>
       </div>
     </div>
   </article>
@@ -731,7 +835,7 @@
         <h3 class="task-group-title">{{ g.label }}</h3>
         <task-row v-for="t in g.tasks" :key="t.id" v-bind="$attrs"
                   :task="t" :projects="projects" :categories="categories"
-                  :statuses="statuses" :today="today"
+                  :statuses="statuses" :today="today" :compact="compact"
                   :selected="selected.includes(t.id)"
                   @toggle="$emit('toggle', t.id)"></task-row>
       </section>
@@ -741,7 +845,7 @@
     <template v-else>
       <task-row v-for="t in tasks" :key="t.id" v-bind="$attrs"
                 :task="t" :projects="projects" :categories="categories"
-                :statuses="statuses" :today="today"
+                :statuses="statuses" :today="today" :compact="compact"
                 :selected="selected.includes(t.id)"
                 @toggle="$emit('toggle', t.id)"></task-row>
     </template>
