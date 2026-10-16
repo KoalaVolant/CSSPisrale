@@ -95,6 +95,7 @@
    Niveaux : .levels-block .level-item .level-add   Couleurs : .tag-colored (--tag-bg, --tag-fg), --item-color   Malus : .is-malus .tag-malus .tag-sign
    Récompenses : .reward (.affordable)   Inventaire : .inventory-item (.used)
    ---------------------------------------------------------- */
+
 /* Extensions Todo Quest */
 .reward-group { width:100%; margin:1.2rem 0; }
 .reward-group-title {border-bottom:1px solid #ccc; padding-bottom:.4rem;}
@@ -125,3 +126,13 @@
 .gratitude-entry p {white-space:pre-wrap}
 @media(max-width:700px){.work-difficulty{flex-direction:column;align-items:stretch}.favorite-reward{max-width:none}}
 
+/* Défis configurables */
+.challenge-entry {padding:14px;margin:12px 0;border:1px solid var(--main-color);border-radius:12px;}
+.challenge-heading,.challenge-actions{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;}
+.challenge-entry progress{display:block;width:100%;margin:10px 0;}
+.challenge-entry small{display:block;margin-bottom:10px;}
+.challenge-actions button{border:1px solid var(--main-color);background:var(--fnd);border-radius:8px;padding:6px 12px;}
+.challenge-form label{display:block;margin:10px 0;}
+.challenge-form input:not([type=checkbox]),.challenge-form select{display:block;width:100%;box-sizing:border-box;padding:8px;}
+.challenge-history,.challenge-summary{padding:8px 12px;border-bottom:1px solid var(--main-color);}
+.challenge-dashboard{margin:12px 0;padding:12px;border:1px solid var(--main-color);}
