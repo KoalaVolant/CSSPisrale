@@ -172,7 +172,7 @@
         <label>Urgence
           <select v-model="taskForm.urgency">
             <option value="">Aucune</option>
-            <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
+            <option v-for="u in (taskForm.scope === 'work' ? data.workUrgencies : data.urgencies)" :key="u.id" :value="u.id">{{ u.name }}</option>
           </select>
         </label>
         <label>Difficulté
@@ -233,7 +233,7 @@
             <select v-model="bulkForm.urgency">
               <option value="__keep">(inchangée)</option>
               <option value="">Aucune</option>
-              <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
+              <option v-for="u in (bulkForm.ids.length && data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope === 'work' ? data.workUrgencies : data.urgencies)" :key="u.id" :value="u.id">{{ u.name }}</option>
             </select>
           </label>
           <label>Difficulté
@@ -290,7 +290,7 @@
           <input class="quick-points" type="number" min="0" v-model.number="row.points" title="Points">
           <select v-model="row.urgency" aria-label="Urgence de cette tâche" title="Urgence">
             <option value="">Sans urgence</option>
-            <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
+            <option v-for="u in (quickForm.scope === 'work' ? data.workUrgencies : data.urgencies)" :key="u.id" :value="u.id">{{ u.name }}</option>
           </select>
           <select v-if="quickForm.scope === 'work'" v-model="row.difficulty" aria-label="Difficulté Travail" title="Difficulté Travail">
             <option value="">Sans difficulté</option>
@@ -336,7 +336,7 @@
           <label>Urgence
             <select v-model="quickForm.paste.urgency">
               <option value="">Aucune</option>
-              <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
+              <option v-for="u in (quickForm.scope === 'work' ? data.workUrgencies : data.urgencies)" :key="u.id" :value="u.id">{{ u.name }}</option>
             </select>
           </label>
           <label>Difficulté
@@ -443,6 +443,9 @@
 
     <section class="view view-work" v-if="view === 'work'">
       <p class="hint">Espace indépendant : tâches professionnelles, catégories et difficultés propres au travail. Les points alimentent ton solde commun.</p>
+      <task-list :tasks="workTasks" :projects="[]" :categories="workCategories" :statuses="statuses" :today="today" :selected="selection"
+        @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany" @edit-selected="editSelected" @delete-selected="deleteSelected"
+        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
       <div class="work-settings">
         <details class="config-fold">
           <summary>Catégories Travail</summary>
@@ -461,13 +464,18 @@
         </details>
         <details class="config-fold">
           <summary>Urgences des tâches Travail</summary>
-          <p>Chaque ticket Travail dispose de sa propre urgence, modifiable sur sa ligne ou dans son formulaire. Les niveaux et leurs bonus sont configurables dans « Urgences & difficultés ».</p>
-          <div class="category-chips"><span v-for="u in data.urgencies" :key="u.id">{{ u.name }}</span></div>
+          <p>Les niveaux et bonus ci-dessous sont indépendants des urgences personnelles.</p>
+          <article class="work-difficulty" v-for="u in data.workUrgencies" :key="u.id">
+            <input type="color" v-model="u.color" title="Couleur de l'urgence" aria-label="Couleur de l'urgence">
+            <input v-model="u.name" aria-label="Nom de l'urgence">
+            <select v-model="u.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
+            <input type="number" min="0" step="0.25" v-model.number="u.pointValue" aria-label="Bonus urgence">
+            <button type="button" @click="deleteWorkUrgency(u)">Supprimer</button>
+          </article>
+          <button type="button" @click="addWorkUrgency">＋ Ajouter une urgence de travail</button>
         </details>
       </div>
-      <task-list :tasks="workTasks" :projects="[]" :categories="workCategories" :statuses="statuses" :today="today" :selected="selection"
-        @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany" @edit-selected="editSelected" @delete-selected="deleteSelected"
-        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
+
     </section>
 
     <section class="view view-gratitude" v-if="view === 'gratitude'">
@@ -749,7 +757,6 @@
         <summary>Catégories de récompenses</summary>
         <form @submit.prevent="addRewardCategory"><label>Nouvelle catégorie de récompenses <input v-model="newRewardCategory" placeholder="Ex : Loisirs"></label><button type="submit">Ajouter</button></form>
         <div class="category-chips"><span v-for="c in rewardCategories" :key="c">{{ c }} <button type="button" @click="deleteRewardCategory(c)" title="Supprimer">×</button></span></div>
-      </div>
       </details>
       <!-- Formulaire récompense -->
       <div class="modal-backdrop" v-if="rewardForm.open" @click.self="rewardForm.open = false">
