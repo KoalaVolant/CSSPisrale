@@ -166,7 +166,7 @@
             <option v-for="c in (taskForm.scope === 'work' ? workCategories : categories)" :key="c" :value="c">{{ c }}</option>
           </select>
         </label>
-        <label v-if="taskForm.scope !== 'work' && !taskForm.projectId">Urgence (hors projet)
+        <label v-if="taskForm.scope !== 'work'">Urgence
           <select v-model="taskForm.urgency">
             <option value="">Aucune</option>
             <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
@@ -461,7 +461,7 @@
       </article>
     </section>
 
-    <section class="view view-habits v-if="view === 'habits'">
+    <section class="view view-habits" v-if="view === 'habits'">
       <button type="button" class="btn-add" @click="openHabitForm()">＋ Nouvelle habitude</button>
       <div class="modal-backdrop" v-if="habitForm.open" @click.self="habitForm.open = false">
         <form class="modal form-panel" @submit.prevent="saveHabit">
@@ -509,9 +509,6 @@
           </label>
           <label>Description
             <textarea v-model="projectForm.description" rows="2"></textarea>
-          </label>
-          <label>Urgence du projet
-            <select v-model="projectForm.urgency"><option value="">Sans urgence</option><option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select>
           </label>
 
           <fieldset v-if="!projectForm.id">
@@ -565,7 +562,7 @@
             <input class="project-color" type="color" :value="p.color || '#888888'" title="Couleur du projet"
                    @change="setProjectColor(p, $event.target.value)">
             <h3 class="project-name">{{ p.name }}</h3>
-            <span class="tag tag-urgency tag-colored" v-if="projectTopUrgency(p)" :style="tagStyle(projectTopUrgency(p).color)">Urgence : {{ projectTopUrgency(p).name }}</span>
+            
             <span class="project-order-buttons" v-if="ui.projectSort === 'manual'">
               <button type="button" :disabled="i === 0" @click="moveProject(i, -1)" title="Monter">↑</button>
               <button type="button" :disabled="i === data.projects.length - 1" @click="moveProject(i, 1)" title="Descendre">↓</button>
@@ -878,8 +875,8 @@
                    @change="onPoints" @keydown.enter="$event.target.blur()"> pts <small v-if="Math.abs(calculatedPoints) !== Number(task.points)">(total : {{ calculatedPoints }} pts)</small>
           </label>
 
-          <!-- Urgence des tâches sans projet -->
-          <label v-if="task.scope !== 'work' && !task.projectId" class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
+          <!-- Urgence individuelle de chaque tâche personnelle -->
+          <label v-if="task.scope !== 'work'" class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
             <select :value="urgencyValue" @change="update('urgency', $event)">
               <option v-for="u in urgencyOptions" :key="u.id" :value="u.id">{{ u.label }}</option>
             </select>
