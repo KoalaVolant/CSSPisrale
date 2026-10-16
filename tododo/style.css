@@ -136,3 +136,16 @@
 .challenge-form input:not([type=checkbox]),.challenge-form select{display:block;width:100%;box-sizing:border-box;padding:8px;}
 .challenge-history,.challenge-summary{padding:8px 12px;border-bottom:1px solid var(--main-color);}
 .challenge-dashboard{margin:12px 0;padding:12px;border:1px solid var(--main-color);}
+
+/* V8 : navigation par groupes et configurations repliables */
+.app-nav .nav-group {display:flex;flex-direction:column;gap:4px;margin-bottom:16px}
+.nav-group-title {font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--tit);margin:6px 4px 7px;padding-bottom:5px;border-bottom:1px solid var(--fnd2)}
+.app-nav .nav-group button {text-align:left;margin-bottom:3px}
+.config-fold {border:1px solid var(--main-color);border-radius:10px;padding:10px;margin:10px 0;background:var(--fnd)}
+.config-fold > summary {cursor:pointer;font-weight:700;padding:6px;user-select:none;color:var(--tit)}
+.config-fold[open] > summary {margin-bottom:12px;border-bottom:1px solid var(--main-color)}
+.work-settings {border:0;padding:0}
+.quick-row {flex-wrap:wrap;align-items:center}
+.quick-row select {max-width:170px}
+@media(max-width:800px){.app-nav .nav-group{min-width:160px;flex:1}}
+
