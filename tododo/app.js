@@ -33,6 +33,7 @@ const TABS = [
   { id: 'home',       label: 'Accueil' },
   { id: 'all',        label: 'Toutes les tâches' },
   { id: 'work',       label: 'Travail' },
+  { id: 'gratitude',  label: 'Gratitude' },
   { id: 'habits',     label: 'Habitudes & routines' },
   { id: 'done',       label: 'Terminés' },
   { id: 'projects',   label: 'Projets' },
@@ -63,6 +64,7 @@ function tagStyle(color) {
 // Valeur d'une tâche en points : positive (bonus) ou négative (malus)
 let liveData = null;
 function effectiveUrgency(t) {
+  if (t.scope === 'work') return '';
   if (!liveData || !t.projectId) return t.urgency || '';
   const project = liveData.projects.find(p => p.id === t.projectId);
   return project ? (project.urgency || '') : (t.urgency || '');
@@ -70,7 +72,7 @@ function effectiveUrgency(t) {
 function taskValue(t) {
   let points = Math.max(0, Number(t.points) || 0);
   if (liveData) {
-    for (const [levels, id] of [[liveData.urgencies, effectiveUrgency(t)], [liveData.difficulties, t.difficulty]]) {
+    for (const [levels, id] of (t.scope === 'work' ? [[liveData.workDifficulties, t.difficulty]] : [[liveData.urgencies, effectiveUrgency(t)], [liveData.difficulties, t.difficulty]])) {
       const level = levels.find(l => l.id === id);
       if (!level) continue;
       const amount = Number(level.pointValue);
@@ -146,6 +148,9 @@ function defaultData() {
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
     rewardCategories: [], // catégories indépendantes des récompenses et de l'inventaire
     habits: [], // habitudes + historique de réalisations
+    gratitude: [], // { date, text, points } : une par jour
+    workCategories: [],
+    workDifficulties: clone(DEFAULT_DIFFICULTIES),
     categories: [{ name: 'Travail', color: '#4f86b9' }],   // { name, color }  ("Sans catégorie" existe toujours, c'est la valeur '')
     urgencies: clone(DEFAULT_URGENCIES),       // { id, name, color }, du plus faible au plus fort
     difficulties: clone(DEFAULT_DIFFICULTIES), // idem
@@ -166,11 +171,18 @@ function loadData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultData();
     const d = Object.assign(defaultData(), JSON.parse(raw));
-    d.categories = normalizeCategories(d.categories);
-    if (!d.categories.some(c => c.name === 'Travail')) d.categories.push({ name: 'Travail', color: '#4f86b9' });
+    d.categories = normalizeCategories(d.categories).filter(c => c.name !== 'Travail');
+
     if (!Array.isArray(d.rewardCategories)) d.rewardCategories = [];
     d.rewardCategories = normalizeCategories(d.rewardCategories);
     if (!Array.isArray(d.habits)) d.habits = [];
+    if (!Array.isArray(d.gratitude)) d.gratitude = [];
+    if (!Array.isArray(d.workCategories)) d.workCategories = [];
+    d.workCategories = normalizeCategories(d.workCategories);
+    if (!Array.isArray(d.workDifficulties)) d.workDifficulties = clone(DEFAULT_DIFFICULTIES);
+    // Migration unique : les anciennes tâches classées Travail sont isolées par scope.
+    (d.tasks || []).forEach(t => { if (!t.scope) t.scope = t.category === 'Travail' ? 'work' : 'personal'; if (t.scope === 'work') { t.projectId = ''; if (t.category === 'Travail') t.category = ''; } });
+    (d.rewards || []).forEach(r => { if (!Number.isFinite(Number(r.saved))) r.saved = 0; });
     const knownRewards = new Set(d.rewardCategories.map(c => c.name));
     [...(d.rewards || []), ...(d.inventory || [])].forEach(x => { if (x.category && !knownRewards.has(x.category)) { d.rewardCategories.push({name:x.category, color:''}); knownRewards.add(x.category); } });
     (d.projects || []).forEach(project => { if (project.urgency === undefined) { const ranks = d.urgencies || DEFAULT_URGENCIES; const tasks = (d.tasks || []).filter(t => t.projectId === project.id); const best = tasks.map(t => t.urgency).sort((a,b) => ranks.findIndex(u => u.id === b) - ranks.findIndex(u => u.id === a))[0]; project.urgency = best || ''; } });
@@ -220,7 +232,7 @@ const TaskRow = {
       return [{ id: '', label: 'Urgence' }, ...this.appData.urgencies.map(u => ({ id: u.id, label: 'Urgence : ' + u.name }))];
     },
     difficultyOptions() {
-      return [{ id: '', label: 'Difficulté' }, ...this.appData.difficulties.map(d => ({ id: d.id, label: 'Difficulté : ' + d.name }))];
+      return [{ id: '', label: 'Difficulté' }, ...(this.task.scope === 'work' ? this.appData.workDifficulties : this.appData.difficulties).map(d => ({ id: d.id, label: 'Difficulté : ' + d.name }))];
     },
     // un niveau supprimé ou inconnu est affiché comme "non défini"
     urgencyValue()    { return this.appData.urgencies.some(u => u.id === this.task.urgency) ? this.task.urgency : ''; },
@@ -238,7 +250,7 @@ const TaskRow = {
       return u ? u.color : '';
     },
     difficultyColor() {
-      const d = this.appData.difficulties.find(x => x.id === this.task.difficulty);
+      const d = (this.task.scope === 'work' ? this.appData.workDifficulties : this.appData.difficulties).find(x => x.id === this.task.difficulty);
       return d ? d.color : '';
     },
     // catégorie de la tâche absente de la liste (ne devrait pas arriver) : on l'affiche quand même
@@ -347,9 +359,9 @@ const app = createApp({
     // Toute catégorie utilisée par une tâche / récompense / objet doit exister dans la liste
     function syncCategories() {
       data.categories = normalizeCategories(data.categories);
-      if (!data.categories.some(c => c.name === 'Travail')) data.categories.push({name:'Travail',color:'#4f86b9'});
+
       const known = new Set(data.categories.map(c => c.name));
-      data.tasks.forEach(x => {
+      data.tasks.filter(x => x.scope !== 'work').forEach(x => {
         if (x.category && !known.has(x.category)) {
           known.add(x.category);
           data.categories.push({ name: x.category, color: '' });
@@ -366,6 +378,7 @@ const app = createApp({
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
       data.tasks        = Array.isArray(src.tasks) ? src.tasks : [];
+      data.tasks.forEach(t => { if (!t.scope) t.scope = t.category === 'Travail' ? 'work' : 'personal'; if (t.scope === 'work') { t.projectId=''; if(t.category==='Travail') t.category=''; } });
       data.projects     = Array.isArray(src.projects) ? src.projects : [];
       data.projects.forEach(project => {
         if (project.urgency !== undefined) return;
@@ -375,11 +388,15 @@ const app = createApp({
         project.urgency = best || '';
       });
       data.rewards      = Array.isArray(src.rewards) ? src.rewards : [];
+      data.rewards.forEach(r => { r.saved = Math.max(0, Math.min(Number(r.cost)||0, Number(r.saved)||0)); });
       data.inventory    = Array.isArray(src.inventory) ? src.inventory : [];
-      data.categories   = normalizeCategories(src.categories);
-      if (!data.categories.some(c => c.name === 'Travail')) data.categories.push({name:'Travail',color:'#4f86b9'});
+      data.categories   = normalizeCategories(src.categories).filter(c=>c.name!=='Travail');
+      data.categories = data.categories.filter(c=>c.name!=='Travail');
       data.rewardCategories = normalizeCategories(src.rewardCategories || [...(src.rewards || []), ...(src.inventory || [])].map(x => x.category).filter(Boolean));
       data.habits = Array.isArray(src.habits) ? src.habits : [];
+      data.gratitude = Array.isArray(src.gratitude) ? src.gratitude : [];
+      data.workCategories = normalizeCategories(src.workCategories);
+      data.workDifficulties = Array.isArray(src.workDifficulties) ? src.workDifficulties : clone(DEFAULT_DIFFICULTIES);
       data.urgencies    = Array.isArray(src.urgencies) ? src.urgencies : clone(DEFAULT_URGENCIES);
       data.difficulties = Array.isArray(src.difficulties) ? src.difficulties : clone(DEFAULT_DIFFICULTIES);
       data.spent        = Number(src.spent) || 0;
@@ -515,7 +532,9 @@ const app = createApp({
     const earned = computed(() =>
       data.tasks.filter(t => t.status === 'done').reduce((s, t) => s + taskValue(t), 0)
       + (Number(data.archived) || 0));
-    const balance = computed(() => earned.value - data.spent + (Number(data.adjust) || 0));
+    const gratitudeTotal = computed(() => Math.round(data.gratitude.reduce((sum,g) => sum+(Number(g.points)||0),0)*100)/100);
+    const savedTotal = computed(() => data.rewards.reduce((sum,r)=>sum+Math.max(0,Number(r.saved)||0),0));
+    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
 
     // Modification manuelle du solde : on règle "adjust" pour tomber pile sur la valeur voulue
     const balanceForm = reactive({ open: false, value: 0 });
@@ -526,19 +545,66 @@ const app = createApp({
     function applyBalance() {
       const target = Number(balanceForm.value);
       if (!Number.isFinite(target)) return;
-      data.adjust = Math.round(target) - (earned.value - data.spent);
+      data.adjust = Math.round((target - (earned.value + gratitudeTotal.value - data.spent - savedTotal.value))*100)/100;
       balanceForm.open = false;
       notify(`Solde réglé à ${Math.round(target)} pts`);
     }
     function resetBalance() {
       if (!confirm('Remettre le solde de points à 0 ?')) return;
-      data.adjust = -(earned.value - data.spent);
+      data.adjust = -(earned.value + gratitudeTotal.value - data.spent - savedTotal.value);
       balanceForm.open = false;
       notify('Solde remis à 0');
     }
 
     const rewardsByCost = computed(() => [...data.rewards].sort((a, b) => a.cost - b.cost));
     const nextReward = computed(() => rewardsByCost.value.find(r => r.cost > balance.value) || null);
+    const favoriteReward = computed(() => data.rewards.find(r => r.favorite) || null);
+    const rewardRemaining = r => Math.max(0, (Number(r.cost)||0) - (Number(r.saved)||0));
+    function toggleRewardFavorite(reward) {
+      const wasFavorite=!!reward.favorite;
+      data.rewards.forEach(r => {r.favorite=false;});
+      reward.favorite=!wasFavorite;
+    }
+    function depositReward(reward) {
+      const max = Math.min(balance.value, rewardRemaining(reward));
+      if (max <= 0) { notify('Aucun point disponible à épargner'); return; }
+      const response = prompt('Points à épargner pour « '+reward.name+' » (max '+max+') :', String(Math.min(5,max)));
+      if (response === null) return;
+      const amount = Number(response.replace(',','.'));
+      if (!Number.isFinite(amount) || amount <= 0 || amount > max || Math.round(amount*100)!==amount*100) { alert('Montant invalide ou supérieur au solde disponible.'); return; }
+      reward.saved = Math.round(((Number(reward.saved)||0)+amount)*100)/100;
+      notify(amount+' pts réservés pour '+reward.name);
+    }
+    function withdrawReward(reward) {
+      const saved=Number(reward.saved)||0;
+      if (saved<=0) return;
+      const response=prompt('Points à retirer de cette épargne (max '+saved+') :',String(saved));
+      if(response===null)return;
+      const amount=Number(response.replace(',','.'));
+      if(!Number.isFinite(amount)||amount<=0||amount>saved || Math.round(amount*100)!==amount*100) {alert('Montant invalide.');return;}
+      reward.saved=Math.round((saved-amount)*100)/100;
+    }
+    const gratitudeDraft = ref('');
+    const todayGratitude = computed(() => data.gratitude.find(g=>g.date===today.value));
+    const sortedGratitude = computed(() => [...data.gratitude].sort((a,b)=>b.date.localeCompare(a.date)));
+    function saveGratitude() {
+      const value=gratitudeDraft.value.trim(); if(!value) return;
+      if(todayGratitude.value) {notify('Tu as déjà enregistré ta gratitude aujourd’hui');return;}
+      const yesterday=new Date(today.value+'T12:00:00Z');yesterday.setUTCDate(yesterday.getUTCDate()-1);
+      let run=0, cursor=yesterday.toISOString().slice(0,10);
+      const dates=new Set(data.gratitude.map(g=>g.date));
+      while(dates.has(cursor)) {run++; const d=new Date(cursor+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-1);cursor=d.toISOString().slice(0,10);}
+      const points=Math.round((run+1)*25)/100;
+      data.gratitude.push({date:today.value,text:value,points});
+      gratitudeDraft.value='';notify('Gratitude enregistrée : +'+points+' pt');
+    }
+    function deleteGratitude(g) {if(confirm('Supprimer cette gratitude et les points associés ?'))data.gratitude=data.gratitude.filter(x=>x.date!==g.date);}
+    const workCategories = computed(()=>data.workCategories.map(c=>c.name));
+    const newWorkCategory=ref('');
+    function addWorkCategory(){const name=newWorkCategory.value.trim();if(name&&!workCategories.value.some(c=>c.toLowerCase()===name.toLowerCase()))data.workCategories.push({name,color:''});newWorkCategory.value='';}
+    function deleteWorkCategory(name){if(!confirm('Supprimer la catégorie de travail « '+name+' » ?'))return;data.tasks.filter(t=>t.scope==='work'&&t.category===name).forEach(t=>t.category='');data.workCategories=data.workCategories.filter(c=>c.name!==name);}
+    function addWorkDifficulty(){data.workDifficulties.push({id:uid(),name:'Nouveau niveau',color:'#6b7280',pointMode:'add',pointValue:0});}
+    function deleteWorkDifficulty(level){if(!confirm('Supprimer ce niveau de difficulté ?'))return;data.tasks.filter(t=>t.scope==='work'&&t.difficulty===level.id).forEach(t=>t.difficulty='');data.workDifficulties=data.workDifficulties.filter(x=>x.id!==level.id);}
 
     // Filtre / tri des récompenses (le filtre de catégorie s'applique aussi à l'inventaire)
     const rewardCategories = computed(() => data.rewardCategories.map(c => c.name));
@@ -632,34 +698,34 @@ const app = createApp({
     }
 
     // Les tâches terminées ne sont plus dans ces listes : elles sont dans l'onglet "Terminés"
-    const activeTasks   = computed(() => data.tasks.filter(t => t.status !== 'done'));
+    const activeTasks   = computed(() => data.tasks.filter(t => t.scope !== 'work' && t.status !== 'done'));
     const todayTasks    = computed(() => applyFilters(activeTasks.value.filter(t => t.due && t.due <= today.value)));
     const upcomingTasks = computed(() => applyFilters(activeTasks.value.filter(t => t.due && t.due > today.value)));
     const allTasks      = computed(() => applyFilters(activeTasks.value));
-    const workTasks = computed(() => applyFilters(activeTasks.value.filter(t => t.category === 'Travail')));
+    const workTasks = computed(() => [...data.tasks.filter(t => t.scope === 'work')].sort((a,b)=>Number(a.status==='done')-Number(b.status==='done') || (a.due||'9999').localeCompare(b.due||'9999')));
     const copyForm = reactive({open:false});
     const copyText = computed(() => allTasks.value.map(t => t.title).join('\n'));
     function copyTaskTitles() { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(copyText.value).then(() => notify('Liste copiée')).catch(() => notify('Sélectionne le texte pour le copier')); }
     // Terminées : triées par date de fin (la plus récente d'abord) ; les filtres s'appliquent aussi
-    const doneTasks     = computed(() => applyFilters(data.tasks.filter(t => t.status === 'done'), false)
+    const doneTasks     = computed(() => applyFilters(data.tasks.filter(t => t.scope !== 'work' && t.status === 'done'), false)
       .sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || '')));
 
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
       open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
-      urgency: '', difficulty: '', doneAt: '',
+      urgency: '', difficulty: '', doneAt: '', scope:'personal',
     });
 
     function openTaskForm(task = null, projectId = '') {
       if (task) {
         Object.assign(taskForm, {
-          id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus,
+          id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal',
           status: task.status, projectId: task.projectId || '', due: task.due || '',
           urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '',
         });
       } else {
         Object.assign(taskForm, {
-          id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId,
+          id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId, scope: view.value==='work'?'work':'personal',
           due: today.value, urgency: '', difficulty: '', doneAt: '',
         });
       }
@@ -692,11 +758,12 @@ const app = createApp({
       const fields = {
         title,
         category: taskForm.category || '',
+        scope:taskForm.scope==='work'?'work':'personal',
         points: Math.max(0, Number(taskForm.points) || 0),
         malus: !!taskForm.malus,
-        projectId: taskForm.projectId || '',
+        projectId: taskForm.scope==='work'?'':(taskForm.projectId || ''),
         due: taskForm.due || '',
-        urgency: taskForm.projectId ? '' : (taskForm.urgency || ''),
+        urgency: taskForm.scope==='work'?'':(taskForm.projectId ? '' : (taskForm.urgency || '')),
         difficulty: taskForm.difficulty || '',
       };
       let becameDone = false;
@@ -847,8 +914,8 @@ const app = createApp({
         if (bulkForm.kind !== '__keep') t.malus = bulkForm.kind === 'malus';
         if (bulkForm.status) setStatus(t, bulkForm.status);
         if (was !== 'done' && t.status === 'done') gained += taskValue(t);
-        if (bulkForm.projectId !== '__keep') t.projectId = bulkForm.projectId;
-        if (bulkForm.urgency !== '__keep') t.urgency = bulkForm.urgency;
+        if (t.scope !== 'work' && bulkForm.projectId !== '__keep') t.projectId = bulkForm.projectId;
+        if (t.scope !== 'work' && bulkForm.urgency !== '__keep') t.urgency = bulkForm.urgency;
         if (bulkForm.difficulty !== '__keep') t.difficulty = bulkForm.difficulty;
         if (bulkForm.clearDue) t.due = '';
         else if (bulkForm.due) t.due = bulkForm.due;
@@ -924,6 +991,7 @@ const app = createApp({
       } else if (field === 'malus') {
         task.malus = value === true || value === 'true';
       } else if (['category', 'projectId', 'urgency', 'difficulty'].includes(field)) {
+        if(task.scope==='work' && ['projectId','urgency'].includes(field))return;
         task[field] = value || '';
       }
     }
@@ -1108,7 +1176,7 @@ const app = createApp({
       const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1), category: rewardForm.category || '' };
       if (rewardForm.id) {
         const r = data.rewards.find(x => x.id === rewardForm.id);
-        if (r) Object.assign(r, payload);
+        if (r) { if(Number(r.saved)>payload.cost) {r.saved=payload.cost;} Object.assign(r, payload); }
       } else {
         data.rewards.push({ id: uid(), ...payload });
       }
@@ -1121,8 +1189,10 @@ const app = createApp({
     }
 
     function claimReward(reward) {
-      if (balance.value < reward.cost) return;
+      const reserved = Number(reward.saved)||0;
+      if (balance.value + reserved < reward.cost) return;
       data.spent += reward.cost;
+      reward.saved=0;
       data.inventory.unshift({
         id: uid(), name: reward.name, category: reward.category || '', cost: reward.cost, date: todayStr(), used: false,
       });
@@ -1383,7 +1453,7 @@ const app = createApp({
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
-      earned, balance, nextReward, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      earned, balance, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, groupedRewards, visibleInventory,
       // filtres
       filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, copyForm, copyText, copyTaskTitles,
