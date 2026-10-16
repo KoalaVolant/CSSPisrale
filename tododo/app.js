@@ -35,6 +35,7 @@ const TABS = [
   { id: 'work',       label: 'Travail' },
   { id: 'gratitude',  label: 'Gratitude' },
   { id: 'habits',     label: 'Habitudes & routines' },
+  { id: 'challenges', label: 'Défis' },
   { id: 'done',       label: 'Terminés' },
   { id: 'projects',   label: 'Projets' },
   { id: 'categories', label: 'Catégories' },
@@ -64,7 +65,7 @@ function tagStyle(color) {
 // Valeur d'une tâche en points : positive (bonus) ou négative (malus)
 let liveData = null;
 function effectiveUrgency(t) {
-  return t.scope === 'work' ? '' : (t.urgency || '');
+  return t.urgency || '';
 }
 function migrateProjectUrgencies(d) {
   if (!Array.isArray(d.tasks) || !Array.isArray(d.projects)) return;
@@ -80,7 +81,7 @@ function migrateProjectUrgencies(d) {
 function taskValue(t) {
   let points = Math.max(0, Number(t.points) || 0);
   if (liveData) {
-    for (const [levels, id] of (t.scope === 'work' ? [[liveData.workDifficulties, t.difficulty]] : [[liveData.urgencies, effectiveUrgency(t)], [liveData.difficulties, t.difficulty]])) {
+    for (const [levels, id] of (t.scope === 'work' ? [[liveData.urgencies, effectiveUrgency(t)], [liveData.workDifficulties, t.difficulty]] : [[liveData.urgencies, effectiveUrgency(t)], [liveData.difficulties, t.difficulty]])) {
       const level = levels.find(l => l.id === id);
       if (!level) continue;
       const amount = Number(level.pointValue);
@@ -173,6 +174,8 @@ function defaultData() {
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
     rewardCategories: [], // catégories indépendantes des récompenses et de l'inventaire
     habits: [], // habitudes + historique de réalisations
+    challenges: [], // défis paramétrables
+    challengeAwards: [], // journal immuable des points attribués
     gratitude: [], // { date, text, points } : une par jour
     gratitudePointsVersion: 2,
     workCategories: [],
@@ -202,6 +205,8 @@ function loadData() {
     if (!Array.isArray(d.rewardCategories)) d.rewardCategories = [];
     d.rewardCategories = normalizeCategories(d.rewardCategories);
     if (!Array.isArray(d.habits)) d.habits = [];
+    if (!Array.isArray(d.challenges)) d.challenges = [];
+    if (!Array.isArray(d.challengeAwards)) d.challengeAwards = [];
     if (!Array.isArray(d.gratitude)) d.gratitude = [];
     if (d.gratitudePointsVersion !== 2) { migrateGratitudePoints(d.gratitude); d.gratitudePointsVersion = 2; }
     if (!Array.isArray(d.workCategories)) d.workCategories = [];
@@ -415,6 +420,8 @@ const app = createApp({
       data.categories = data.categories.filter(c=>c.name!=='Travail');
       data.rewardCategories = normalizeCategories(src.rewardCategories || [...(src.rewards || []), ...(src.inventory || [])].map(x => x.category).filter(Boolean));
       data.habits = Array.isArray(src.habits) ? src.habits : [];
+      data.challenges = Array.isArray(src.challenges) ? src.challenges : [];
+      data.challengeAwards = Array.isArray(src.challengeAwards) ? src.challengeAwards : [];
       data.gratitude = Array.isArray(src.gratitude) ? src.gratitude : [];
       if (src.gratitudePointsVersion !== 2) migrateGratitudePoints(data.gratitude);
       data.gratitudePointsVersion = 2;
@@ -556,7 +563,8 @@ const app = createApp({
       + (Number(data.archived) || 0));
     const gratitudeTotal = computed(() => Math.round(data.gratitude.reduce((sum,g) => sum+(Number(g.points)||0),0)*100)/100);
     const savedTotal = computed(() => data.rewards.reduce((sum,r)=>sum+Math.max(0,Number(r.saved)||0),0));
-    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
+    const challengeTotal = computed(() => Math.round(data.challengeAwards.reduce((sum,a) => sum + (Number(a.points)||0), 0)*100)/100);
+    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value + challengeTotal.value - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
 
     // Modification manuelle du solde : on règle "adjust" pour tomber pile sur la valeur voulue
     const balanceForm = reactive({ open: false, value: 0 });
@@ -785,7 +793,7 @@ const app = createApp({
         malus: !!taskForm.malus,
         projectId: taskForm.scope==='work'?'':(taskForm.projectId || ''),
         due: taskForm.due || '',
-        urgency: taskForm.scope==='work' ? '' : (taskForm.urgency || ''),
+        urgency: taskForm.urgency || '',
         difficulty: taskForm.difficulty || '',
       };
       let becameDone = false;
@@ -812,7 +820,7 @@ const app = createApp({
 
     /* ---------- To do rapide (plusieurs tâches d'un coup) ---------- */
     const quickForm = reactive({
-      open: false, mode: 'rows', due: '', rows: [],
+      open: false, mode: 'rows', scope: 'personal', due: '', rows: [],
       paste: { text: '', points: 10, malus: false, category: '', urgency: '', difficulty: '', due: '', project: '' },
     });
     const pastePreview = computed(() => parsePastedList(quickForm.paste.text));
@@ -820,6 +828,7 @@ const app = createApp({
     function openQuickForm() {
       taskForm.open = false;
       quickForm.mode = 'rows';
+      quickForm.scope = view.value === 'work' ? 'work' : 'personal';
       quickForm.paste = { text: '', points: 10, malus: false, category: '', urgency: '', difficulty: '', due: today.value, project: '' };
       quickForm.due = today.value;
       quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value }));
@@ -856,6 +865,7 @@ const app = createApp({
       rows.forEach(r => data.tasks.push(newTask({
         title: r.title.trim(),
         points: Math.max(0, Number(r.points) || 0),
+        scope: quickForm.scope,
         due: r.due || '',
       })));
       notify(rows.length ? `${rows.length} tâche(s) ajoutée(s)` : 'Aucune tâche à ajouter');
@@ -866,7 +876,7 @@ const app = createApp({
       const { header, items } = pastePreview.value;
       if (!items.length) { notify('Aucune tâche détectée'); return; }
 
-      let projectId = quickForm.paste.project;
+      let projectId = quickForm.scope === 'work' ? '' : quickForm.paste.project;
       if (projectId === '__header') {
         if (header) {
           const project = { id: uid(), name: header, description: '', color: nextColor(data.projects.length) };
@@ -879,7 +889,7 @@ const app = createApp({
 
       const points = Math.max(0, Number(quickForm.paste.points) || 0);
       items.forEach(title => data.tasks.push(newTask({
-        title, points, projectId,
+        title, points, projectId, scope: quickForm.scope,
         malus: !!quickForm.paste.malus,
         category: quickForm.paste.category || '',
         urgency: quickForm.paste.urgency || '',
@@ -937,7 +947,7 @@ const app = createApp({
         if (bulkForm.status) setStatus(t, bulkForm.status);
         if (was !== 'done' && t.status === 'done') gained += taskValue(t);
         if (t.scope !== 'work' && bulkForm.projectId !== '__keep') t.projectId = bulkForm.projectId;
-        if (t.scope !== 'work' && bulkForm.urgency !== '__keep') t.urgency = bulkForm.urgency;
+        if (bulkForm.urgency !== '__keep') t.urgency = bulkForm.urgency;
         if (bulkForm.difficulty !== '__keep') t.difficulty = bulkForm.difficulty;
         if (bulkForm.clearDue) t.due = '';
         else if (bulkForm.due) t.due = bulkForm.due;
@@ -1013,7 +1023,7 @@ const app = createApp({
       } else if (field === 'malus') {
         task.malus = value === true || value === 'true';
       } else if (['category', 'projectId', 'urgency', 'difficulty'].includes(field)) {
-        if(task.scope==='work' && ['projectId','urgency'].includes(field))return;
+        if(task.scope==='work' && field==='projectId')return;
         task[field] = value || '';
       }
     }
@@ -1299,6 +1309,104 @@ const app = createApp({
     function deleteHabit(h) {if(confirm('Supprimer cette habitude et son historique ?')) data.habits=data.habits.filter(x=>x.id!==h.id);}
     const habitCount = h => (h.history||[]).length;
 
+    /* ---------- Défis personnalisables ---------- */
+    // Les défis attribuent des points à la première réussite d'une période.
+    // Les récompenses déjà attribuées ne changent pas lors de la modification d'un défi.
+    const CHALLENGE_KINDS = [
+      {id:'task-count',label:'Terminer X tâches'},
+      {id:'all-tasks',label:'Terminer toutes les tâches prévues'},
+      {id:'habit-count',label:'Effectuer X habitudes'},
+      {id:'all-habits',label:'Effectuer toutes les habitudes prévues'},
+      {id:'project-count',label:'Terminer X tâches d’un projet'}
+    ];
+    const challengeForm = reactive({open:false,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true});
+    function openChallengeForm(ch = null) {
+      Object.assign(challengeForm, ch ? {
+        open:true,id:ch.id,name:ch.name,kind:ch.kind,scope:ch.scope||'personal',
+        projectId:ch.projectId||'',target:ch.target||1,period:ch.period||'daily',
+        points:ch.points||0,enabled:ch.enabled!==false
+      } : {open:true,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true});
+    }
+    function saveChallenge() {
+      const name=String(challengeForm.name||'').trim();
+      const target=Math.floor(Number(challengeForm.target));
+      const points=Number(challengeForm.points);
+      if (!name || !Number.isFinite(points) || points<0 || !Number.isFinite(target) || target<1 || target>100000) {notify('Nom, objectif et points invalides');return;}
+      if (challengeForm.kind==='project-count' && !data.projects.some(p=>p.id===challengeForm.projectId)) {notify('Sélectionne un projet');return;}
+      const fields={name,kind:challengeForm.kind,scope:challengeForm.scope,projectId:challengeForm.kind==='project-count'?challengeForm.projectId:'',target,period:challengeForm.period,points:Math.round(points*100)/100,enabled:challengeForm.enabled};
+      if (challengeForm.id) {
+        const item=data.challenges.find(c=>c.id===challengeForm.id);
+        if(item) Object.assign(item,fields,{activationDate:today.value});
+      } else data.challenges.push({id:uid(),...fields,activationDate:today.value});
+      challengeForm.open=false;
+      evaluateChallenges();
+    }
+    function deleteChallenge(c) {
+      if(!confirm('Supprimer ce défi ? Les points déjà gagnés seront conservés.'))return;
+      data.challenges=data.challenges.filter(x=>x.id!==c.id);
+    }
+    function toggleChallenge(c) {c.enabled=!c.enabled;if(c.enabled){c.activationDate=today.value;evaluateChallenges();}}
+    const weekStart = date => {
+      const d=new Date(date+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);
+      return d.toISOString().slice(0,10);
+    };
+    const challengePeriodKey = (c,date) => c.period==='once'?'once':c.period==='weekly'?weekStart(date):date;
+    function challengeProgress(c, date=today.value) {
+      const start=c.period==='weekly'?weekStart(date):date;
+      const end=c.period==='weekly' ? (()=>{const d=new Date(start+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+6);return d.toISOString().slice(0,10);})() : date;
+      const scopeOk=t=>c.scope==='both'||(c.scope==='work'?t.scope==='work':t.scope!=='work');
+      const completed=t=>t.status==='done'&&t.doneAt>=start&&t.doneAt<=end;
+      if(c.kind==='all-habits'||c.kind==='habit-count') {
+        // Une habitude prévue aujourd'hui compte dans le dénominateur.
+        // Pour la semaine, les réalisations de la semaine sont comptées par habitude.
+        const valid=data.habits.filter(h=> c.period==='weekly' ? true : habitDue(h));
+        const done=valid.filter(h=>(h.history||[]).some(d=>d>=start&&d<=end)).length;
+        const goal=c.kind==='all-habits'?valid.length:c.target;
+        return {current:done,target:goal,complete:goal>0&&done>=goal};
+      }
+      if(c.kind==='project-count') {
+        const n=data.tasks.filter(t=>t.projectId===c.projectId&&completed(t)).length;
+        return {current:n,target:c.target,complete:n>=c.target};
+      }
+      const relevant=data.tasks.filter(scopeOk);
+      if(c.kind==='all-tasks') {
+        // Toutes les tâches dont l'échéance est dans la période, plus les retards
+        // à terminer pendant cette période. Aucune tâche = défi non validé.
+        const due=relevant.filter(t=>t.due&&t.due<=end && (t.status!=='done'||t.doneAt>=start));
+        const done=due.filter(t=>t.status==='done'&&t.doneAt<=end).length;
+        return {current:done,target:due.length,complete:due.length>0&&done===due.length};
+      }
+      const n=relevant.filter(completed).length;
+      return {current:n,target:c.target,complete:n>=c.target};
+    }
+    const currentChallenges = computed(()=>data.challenges.map(c=>{
+      const progress=challengeProgress(c);
+      const award=data.challengeAwards.find(a=>a.challengeId===c.id&&a.periodKey===challengePeriodKey(c,today.value));
+      return {...c,...progress,awarded:!!award};
+    }));
+    const challengeHistory = computed(()=>[...data.challengeAwards].sort((a,b)=>(b.date||'').localeCompare(a.date||'')));
+    let evaluatingChallenges=false;
+    function evaluateChallenges() {
+      if(evaluatingChallenges) return;
+      evaluatingChallenges=true;
+      try {
+        for(const c of data.challenges) {
+          if(c.enabled===false)continue;
+          const key=challengePeriodKey(c,today.value);
+          // Un nouveau défi ne peut pas accorder des points pour les périodes passées.
+          if(key < challengePeriodKey(c,c.activationDate||today.value))continue;
+          if(data.challengeAwards.some(a=>a.challengeId===c.id&&a.periodKey===key))continue;
+          if(!challengeProgress(c).complete)continue;
+          data.challengeAwards.push({id:uid(),challengeId:c.id,challengeName:c.name,periodKey:key,date:today.value,points:Number(c.points)||0});
+          notify('Défi réussi : '+c.name+' (+'+c.points+' pts)');
+        }
+      } finally {evaluatingChallenges=false;}
+    }
+    watch(data,()=>evaluateChallenges(),{deep:true,flush:'post'});
+    watch(today,()=>evaluateChallenges());
+    // Un défi peut devenir validé lors du chargement des données distantes.
+    // On attend la première synchronisation pour évaluer lors de l'ouverture.
+
     /* ---------- Export / import / reset ---------- */
     function exportData() {
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1478,7 +1586,7 @@ const app = createApp({
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
-      earned, balance, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, groupedRewards, visibleInventory,
       // filtres
       filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, copyForm, copyText, copyTaskTitles,
@@ -1498,6 +1606,7 @@ const app = createApp({
       invForm, startEditInv, saveInv, deleteInv, refundInv,
       // données
       exportData, importData, resetAll,
+      CHALLENGE_KINDS, challengeForm, openChallengeForm, saveChallenge, deleteChallenge, toggleChallenge, currentChallenges, challengeHistory, challengeProgress,
       habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount,
       // utilitaires
       formatDate,
