@@ -33,6 +33,12 @@
       <div class="points-badge" title="Solde de points">{{ balance }}</div>
       <span class="points-label">pts</span>
     </div>
+    <div class="favorite-reward" v-if="favoriteReward">
+            <strong>★ Récompense favorite : {{ favoriteReward.name }}</strong>
+            <span>{{ favoriteReward.saved || 0 }} / {{ favoriteReward.cost }} pts réservés · {{ rewardRemaining(favoriteReward) }} pts restant à épargner</span>
+            <progress :value="Number(favoriteReward.saved)||0" :max="favoriteReward.cost"></progress>
+            <button type="button" @click="depositReward(favoriteReward)">Épargner des points</button>
+          </div>
 
   </header>
 
@@ -59,8 +65,8 @@
         <div class="page-actions">
           <template v-if="view === 'home' || view === 'all' || view === 'done' || view === 'work'">
             <button type="button" class="btn-add" v-if="view !== 'done'" @click="toggleTaskForm">＋ Ajouter une tâche</button>
-            <button type="button" class="btn-quick" v-if="view !== 'done'" @click="toggleQuickForm">＋ To do rapide</button>
-            <button type="button" class="filters-toggle" :class="{ active: ui.filtersOpen }" :aria-expanded="ui.filtersOpen"
+            <button type="button" class="btn-quick" v-if="view !== 'done' && view !== 'work'" @click="toggleQuickForm">＋ To do rapide</button>
+            <button type="button" class="filters-toggle" v-if="view !== 'work'" :class="{ active: ui.filtersOpen }" :aria-expanded="ui.filtersOpen"
                     @click="ui.filtersOpen = !ui.filtersOpen">
               Filtres / tri <small v-if="activeFilterCount">({{ activeFilterCount }})</small>
             </button>
@@ -157,10 +163,10 @@
         <label>Catégorie
           <select v-model="taskForm.category">
             <option value="">Sans catégorie</option>
-            <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+            <option v-for="c in (taskForm.scope === 'work' ? workCategories : categories)" :key="c" :value="c">{{ c }}</option>
           </select>
         </label>
-        <label v-if="!taskForm.projectId">Urgence (hors projet)
+        <label v-if="taskForm.scope !== 'work' && !taskForm.projectId">Urgence (hors projet)
           <select v-model="taskForm.urgency">
             <option value="">Aucune</option>
             <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
@@ -169,7 +175,7 @@
         <label>Difficulté
           <select v-model="taskForm.difficulty">
             <option value="">Aucune</option>
-            <option v-for="d in data.difficulties" :key="d.id" :value="d.id">{{ d.name }}</option>
+            <option v-for="d in (taskForm.scope === 'work' ? data.workDifficulties : data.difficulties)" :key="d.id" :value="d.id">{{ d.name }}</option>
           </select>
         </label>
         <label>Statut
@@ -180,7 +186,7 @@
         <label v-if="taskForm.status === 'done'">Date de fin
           <input type="date" v-model="taskForm.doneAt">
         </label>
-        <label>Projet
+        <label v-if="taskForm.scope !== 'work'">Projet
           <select v-model="taskForm.projectId">
             <option value="">— Aucun —</option>
             <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
@@ -217,10 +223,10 @@
             <select v-model="bulkForm.category">
               <option value="__keep">(inchangée)</option>
               <option value="">Sans catégorie</option>
-              <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+              <option v-for="c in (bulkForm.ids.length && data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope === 'work' ? workCategories : categories)" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
-          <label>Urgence
+          <label v-if="!bulkForm.ids.length || data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope !== 'work'">Urgence
             <select v-model="bulkForm.urgency">
               <option value="__keep">(inchangée)</option>
               <option value="">Aucune</option>
@@ -231,7 +237,7 @@
             <select v-model="bulkForm.difficulty">
               <option value="__keep">(inchangée)</option>
               <option value="">Aucune</option>
-              <option v-for="d in data.difficulties" :key="d.id" :value="d.id">{{ d.name }}</option>
+              <option v-for="d in (bulkForm.ids.length && data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope === 'work' ? data.workDifficulties : data.difficulties)" :key="d.id" :value="d.id">{{ d.name }}</option>
             </select>
           </label>
           <label>Statut
@@ -240,7 +246,7 @@
               <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
             </select>
           </label>
-          <label>Projet
+          <label v-if="!bulkForm.ids.length || data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope !== 'work'">Projet
             <select v-model="bulkForm.projectId">
               <option value="__keep">(inchangé)</option>
               <option value="">Aucun projet</option>
@@ -421,13 +427,41 @@
     </section>
 
     <section class="view view-work" v-if="view === 'work'">
-      <p class="hint">{{ workTasks.length }} tâche(s) de la catégorie Travail, avec les filtres actuels.</p>
-      <task-list :tasks="workTasks" :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
+      <p class="hint">Espace indépendant : tâches professionnelles, catégories et difficultés propres au travail. Les points alimentent ton solde commun.</p>
+      <div class="work-settings">
+        <form @submit.prevent="addWorkCategory"><label>Ajouter une catégorie de travail <input v-model="newWorkCategory" placeholder="Ex : Clients, Administratif"></label> <button type="submit">Ajouter</button></form>
+        <div class="category-chips"><span v-for="c in workCategories" :key="c">{{ c }} <button type="button" @click="deleteWorkCategory(c)">×</button></span></div>
+        <h3>Difficultés de travail et bonus de points</h3>
+        <article class="work-difficulty" v-for="d in data.workDifficulties" :key="d.id">
+          <input v-model="d.name" aria-label="Nom de la difficulté">
+          <select v-model="d.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
+          <input type="number" min="0" step="0.25" v-model.number="d.pointValue" aria-label="Bonus">
+          <button type="button" @click="deleteWorkDifficulty(d)">Supprimer</button>
+        </article>
+        <button type="button" @click="addWorkDifficulty">＋ Ajouter une difficulté de travail</button>
+      </div>
+      <task-list :tasks="workTasks" :projects="[]" :categories="workCategories" :statuses="statuses" :today="today" :selected="selection"
         @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany" @edit-selected="editSelected" @delete-selected="deleteSelected"
         @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
     </section>
 
-    <section class="view view-habits" v-if="view === 'habits'">
+    <section class="view view-gratitude" v-if="view === 'gratitude'">
+      <h3>Une gratitude par jour</h3>
+      <p>Premier jour : +0,25 pt ; deuxième jour consécutif : +0,50 pt ; puis +0,25 pt par jour supplémentaire. La série reprend à zéro après un jour manqué.</p>
+      <p>Total gagné : <strong>{{ gratitudeTotal }} pts</strong></p>
+      <form v-if="!todayGratitude" @submit.prevent="saveGratitude">
+        <label>Ta gratitude du jour <textarea v-model="gratitudeDraft" required maxlength="3000" rows="4" placeholder="Aujourd'hui, je suis reconnaissant(e) pour..."></textarea></label>
+        <button type="submit">Enregistrer la gratitude du jour</button>
+      </form>
+      <p v-else>✓ Gratitude d'aujourd'hui enregistrée : {{ todayGratitude.text }} (+{{ todayGratitude.points }} pt)</p>
+      <h3>Historique</h3>
+      <article v-for="g in sortedGratitude" :key="g.date" class="gratitude-entry">
+        <div><strong>{{ formatDate(g.date) }}</strong> · +{{ g.points }} pt <p>{{ g.text }}</p></div>
+        <button type="button" @click="deleteGratitude(g)">Supprimer</button>
+      </article>
+    </section>
+
+    <section class="view view-habits v-if="view === 'habits'">
       <button type="button" class="btn-add" @click="openHabitForm()">＋ Nouvelle habitude</button>
       <div class="modal-backdrop" v-if="habitForm.open" @click.self="habitForm.open = false">
         <form class="modal form-panel" @submit.prevent="saveHabit">
@@ -704,17 +738,20 @@
       <div class="reward-group" v-for="group in groupedRewards" :key="group.name">
        <h3 class="reward-group-title">{{ group.name }} ({{ group.rewards.length }})</h3>
        <div class="reward-list">
-        <article class="reward" v-for="r in group.rewards" :key="r.id" :class="{ affordable: balance >= r.cost }">
+        <article class="reward" v-for="r in group.rewards" :key="r.id" :class="{ affordable: balance + (Number(r.saved)||0) >= r.cost }">
           <div class="reward-body">
-            <h3 class="reward-name">{{ r.name }}</h3>
+            <h3 class="reward-name">{{ r.favorite ? '★ ' : '' }}{{ r.name }}</h3>
             <div class="reward-fl"><p class="reward-category">{{ r.category || 'Sans catégorie' }}</p>
             <p class="reward-cost">{{ r.cost }} pts</p></div>
-            <progress :value="Math.min(Math.max(0, balance), r.cost)" :max="r.cost"></progress>
-            <p class="reward-status" v-if="balance >= r.cost">Dispo ! Tu peux la réclamer.</p>
-            <p class="reward-status" v-else>Il te reste <strong>{{ r.cost - balance }} pts</strong> avant d'avoir ça.</p>
+            <progress :value="Number(r.saved)||0" :max="r.cost"></progress>
+            <p class="reward-status">Épargne : <strong>{{ r.saved || 0 }} / {{ r.cost }} pts</strong> · Reste à épargner : {{ rewardRemaining(r) }} pts</p>
+            <p v-if="balance + (Number(r.saved)||0) >= r.cost">Points suffisants pour la réclamer.</p>
           </div>
           <div class="reward-actions">
-            <button type="button" :disabled="balance < r.cost" @click="claimReward(r)">Réclamer</button>
+            <button type="button" :disabled="balance + (Number(r.saved)||0) < r.cost" @click="claimReward(r)">Réclamer</button>
+            <button type="button" @click="toggleRewardFavorite(r)">{{ r.favorite ? '★ Retirer favori' : '☆ Favori' }}</button>
+            <button type="button" @click="depositReward(r)" :disabled="balance <= 0 || rewardRemaining(r)<=0">＋ Épargner</button>
+            <button type="button" @click="withdrawReward(r)" :disabled="!(Number(r.saved)>0)">− Retirer</button>
             <button type="button" @click="openRewardForm(r)">Modifier</button>
             <button type="button" @click="deleteReward(r)">Supprimer</button>
           </div>
@@ -812,7 +849,7 @@
         </label>
 
         <!-- Projet -->
-        <label class="tag tag-project" :class="{ 'tag-empty': !task.projectId, 'tag-colored': !!projectColor }" :style="styleFor(projectColor)">
+        <label v-if="task.scope !== 'work'" class="tag tag-project" :class="{ 'tag-empty': !task.projectId, 'tag-colored': !!projectColor }" :style="styleFor(projectColor)">
           <select :value="task.projectId || ''" @change="update('projectId', $event)">
             <option value="">Sans projet</option>
             <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
@@ -842,7 +879,7 @@
           </label>
 
           <!-- Urgence des tâches sans projet -->
-          <label v-if="!task.projectId" class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
+          <label v-if="task.scope !== 'work' && !task.projectId" class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
             <select :value="urgencyValue" @change="update('urgency', $event)">
               <option v-for="u in urgencyOptions" :key="u.id" :value="u.id">{{ u.label }}</option>
             </select>
