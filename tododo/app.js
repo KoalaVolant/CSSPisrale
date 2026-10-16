@@ -88,7 +88,7 @@ function migrateProjectUrgencies(d) {
 function taskValue(t) {
   let points = Math.max(0, Number(t.points) || 0);
   if (liveData) {
-    for (const [levels, id] of (t.scope === 'work' ? [[liveData.urgencies, effectiveUrgency(t)], [liveData.workDifficulties, t.difficulty]] : [[liveData.urgencies, effectiveUrgency(t)], [liveData.difficulties, t.difficulty]])) {
+    for (const [levels, id] of (t.scope === 'work' ? [[liveData.workUrgencies, effectiveUrgency(t)], [liveData.workDifficulties, t.difficulty]] : [[liveData.urgencies, effectiveUrgency(t)], [liveData.difficulties, t.difficulty]])) {
       const level = levels.find(l => l.id === id);
       if (!level) continue;
       const amount = Number(level.pointValue);
@@ -187,6 +187,7 @@ function defaultData() {
     gratitudePointsVersion: 2,
     workCategories: [],
     workDifficulties: clone(DEFAULT_DIFFICULTIES),
+    workUrgencies: clone(DEFAULT_URGENCIES),
     categories: [{ name: 'Travail', color: '#4f86b9' }],   // { name, color }  ("Sans catégorie" existe toujours, c'est la valeur '')
     urgencies: clone(DEFAULT_URGENCIES),       // { id, name, color }, du plus faible au plus fort
     difficulties: clone(DEFAULT_DIFFICULTIES), // idem
@@ -219,6 +220,7 @@ function loadData() {
     if (!Array.isArray(d.workCategories)) d.workCategories = [];
     d.workCategories = normalizeCategories(d.workCategories);
     if (!Array.isArray(d.workDifficulties)) d.workDifficulties = clone(DEFAULT_DIFFICULTIES);
+    if (!Array.isArray(d.workUrgencies)) d.workUrgencies = clone(Array.isArray(d.urgencies) ? d.urgencies : DEFAULT_URGENCIES);
     // Migration unique : les anciennes tâches classées Travail sont isolées par scope.
     (d.tasks || []).forEach(t => { if (!t.scope) t.scope = t.category === 'Travail' ? 'work' : 'personal'; if (t.scope === 'work') { t.projectId = ''; if (t.category === 'Travail') t.category = ''; } });
     (d.rewards || []).forEach(r => { if (!Number.isFinite(Number(r.saved))) r.saved = 0; });
@@ -268,13 +270,13 @@ const TaskRow = {
     },
     calculatedPoints() { return taskValue(this.task); },
     urgencyOptions() {
-      return [{ id: '', label: 'Urgence' }, ...this.appData.urgencies.map(u => ({ id: u.id, label: 'Urgence : ' + u.name }))];
+      return [{ id: '', label: 'Urgence' }, ...(this.task.scope === 'work' ? this.appData.workUrgencies : this.appData.urgencies).map(u => ({ id: u.id, label: 'Urgence : ' + u.name }))];
     },
     difficultyOptions() {
       return [{ id: '', label: 'Difficulté' }, ...(this.task.scope === 'work' ? this.appData.workDifficulties : this.appData.difficulties).map(d => ({ id: d.id, label: 'Difficulté : ' + d.name }))];
     },
     // un niveau supprimé ou inconnu est affiché comme "non défini"
-    urgencyValue()    { return this.appData.urgencies.some(u => u.id === this.task.urgency) ? this.task.urgency : ''; },
+    urgencyValue()    { return (this.task.scope === 'work' ? this.appData.workUrgencies : this.appData.urgencies).some(u => u.id === this.task.urgency) ? this.task.urgency : ''; },
     difficultyValue() { return (this.task.scope === 'work' ? this.appData.workDifficulties : this.appData.difficulties).some(d => d.id === this.task.difficulty) ? this.task.difficulty : ''; },
     categoryColor() {
       const c = (this.task.scope === 'work' ? this.appData.workCategories : this.appData.categories).find(x => x.name === this.task.category);
@@ -285,7 +287,7 @@ const TaskRow = {
       return p ? p.color || '' : '';
     },
     urgencyColor() {
-      const u = this.appData.urgencies.find(x => x.id === this.task.urgency);
+      const u = (this.task.scope === 'work' ? this.appData.workUrgencies : this.appData.urgencies).find(x => x.id === this.task.urgency);
       return u ? u.color : '';
     },
     difficultyColor() {
@@ -434,6 +436,7 @@ const app = createApp({
       data.gratitudePointsVersion = 2;
       data.workCategories = normalizeCategories(src.workCategories);
       data.workDifficulties = Array.isArray(src.workDifficulties) ? src.workDifficulties : clone(DEFAULT_DIFFICULTIES);
+      data.workUrgencies = Array.isArray(src.workUrgencies) ? src.workUrgencies : clone(Array.isArray(src.urgencies) ? src.urgencies : DEFAULT_URGENCIES);
       data.urgencies    = Array.isArray(src.urgencies) ? src.urgencies : clone(DEFAULT_URGENCIES);
       data.difficulties = Array.isArray(src.difficulties) ? src.difficulties : clone(DEFAULT_DIFFICULTIES);
       data.spent        = Number(src.spent) || 0;
@@ -640,6 +643,8 @@ const app = createApp({
     const newWorkCategory=ref('');
     function addWorkCategory(){const name=newWorkCategory.value.trim();if(name&&!workCategories.value.some(c=>c.toLowerCase()===name.toLowerCase()))data.workCategories.push({name,color:''});newWorkCategory.value='';}
     function deleteWorkCategory(name){if(!confirm('Supprimer la catégorie de travail « '+name+' » ?'))return;data.tasks.filter(t=>t.scope==='work'&&t.category===name).forEach(t=>t.category='');data.workCategories=data.workCategories.filter(c=>c.name!==name);}
+    function addWorkUrgency(){data.workUrgencies.push({id:uid(),name:'Nouvelle urgence',color:'#6b7280',pointMode:'add',pointValue:0});}
+    function deleteWorkUrgency(level){if(!confirm('Supprimer cette urgence de travail ?'))return;data.tasks.filter(t=>t.scope==='work'&&t.urgency===level.id).forEach(t=>t.urgency='');data.workUrgencies=data.workUrgencies.filter(x=>x.id!==level.id);}
     function addWorkDifficulty(){data.workDifficulties.push({id:uid(),name:'Nouveau niveau',color:'#6b7280',pointMode:'add',pointValue:0});}
     function deleteWorkDifficulty(level){if(!confirm('Supprimer ce niveau de difficulté ?'))return;data.tasks.filter(t=>t.scope==='work'&&t.difficulty===level.id).forEach(t=>t.difficulty='');data.workDifficulties=data.workDifficulties.filter(x=>x.id!==level.id);}
 
@@ -1595,7 +1600,7 @@ const app = createApp({
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
-      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, groupedRewards, visibleInventory,
       // filtres
       filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, copyForm, copyText, copyTaskTitles,
