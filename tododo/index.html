@@ -65,7 +65,7 @@
         <div class="page-actions">
           <template v-if="view === 'home' || view === 'all' || view === 'done' || view === 'work'">
             <button type="button" class="btn-add" v-if="view !== 'done'" @click="toggleTaskForm">＋ Ajouter une tâche</button>
-            <button type="button" class="btn-quick" v-if="view !== 'done' && view !== 'work'" @click="toggleQuickForm">＋ To do rapide</button>
+            <button type="button" class="btn-quick" v-if="view !== 'done'" @click="toggleQuickForm">＋ To do rapide</button>
             <button type="button" class="filters-toggle" v-if="view !== 'work'" :class="{ active: ui.filtersOpen }" :aria-expanded="ui.filtersOpen"
                     @click="ui.filtersOpen = !ui.filtersOpen">
               Filtres / tri <small v-if="activeFilterCount">({{ activeFilterCount }})</small>
@@ -166,7 +166,7 @@
             <option v-for="c in (taskForm.scope === 'work' ? workCategories : categories)" :key="c" :value="c">{{ c }}</option>
           </select>
         </label>
-        <label v-if="taskForm.scope !== 'work'">Urgence
+        <label>Urgence
           <select v-model="taskForm.urgency">
             <option value="">Aucune</option>
             <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
@@ -226,7 +226,7 @@
               <option v-for="c in (bulkForm.ids.length && data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope === 'work' ? workCategories : categories)" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
-          <label v-if="!bulkForm.ids.length || data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope !== 'work'">Urgence
+          <label>Urgence
             <select v-model="bulkForm.urgency">
               <option value="__keep">(inchangée)</option>
               <option value="">Aucune</option>
@@ -319,7 +319,7 @@
           <label>Catégorie
             <select v-model="quickForm.paste.category">
               <option value="">Sans catégorie</option>
-              <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+              <option v-for="c in (quickForm.scope === 'work' ? workCategories : categories)" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
           <label>Urgence
@@ -331,13 +331,13 @@
           <label>Difficulté
             <select v-model="quickForm.paste.difficulty">
               <option value="">Aucune</option>
-              <option v-for="d in data.difficulties" :key="d.id" :value="d.id">{{ d.name }}</option>
+              <option v-for="d in (quickForm.scope === 'work' ? data.workDifficulties : data.difficulties)" :key="d.id" :value="d.id">{{ d.name }}</option>
             </select>
           </label>
           <label>Date butoir
             <input type="date" v-model="quickForm.paste.due">
           </label>
-          <label>Projet
+          <label v-if="quickForm.scope !== 'work'">Projet
             <select v-model="quickForm.paste.project">
               <option value="">— Aucun —</option>
               <option value="__header" v-if="pastePreview.header">Nouveau projet : {{ pastePreview.header }}</option>
@@ -373,6 +373,10 @@
         <span class="next-reward-label" v-else>Toutes tes récompenses sont accessibles !</span>
       </div>
 
+      <section class="challenge-dashboard" v-if="currentChallenges.some(c=>c.enabled!==false && !c.awarded)">
+        <h2>Défis en cours</h2>
+        <div v-for="c in currentChallenges.filter(x=>x.enabled!==false && !x.awarded)" :key="c.id" class="challenge-summary"><strong>{{ c.name }}</strong> · {{ c.current }}/{{ c.target }} · +{{ c.points }} pts</div>
+      </section>
       <section class="habit-dashboard" v-if="data.habits.length">
         <h2>Habitudes <small>({{ dashboardHabits.length }})</small></h2>
         <div class="habit-entry" v-for="habit in dashboardHabits" :key="habit.id" :class="{ 'habit-completed': habitDoneToday(habit) }">
@@ -447,7 +451,7 @@
 
     <section class="view view-gratitude" v-if="view === 'gratitude'">
       <h3>Une gratitude par jour</h3>
-      <p>Premier jour : +0,25 pt ; deuxième jour consécutif : +0,50 pt ; puis +0,25 pt par jour supplémentaire. La série reprend à zéro après un jour manqué.</p>
+      <p>Premier jour : +1 pt ; deuxième jour consécutif : +1,25 pt ; puis +0,25 pt par jour supplémentaire. La série reprend à zéro après un jour manqué.</p>
       <p>Total gagné : <strong>{{ gratitudeTotal }} pts</strong></p>
       <form v-if="!todayGratitude" @submit.prevent="saveGratitude">
         <label>Ta gratitude du jour <textarea v-model="gratitudeDraft" required maxlength="3000" rows="4" placeholder="Aujourd'hui, je suis reconnaissant(e) pour..."></textarea></label>
@@ -480,6 +484,36 @@
         <div class="habit-actions"><button type="button" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)">Terminer</button><button type="button" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)">Reporter à demain</button><button type="button" v-if="habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
         <details><summary>Historique des réalisations</summary><p>{{ (habit.history || []).length ? [...habit.history].sort().reverse().join(' · ') : 'Aucune réalisation' }}</p></details>
       </article>
+    </section>
+
+    <!-- ============ DÉFIS CONFIGURABLES ============ -->
+    <section class="view view-challenges" v-if="view === 'challenges'">
+      <div class="page-actions"><button type="button" class="btn-add" @click="openChallengeForm()">＋ Nouveau défi</button></div>
+      <p class="hint">Les défis gagnent automatiquement des points une fois par période. Les gains déjà attribués restent acquis même si tu modifies ou supprimes le défi.</p>
+      <div class="modal-backdrop" v-if="challengeForm.open" @click.self="challengeForm.open=false">
+        <form class="modal form-panel challenge-form" @submit.prevent="saveChallenge">
+          <h3>{{ challengeForm.id ? 'Modifier' : 'Créer' }} un défi</h3>
+          <label>Nom <input v-model="challengeForm.name" maxlength="120" required placeholder="Ex : Journée productive"></label>
+          <label>Objectif <select v-model="challengeForm.kind"><option v-for="kind in CHALLENGE_KINDS" :key="kind.id" :value="kind.id">{{ kind.label }}</option></select></label>
+          <label v-if="challengeForm.kind==='task-count' || challengeForm.kind==='all-tasks'">Type de tâches <select v-model="challengeForm.scope"><option value="personal">Personnelles</option><option value="work">Travail</option><option value="both">Toutes</option></select></label>
+          <label v-if="challengeForm.kind==='project-count'">Projet <select v-model="challengeForm.projectId" required><option value="">Choisir...</option><option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option></select></label>
+          <label v-if="['task-count','habit-count','project-count'].includes(challengeForm.kind)">Nombre à atteindre <input type="number" min="1" max="100000" v-model.number="challengeForm.target" required></label>
+          <label>Fréquence <select v-model="challengeForm.period"><option value="daily">Tous les jours</option><option value="weekly">Toutes les semaines</option><option value="once">Une seule fois</option></select></label>
+          <label>Points gagnés <input type="number" min="0" max="100000" step="0.25" v-model.number="challengeForm.points" required></label>
+          <label><input type="checkbox" v-model="challengeForm.enabled"> Défi actif</label>
+          <div class="form-actions"><button type="submit">Enregistrer</button><button type="button" @click="challengeForm.open=false">Annuler</button></div>
+        </form>
+      </div>
+      <p class="empty" v-if="!currentChallenges.length">Aucun défi. Crée ton premier défi avec le bouton ci-dessus.</p>
+      <article class="challenge-entry" v-for="c in currentChallenges" :key="c.id">
+        <div class="challenge-heading"><strong>{{ c.name }}</strong><span>{{ c.awarded ? '✓ Récompense acquise' : !c.enabled ? 'En pause' : '+'+c.points+' pts' }}</span></div>
+        <p>{{ (CHALLENGE_KINDS.find(k=>k.id===c.kind)||{}).label }} · {{ c.period==='daily' ? 'quotidien' : c.period==='weekly' ? 'hebdomadaire' : 'unique' }}</p>
+        <progress :value="Math.min(c.current,c.target)" :max="Math.max(1,c.target)"></progress><small>{{ c.current }} / {{ c.target }} · {{ c.complete ? 'Objectif atteint' : 'En cours' }}</small>
+        <div class="challenge-actions"><button type="button" @click="openChallengeForm(c)">Modifier</button><button type="button" @click="toggleChallenge(c)">{{ c.enabled===false ? 'Activer' : 'Mettre en pause' }}</button><button type="button" @click="deleteChallenge(c)">Supprimer</button></div>
+      </article>
+      <h3>Historique des récompenses · {{ challengeTotal }} pts</h3>
+      <p v-if="!challengeHistory.length" class="hint">Pas encore de défi récompensé.</p>
+      <div class="challenge-history" v-for="a in challengeHistory" :key="a.id">{{ formatDate(a.date) }} · {{ a.challengeName }} · +{{ a.points }} pts</div>
     </section>
 
     <!-- ============ TERMINÉS : rangés par date de fin, seulement catégorie et projet ============ -->
@@ -876,7 +910,7 @@
           </label>
 
           <!-- Urgence individuelle de chaque tâche personnelle -->
-          <label v-if="task.scope !== 'work'" class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
+          <label class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
             <select :value="urgencyValue" @change="update('urgency', $event)">
               <option v-for="u in urgencyOptions" :key="u.id" :value="u.id">{{ u.label }}</option>
             </select>
