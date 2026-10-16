@@ -95,22 +95,3 @@
    Niveaux : .levels-block .level-item .level-add   Couleurs : .tag-colored (--tag-bg, --tag-fg), --item-color   Malus : .is-malus .tag-malus .tag-sign
    Récompenses : .reward (.affordable)   Inventaire : .inventory-item (.used)
    ---------------------------------------------------------- */
-
-/* Extensions Todo Quest */
-.reward-group { width:100%; margin:1.2rem 0; }
-.reward-group-title {border-bottom:1px solid #ccc; padding-bottom:.4rem;}
-.reward-group .reward-list {justify-content:flex-start;}
-.reward-category-manager {margin:1rem 0; padding:.6rem; background:var(--fnd); border-radius:8px;}
-.category-chips {display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.5rem;}
-.category-chips span {background:white; padding:.4rem; border-radius:6px;}
-.level-point-value {width:4.5rem;}
-.level-point-mode select {max-width:9rem;}
-.level-item {flex-wrap:wrap;}
-.habit-dashboard {margin:1rem 0;padding:1rem;border:1px solid #ddd;}
-.habit-entry {padding:.7rem; margin:.5rem 0;border:1px solid #ddd;border-radius:8px;}
-.habit-dashboard .habit-entry {display:flex;align-items:center;justify-content:space-between;}
-.habit-completed {opacity:.45;}
-.habit-actions {display:flex;gap:.4rem;flex-wrap:wrap;margin:.5rem 0;}
-.habit-days {display:flex;gap:.5rem;flex-wrap:wrap;}
-.habit-days label {display:inline-flex;gap:.2rem;align-items:center;}
-@media(max-width:800px){.layout{flex-direction:column}.sidebar{width:auto}.app-nav{flex-direction:row;flex-wrap:wrap}.dashboard{display:block}.view-today,.view-upcoming{width:auto}.reward-list .reward{width:100%}}
