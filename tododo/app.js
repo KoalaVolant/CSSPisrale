@@ -64,10 +64,18 @@ function tagStyle(color) {
 // Valeur d'une tâche en points : positive (bonus) ou négative (malus)
 let liveData = null;
 function effectiveUrgency(t) {
-  if (t.scope === 'work') return '';
-  if (!liveData || !t.projectId) return t.urgency || '';
-  const project = liveData.projects.find(p => p.id === t.projectId);
-  return project ? (project.urgency || '') : (t.urgency || '');
+  return t.scope === 'work' ? '' : (t.urgency || '');
+}
+function migrateProjectUrgencies(d) {
+  if (!Array.isArray(d.tasks) || !Array.isArray(d.projects)) return;
+  const projects = new Map(d.projects.map(p => [p.id, p]));
+  d.tasks.forEach(t => {
+    if (t.scope !== 'work' && !t.urgency && t.projectId) {
+      const p = projects.get(t.projectId);
+      if (p && p.urgency) t.urgency = p.urgency;
+    }
+  });
+  d.projects.forEach(p => { delete p.urgency; });
 }
 function taskValue(t) {
   let points = Math.max(0, Number(t.points) || 0);
@@ -142,6 +150,23 @@ function normalizeCategories(list) {
   return out;
 }
 
+// Barème gratitude V4 : 1 point par entrée, +0,25 par jour consécutif après le premier.
+// Recalcule l'historique chronologiquement pour mettre à niveau les entrées de V3.
+function migrateGratitudePoints(records) {
+  if (!Array.isArray(records)) return [];
+  const ordered = [...records].filter(g => g && /^\d{4}-\d{2}-\d{2}$/.test(g.date))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  let previous = '', streak = 0;
+  for (const g of ordered) {
+    const current = Date.parse(g.date + 'T12:00:00Z');
+    const prior = previous ? Date.parse(previous + 'T12:00:00Z') : NaN;
+    streak = Number.isFinite(prior) && current - prior === 86400000 ? streak + 1 : 1;
+    g.points = 1 + (streak - 1) * 0.25;
+    previous = g.date;
+  }
+  return records;
+}
+
 function defaultData() {
   return {
     tasks: [],        // { id, title, category, points, malus, status, projectId, due, urgency, difficulty, doneAt }
@@ -149,6 +174,7 @@ function defaultData() {
     rewardCategories: [], // catégories indépendantes des récompenses et de l'inventaire
     habits: [], // habitudes + historique de réalisations
     gratitude: [], // { date, text, points } : une par jour
+    gratitudePointsVersion: 2,
     workCategories: [],
     workDifficulties: clone(DEFAULT_DIFFICULTIES),
     categories: [{ name: 'Travail', color: '#4f86b9' }],   // { name, color }  ("Sans catégorie" existe toujours, c'est la valeur '')
@@ -177,6 +203,7 @@ function loadData() {
     d.rewardCategories = normalizeCategories(d.rewardCategories);
     if (!Array.isArray(d.habits)) d.habits = [];
     if (!Array.isArray(d.gratitude)) d.gratitude = [];
+    if (d.gratitudePointsVersion !== 2) { migrateGratitudePoints(d.gratitude); d.gratitudePointsVersion = 2; }
     if (!Array.isArray(d.workCategories)) d.workCategories = [];
     d.workCategories = normalizeCategories(d.workCategories);
     if (!Array.isArray(d.workDifficulties)) d.workDifficulties = clone(DEFAULT_DIFFICULTIES);
@@ -185,7 +212,7 @@ function loadData() {
     (d.rewards || []).forEach(r => { if (!Number.isFinite(Number(r.saved))) r.saved = 0; });
     const knownRewards = new Set(d.rewardCategories.map(c => c.name));
     [...(d.rewards || []), ...(d.inventory || [])].forEach(x => { if (x.category && !knownRewards.has(x.category)) { d.rewardCategories.push({name:x.category, color:''}); knownRewards.add(x.category); } });
-    (d.projects || []).forEach(project => { if (project.urgency === undefined) { const ranks = d.urgencies || DEFAULT_URGENCIES; const tasks = (d.tasks || []).filter(t => t.projectId === project.id); const best = tasks.map(t => t.urgency).sort((a,b) => ranks.findIndex(u => u.id === b) - ranks.findIndex(u => u.id === a))[0]; project.urgency = best || ''; } });
+    migrateProjectUrgencies(d);
     if (!Array.isArray(d.urgencies)) d.urgencies = clone(DEFAULT_URGENCIES);
     if (!Array.isArray(d.difficulties)) d.difficulties = clone(DEFAULT_DIFFICULTIES);
     return d;
@@ -380,13 +407,7 @@ const app = createApp({
       data.tasks        = Array.isArray(src.tasks) ? src.tasks : [];
       data.tasks.forEach(t => { if (!t.scope) t.scope = t.category === 'Travail' ? 'work' : 'personal'; if (t.scope === 'work') { t.projectId=''; if(t.category==='Travail') t.category=''; } });
       data.projects     = Array.isArray(src.projects) ? src.projects : [];
-      data.projects.forEach(project => {
-        if (project.urgency !== undefined) return;
-        const levels = Array.isArray(src.urgencies) ? src.urgencies : DEFAULT_URGENCIES;
-        const tasks = (src.tasks || []).filter(t => t.projectId === project.id);
-        const best = tasks.map(t => t.urgency).sort((a,b) => levels.findIndex(u=>u.id===b)-levels.findIndex(u=>u.id===a))[0];
-        project.urgency = best || '';
-      });
+      migrateProjectUrgencies(data);
       data.rewards      = Array.isArray(src.rewards) ? src.rewards : [];
       data.rewards.forEach(r => { r.saved = Math.max(0, Math.min(Number(r.cost)||0, Number(r.saved)||0)); });
       data.inventory    = Array.isArray(src.inventory) ? src.inventory : [];
@@ -395,6 +416,8 @@ const app = createApp({
       data.rewardCategories = normalizeCategories(src.rewardCategories || [...(src.rewards || []), ...(src.inventory || [])].map(x => x.category).filter(Boolean));
       data.habits = Array.isArray(src.habits) ? src.habits : [];
       data.gratitude = Array.isArray(src.gratitude) ? src.gratitude : [];
+      if (src.gratitudePointsVersion !== 2) migrateGratitudePoints(data.gratitude);
+      data.gratitudePointsVersion = 2;
       data.workCategories = normalizeCategories(src.workCategories);
       data.workDifficulties = Array.isArray(src.workDifficulties) ? src.workDifficulties : clone(DEFAULT_DIFFICULTIES);
       data.urgencies    = Array.isArray(src.urgencies) ? src.urgencies : clone(DEFAULT_URGENCIES);
@@ -487,7 +510,7 @@ const app = createApp({
     const levelField = kind => (kind === 'urgencies' ? 'urgency' : 'difficulty');
 
     function levelUsage(kind, id) {
-      return kind === 'urgencies' ? data.projects.filter(p => p.urgency === id).length : data.tasks.filter(t => t.difficulty === id).length;
+      return data.tasks.filter(t => t[levelField(kind)] === id).length;
     }
 
     function addLevel(kind) {
@@ -517,8 +540,7 @@ const app = createApp({
       const n = levelUsage(kind, level.id);
       const msg = n ? `Supprimer « ${level.name} » ? ${n} tâche(s) n'auront plus de niveau.` : `Supprimer « ${level.name} » ?`;
       if (!confirm(msg)) return;
-      if (kind === 'urgencies') data.projects.forEach(p => { if (p.urgency === level.id) p.urgency = ''; });
-      else data.tasks.forEach(t => { if (t.difficulty === level.id) t.difficulty = ''; });
+      data.tasks.forEach(t => { if (t[levelField(kind)] === level.id) t[levelField(kind)] = ''; });
       data[kind] = data[kind].filter(l => l.id !== level.id);
       const fkey = kind === 'urgencies' ? 'urgency' : 'difficulty';
       if (filters[fkey] === level.id) filters[fkey] = '';
@@ -594,7 +616,7 @@ const app = createApp({
       let run=0, cursor=yesterday.toISOString().slice(0,10);
       const dates=new Set(data.gratitude.map(g=>g.date));
       while(dates.has(cursor)) {run++; const d=new Date(cursor+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-1);cursor=d.toISOString().slice(0,10);}
-      const points=Math.round((run+1)*25)/100;
+      const points=1 + run * 0.25;
       data.gratitude.push({date:today.value,text:value,points});
       gratitudeDraft.value='';notify('Gratitude enregistrée : +'+points+' pt');
     }
@@ -763,7 +785,7 @@ const app = createApp({
         malus: !!taskForm.malus,
         projectId: taskForm.scope==='work'?'':(taskForm.projectId || ''),
         due: taskForm.due || '',
-        urgency: taskForm.scope==='work'?'':(taskForm.projectId ? '' : (taskForm.urgency || '')),
+        urgency: taskForm.scope==='work' ? '' : (taskForm.urgency || ''),
         difficulty: taskForm.difficulty || '',
       };
       let becameDone = false;
@@ -1002,17 +1024,17 @@ const app = createApp({
     }
 
     /* ---------- Projets ---------- */
-    const projectForm = reactive({ open: false, id: null, name: '', description: '', color: '#6366f1', urgency: '', tasks: [] });
+    const projectForm = reactive({ open: false, id: null, name: '', description: '', color: '#6366f1', tasks: [] });
 
     function openProjectForm(project = null) {
       if (project) {
         Object.assign(projectForm, {
           id: project.id, name: project.name, description: project.description || '',
-          color: project.color || nextColor(data.projects.length), urgency: project.urgency || '', tasks: [],
+          color: project.color || nextColor(data.projects.length), tasks: [],
         });
       } else {
         Object.assign(projectForm, {
-          id: null, name: '', description: '', color: nextColor(data.projects.length), urgency: '',
+          id: null, name: '', description: '', color: nextColor(data.projects.length),
           tasks: [{ title: '', category: '', points: 10, due: '' }],
         });
       }
@@ -1028,9 +1050,9 @@ const app = createApp({
       if (!name) return;
       if (projectForm.id) {
         const p = data.projects.find(x => x.id === projectForm.id);
-        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color; p.urgency = projectForm.urgency; }
+        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color; }
       } else {
-        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color, urgency: projectForm.urgency };
+        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color };
         data.projects.push(project);
         projectForm.tasks
           .filter(d => d.title.trim())
@@ -1067,9 +1089,12 @@ const app = createApp({
       };
     }
 
-    // L'urgence appartient au projet, indépendamment de ses tâches.
+    // Urgence maximale des tâches d'un projet, uniquement pour le tri des projets.
     function projectTopUrgency(project) {
-      return data.urgencies.find(u => u.id === project.urgency) || null;
+      const tasks = data.tasks.filter(t => t.projectId === project.id && t.scope !== 'work');
+      const rank = id => levelRank(data.urgencies, id);
+      const top = tasks.reduce((best, t) => rank(t.urgency) > rank(best) ? t.urgency : best, '');
+      return data.urgencies.find(u => u.id === top) || null;
     }
 
     // Tri des projets : ordre manuel (glisser-déposer) ou par urgence
