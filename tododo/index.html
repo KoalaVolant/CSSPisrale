@@ -57,7 +57,7 @@
       <div class="page-header">
         <h2 class="page-title">{{ pageTitle }}</h2>
         <div class="page-actions">
-          <template v-if="view === 'home' || view === 'all' || view === 'done'">
+          <template v-if="view === 'home' || view === 'all' || view === 'done' || view === 'work'">
             <button type="button" class="btn-add" v-if="view !== 'done'" @click="toggleTaskForm">＋ Ajouter une tâche</button>
             <button type="button" class="btn-quick" v-if="view !== 'done'" @click="toggleQuickForm">＋ To do rapide</button>
             <button type="button" class="filters-toggle" :class="{ active: ui.filtersOpen }" :aria-expanded="ui.filtersOpen"
@@ -85,7 +85,7 @@
       </div>
 
       <!-- Tri / filtre des tâches (Accueil, Toutes les tâches, Terminés) -->
-      <section class="filters" v-if="ui.filtersOpen && (view === 'home' || view === 'all' || view === 'done')">
+      <section class="filters" v-if="ui.filtersOpen && (view === 'home' || view === 'all' || view === 'done' || view === 'work')">
         <div class="filters-row">
           <input type="search" v-model="filters.search" placeholder="Rechercher…">
 
@@ -160,7 +160,7 @@
             <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
           </select>
         </label>
-        <label>Urgence
+        <label v-if="!taskForm.projectId">Urgence (hors projet)
           <select v-model="taskForm.urgency">
             <option value="">Aucune</option>
             <option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option>
@@ -367,6 +367,12 @@
         <span class="next-reward-label" v-else>Toutes tes récompenses sont accessibles !</span>
       </div>
 
+      <section class="habit-dashboard" v-if="data.habits.length">
+        <h2>Habitudes <small>({{ dashboardHabits.length }})</small></h2>
+        <div class="habit-entry" v-for="habit in dashboardHabits" :key="habit.id" :class="{ 'habit-completed': habitDoneToday(habit) }">
+          <span>{{ habit.title }}</span><div class="habit-actions"><button type="button" v-if="!habitDoneToday(habit)" @click="completeHabit(habit)">✓</button><span v-else>Effectuée ✓</span><button type="button" v-if="!habitDoneToday(habit)" @click="postponeHabit(habit)">Demain</button></div>
+        </div>
+      </section>
       <div class="dashboard">
 
         <section class="view view-today">
@@ -396,6 +402,14 @@
 
     <!-- ============ TOUTES LES TÂCHES (en cours) ============ -->
     <section class="view view-all" v-if="view === 'all'">
+      <button type="button" class="btn-quick" @click="copyForm.open = true">Copier la liste filtrée</button>
+      <div class="modal-backdrop" v-if="copyForm.open" @click.self="copyForm.open = false">
+        <section class="modal form-panel" role="dialog" aria-modal="true">
+          <h3>Liste à copier ({{ allTasks.length }} tâches)</h3>
+          <textarea readonly rows="13" :value="copyText" @focus="$event.target.select()"></textarea>
+          <div class="form-actions"><button type="button" @click="copyTaskTitles">Copier</button><button type="button" @click="copyForm.open = false">Fermer</button></div>
+        </section>
+      </div>
       <p class="hint">{{ allTasks.length }} tâche{{ allTasks.length > 1 ? 's' : '' }} en cours, y compris celles sans date butoir. Les tâches terminées sont dans l'onglet « Terminés ».</p>
       <p class="empty" v-if="!allTasks.length">Aucune tâche.</p>
       <div class="task-list">
@@ -404,6 +418,34 @@
                    @edit-selected="editSelected" @delete-selected="deleteSelected"
                    @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
       </div>
+    </section>
+
+    <section class="view view-work" v-if="view === 'work'">
+      <p class="hint">{{ workTasks.length }} tâche(s) de la catégorie Travail, avec les filtres actuels.</p>
+      <task-list :tasks="workTasks" :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
+        @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany" @edit-selected="editSelected" @delete-selected="deleteSelected"
+        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
+    </section>
+
+    <section class="view view-habits" v-if="view === 'habits'">
+      <button type="button" class="btn-add" @click="openHabitForm()">＋ Nouvelle habitude</button>
+      <div class="modal-backdrop" v-if="habitForm.open" @click.self="habitForm.open = false">
+        <form class="modal form-panel" @submit.prevent="saveHabit">
+          <h3>{{ habitForm.id ? 'Modifier' : 'Nouvelle' }} habitude / routine</h3>
+          <label>Nom <input v-model="habitForm.title" required></label>
+          <label>Fréquence <select v-model="habitForm.frequency"><option value="daily">Tous les jours</option><option value="weekdays">Certains jours</option><option value="interval">Tous les X jours</option><option value="weekly">X fois par semaine</option></select></label>
+          <div v-if="habitForm.frequency === 'weekdays'" class="habit-days"><label v-for="d in habitWeekdays" :key="d.id"><input type="checkbox" :value="d.id" v-model="habitForm.weekdays"> {{ d.label }}</label></div>
+          <label v-if="habitForm.frequency === 'interval'">Tous les <input type="number" min="1" v-model.number="habitForm.every"> jours</label>
+          <label v-if="habitForm.frequency === 'weekly'">Nombre par semaine <input type="number" min="1" max="7" v-model.number="habitForm.weeklyTarget"></label>
+          <div class="form-actions"><button type="submit">Enregistrer</button><button type="button" @click="habitForm.open=false">Annuler</button></div>
+        </form>
+      </div>
+      <p class="empty" v-if="!data.habits.length">Aucune habitude enregistrée.</p>
+      <article class="habit-entry" v-for="habit in data.habits" :key="habit.id">
+        <div><strong>{{ habit.title }}</strong> <span v-if="habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small>{{ habitCount(habit) }} réalisation(s) au total · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
+        <div class="habit-actions"><button type="button" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)">Terminer</button><button type="button" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)">Reporter à demain</button><button type="button" v-if="habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
+        <details><summary>Historique des réalisations</summary><p>{{ (habit.history || []).length ? [...habit.history].sort().reverse().join(' · ') : 'Aucune réalisation' }}</p></details>
+      </article>
     </section>
 
     <!-- ============ TERMINÉS : rangés par date de fin, seulement catégorie et projet ============ -->
@@ -433,6 +475,9 @@
           </label>
           <label>Description
             <textarea v-model="projectForm.description" rows="2"></textarea>
+          </label>
+          <label>Urgence du projet
+            <select v-model="projectForm.urgency"><option value="">Sans urgence</option><option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select>
           </label>
 
           <fieldset v-if="!projectForm.id">
@@ -471,7 +516,7 @@
         </template>
       </div>
       <p class="hint" v-if="data.projects.length > 1 && ui.projectSort === 'manual'">Glisse un projet par sa poignée (⠿) ou utilise les flèches pour changer l'ordre.</p>
-      <p class="hint" v-else-if="data.projects.length > 1">Projets triés par urgence (la plus haute urgence de leurs tâches en cours). Repasse en « Ordre manuel » pour les réorganiser.</p>
+      <p class="hint" v-else-if="data.projects.length > 1">Projets triés par urgence (urgence définie dans les propriétés du projet). Repasse en « Ordre manuel » pour les réorganiser.</p>
 
       <article class="project" v-for="(p, i) in sortedProjects" :key="p.id" tabindex="0"
                :class="{ selected: projectSelection.includes(p.id), dragging: dragProject.from === i, 'drag-over': dragProject.over === i && dragProject.from !== i }"
@@ -572,7 +617,9 @@
                    @change="setLevelColor(l, $event.target.value)">
             <input class="level-name" type="text" :value="l.name" title="Renommer"
                    @change="renameLevel(l, $event)" @keydown.enter="$event.target.blur()">
-            <span class="level-count">{{ levelUsage(block.key, l.id) }} tâche(s)</span>
+            <span class="level-count">{{ levelUsage(block.key, l.id) }} {{ block.key === 'urgencies' ? 'projet(s)' : 'tâche(s)' }}</span>
+            <label class="level-point-mode">Bonus <select v-model="l.pointMode"><option value="add">+ fixe</option><option value="multiply">× multiplicateur</option></select></label>
+            <input class="level-point-value" type="number" step="0.1" min="0" v-model.number="l.pointValue" placeholder="0" title="Valeur du bonus">
             <span class="level-actions">
               <button type="button" :disabled="i === 0" @click="moveLevel(block.key, i, -1)" title="Monter">↑</button>
               <button type="button" :disabled="i === data[block.key].length - 1" @click="moveLevel(block.key, i, 1)" title="Descendre">↓</button>
@@ -607,6 +654,10 @@
         </form>
       </div>
 
+      <div class="reward-category-manager">
+        <form @submit.prevent="addRewardCategory"><label>Nouvelle catégorie de récompenses <input v-model="newRewardCategory" placeholder="Ex : Loisirs"></label><button type="submit">Ajouter</button></form>
+        <div class="category-chips"><span v-for="c in rewardCategories" :key="c">{{ c }} <button type="button" @click="deleteRewardCategory(c)" title="Supprimer">×</button></span></div>
+      </div>
       <!-- Formulaire récompense -->
       <div class="modal-backdrop" v-if="rewardForm.open" @click.self="rewardForm.open = false">
       <div class="form-panel modal reward-form" role="dialog" aria-modal="true">
@@ -621,7 +672,7 @@
           <label>Catégorie
             <select v-model="rewardForm.category">
               <option value="">Sans catégorie</option>
-              <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+              <option v-for="c in rewardCategories" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
           <div class="form-actions">
@@ -636,7 +687,7 @@
         <select v-model="rewardFilters.category">
           <option value="">Toutes catégories</option>
           <option value="__none">Sans catégorie</option>
-          <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+          <option v-for="c in rewardCategories" :key="c" :value="c">{{ c }}</option>
         </select>
         <select v-model="rewardFilters.sort">
           <option value="cost-asc">Trier : coût ↑</option>
@@ -650,8 +701,10 @@
       <p class="empty" v-if="!data.rewards.length">Aucune récompense. Ajoutes-en une !</p>
       <p class="empty" v-else-if="!visibleRewards.length">Aucune récompense dans cette catégorie.</p>
 
-      <div class="reward-list">
-        <article class="reward" v-for="r in visibleRewards" :key="r.id" :class="{ affordable: balance >= r.cost }">
+      <div class="reward-group" v-for="group in groupedRewards" :key="group.name">
+       <h3 class="reward-group-title">{{ group.name }} ({{ group.rewards.length }})</h3>
+       <div class="reward-list">
+        <article class="reward" v-for="r in group.rewards" :key="r.id" :class="{ affordable: balance >= r.cost }">
           <div class="reward-body">
             <h3 class="reward-name">{{ r.name }}</h3>
             <div class="reward-fl"><p class="reward-category">{{ r.category || 'Sans catégorie' }}</p>
@@ -666,6 +719,7 @@
             <button type="button" @click="deleteReward(r)">Supprimer</button>
           </div>
         </article>
+       </div>
       </div>
     </section>
 
@@ -675,7 +729,7 @@
         <select v-model="rewardFilters.category">
           <option value="">Toutes catégories</option>
           <option value="__none">Sans catégorie</option>
-          <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+          <option v-for="c in rewardCategories" :key="c" :value="c">{{ c }}</option>
         </select>
         <button type="button" @click="rewardFilters.category = ''">Réinitialiser</button>
       </div>
@@ -691,7 +745,7 @@
               <input type="text" v-model="invForm.name" required>
               <select v-model="invForm.category">
                 <option value="">Sans catégorie</option>
-                <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+                <option v-for="c in rewardCategories" :key="c" :value="c">{{ c }}</option>
               </select>
               <button type="submit">OK</button>
               <button type="button" @click="invForm.id = null">Annuler</button>
@@ -784,11 +838,11 @@
             </select>
             <input class="tag-points-input" type="number" min="0" :value="task.points"
                    title="Cliquer pour modifier les points"
-                   @change="onPoints" @keydown.enter="$event.target.blur()"> pts
+                   @change="onPoints" @keydown.enter="$event.target.blur()"> pts <small v-if="Math.abs(calculatedPoints) !== Number(task.points)">(total : {{ calculatedPoints }} pts)</small>
           </label>
 
-          <!-- Urgence -->
-          <label class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
+          <!-- Urgence des tâches sans projet -->
+          <label v-if="!task.projectId" class="tag tag-urgency" :class="{ 'tag-empty': !urgencyValue, 'tag-colored': !!urgencyColor && !!urgencyValue }" :style="styleFor(urgencyValue ? urgencyColor : '')">
             <select :value="urgencyValue" @change="update('urgency', $event)">
               <option v-for="u in urgencyOptions" :key="u.id" :value="u.id">{{ u.label }}</option>
             </select>
