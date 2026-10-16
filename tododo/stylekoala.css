@@ -129,3 +129,7 @@ margin:5px; padding:10px; }
 .view-today .task-list-box [class*="status"]{ width:100%; }
 
 .view-levels .level-count{ display:none; }
+
+.habit-dashboard{ display:flex; flex-wrap:wrap; }
+.habit-dashboard h2{ width:100%; }
+.habit-dashboard div{ width:30%; margin:3px; }
