@@ -32,6 +32,8 @@ const nextColor = i => PALETTE[Math.abs(i) % PALETTE.length];
 const TABS = [
   { id: 'home',       label: 'Accueil' },
   { id: 'all',        label: 'Toutes les tâches' },
+  { id: 'work',       label: 'Travail' },
+  { id: 'habits',     label: 'Habitudes & routines' },
   { id: 'done',       label: 'Terminés' },
   { id: 'projects',   label: 'Projets' },
   { id: 'categories', label: 'Catégories' },
@@ -59,7 +61,25 @@ function tagStyle(color) {
 }
 
 // Valeur d'une tâche en points : positive (bonus) ou négative (malus)
-const taskValue = t => (t.malus ? -1 : 1) * (Number(t.points) || 0);
+let liveData = null;
+function effectiveUrgency(t) {
+  if (!liveData || !t.projectId) return t.urgency || '';
+  const project = liveData.projects.find(p => p.id === t.projectId);
+  return project ? (project.urgency || '') : (t.urgency || '');
+}
+function taskValue(t) {
+  let points = Math.max(0, Number(t.points) || 0);
+  if (liveData) {
+    for (const [levels, id] of [[liveData.urgencies, effectiveUrgency(t)], [liveData.difficulties, t.difficulty]]) {
+      const level = levels.find(l => l.id === id);
+      if (!level) continue;
+      const amount = Number(level.pointValue);
+      if (!Number.isFinite(amount)) continue;
+      points = level.pointMode === 'multiply' ? points * Math.max(0, amount) : points + amount;
+    }
+  }
+  return (t.malus ? -1 : 1) * Math.round(Math.max(0, points));
+}
 const fmtPts = v => `${v < 0 ? '−' : '+'}${Math.abs(v)} pts`;
 
 // Découpe une liste collée en tâches.
@@ -124,7 +144,9 @@ function defaultData() {
   return {
     tasks: [],        // { id, title, category, points, malus, status, projectId, due, urgency, difficulty, doneAt }
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
-    categories: [],   // { name, color }  ("Sans catégorie" existe toujours, c'est la valeur '')
+    rewardCategories: [], // catégories indépendantes des récompenses et de l'inventaire
+    habits: [], // habitudes + historique de réalisations
+    categories: [{ name: 'Travail', color: '#4f86b9' }],   // { name, color }  ("Sans catégorie" existe toujours, c'est la valeur '')
     urgencies: clone(DEFAULT_URGENCIES),       // { id, name, color }, du plus faible au plus fort
     difficulties: clone(DEFAULT_DIFFICULTIES), // idem
     rewards: [        // { id, name, category, cost }
@@ -145,6 +167,13 @@ function loadData() {
     if (!raw) return defaultData();
     const d = Object.assign(defaultData(), JSON.parse(raw));
     d.categories = normalizeCategories(d.categories);
+    if (!d.categories.some(c => c.name === 'Travail')) d.categories.push({ name: 'Travail', color: '#4f86b9' });
+    if (!Array.isArray(d.rewardCategories)) d.rewardCategories = [];
+    d.rewardCategories = normalizeCategories(d.rewardCategories);
+    if (!Array.isArray(d.habits)) d.habits = [];
+    const knownRewards = new Set(d.rewardCategories.map(c => c.name));
+    [...(d.rewards || []), ...(d.inventory || [])].forEach(x => { if (x.category && !knownRewards.has(x.category)) { d.rewardCategories.push({name:x.category, color:''}); knownRewards.add(x.category); } });
+    (d.projects || []).forEach(project => { if (project.urgency === undefined) { const ranks = d.urgencies || DEFAULT_URGENCIES; const tasks = (d.tasks || []).filter(t => t.projectId === project.id); const best = tasks.map(t => t.urgency).sort((a,b) => ranks.findIndex(u => u.id === b) - ranks.findIndex(u => u.id === a))[0]; project.urgency = best || ''; } });
     if (!Array.isArray(d.urgencies)) d.urgencies = clone(DEFAULT_URGENCIES);
     if (!Array.isArray(d.difficulties)) d.difficulties = clone(DEFAULT_DIFFICULTIES);
     return d;
@@ -186,6 +215,7 @@ const TaskRow = {
     dueLabel() {
       return formatLongDate(this.task.due);
     },
+    calculatedPoints() { return taskValue(this.task); },
     urgencyOptions() {
       return [{ id: '', label: 'Urgence' }, ...this.appData.urgencies.map(u => ({ id: u.id, label: 'Urgence : ' + u.name }))];
     },
@@ -311,13 +341,15 @@ const app = createApp({
   setup() {
     /* ---------- Données + sauvegarde auto ---------- */
     const data = reactive(loadData());
+    liveData = data;
     provide('app-data', data);   // les lignes de tâches y lisent les couleurs et les niveaux
 
     // Toute catégorie utilisée par une tâche / récompense / objet doit exister dans la liste
     function syncCategories() {
       data.categories = normalizeCategories(data.categories);
+      if (!data.categories.some(c => c.name === 'Travail')) data.categories.push({name:'Travail',color:'#4f86b9'});
       const known = new Set(data.categories.map(c => c.name));
-      [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => {
+      data.tasks.forEach(x => {
         if (x.category && !known.has(x.category)) {
           known.add(x.category);
           data.categories.push({ name: x.category, color: '' });
@@ -335,9 +367,19 @@ const app = createApp({
     function applyData(src) {
       data.tasks        = Array.isArray(src.tasks) ? src.tasks : [];
       data.projects     = Array.isArray(src.projects) ? src.projects : [];
+      data.projects.forEach(project => {
+        if (project.urgency !== undefined) return;
+        const levels = Array.isArray(src.urgencies) ? src.urgencies : DEFAULT_URGENCIES;
+        const tasks = (src.tasks || []).filter(t => t.projectId === project.id);
+        const best = tasks.map(t => t.urgency).sort((a,b) => levels.findIndex(u=>u.id===b)-levels.findIndex(u=>u.id===a))[0];
+        project.urgency = best || '';
+      });
       data.rewards      = Array.isArray(src.rewards) ? src.rewards : [];
       data.inventory    = Array.isArray(src.inventory) ? src.inventory : [];
       data.categories   = normalizeCategories(src.categories);
+      if (!data.categories.some(c => c.name === 'Travail')) data.categories.push({name:'Travail',color:'#4f86b9'});
+      data.rewardCategories = normalizeCategories(src.rewardCategories || [...(src.rewards || []), ...(src.inventory || [])].map(x => x.category).filter(Boolean));
+      data.habits = Array.isArray(src.habits) ? src.habits : [];
       data.urgencies    = Array.isArray(src.urgencies) ? src.urgencies : clone(DEFAULT_URGENCIES);
       data.difficulties = Array.isArray(src.difficulties) ? src.difficulties : clone(DEFAULT_DIFFICULTIES);
       data.spent        = Number(src.spent) || 0;
@@ -392,9 +434,9 @@ const app = createApp({
         const old = categoryForm.oldName;
         const cat = data.categories.find(c => c.name === old);
         if (cat) { cat.name = name; cat.color = categoryForm.color; }
-        [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => { if (x.category === old) x.category = name; });
+        data.tasks.forEach(x => { if (x.category === old) x.category = name; });
         if (filters.category === old) filters.category = name;
-        if (rewardFilters.category === old) rewardFilters.category = name;
+
       } else {
         data.categories.push({ name, color: categoryForm.color });
       }
@@ -406,7 +448,7 @@ const app = createApp({
     function categoryUsage(name) {
       return {
         tasks: data.tasks.filter(t => (t.category || '') === name).length,
-        rewards: data.rewards.filter(r => (r.category || '') === name).length,
+        rewards: 0,
       };
     }
 
@@ -417,10 +459,10 @@ const app = createApp({
         ? `Supprimer la catégorie « ${name} » ? ${u.tasks} tâche(s) et ${u.rewards} récompense(s) passeront en « Sans catégorie ».`
         : `Supprimer la catégorie « ${name} » ?`;
       if (!confirm(msg)) return;
-      [...data.tasks, ...data.rewards, ...data.inventory].forEach(x => { if (x.category === name) x.category = ''; });
+      data.tasks.forEach(x => { if (x.category === name) x.category = ''; });
       data.categories = data.categories.filter(c => c.name !== name);
       if (filters.category === name) filters.category = '';
-      if (rewardFilters.category === name) rewardFilters.category = '';
+
     }
 
     /* ---------- Urgences & difficultés (niveaux modifiables, avec couleur) ---------- */
@@ -428,7 +470,7 @@ const app = createApp({
     const levelField = kind => (kind === 'urgencies' ? 'urgency' : 'difficulty');
 
     function levelUsage(kind, id) {
-      return data.tasks.filter(t => t[levelField(kind)] === id).length;
+      return kind === 'urgencies' ? data.projects.filter(p => p.urgency === id).length : data.tasks.filter(t => t.difficulty === id).length;
     }
 
     function addLevel(kind) {
@@ -458,7 +500,8 @@ const app = createApp({
       const n = levelUsage(kind, level.id);
       const msg = n ? `Supprimer « ${level.name} » ? ${n} tâche(s) n'auront plus de niveau.` : `Supprimer « ${level.name} » ?`;
       if (!confirm(msg)) return;
-      data.tasks.forEach(t => { if (t[levelField(kind)] === level.id) t[levelField(kind)] = ''; });
+      if (kind === 'urgencies') data.projects.forEach(p => { if (p.urgency === level.id) p.urgency = ''; });
+      else data.tasks.forEach(t => { if (t.difficulty === level.id) t.difficulty = ''; });
       data[kind] = data[kind].filter(l => l.id !== level.id);
       const fkey = kind === 'urgencies' ? 'urgency' : 'difficulty';
       if (filters[fkey] === level.id) filters[fkey] = '';
@@ -498,6 +541,19 @@ const app = createApp({
     const nextReward = computed(() => rewardsByCost.value.find(r => r.cost > balance.value) || null);
 
     // Filtre / tri des récompenses (le filtre de catégorie s'applique aussi à l'inventaire)
+    const rewardCategories = computed(() => data.rewardCategories.map(c => c.name));
+    const newRewardCategory = ref('');
+    function addRewardCategory() {
+      const name = newRewardCategory.value.trim();
+      if (name && !data.rewardCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) data.rewardCategories.push({name, color:''});
+      newRewardCategory.value = '';
+    }
+    function deleteRewardCategory(name) {
+      if (!confirm('Supprimer cette catégorie de récompenses ? Les récompenses seront conservées sans catégorie.')) return;
+      [...data.rewards, ...data.inventory].forEach(x => { if (x.category === name) x.category = ''; });
+      data.rewardCategories = data.rewardCategories.filter(c => c.name !== name);
+      if (rewardFilters.category === name) rewardFilters.category = '';
+    }
     const rewardFilters = reactive({ category: '', sort: 'cost-asc' });
 
     function matchesRewardCategory(item) {
@@ -518,6 +574,11 @@ const app = createApp({
       return list;
     });
 
+    const groupedRewards = computed(() => {
+      const groups = new Map();
+      visibleRewards.value.forEach(r => { const key = r.category || 'Sans catégorie'; if (!groups.has(key)) groups.set(key, []); groups.get(key).push(r); });
+      return [...groups].map(([name, rewards]) => ({name, rewards}));
+    });
     const visibleInventory = computed(() => data.inventory.filter(matchesRewardCategory));
 
     /* ---------- Filtres & tris des tâches ---------- */
@@ -550,7 +611,7 @@ const app = createApp({
         if (filters.category && filters.category !== '__none' && t.category !== filters.category) return false;
         if (filters.project === '__none' && t.projectId) return false;
         if (filters.project && filters.project !== '__none' && t.projectId !== filters.project) return false;
-        if (filters.urgency && (t.urgency || '') !== (filters.urgency === '__none' ? '' : filters.urgency)) return false;
+        if (filters.urgency && effectiveUrgency(t) !== (filters.urgency === '__none' ? '' : filters.urgency)) return false;
         if (filters.difficulty && (t.difficulty || '') !== (filters.difficulty === '__none' ? '' : filters.difficulty)) return false;
         if (filters.kind === 'malus' && !t.malus) return false;
         if (filters.kind === 'bonus' && t.malus) return false;
@@ -562,7 +623,7 @@ const app = createApp({
       switch (filters.sort) {
         case 'points-desc':     res.sort((a, b) => taskValue(b) - taskValue(a) || byDue(a, b)); break;
         case 'points-asc':      res.sort((a, b) => taskValue(a) - taskValue(b) || byDue(a, b)); break;
-        case 'urgency-desc':    res.sort((a, b) => levelRank(data.urgencies, b.urgency) - levelRank(data.urgencies, a.urgency) || byDue(a, b)); break;
+        case 'urgency-desc':    res.sort((a, b) => levelRank(data.urgencies, effectiveUrgency(b)) - levelRank(data.urgencies, effectiveUrgency(a)) || byDue(a, b)); break;
         case 'difficulty-desc': res.sort((a, b) => levelRank(data.difficulties, b.difficulty) - levelRank(data.difficulties, a.difficulty) || byDue(a, b)); break;
         case 'title':           res.sort((a, b) => a.title.localeCompare(b.title)); break;
         default:                res.sort(byDue);
@@ -575,6 +636,10 @@ const app = createApp({
     const todayTasks    = computed(() => applyFilters(activeTasks.value.filter(t => t.due && t.due <= today.value)));
     const upcomingTasks = computed(() => applyFilters(activeTasks.value.filter(t => t.due && t.due > today.value)));
     const allTasks      = computed(() => applyFilters(activeTasks.value));
+    const workTasks = computed(() => applyFilters(activeTasks.value.filter(t => t.category === 'Travail')));
+    const copyForm = reactive({open:false});
+    const copyText = computed(() => allTasks.value.map(t => t.title).join('\n'));
+    function copyTaskTitles() { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(copyText.value).then(() => notify('Liste copiée')).catch(() => notify('Sélectionne le texte pour le copier')); }
     // Terminées : triées par date de fin (la plus récente d'abord) ; les filtres s'appliquent aussi
     const doneTasks     = computed(() => applyFilters(data.tasks.filter(t => t.status === 'done'), false)
       .sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || '')));
@@ -631,7 +696,7 @@ const app = createApp({
         malus: !!taskForm.malus,
         projectId: taskForm.projectId || '',
         due: taskForm.due || '',
-        urgency: taskForm.urgency || '',
+        urgency: taskForm.projectId ? '' : (taskForm.urgency || ''),
         difficulty: taskForm.difficulty || '',
       };
       let becameDone = false;
@@ -869,17 +934,17 @@ const app = createApp({
     }
 
     /* ---------- Projets ---------- */
-    const projectForm = reactive({ open: false, id: null, name: '', description: '', color: '#6366f1', tasks: [] });
+    const projectForm = reactive({ open: false, id: null, name: '', description: '', color: '#6366f1', urgency: '', tasks: [] });
 
     function openProjectForm(project = null) {
       if (project) {
         Object.assign(projectForm, {
           id: project.id, name: project.name, description: project.description || '',
-          color: project.color || nextColor(data.projects.length), tasks: [],
+          color: project.color || nextColor(data.projects.length), urgency: project.urgency || '', tasks: [],
         });
       } else {
         Object.assign(projectForm, {
-          id: null, name: '', description: '', color: nextColor(data.projects.length),
+          id: null, name: '', description: '', color: nextColor(data.projects.length), urgency: '',
           tasks: [{ title: '', category: '', points: 10, due: '' }],
         });
       }
@@ -895,9 +960,9 @@ const app = createApp({
       if (!name) return;
       if (projectForm.id) {
         const p = data.projects.find(x => x.id === projectForm.id);
-        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color; }
+        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color; p.urgency = projectForm.urgency; }
       } else {
-        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color };
+        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color, urgency: projectForm.urgency };
         data.projects.push(project);
         projectForm.tasks
           .filter(d => d.title.trim())
@@ -934,16 +999,9 @@ const app = createApp({
       };
     }
 
-    // Urgence d'un projet = la plus haute urgence parmi ses tâches pas encore terminées
+    // L'urgence appartient au projet, indépendamment de ses tâches.
     function projectTopUrgency(project) {
-      let best = null;
-      let bestRank = 0;
-      data.tasks.forEach(t => {
-        if (t.projectId !== project.id || t.status === 'done') return;
-        const r = levelRank(data.urgencies, t.urgency);
-        if (r > bestRank) { bestRank = r; best = data.urgencies[r - 1]; }
-      });
-      return best;
+      return data.urgencies.find(u => u.id === project.urgency) || null;
     }
 
     // Tri des projets : ordre manuel (glisser-déposer) ou par urgence
@@ -1098,6 +1156,53 @@ const app = createApp({
       data.inventory = data.inventory.filter(i => i.id !== item.id);
       notify(`+${item.cost} pts remboursés`);
     }
+
+    /* ---------- Habitudes et routines ---------- */
+    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3});
+    const habitWeekdays = [{id:1,label:'Lun'},{id:2,label:'Mar'},{id:3,label:'Mer'},{id:4,label:'Jeu'},{id:5,label:'Ven'},{id:6,label:'Sam'},{id:0,label:'Dim'}];
+    function openHabitForm(habit = null) {
+      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3});
+    }
+    function saveHabit() {
+      const title = habitForm.title.trim(); if (!title) return;
+      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3))};
+      if (habitForm.id) {const h=data.habits.find(x=>x.id===habitForm.id);if(h) Object.assign(h,fields);}
+      else data.habits.push({id:uid(),...fields,createdAt:todayStr(),history:[],postponed:[]});
+      habitForm.open=false;
+    }
+    const dayDiff = (a,b) => Math.round((Date.parse(b+'T12:00:00Z')-Date.parse(a+'T12:00:00Z'))/86400000);
+    const monday = date => {const d=new Date(date+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);return d.toISOString().slice(0,10);};
+    function habitDoneToday(h) {return (h.history||[]).includes(today.value);}
+    function habitDue(h) {
+      if (habitDoneToday(h)) return true;
+      if (h.forceDue === today.value) return true;
+      if ((h.postponed||[]).includes(today.value)) return false;
+      const dow = new Date(today.value+'T12:00:00Z').getUTCDay();
+      if (h.frequency==='weekdays') return (h.weekdays||[]).includes(dow);
+      if (h.frequency==='interval') return dayDiff(h.createdAt||today.value,today.value)%Math.max(1,h.every||2)===0;
+      if (h.frequency==='weekly') return (h.history||[]).filter(d=>monday(d)===monday(today.value)).length < (h.weeklyTarget||3);
+      return true;
+    }
+    const dashboardHabits = computed(() => data.habits.filter(h=>habitDue(h)));
+    function completeHabit(h) {
+      if (habitDoneToday(h)) return;
+      if (!confirm('Confirmer la réalisation de « '+h.title+' » aujourd’hui ?')) return;
+      if (!Array.isArray(h.history)) h.history=[];
+      h.history.push(today.value);
+      h.postponed=(h.postponed||[]).filter(d=>d!==today.value);
+      notify('Habitude enregistrée');
+    }
+    function postponeHabit(h) {
+      if (!confirm('Reporter « '+h.title+' » à demain ?')) return;
+      const d=new Date(today.value+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);
+      const tomorrow=d.toISOString().slice(0,10);
+      if (!Array.isArray(h.postponed)) h.postponed=[];
+      if (!h.postponed.includes(today.value)) h.postponed.push(today.value);
+      h.forceDue=tomorrow;
+    }
+    function undoHabit(h) { if(!confirm('Annuler la réalisation du jour ?'))return; h.history=(h.history||[]).filter(d=>d!==today.value); }
+    function deleteHabit(h) {if(confirm('Supprimer cette habitude et son historique ?')) data.habits=data.habits.filter(x=>x.id!==h.id);}
+    const habitCount = h => (h.history||[]).length;
 
     /* ---------- Export / import / reset ---------- */
     function exportData() {
@@ -1274,14 +1379,14 @@ const app = createApp({
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
       // catégories
-      categories, categoryForm, openCategoryForm, saveCategory, deleteCategory, categoryUsage, setCategoryColor,
+      categories, rewardCategories, newRewardCategory, addRewardCategory, deleteRewardCategory, categoryForm, openCategoryForm, saveCategory, deleteCategory, categoryUsage, setCategoryColor,
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
       earned, balance, nextReward, balanceForm, openBalanceForm, applyBalance, resetBalance,
-      rewardFilters, visibleRewards, visibleInventory,
+      rewardFilters, visibleRewards, groupedRewards, visibleInventory,
       // filtres
-      filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, doneTasks,
+      filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, copyForm, copyText, copyTaskTitles,
       // tâches
       quickForm, openQuickForm, toggleQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
       taskForm, openTaskForm, toggleTaskForm, saveTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName,
@@ -1298,6 +1403,7 @@ const app = createApp({
       invForm, startEditInv, saveInv, deleteInv, refundInv,
       // données
       exportData, importData, resetAll,
+      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount,
       // utilitaires
       formatDate,
     };
