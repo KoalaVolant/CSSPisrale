@@ -165,6 +165,9 @@
         <label>Points
           <input type="number" min="0" v-model.number="taskForm.points">
         </label>
+        <label v-if="taskForm.scope === 'work'">Nom du ticket
+          <input type="text" v-model="taskForm.ticketName" placeholder="Ex : INC-1234 ou Ticket client" maxlength="200">
+        </label>
         <label v-if="taskForm.scope === 'work'">Catégories Travail (plusieurs possibles)
           <span class="work-category-choices"><label v-for="c in workCategories" :key="c"><input type="checkbox" :value="c" v-model="taskForm.workCategoryNames"> {{ c }}</label></span>
         </label>
@@ -296,6 +299,7 @@
         <div class="quick-row" v-for="(row, i) in quickForm.rows" :key="i">
           <input class="quick-name" type="text" v-model="row.title" placeholder="Nom de la tâche"
                  @keydown.enter.prevent="addQuickRow">
+          <input v-if="quickForm.scope === 'work'" type="text" v-model="row.ticketName" class="quick-ticket-name" placeholder="Nom du ticket" title="Nom du ticket" maxlength="200">
           <input class="quick-points" type="number" min="0" v-model.number="row.points" title="Points">
           <select v-model="row.urgency" aria-label="Urgence de cette tâche" title="Urgence">
             <option value="">Sans urgence</option>
@@ -336,6 +340,9 @@
               <option :value="false">Bonus</option>
               <option :value="true">Malus</option>
             </select>
+          </label>
+          <label v-if="quickForm.scope === 'work'">Nom du ticket (commun aux tâches créées)
+            <input type="text" v-model="quickForm.paste.ticketName" placeholder="Ex : INC-1234" maxlength="200">
           </label>
           <label>Points par tâche
             <input type="number" min="0" v-model.number="quickForm.paste.points">
@@ -980,6 +987,9 @@
       <input v-else ref="titleInput" class="task-title-input" type="text" v-model="draft"
              @keydown.enter.prevent="saveTitle" @keydown.esc.stop.prevent="cancelTitle" @blur="saveTitle">
 
+      <div v-if="task.scope === 'work'" class="work-ticket-field" @click.stop>
+        <label>Nom du ticket : <input type="text" :value="task.ticketName || ''" placeholder="Non renseigné" maxlength="200" @change="update('ticketName', $event)" @keydown.enter.prevent="$event.target.blur()"></label>
+      </div>
       <div class="task-tags">
 
         <!-- Catégorie -->
