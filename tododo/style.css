@@ -167,3 +167,8 @@
 .work-tag-picker summary {list-style:none;cursor:pointer;white-space:normal}
 .work-tag-options {position:absolute;top:100%;left:0;min-width:180px;max-height:250px;overflow:auto;background:Canvas;color:CanvasText;border:1px solid #bbb;padding:.65rem;z-index:20;box-shadow:0 3px 10px #0002}
 .work-tag-options label {display:flex;align-items:center;gap:.3rem;padding:.2rem}
+
+/* V13 : identification libre des tickets Travail */
+.work-ticket-field {margin:.35rem 0;font-size:.85rem;}
+.work-ticket-field input,.quick-ticket-name {max-width:210px;padding:.3rem .5rem;border:1px solid #bbb;border-radius:6px;}
+.work-ticket-field label {display:inline-flex;align-items:center;gap:.35rem;flex-wrap:wrap;}
