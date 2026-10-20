@@ -158,7 +158,7 @@ function formatLongDate(str) {
 function newTask(fields = {}) {
   return {
     id: uid(), title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
-    urgency: '', difficulty: '', doneAt: '',
+    urgency: '', difficulty: '', doneAt: '', ticketName: '',
     ...fields,
   };
 }
@@ -800,7 +800,7 @@ const app = createApp({
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
       open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
-      urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [],
+      urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '',
     });
 
     function openTaskForm(task = null, projectId = '') {
@@ -808,12 +808,12 @@ const app = createApp({
         Object.assign(taskForm, {
           id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal',
           status: task.status, projectId: task.projectId || '', due: task.due || '',
-          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task),
+          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '',
         });
       } else {
         Object.assign(taskForm, {
           id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId, scope: view.value==='work'?'work':'personal',
-          due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [],
+          due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [], ticketName: '',
         });
       }
       quickForm.open = false;
@@ -846,6 +846,7 @@ const app = createApp({
         title,
         category: taskForm.scope === 'work' ? (taskForm.workCategoryNames[0] || '') : (taskForm.category || ''),
         workCategoryNames: taskForm.scope === 'work' ? [...taskForm.workCategoryNames] : [],
+        ticketName: taskForm.scope === 'work' ? taskForm.ticketName.trim() : '',
         scope:taskForm.scope==='work'?'work':'personal',
         points: Math.max(0, Number(taskForm.points) || 0),
         malus: !!taskForm.malus,
@@ -879,7 +880,7 @@ const app = createApp({
     /* ---------- To do rapide (plusieurs tâches d'un coup) ---------- */
     const quickForm = reactive({
       open: false, mode: 'rows', scope: 'personal', due: '', rows: [],
-      paste: { text: '', points: 10, malus: false, category: '', workCategoryNames: [], urgency: '', difficulty: '', due: '', project: '' },
+      paste: { text: '', points: 10, malus: false, category: '', workCategoryNames: [], ticketName: '', urgency: '', difficulty: '', due: '', project: '' },
     });
     const pastePreview = computed(() => parsePastedList(quickForm.paste.text));
 
@@ -887,9 +888,9 @@ const app = createApp({
       taskForm.open = false;
       quickForm.mode = 'rows';
       quickForm.scope = view.value === 'work' ? 'work' : 'personal';
-      quickForm.paste = { text: '', points: 10, malus: false, category: '', workCategoryNames: [], urgency: '', difficulty: '', due: today.value, project: '' };
+      quickForm.paste = { text: '', points: 10, malus: false, category: '', workCategoryNames: [], ticketName: '', urgency: '', difficulty: '', due: today.value, project: '' };
       quickForm.due = today.value;
-      quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value, urgency: '', difficulty: '', workCategoryNames: [] }));
+      quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value, urgency: '', difficulty: '', workCategoryNames: [], ticketName: '' }));
       quickForm.open = true;
       focusLastQuickRow(0);
     }
@@ -904,13 +905,13 @@ const app = createApp({
 
     function addQuickRow() {
       const last = quickForm.rows[quickForm.rows.length - 1];
-      quickForm.rows.push({ title: '', points: last ? last.points : 10, due: last ? last.due : '', urgency: last ? last.urgency || '' : '', difficulty: last ? last.difficulty || '' : '', workCategoryNames: last ? [...(last.workCategoryNames || [])] : [] });
+      quickForm.rows.push({ title: '', points: last ? last.points : 10, due: last ? last.due : '', urgency: last ? last.urgency || '' : '', difficulty: last ? last.difficulty || '' : '', workCategoryNames: last ? [...(last.workCategoryNames || [])] : [], ticketName: last ? last.ticketName || '' : '' });
       focusLastQuickRow();
     }
 
     function removeQuickRow(i) {
       quickForm.rows.splice(i, 1);
-      if (!quickForm.rows.length) quickForm.rows.push({ title: '', points: 10, due: quickForm.due, urgency: '', difficulty: '', workCategoryNames: [] });
+      if (!quickForm.rows.length) quickForm.rows.push({ title: '', points: 10, due: quickForm.due, urgency: '', difficulty: '', workCategoryNames: [], ticketName: '' });
     }
 
     // Applique la date "pour toutes" à chaque ligne
@@ -927,6 +928,7 @@ const app = createApp({
         urgency: r.urgency || '',
         difficulty: quickForm.scope === 'work' ? (r.difficulty || '') : '',
         workCategoryNames: quickForm.scope === 'work' ? [...(r.workCategoryNames || [])] : [],
+        ticketName: quickForm.scope === 'work' ? String(r.ticketName || '').trim() : '',
         category: quickForm.scope === 'work' ? ((r.workCategoryNames || [])[0] || '') : '',
         due: r.due || '',
       })));
@@ -955,6 +957,7 @@ const app = createApp({
         malus: !!quickForm.paste.malus,
         category: quickForm.scope === 'work' ? (quickForm.paste.workCategoryNames[0] || '') : (quickForm.paste.category || ''),
         workCategoryNames: quickForm.scope === 'work' ? [...quickForm.paste.workCategoryNames] : [],
+        ticketName: quickForm.scope === 'work' ? String(quickForm.paste.ticketName || '').trim() : '',
         urgency: quickForm.paste.urgency || '',
         difficulty: quickForm.paste.difficulty || '',
         due: quickForm.paste.due || '',
@@ -1101,6 +1104,8 @@ const app = createApp({
       if (field === 'title') {
         const v = String(value).trim();
         if (v) task.title = v;
+      } else if (field === 'ticketName' && task.scope === 'work') {
+        task.ticketName = String(value || '').trim();
       } else if (field === 'malus') {
         task.malus = value === true || value === 'true';
       } else if (field === 'workCategoryToggle' && task.scope === 'work') {
