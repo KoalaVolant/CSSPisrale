@@ -149,3 +149,13 @@
 .quick-row select {max-width:170px}
 @media(max-width:800px){.app-nav .nav-group{min-width:160px;flex:1}}
 
+
+/* V10 : ajouts structurels ; stylekoala.css reste la feuille personnelle */
+.page-header {position:sticky;top:0;z-index:30;background:var(--fnd,#f5f5f5);padding:8px;}
+.task-toolbar {position:sticky;top:70px;z-index:20;background:var(--fnd,#f5f5f5);padding:6px;}
+.habit-overdue {border:2px solid #cb2b35 !important;color:#a11925;}
+.habit-overdue small {font-weight:600;}
+.activity-entry {display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid #ccc;padding:10px;}
+.activity-entry strong{flex:1;}
+.task-duplicate{font-size:.8rem;cursor:pointer;border-radius:6px;border:1px solid #ddd;padding:3px 7px;}
+.inventory-used-list{opacity:.78;}
