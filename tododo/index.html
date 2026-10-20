@@ -165,7 +165,10 @@
         <label>Points
           <input type="number" min="0" v-model.number="taskForm.points">
         </label>
-        <label>Catégorie
+        <label v-if="taskForm.scope === 'work'">Catégories Travail (plusieurs possibles)
+          <span class="work-category-choices"><label v-for="c in workCategories" :key="c"><input type="checkbox" :value="c" v-model="taskForm.workCategoryNames"> {{ c }}</label></span>
+        </label>
+        <label v-else>Catégorie
           <select v-model="taskForm.category">
             <option value="">Sans catégorie</option>
             <option v-for="c in (taskForm.scope === 'work' ? workCategories : categories)" :key="c" :value="c">{{ c }}</option>
@@ -224,7 +227,11 @@
           <label>Points
             <input type="number" min="0" v-model.number="bulkForm.points" placeholder="(inchangés)">
           </label>
-          <label>Catégorie
+          <label v-if="bulkForm.ids.length && data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope === 'work'">Catégories Travail
+            <span><input type="checkbox" v-model="bulkForm.editWorkCategories"> Remplacer les catégories des tâches sélectionnées</span>
+            <span class="work-category-choices" v-if="bulkForm.editWorkCategories"><label v-for="c in workCategories" :key="c"><input type="checkbox" :value="c" v-model="bulkForm.workCategoryNames"> {{ c }}</label></span>
+          </label>
+          <label v-else>Catégorie
             <select v-model="bulkForm.category">
               <option value="__keep">(inchangée)</option>
               <option value="">Sans catégorie</option>
@@ -298,6 +305,10 @@
             <option value="">Sans difficulté</option>
             <option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option>
           </select>
+          <details v-if="quickForm.scope === 'work'" class="quick-work-categories">
+            <summary>Catégories ({{ (row.workCategoryNames || []).length }})</summary>
+            <div class="work-category-choices"><label v-for="c in workCategories" :key="c"><input type="checkbox" :value="c" v-model="row.workCategoryNames"> {{ c }}</label></div>
+          </details>
           <input class="quick-due" type="date" v-model="row.due" title="Date butoir">
           <button type="button" @click="removeQuickRow(i)" title="Retirer cette ligne">Retirer</button>
         </div>
@@ -329,7 +340,10 @@
           <label>Points par tâche
             <input type="number" min="0" v-model.number="quickForm.paste.points">
           </label>
-          <label>Catégorie
+          <label v-if="quickForm.scope === 'work'">Catégories Travail
+            <span class="work-category-choices"><label v-for="c in workCategories" :key="c"><input type="checkbox" :value="c" v-model="quickForm.paste.workCategoryNames"> {{ c }}</label></span>
+          </label>
+          <label v-else>Catégorie
             <select v-model="quickForm.paste.category">
               <option value="">Sans catégorie</option>
               <option v-for="c in (quickForm.scope === 'work' ? workCategories : categories)" :key="c" :value="c">{{ c }}</option>
@@ -554,10 +568,18 @@
 
     <!-- ============ TERMINÉS : rangés par date de fin, seulement catégorie et projet ============ -->
     <section class="view view-done" v-if="view === 'done'">
-      <p class="hint">{{ doneTasks.length }} tâche{{ doneTasks.length > 1 ? 's' : '' }} terminée{{ doneTasks.length > 1 ? 's' : '' }}, de la plus récente à la plus ancienne. Supprimer une tâche terminée ne retire pas ses points. Pour la rouvrir ou changer son statut : sélectionne-la puis « Modifier ».</p>
-      <p class="empty" v-if="!doneTasks.length">Aucune tâche terminée pour l'instant.</p>
+      <p class="hint">{{ doneTasks.length + doneWorkTasks.length }} tâche{{ (doneTasks.length + doneWorkTasks.length) > 1 ? 's' : '' }} terminée{{ (doneTasks.length + doneWorkTasks.length) > 1 ? 's' : '' }}, de la plus récente à la plus ancienne. Supprimer une tâche terminée ne retire pas ses points. Pour la rouvrir ou changer son statut : sélectionne-la puis « Modifier ».</p>
+      <p class="empty" v-if="!doneTasks.length && !doneWorkTasks.length">Aucune tâche terminée pour l'instant.</p>
+      <h3 v-if="doneTasks.length">Personnel</h3>
       <div class="task-list">
         <task-list :tasks="doneTasks" group="doneAt" compact :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
+                   @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
+                   @edit-selected="editSelected" @delete-selected="deleteSelected"
+                   @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
+      </div>
+      <h3 v-if="doneWorkTasks.length">Travail</h3>
+      <div class="task-list" v-if="doneWorkTasks.length">
+        <task-list :tasks="doneWorkTasks" group="doneAt" compact :projects="[]" :categories="workCategories" :statuses="statuses" :today="today" :selected="selection"
                    @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
                    @edit-selected="editSelected" @delete-selected="deleteSelected"
                    @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
@@ -961,7 +983,11 @@
       <div class="task-tags">
 
         <!-- Catégorie -->
-        <label class="tag tag-category" :class="{ 'tag-empty': !task.category, 'tag-colored': !!categoryColor }" :style="styleFor(categoryColor)">
+        <details v-if="task.scope === 'work'" class="tag tag-category work-tag-picker" @click.stop>
+          <summary>{{ workTags.length ? workTags.join(', ') : 'Sans catégorie' }}</summary>
+          <div class="work-tag-options"><label v-for="c in categories" :key="c"><input type="checkbox" :checked="workTags.includes(c)" @change="update('workCategoryToggle', {target:{value:c}})"> {{ c }}</label></div>
+        </details>
+        <label v-else class="tag tag-category" :class="{ 'tag-empty': !task.category, 'tag-colored': !!categoryColor }" :style="styleFor(categoryColor)">
           <select :value="task.category || ''" @change="update('category', $event)">
             <option value="">Sans catégorie</option>
             <option v-if="categoryMissing" :value="task.category">{{ task.category }}</option>
