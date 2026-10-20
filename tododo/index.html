@@ -127,6 +127,8 @@
             <option v-for="d in data.difficulties" :key="d.id" :value="d.id">Difficulté : {{ d.name }}</option>
           </select>
 
+          <select v-model="filters.dueMode" title="Filtre de date butoir"><option value="any">Avec ou sans date</option><option value="dated">Avec date</option><option value="none">Sans date</option></select>
+          <label>Du <input type="date" v-model="filters.dueFrom"></label><label>Au <input type="date" v-model="filters.dueTo"></label>
           <select v-model="filters.kind">
             <option value="">Bonus et malus</option>
             <option value="bonus">Bonus seulement</option>
@@ -390,8 +392,8 @@
       </section>
       <section class="habit-dashboard" v-if="data.habits.length">
         <h2>Habitudes <small>({{ dashboardHabits.length }})</small></h2>
-        <div class="habit-entry" v-for="habit in dashboardHabits" :key="habit.id" :class="{ 'habit-completed': habitDoneToday(habit) }">
-          <span>{{ habit.title }}</span><div class="habit-actions"><button type="button" v-if="!habitDoneToday(habit)" @click="completeHabit(habit)">✓</button><span v-else>Effectuée ✓</span><button type="button" v-if="!habitDoneToday(habit)" @click="postponeHabit(habit)">Demain</button></div>
+        <div class="habit-entry" v-for="habit in dashboardHabits" :key="habit.id" :class="{ 'habit-completed': habitDoneToday(habit), 'habit-overdue': habitLateDays(habit)>0 }">
+          <span>{{ habit.title }} <small v-if="habitLateDays(habit)>0">({{ habitLateDays(habit) }} jour(s) de retard)</small></span><div class="habit-actions"><button type="button" v-if="!habitDoneToday(habit)" @click="completeHabit(habit)">✓</button><span v-else>Effectuée ✓</span><button type="button" v-if="!habitDoneToday(habit)" @click="postponeHabit(habit)">Demain</button></div>
         </div>
       </section>
       <div class="dashboard">
@@ -403,7 +405,7 @@
             <task-list :tasks="todayTasks" :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
                        @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
                        @edit-selected="editSelected" @delete-selected="deleteSelected"
-                       @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
+                       @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
           </div>
         </section>
 
@@ -414,7 +416,7 @@
             <task-list :tasks="upcomingTasks" :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
                        @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
                        @edit-selected="editSelected" @delete-selected="deleteSelected"
-                       @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
+                       @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
           </div>
         </section>
 
@@ -437,7 +439,7 @@
         <task-list :tasks="allTasks" :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
                    @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
                    @edit-selected="editSelected" @delete-selected="deleteSelected"
-                   @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
+                   @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
       </div>
     </section>
 
@@ -445,7 +447,7 @@
       <p class="hint">Espace indépendant : tâches professionnelles, catégories et difficultés propres au travail. Les points alimentent ton solde commun.</p>
       <task-list :tasks="workTasks" :projects="[]" :categories="workCategories" :statuses="statuses" :today="today" :selected="selection"
         @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany" @edit-selected="editSelected" @delete-selected="deleteSelected"
-        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
+        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
       <div class="work-settings">
         <details class="config-fold">
           <summary>Catégories Travail</summary>
@@ -458,7 +460,7 @@
             <input v-model="d.name" aria-label="Nom de la difficulté">
             <select v-model="d.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
             <input type="number" min="0" step="0.25" v-model.number="d.pointValue" aria-label="Bonus">
-            <button type="button" @click="deleteWorkDifficulty(d)">Supprimer</button>
+            <button type="button" @click="moveWorkLevel('difficulty',data.workDifficulties.indexOf(d),-1)" :disabled="data.workDifficulties.indexOf(d)===0">↑</button><button type="button" @click="moveWorkLevel('difficulty',data.workDifficulties.indexOf(d),1)" :disabled="data.workDifficulties.indexOf(d)===data.workDifficulties.length-1">↓</button><button type="button" @click="deleteWorkDifficulty(d)">Supprimer</button>
           </article>
           <button type="button" @click="addWorkDifficulty">＋ Ajouter une difficulté de travail</button>
         </details>
@@ -470,7 +472,7 @@
             <input v-model="u.name" aria-label="Nom de l'urgence">
             <select v-model="u.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
             <input type="number" min="0" step="0.25" v-model.number="u.pointValue" aria-label="Bonus urgence">
-            <button type="button" @click="deleteWorkUrgency(u)">Supprimer</button>
+            <button type="button" @click="moveWorkLevel('urgency',data.workUrgencies.indexOf(u),-1)" :disabled="data.workUrgencies.indexOf(u)===0">↑</button><button type="button" @click="moveWorkLevel('urgency',data.workUrgencies.indexOf(u),1)" :disabled="data.workUrgencies.indexOf(u)===data.workUrgencies.length-1">↓</button><button type="button" @click="deleteWorkUrgency(u)">Supprimer</button>
           </article>
           <button type="button" @click="addWorkUrgency">＋ Ajouter une urgence de travail</button>
         </details>
@@ -500,6 +502,11 @@
         <form class="modal form-panel" @submit.prevent="saveHabit">
           <h3>{{ habitForm.id ? 'Modifier' : 'Nouvelle' }} habitude / routine</h3>
           <label>Nom <input v-model="habitForm.title" required></label>
+          <label>Date de début <input type="date" v-model="habitForm.startDate" required></label>
+          <label>Points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.basePoints"></label>
+          <label>Bonus par réalisation consécutive <input type="number" min="0" step="0.25" v-model.number="habitForm.comboPoints"></label>
+          <label>Maximum de points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.maxPoints" placeholder="Sans plafond (anciennes habitudes)"></label>
+          <small>Exemple : base 3 pts, bonus 0,5 pt, plafond 5 pts. Chaque réalisation rapportera au maximum 5 pts. Les points déjà gagnés sont conservés.</small>
           <label>Fréquence <select v-model="habitForm.frequency"><option value="daily">Tous les jours</option><option value="weekdays">Certains jours</option><option value="interval">Tous les X jours</option><option value="weekly">X fois par semaine</option></select></label>
           <div v-if="habitForm.frequency === 'weekdays'" class="habit-days"><label v-for="d in habitWeekdays" :key="d.id"><input type="checkbox" :value="d.id" v-model="habitForm.weekdays"> {{ d.label }}</label></div>
           <label v-if="habitForm.frequency === 'interval'">Tous les <input type="number" min="1" v-model.number="habitForm.every"> jours</label>
@@ -508,10 +515,10 @@
         </form>
       </div>
       <p class="empty" v-if="!data.habits.length">Aucune habitude enregistrée.</p>
-      <article class="habit-entry" v-for="habit in data.habits" :key="habit.id">
-        <div><strong>{{ habit.title }}</strong> <span v-if="habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small>{{ habitCount(habit) }} réalisation(s) au total · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
+      <article class="habit-entry" v-for="habit in data.habits" :key="habit.id" :class="{'habit-overdue':habitLateDays(habit)>0}">
+        <div><strong>{{ habit.title }}</strong> <small v-if="habitLateDays(habit)>0">{{ habitLateDays(habit) }} jour(s) de retard</small> <span v-if="habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small>{{ habitCount(habit) }} réalisation(s) · {{ habitAwards(habit).reduce((s,a)=>s+a.points,0) }} pts gagnés · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
         <div class="habit-actions"><button type="button" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)">Terminer</button><button type="button" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)">Reporter à demain</button><button type="button" v-if="habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
-        <details><summary>Historique des réalisations</summary><p>{{ (habit.history || []).length ? [...habit.history].sort().reverse().join(' · ') : 'Aucune réalisation' }}</p></details>
+        <details><summary>Historique des réalisations et points</summary><p v-for="a in [...habitAwards(habit)].reverse()" :key="a.date">{{ formatDate(a.date) }} · +{{ a.points }} pts · série {{ a.streak }}</p><p v-if="!habitCount(habit)">Aucune réalisation</p></details>
       </article>
     </section>
 
@@ -553,7 +560,7 @@
         <task-list :tasks="doneTasks" group="doneAt" compact :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
                    @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
                    @edit-selected="editSelected" @delete-selected="deleteSelected"
-                   @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask"></task-list>
+                   @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
       </div>
     </section>
 
@@ -807,6 +814,7 @@
         <article class="reward" v-for="r in group.rewards" :key="r.id" :class="{ affordable: balance + (Number(r.saved)||0) >= r.cost }">
           <div class="reward-body">
             <h3 class="reward-name">{{ r.favorite ? '★ ' : '' }}{{ r.name }}</h3>
+            <small>Déjà obtenue {{ rewardClaimCount(r) }} fois</small>
             <div class="reward-fl"><p class="reward-category">{{ r.category || 'Sans catégorie' }}</p>
             <p class="reward-cost">{{ r.cost }} pts</p></div>
             <progress :value="Number(r.saved)||0" :max="r.cost"></progress>
@@ -841,8 +849,9 @@
       <p class="empty" v-if="!data.inventory.length">Tu n'as encore rien gagné. Réclame une récompense dans l'onglet « Récompenses ».</p>
       <p class="empty" v-else-if="!visibleInventory.length">Rien dans cette catégorie.</p>
 
+      <h3>Disponibles ({{ unusedInventory.length }})</h3>
       <div class="inventory-list">
-        <article class="inventory-item" v-for="item in visibleInventory" :key="item.id" :class="{ used: item.used }">
+        <article class="inventory-item" v-for="item in unusedInventory" :key="item.id" :class="{ used: item.used }">
           <template v-if="invForm.id === item.id">
             <form class="inventory-edit" @submit.prevent="saveInv">
               <input type="text" v-model="invForm.name" required>
@@ -857,10 +866,10 @@
           <template v-else>
             <div class="inventory-body">
               <h3 class="inventory-name">{{ item.name }}</h3>
-              <p class="inventory-meta"><span class="inventory-category">{{ item.category || 'Sans catégorie' }} · </span>Gagnée le {{ formatDate(item.date) }} · {{ item.cost }} pts</p>
+              <p class="inventory-meta"><span class="inventory-category">{{ item.category || 'Sans catégorie' }} · </span>Gagnée le {{ formatDate(item.date) }} · {{ item.cost }} pts <span v-if="item.used">· Utilisée le {{ formatDate(item.usedAt||item.date) }}</span></p>
             </div>
             <label class="inventory-used">
-              <input type="checkbox" v-model="item.used"> Utilisée
+              <input type="checkbox"  :checked="item.used" @change="setInventoryUsed(item,$event.target.checked)"> Utilisée
             </label>
             <div class="inventory-actions">
               <button type="button" @click="startEditInv(item)">Modifier</button>
@@ -870,6 +879,52 @@
           </template>
         </article>
       </div>
+      <h3>Utilisées ({{ usedInventory.length }})</h3>
+      <div class="inventory-list inventory-used-list">
+        <article class="inventory-item" v-for="item in usedInventory" :key="item.id" :class="{ used: item.used }">
+          <template v-if="invForm.id === item.id">
+            <form class="inventory-edit" @submit.prevent="saveInv">
+              <input type="text" v-model="invForm.name" required>
+              <select v-model="invForm.category">
+                <option value="">Sans catégorie</option>
+                <option v-for="c in rewardCategories" :key="c" :value="c">{{ c }}</option>
+              </select>
+              <button type="submit">OK</button>
+              <button type="button" @click="invForm.id = null">Annuler</button>
+            </form>
+          </template>
+          <template v-else>
+            <div class="inventory-body">
+              <h3 class="inventory-name">{{ item.name }}</h3>
+              <p class="inventory-meta"><span class="inventory-category">{{ item.category || 'Sans catégorie' }} · </span>Gagnée le {{ formatDate(item.date) }} · {{ item.cost }} pts <span v-if="item.used">· Utilisée le {{ formatDate(item.usedAt||item.date) }}</span></p>
+            </div>
+            <label class="inventory-used">
+              <input type="checkbox"  :checked="item.used" @change="setInventoryUsed(item,$event.target.checked)"> Utilisée
+            </label>
+            <div class="inventory-actions">
+              <button type="button" @click="startEditInv(item)">Modifier</button>
+              <button type="button" @click="deleteInv(item)">Supprimer</button>
+              <button type="button" @click="refundInv(item)">Supprimer + rembourser</button>
+            </div>
+          </template>
+        </article>
+      </div>
+    </section>
+
+    <section class="view view-activities" v-if="view==='activities'">
+      <button type="button" class="btn-add" @click="openActivityForm()">＋ Ajouter une idée</button>
+      <p class="hint">Clique sur « Créer une tâche » pour ajouter l'activité aux tâches personnelles du jour.</p>
+      <div class="modal-backdrop" v-if="activityForm.open" @click.self="activityForm.open=false">
+        <form class="modal form-panel" @submit.prevent="saveActivity">
+          <h3>{{ activityForm.id?'Modifier':'Nouvelle' }} idée</h3>
+          <label>Nom <input v-model="activityForm.title" required maxlength="150"></label>
+          <label>Points de la future tâche <input type="number" min="0" v-model.number="activityForm.points"></label>
+          <div class="form-actions"><button type="submit">Enregistrer</button><button type="button" @click="activityForm.open=false">Annuler</button></div>
+        </form>
+      </div>
+      <p v-if="!data.activities.length" class="empty">Aucune idée enregistrée.</p>
+      <article class="activity-entry" v-for="a in data.activities" :key="a.id"><strong>{{ a.title }}</strong><span>{{ a.points }} pts</span>
+        <button type="button" @click="createFromActivity(a)">Créer une tâche</button><button type="button" @click="openActivityForm(a)">Modifier</button><button type="button" @click="deleteActivity(a)">Supprimer</button></article>
     </section>
 
     <!-- ============ SAUVEGARDE ============ -->
@@ -967,6 +1022,8 @@
           </label>
 
           <span class="tag tag-late" v-if="isOverdue">En retard</span>
+          <button type="button" class="task-duplicate" @click.stop="$emit('duplicate',task,'tomorrow')" title="Dupliquer avec échéance demain">+ Demain</button>
+          <button type="button" class="task-duplicate" @click.stop="$emit('duplicate',task,'followup')" title="Créer une tâche suivante liée">+ Suite</button>
         </template>
       </div>
     </div>
