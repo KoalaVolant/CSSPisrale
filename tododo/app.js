@@ -42,12 +42,13 @@ const TABS = [
   { id: 'levels',     label: 'Urgences & difficultés' },
   { id: 'rewards',    label: 'Récompenses' },
   { id: 'inventory',  label: 'Inventaire' },
+  { id: 'activities', label: 'Idées d’activités' },
   { id: 'data',       label: 'Sauvegarde' },
 ];
 
 const NAV_GROUPS = [
   { title: 'Tâches', ids: ['home','all','work','habits','done'] },
-  { title: 'Plaisir', ids: ['rewards','inventory'] },
+  { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','challenges'] },
   { title: 'Configuration', ids: ['projects','categories','levels','data'] },
 ].map(group => ({ ...group, tabs: group.ids.map(id => TABS.find(t => t.id === id)).filter(Boolean) }));
@@ -181,6 +182,7 @@ function defaultData() {
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
     rewardCategories: [], // catégories indépendantes des récompenses et de l'inventaire
     habits: [], // habitudes + historique de réalisations
+    activities: [], // idées d'activités personnelles
     challenges: [], // défis paramétrables
     challengeAwards: [], // journal immuable des points attribués
     gratitude: [], // { date, text, points } : une par jour
@@ -213,6 +215,8 @@ function loadData() {
     if (!Array.isArray(d.rewardCategories)) d.rewardCategories = [];
     d.rewardCategories = normalizeCategories(d.rewardCategories);
     if (!Array.isArray(d.habits)) d.habits = [];
+    if (!Array.isArray(d.activities)) d.activities = [];
+    d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
     if (!Array.isArray(d.challenges)) d.challenges = [];
     if (!Array.isArray(d.challengeAwards)) d.challengeAwards = [];
     if (!Array.isArray(d.gratitude)) d.gratitude = [];
@@ -429,6 +433,8 @@ const app = createApp({
       data.categories = data.categories.filter(c=>c.name!=='Travail');
       data.rewardCategories = normalizeCategories(src.rewardCategories || [...(src.rewards || []), ...(src.inventory || [])].map(x => x.category).filter(Boolean));
       data.habits = Array.isArray(src.habits) ? src.habits : [];
+      data.activities = Array.isArray(src.activities) ? src.activities : [];
+      data.inventory.forEach(i=>{if(i.used&&!i.usedAt)i.usedAt=i.date||todayStr();});
       data.challenges = Array.isArray(src.challenges) ? src.challenges : [];
       data.challengeAwards = Array.isArray(src.challengeAwards) ? src.challengeAwards : [];
       data.gratitude = Array.isArray(src.gratitude) ? src.gratitude : [];
@@ -573,8 +579,9 @@ const app = createApp({
       + (Number(data.archived) || 0));
     const gratitudeTotal = computed(() => Math.round(data.gratitude.reduce((sum,g) => sum+(Number(g.points)||0),0)*100)/100);
     const savedTotal = computed(() => data.rewards.reduce((sum,r)=>sum+Math.max(0,Number(r.saved)||0),0));
+    const habitTotal = computed(() => Math.round(data.habits.reduce((sum,h)=>sum+habitAwards(h).reduce((s,a)=>s+a.points,0),0)*100)/100);
     const challengeTotal = computed(() => Math.round(data.challengeAwards.reduce((sum,a) => sum + (Number(a.points)||0), 0)*100)/100);
-    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value + challengeTotal.value - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
+    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
 
     // Modification manuelle du solde : on règle "adjust" pour tomber pile sur la valeur voulue
     const balanceForm = reactive({ open: false, value: 0 });
@@ -585,13 +592,13 @@ const app = createApp({
     function applyBalance() {
       const target = Number(balanceForm.value);
       if (!Number.isFinite(target)) return;
-      data.adjust = Math.round((target - (earned.value + gratitudeTotal.value - data.spent - savedTotal.value))*100)/100;
+      data.adjust = Math.round((target - (earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value - data.spent - savedTotal.value))*100)/100;
       balanceForm.open = false;
       notify(`Solde réglé à ${Math.round(target)} pts`);
     }
     function resetBalance() {
       if (!confirm('Remettre le solde de points à 0 ?')) return;
-      data.adjust = -(earned.value + gratitudeTotal.value - data.spent - savedTotal.value);
+      data.adjust = -(earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value - data.spent - savedTotal.value);
       balanceForm.open = false;
       notify('Solde remis à 0');
     }
@@ -643,6 +650,7 @@ const app = createApp({
     const newWorkCategory=ref('');
     function addWorkCategory(){const name=newWorkCategory.value.trim();if(name&&!workCategories.value.some(c=>c.toLowerCase()===name.toLowerCase()))data.workCategories.push({name,color:''});newWorkCategory.value='';}
     function deleteWorkCategory(name){if(!confirm('Supprimer la catégorie de travail « '+name+' » ?'))return;data.tasks.filter(t=>t.scope==='work'&&t.category===name).forEach(t=>t.category='');data.workCategories=data.workCategories.filter(c=>c.name!==name);}
+    function moveWorkLevel(kind,index,delta){const levels=kind==='urgency'?data.workUrgencies:data.workDifficulties;const dest=index+delta;if(dest<0||dest>=levels.length)return;const [v]=levels.splice(index,1);levels.splice(dest,0,v);}
     function addWorkUrgency(){data.workUrgencies.push({id:uid(),name:'Nouvelle urgence',color:'#6b7280',pointMode:'add',pointValue:0});}
     function deleteWorkUrgency(level){if(!confirm('Supprimer cette urgence de travail ?'))return;data.tasks.filter(t=>t.scope==='work'&&t.urgency===level.id).forEach(t=>t.urgency='');data.workUrgencies=data.workUrgencies.filter(x=>x.id!==level.id);}
     function addWorkDifficulty(){data.workDifficulties.push({id:uid(),name:'Nouveau niveau',color:'#6b7280',pointMode:'add',pointValue:0});}
@@ -688,9 +696,12 @@ const app = createApp({
       return [...groups].map(([name, rewards]) => ({name, rewards}));
     });
     const visibleInventory = computed(() => data.inventory.filter(matchesRewardCategory));
+    const unusedInventory = computed(()=>visibleInventory.value.filter(i=>!i.used));
+    const usedInventory = computed(()=>visibleInventory.value.filter(i=>i.used).sort((a,b)=>(b.usedAt||'').localeCompare(a.usedAt||'')));
+    const rewardClaimCount = r => data.inventory.filter(i=>i.rewardId===r.id || (!i.rewardId && i.name===r.name)).length;
 
     /* ---------- Filtres & tris des tâches ---------- */
-    const FILTER_DEFAULTS = { search: '', category: '', status: '', project: '', urgency: '', difficulty: '', kind: '', sort: 'due' };
+    const FILTER_DEFAULTS = { search: '', category: '', status: '', project: '', urgency: '', difficulty: '', kind: '', dueMode: 'any', dueFrom: '', dueTo: '', sort: 'due' };
     const filters = reactive({ ...FILTER_DEFAULTS });
 
     function resetFilters() {
@@ -707,6 +718,9 @@ const app = createApp({
       if (filters.urgency) n++;
       if (filters.difficulty) n++;
       if (filters.kind) n++;
+      if (filters.dueMode !== 'any') n++;
+      if (filters.dueFrom) n++;
+      if (filters.dueTo) n++;
       if (filters.sort !== 'due') n++;
       return n;
     });
@@ -715,6 +729,10 @@ const app = createApp({
       const q = filters.search.trim().toLowerCase();
       const res = list.filter(t => {
         if (filters.status && t.status !== filters.status) return false;
+        if (filters.dueMode==='none' && t.due) return false;
+        if (filters.dueMode==='dated' && !t.due) return false;
+        if (filters.dueFrom && (!t.due || t.due<filters.dueFrom)) return false;
+        if (filters.dueTo && (!t.due || t.due>filters.dueTo)) return false;
         if (filters.category === '__none' && t.category) return false;
         if (filters.category && filters.category !== '__none' && t.category !== filters.category) return false;
         if (filters.project === '__none' && t.projectId) return false;
@@ -1021,6 +1039,19 @@ const app = createApp({
       if (old === 'done' && newStatus !== 'done') notify(`${fmtPts(-v)} (tâche rouverte)`);
     }
 
+    function duplicateTask(task,mode='tomorrow') {
+      const copy=newTask({...task,id:uid(),title:task.title,status:'todo',doneAt:'',scope:task.scope||'personal'});
+      if(mode==='tomorrow'){
+        const d=new Date(today.value+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);copy.due=d.toISOString().slice(0,10);
+      } else {
+        const title=prompt('Nom de la tâche suivante :',task.title+' (suite)');
+        if(!title||!title.trim())return;
+        copy.title=title.trim();copy.previousTaskId=task.id;copy.due=task.due||today.value;
+      }
+      data.tasks.push(copy);
+      notify('Nouvelle tâche créée : '+copy.title);
+    }
+
     function changePoints(task, value) {
       task.points = Math.max(0, Number(value) || 0);
     }
@@ -1100,7 +1131,7 @@ const app = createApp({
 
     function projectTasks(project) {
       return data.tasks
-        .filter(t => t.projectId === project.id)
+        .filter(t => t.projectId === project.id && t.status !== 'done')
         .sort((a, b) => (a.due || '9999').localeCompare(b.due || '9999'));
     }
 
@@ -1243,7 +1274,7 @@ const app = createApp({
       data.spent += reward.cost;
       reward.saved=0;
       data.inventory.unshift({
-        id: uid(), name: reward.name, category: reward.category || '', cost: reward.cost, date: todayStr(), used: false,
+        id: uid(), rewardId:reward.id, name: reward.name, category: reward.category || '', cost: reward.cost, date: todayStr(), used: false, usedAt:'',
       });
       notify(`Récompense gagnée : ${reward.name} ! Elle est dans l'Inventaire`);
     }
@@ -1264,6 +1295,8 @@ const app = createApp({
       invForm.id = null;
     }
 
+    function setInventoryUsed(item,used){item.used=!!used;item.usedAt=used?todayStr():'';}
+
     function deleteInv(item) {
       if (!confirm(`Retirer « ${item.name} » de l'inventaire ? (Les points ne sont pas rendus.)`)) return;
       data.inventory = data.inventory.filter(i => i.id !== item.id);
@@ -1277,37 +1310,69 @@ const app = createApp({
     }
 
     /* ---------- Habitudes et routines ---------- */
-    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3});
+    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',basePoints:1,comboPoints:0.25,maxPoints:10});
     const habitWeekdays = [{id:1,label:'Lun'},{id:2,label:'Mar'},{id:3,label:'Mer'},{id:4,label:'Jeu'},{id:5,label:'Ven'},{id:6,label:'Sam'},{id:0,label:'Dim'}];
     function openHabitForm(habit = null) {
-      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3});
+      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),basePoints:habit.basePoints??0,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??''} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),basePoints:1,comboPoints:0.25,maxPoints:10});
     }
     function saveHabit() {
       const title = habitForm.title.trim(); if (!title) return;
-      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3))};
-      if (habitForm.id) {const h=data.habits.find(x=>x.id===habitForm.id);if(h) Object.assign(h,fields);}
+      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0)};
+      if (habitForm.id) {const h=data.habits.find(x=>x.id===habitForm.id);if(h) { if (!h.pointAwards) h.pointAwards = Object.fromEntries(habitAwards(h).map(a=>[a.date,a.points])); Object.assign(h,fields); }}
       else data.habits.push({id:uid(),...fields,createdAt:todayStr(),history:[],postponed:[]});
       habitForm.open=false;
     }
     const dayDiff = (a,b) => Math.round((Date.parse(b+'T12:00:00Z')-Date.parse(a+'T12:00:00Z'))/86400000);
     const monday = date => {const d=new Date(date+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);return d.toISOString().slice(0,10);};
+    function habitAwards(h) {
+      const dates=[...new Set(h.history||[])].filter(d=>d && d>=(h.startDate||h.createdAt||'0000')).sort();
+      let streak=0,previous='';
+      return dates.map(date=>{
+        // Une série quotidienne est rompue si un jour manque. Les autres fréquences
+        // comptent les réalisations consécutives du planning, sans jour obligatoire entre deux.
+        if(h.frequency==='daily' && previous && dayDiff(previous,date)!==1)streak=0;
+        streak++;previous=date;
+        const calculated=Math.max(0,Number(h.basePoints)||0)+Math.max(0,Number(h.comboPoints)||0)*(streak-1);
+        const limit = h.maxPoints === undefined || h.maxPoints === null || h.maxPoints === '' ? Infinity : Math.max(0,Number(h.maxPoints)||0);
+        const awarded = h.pointAwards && Object.prototype.hasOwnProperty.call(h.pointAwards,date) ? h.pointAwards[date] : Math.round(Math.min(calculated,limit)*100)/100;
+        return {date,points:awarded,streak};
+      });
+    }
+    function habitLateDays(h){
+      const start=h.startDate||h.createdAt||today.value;
+      if(start>today.value || habitDoneToday(h))return 0;
+      const last=[...(h.history||[])].filter(d=>d<today.value).sort().pop();
+      const from=last||start;
+      let n=0;
+      for(let i=last?1:0;i<=Math.min(3650,dayDiff(from,today.value));i++){
+        const d=new Date(from+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+i);
+        const day=d.toISOString().slice(0,10);
+        if(day>=today.value||day<start||(h.postponed||[]).includes(day))continue;
+        const dow=d.getUTCDay();
+        if(h.frequency==='daily'||h.frequency==='weekdays'&&(h.weekdays||[]).includes(dow)||h.frequency==='interval'&&dayDiff(start,day)%Math.max(1,h.every||2)===0)n++;
+      }
+      return h.frequency==='weekly'?Math.max(0,Math.floor(dayDiff(start,today.value)/7)*(h.weeklyTarget||3)-(h.history||[]).length):n;
+    }
     function habitDoneToday(h) {return (h.history||[]).includes(today.value);}
     function habitDue(h) {
+      if ((h.startDate||h.createdAt||today.value)>today.value) return false;
       if (habitDoneToday(h)) return true;
       if (h.forceDue === today.value) return true;
       if ((h.postponed||[]).includes(today.value)) return false;
       const dow = new Date(today.value+'T12:00:00Z').getUTCDay();
       if (h.frequency==='weekdays') return (h.weekdays||[]).includes(dow);
-      if (h.frequency==='interval') return dayDiff(h.createdAt||today.value,today.value)%Math.max(1,h.every||2)===0;
+      if (h.frequency==='interval') return dayDiff(h.startDate||h.createdAt||today.value,today.value)%Math.max(1,h.every||2)===0;
       if (h.frequency==='weekly') return (h.history||[]).filter(d=>monday(d)===monday(today.value)).length < (h.weeklyTarget||3);
       return true;
     }
-    const dashboardHabits = computed(() => data.habits.filter(h=>habitDue(h)));
+    const dashboardHabits = computed(() => data.habits.filter(h=>habitDue(h)||habitLateDays(h)>0));
     function completeHabit(h) {
-      if (habitDoneToday(h)) return;
+      if ((h.startDate||h.createdAt||today.value)>today.value || habitDoneToday(h)) return;
       if (!confirm('Confirmer la réalisation de « '+h.title+' » aujourd’hui ?')) return;
       if (!Array.isArray(h.history)) h.history=[];
       h.history.push(today.value);
+      if (!h.pointAwards) h.pointAwards={};
+      h.pointAwards[today.value]=habitAwards(h).find(a=>a.date===today.value)?.points ?? 0;
       h.postponed=(h.postponed||[]).filter(d=>d!==today.value);
       notify('Habitude enregistrée');
     }
@@ -1319,9 +1384,17 @@ const app = createApp({
       if (!h.postponed.includes(today.value)) h.postponed.push(today.value);
       h.forceDue=tomorrow;
     }
-    function undoHabit(h) { if(!confirm('Annuler la réalisation du jour ?'))return; h.history=(h.history||[]).filter(d=>d!==today.value); }
+    function undoHabit(h) { if(!confirm('Annuler la réalisation du jour ?'))return; h.history=(h.history||[]).filter(d=>d!==today.value); if(h.pointAwards)delete h.pointAwards[today.value]; }
     function deleteHabit(h) {if(confirm('Supprimer cette habitude et son historique ?')) data.habits=data.habits.filter(x=>x.id!==h.id);}
     const habitCount = h => (h.history||[]).length;
+
+    /* ---------- Idées d'activités ---------- */
+    const activityForm=reactive({open:false,id:null,title:'',points:10});
+    function openActivityForm(a=null){Object.assign(activityForm,a?{open:true,id:a.id,title:a.title,points:a.points??10}:{open:true,id:null,title:'',points:10});}
+    function saveActivity(){const title=activityForm.title.trim();if(!title)return;const payload={title,points:Math.max(0,Number(activityForm.points)||0)};
+      const existing=data.activities.find(a=>a.id===activityForm.id);if(existing)Object.assign(existing,payload);else data.activities.push({id:uid(),...payload});activityForm.open=false;}
+    function deleteActivity(a){if(confirm('Supprimer cette idée ?'))data.activities=data.activities.filter(x=>x.id!==a.id);}
+    function createFromActivity(a){data.tasks.push(newTask({title:a.title,points:a.points||0,scope:'personal',due:today.value}));notify('Tâche créée : '+a.title);view.value='all';}
 
     /* ---------- Défis personnalisables ---------- */
     // Les défis attribuent des points à la première réussite d'une période.
@@ -1600,13 +1673,13 @@ const app = createApp({
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
-      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, balanceForm, openBalanceForm, applyBalance, resetBalance,
-      rewardFilters, visibleRewards, groupedRewards, visibleInventory,
+      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      rewardFilters, visibleRewards, groupedRewards, visibleInventory, unusedInventory, usedInventory, rewardClaimCount, setInventoryUsed,
       // filtres
       filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, copyForm, copyText, copyTaskTitles,
       // tâches
       quickForm, openQuickForm, toggleQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
-      taskForm, openTaskForm, toggleTaskForm, saveTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName,
+      taskForm, openTaskForm, toggleTaskForm, saveTask, duplicateTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName,
       selection, toggleSelect, selectMany, deselectMany, editSelected, deleteSelected, bulkForm, saveBulk,
       todayPoints, upcomingPoints,
       // projets
@@ -1621,7 +1694,8 @@ const app = createApp({
       // données
       exportData, importData, resetAll,
       CHALLENGE_KINDS, challengeForm, openChallengeForm, saveChallenge, deleteChallenge, toggleChallenge, currentChallenges, challengeHistory, challengeProgress,
-      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount,
+      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitTotal,
+      activityForm, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
       formatDate,
     };
