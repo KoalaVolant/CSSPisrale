@@ -67,8 +67,8 @@
         <h2 class="page-title">{{ pageTitle }}</h2>
         <div class="page-actions">
           <template v-if="view === 'home' || view === 'all' || view === 'done' || view === 'work'">
-            <button type="button" class="btn-add" v-if="view !== 'done'" @click="toggleTaskForm">＋ Ajouter une tâche</button>
-            <button type="button" class="btn-quick" v-if="view !== 'done'" @click="toggleQuickForm">＋ To do rapide</button>
+            <button type="button" class="btn-add" v-if="view !== 'done' && view !== 'work'" @click="toggleTaskForm">＋ Ajouter une tâche</button>
+            <button type="button" class="btn-quick" v-if="view !== 'done' && view !== 'work'" @click="toggleQuickForm">＋ To do rapide</button>
             <button type="button" class="filters-toggle" v-if="view !== 'work'" :class="{ active: ui.filtersOpen }" :aria-expanded="ui.filtersOpen"
                     @click="ui.filtersOpen = !ui.filtersOpen">
               Filtres / tri <small v-if="activeFilterCount">({{ activeFilterCount }})</small>
@@ -149,7 +149,7 @@
       </section>
 
     <!-- Popup : ajouter / modifier une tâche -->
-    <div class="modal-backdrop" v-if="taskForm.open" @click.self="taskForm.open = false">
+    <div class="modal-backdrop" v-if="taskForm.open">
     <section class="form-panel modal task-form" role="dialog" aria-modal="true">
       <h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
       <form @submit.prevent="saveTask">
@@ -215,7 +215,7 @@
     </div>
 
     <!-- Popup : modifier plusieurs tâches sélectionnées d'un coup -->
-    <div class="modal-backdrop" v-if="bulkForm.open" @click.self="bulkForm.open = false">
+    <div class="modal-backdrop" v-if="bulkForm.open">
       <section class="form-panel modal bulk-form" role="dialog" aria-modal="true">
         <h2>Modifier {{ bulkForm.ids.length }} tâches</h2>
         <p class="hint">Seuls les champs modifiés sont appliqués à toutes les tâches sélectionnées.</p>
@@ -283,7 +283,7 @@
     </div>
 
     <!-- Popup : "To do rapide" (plusieurs tâches d'un coup) -->
-    <div class="modal-backdrop" v-if="quickForm.open" @click.self="quickForm.open = false">
+    <div class="modal-backdrop" v-if="quickForm.open">
     <section class="form-panel modal modal-wide quick-form" role="dialog" aria-modal="true">
       <h2>To do rapide</h2>
 
@@ -447,7 +447,7 @@
     <!-- ============ TOUTES LES TÂCHES (en cours) ============ -->
     <section class="view view-all" v-if="view === 'all'">
       <button type="button" class="btn-quick" @click="copyForm.open = true">Copier la liste filtrée</button>
-      <div class="modal-backdrop" v-if="copyForm.open" @click.self="copyForm.open = false">
+      <div class="modal-backdrop" v-if="copyForm.open">
         <section class="modal form-panel" role="dialog" aria-modal="true">
           <h3>Liste à copier ({{ allTasks.length }} tâches)</h3>
           <textarea readonly rows="13" :value="copyText" @focus="$event.target.select()"></textarea>
@@ -465,6 +465,26 @@
     </section>
 
     <section class="view view-work" v-if="view === 'work'">
+      <div class="ticket-create">
+        <h3>Créer un ticket</h3>
+        <form class="ticket-inline" @submit.prevent="createTicket">
+          <input v-model="ticketDraft.name" required placeholder="Nom ou référence du ticket" aria-label="Nom du ticket">
+          <select v-model="ticketDraft.urgency" aria-label="Urgence du ticket"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select>
+          <select v-model="ticketDraft.difficulty" aria-label="Difficulté du ticket"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select>
+          <input type="date" v-model="ticketDraft.due" title="Échéance du ticket">
+          <button type="submit">＋ Créer le ticket</button>
+        </form>
+      </div>
+      <h3>Tickets en cours ({{ openTickets.length }})</h3>
+      <p v-if="!openTickets.length" class="hint">Aucun ticket ouvert.</p>
+      <article class="ticket-card" v-for="ticket in openTickets" :key="ticket.id">
+        <div class="ticket-heading"><div><strong>🎫 {{ ticket.name }}</strong><small>Urgence : {{ data.workUrgencies.find(u=>u.id===ticket.urgency)?.name || 'Aucune' }} · Difficulté : {{ data.workDifficulties.find(d=>d.id===ticket.difficulty)?.name || 'Aucune' }} · {{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts</small></div><button type="button" @click="removeTicket(ticket)">Supprimer</button></div>
+        <div class="ticket-items"><div class="ticket-item" v-for="item in ticket.items.filter(x=>!x.done)" :key="item.id"><label><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label><span>{{ ticketItemValue(ticket,item) }} pts</span><button type="button" @click="removeTicketItem(ticket,item)" title="Supprimer la tâche">×</button></div><details v-if="ticket.items.some(i=>i.done)"><summary>✓ Tâches terminées ({{ ticket.items.filter(i=>i.done).length }})</summary><div class="ticket-item" v-for="item in ticket.items.filter(x=>x.done)" :key="item.id"><label class="ticket-checked"><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label><span>{{ ticketItemValue(ticket,item) }} pts</span><button type="button" @click="removeTicketItem(ticket,item)" title="Supprimer la tâche">×</button></div></details></div>
+        <form class="ticket-inline ticket-add" @submit.prevent="addTicketItem(ticket)"><input v-model="ticketInputs[ticket.id].name" required placeholder="Nouvelle tâche : intitulé"><input v-model.number="ticketInputs[ticket.id].points" type="number" min="0" placeholder="Points" aria-label="Points" class="ticket-point-input"><button type="submit">＋ Ajouter</button></form>
+        <button type="button" class="ticket-finish" :disabled="!ticket.items.length || ticket.items.some(i=>!i.done)" @click="finishTicket(ticket)">Terminer le ticket</button>
+      </article>
+      <h3>Tâches travail indépendantes (historique)</h3>
+
       <p class="hint">Espace indépendant : tâches professionnelles, catégories et difficultés propres au travail. Les points alimentent ton solde commun.</p>
       <task-list :tasks="workTasks" :projects="[]" :categories="workCategories" :statuses="statuses" :today="today" :selected="selection"
         @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany" @edit-selected="editSelected" @delete-selected="deleteSelected"
@@ -519,7 +539,7 @@
 
     <section class="view view-habits" v-if="view === 'habits'">
       <button type="button" class="btn-add" @click="openHabitForm()">＋ Nouvelle habitude</button>
-      <div class="modal-backdrop" v-if="habitForm.open" @click.self="habitForm.open = false">
+      <div class="modal-backdrop" v-if="habitForm.open">
         <form class="modal form-panel" @submit.prevent="saveHabit">
           <h3>{{ habitForm.id ? 'Modifier' : 'Nouvelle' }} habitude / routine</h3>
           <label>Nom <input v-model="habitForm.title" required></label>
@@ -547,7 +567,7 @@
     <section class="view view-challenges" v-if="view === 'challenges'">
       <div class="page-actions"><button type="button" class="btn-add" @click="openChallengeForm()">＋ Nouveau défi</button></div>
       <p class="hint">Les défis gagnent automatiquement des points une fois par période. Les gains déjà attribués restent acquis même si tu modifies ou supprimes le défi.</p>
-      <div class="modal-backdrop" v-if="challengeForm.open" @click.self="challengeForm.open=false">
+      <div class="modal-backdrop" v-if="challengeForm.open">
         <form class="modal form-panel challenge-form" @submit.prevent="saveChallenge">
           <h3>{{ challengeForm.id ? 'Modifier' : 'Créer' }} un défi</h3>
           <label>Nom <input v-model="challengeForm.name" maxlength="120" required placeholder="Ex : Journée productive"></label>
@@ -573,6 +593,32 @@
       <div class="challenge-history" v-for="a in challengeHistory" :key="a.id">{{ formatDate(a.date) }} · {{ a.challengeName }} · +{{ a.points }} pts</div>
     </section>
 
+    <!-- ============ STATISTIQUES ============ -->
+    <section class="view view-statistics" v-if="view === 'statistics'">
+      <p class="hint">Les calculs utilisent les données enregistrées. Les anciennes tâches supprimées conservent leur valeur dans le solde, mais sans historique journalier.</p>
+      <div class="stats-cards">
+        <article v-for="card in [
+          {name:'Points de tâches',value:statistics.points}, {name:'Moyenne par tâche terminée',value:statistics.average},
+          {name:'Points aujourd’hui',value:statistics.todayPoints},{name:'Tâches terminées aujourd’hui',value:statistics.todayCount},
+          {name:'Tâches terminées',value:statistics.completed},{name:'Tâches actives',value:statistics.active},
+          {name:'Tâches en retard',value:statistics.overdue},{name:'Taux de complétion (tâches classiques)',value:statistics.completionRate+' %'},
+          {name:'Tickets ouverts',value:statistics.ticketsOpen},{name:'Tickets clos',value:statistics.ticketsClosed},
+          {name:'Sous-tâches de tickets terminées',value:statistics.ticketItemsDone+' / '+statistics.ticketItems},
+          {name:'Solde disponible',value:balance}, {name:'Points dépensés',value:statistics.spent},
+          {name:'Points épargnés',value:statistics.saved}, {name:'Projets',value:statistics.projects},
+          {name:'Habitudes',value:statistics.habits},{name:'Défis',value:statistics.challenges},
+          {name:'Gratitudes',value:statistics.gratitude},{name:'Récompenses',value:statistics.rewards},{name:'Objets obtenus',value:statistics.inventory}
+        ]" :key="card.name"><small>{{ card.name }}</small><strong>{{ card.value }}</strong></article>
+      </div>
+      <h3>Répartition personnel et travail</h3>
+      <div class="stats-cards"><article v-for="scope in ['personal','work']" :key="scope"><strong>{{ scope==='personal'?'Personnel':'Travail' }}</strong><p>{{ doneStats[scope].count }} tâches · {{ doneStats[scope].total }} pts · moyenne {{ doneStats[scope].average }} pts</p></article></div>
+      <h3>Points gagnés par jour</h3>
+      <p v-if="statistics.mostProductive">Meilleure journée enregistrée : {{ formatDate(statistics.mostProductive.date) }} ({{ statistics.mostProductive.points }} pts).</p>
+      <div class="stats-day" v-for="day in statistics.days" :key="day.date"><span>{{ formatDate(day.date) }} · {{ day.count }} tâches</span><strong>{{ day.points }} pts</strong></div>
+      <h3>Statuts des tâches</h3><div class="stats-day" v-for="s in statistics.byStatus" :key="s.name"><span>{{ s.name }}</span><strong>{{ s.count }}</strong></div>
+      <h3>Catégories les plus utilisées</h3><div class="stats-day" v-for="c in statistics.categories" :key="c[0]"><span>{{ c[0] }}</span><strong>{{ c[1] }}</strong></div>
+    </section>
+
     <!-- ============ TERMINÉS : rangés par date de fin, seulement catégorie et projet ============ -->
     <section class="view view-done" v-if="view === 'done'">
       <p class="hint">{{ doneTasks.length + doneWorkTasks.length }} tâche{{ (doneTasks.length + doneWorkTasks.length) > 1 ? 's' : '' }} terminée{{ (doneTasks.length + doneWorkTasks.length) > 1 ? 's' : '' }}, de la plus récente à la plus ancienne. Supprimer une tâche terminée ne retire pas ses points. Pour la rouvrir ou changer son statut : sélectionne-la puis « Modifier ».</p>
@@ -584,6 +630,16 @@
                    @edit-selected="editSelected" @delete-selected="deleteSelected"
                    @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
       </div>
+      <div class="done-summary" v-for="scope in ['personal','work']" :key="scope">
+        <h3>{{ scope === 'personal' ? 'Points personnels' : 'Points travail' }}</h3>
+        <p><strong>{{ doneStats[scope].total }} pts</strong> gagnés · <strong>{{ doneStats[scope].average }} pts</strong> par tâche · {{ doneStats[scope].count }} tâches terminées</p>
+        <details><summary>Points gagnés par jour ({{ doneStats[scope].days.length }} jours)</summary><div class="stats-day" v-for="day in doneStats[scope].days" :key="day.date"><span>{{ formatDate(day.date) }}</span><strong>{{ day.points }} pts</strong></div></details>
+      </div>
+      <h3 v-if="closedTickets.length">🎫 Tickets travail terminés ({{ closedTickets.length }})</h3>
+      <article class="ticket-card ticket-closed" v-for="ticket in closedTickets" :key="ticket.id">
+        <div class="ticket-heading"><div><strong>🎫 Ticket : {{ ticket.name }}</strong><small>Terminé le {{ formatDate(ticket.doneAt) }} · {{ ticketPoints(ticket) }} pts · {{ ticket.items.length }} tâches</small></div><button type="button" @click="reopenTicket(ticket)">Rouvrir</button></div>
+        <details><summary>Afficher les tâches réalisées</summary><div class="ticket-item" v-for="item in ticket.items" :key="item.id"><span>✓ {{ item.name }}</span><strong>{{ ticketItemValue(ticket,item) }} pts · {{ formatDate(item.doneAt) }}</strong></div></details>
+      </article>
       <h3 v-if="doneWorkTasks.length">Travail</h3>
       <div class="task-list" v-if="doneWorkTasks.length">
         <task-list :tasks="doneWorkTasks" group="doneAt" compact :projects="[]" :categories="workCategories" :statuses="statuses" :today="today" :selected="selection"
@@ -596,7 +652,7 @@
     <!-- ============ PROJETS ============ -->
     <section class="view view-projects" v-if="view === 'projects'">
       <!-- Formulaire projet -->
-      <div class="modal-backdrop" v-if="projectForm.open" @click.self="projectForm.open = false">
+      <div class="modal-backdrop" v-if="projectForm.open">
       <div class="form-panel modal modal-wide project-form" role="dialog" aria-modal="true">
         <h3>{{ projectForm.id ? 'Modifier le projet' : 'Nouveau projet' }}</h3>
         <form @submit.prevent="saveProject">
@@ -696,7 +752,7 @@
     <section class="view view-categories" v-if="view === 'categories'">
       <p class="hint">Les catégories de tâches sont indépendantes de celles des récompenses et du Travail. « Sans catégorie » existe toujours. La couleur colore le tag des tâches.</p>
 
-      <div class="modal-backdrop" v-if="categoryForm.open" @click.self="categoryForm.open = false">
+      <div class="modal-backdrop" v-if="categoryForm.open">
         <div class="form-panel modal category-form" role="dialog" aria-modal="true">
           <h3>{{ categoryForm.oldName ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h3>
           <form @submit.prevent="saveCategory">
@@ -775,7 +831,7 @@
       <p class="balance-line">Solde : <strong>{{ balance }} pts</strong>
         <small>(gagnés : {{ earned }} · dépensés : {{ data.spent }}<template v-if="data.adjust"> · ajustement manuel : {{ data.adjust > 0 ? '+' : '' }}{{ data.adjust }}</template>)</small></p>
 
-      <div class="modal-backdrop" v-if="balanceForm.open" @click.self="balanceForm.open = false">
+      <div class="modal-backdrop" v-if="balanceForm.open">
         <form class="form-panel modal balance-form" @submit.prevent="applyBalance">
           <label>Nouveau solde (pts)
             <input type="number" v-model.number="balanceForm.value" required>
@@ -795,7 +851,7 @@
         <div class="category-chips"><span v-for="c in rewardCategories" :key="c">{{ c }} <button type="button" @click="deleteRewardCategory(c)" title="Supprimer">×</button></span></div>
       </details>
       <!-- Formulaire récompense -->
-      <div class="modal-backdrop" v-if="rewardForm.open" @click.self="rewardForm.open = false">
+      <div class="modal-backdrop" v-if="rewardForm.open">
       <div class="form-panel modal reward-form" role="dialog" aria-modal="true">
         <h3>{{ rewardForm.id ? 'Modifier la récompense' : 'Nouvelle récompense' }}</h3>
         <form @submit.prevent="saveReward">
@@ -943,7 +999,7 @@
     <section class="view view-activities" v-if="view==='activities'">
       <button type="button" class="btn-add" @click="openActivityForm()">＋ Ajouter une idée</button>
       <p class="hint">Clique sur « Créer une tâche » pour ajouter l'activité aux tâches personnelles du jour.</p>
-      <div class="modal-backdrop" v-if="activityForm.open" @click.self="activityForm.open=false">
+      <div class="modal-backdrop" v-if="activityForm.open">
         <form class="modal form-panel" @submit.prevent="saveActivity">
           <h3>{{ activityForm.id?'Modifier':'Nouvelle' }} idée</h3>
           <label>Nom <input v-model="activityForm.title" required maxlength="150"></label>
