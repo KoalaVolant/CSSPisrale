@@ -189,3 +189,25 @@
 .stats-cards article{padding:14px;border:1px solid #ccc;border-radius:10px;background:var(--fnd,#fafafa)}
 .stats-cards small{display:block}.stats-cards strong{display:block;font-size:1.5rem;margin-top:5px}
 @media(max-width:700px){.ticket-inline{flex-direction:column;align-items:stretch}.ticket-inline input,.ticket-inline select{max-width:none}.ticket-heading{align-items:flex-start}}
+
+/* V15 : tickets repliables et points des sous-tâches modifiables */
+.work-independent-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:24px}
+.ticket-toggle{display:flex;flex-wrap:wrap;align-items:center;gap:8px;flex:1;text-align:left;background:transparent!important;border:0!important;font-size:1rem;min-width:0}
+.ticket-toggle strong{overflow-wrap:anywhere}
+.ticket-pending,.ticket-complete,.ticket-empty{font-size:.78rem;padding:3px 8px;border-radius:10px;background:#eee;color:#333}
+.ticket-pending{background:#ffe7bf;color:#6b3e00}
+.ticket-complete{background:#d8f2dc;color:#20552b}
+.ticket-body{margin-top:10px}
+.ticket-point-label{display:inline-flex!important;flex:0 0 auto!important;align-items:center;gap:5px;font-size:.8rem}
+.ticket-point-label .ticket-point-input{width:78px!important;padding:5px;box-sizing:border-box}
+.ticket-item{flex-wrap:wrap}
+
+/* V16 : commandes explicites Travail et tickets repliés par défaut */
+.work-mode-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 18px}
+.work-mode-actions button,.work-mode-actions a{display:inline-block;padding:10px 14px;border-radius:9px;border:1px solid var(--fnd3,#88a7a1);background:var(--fnd2,#accac4);color:#172b26;text-decoration:none;font-size:14px;font-weight:650;cursor:pointer}
+.work-mode-actions button:hover,.work-mode-actions a:hover{filter:brightness(.95)}
+.work-release{font-size:11px;opacity:.65;margin-left:auto}
+.work-help{display:block;font-size:12px;font-weight:400;text-transform:none;color:#555}
+.ticket-toggle{cursor:pointer;width:100%;padding:10px 8px!important}
+.ticket-heading{align-items:center}.ticket-card{scroll-margin-top:110px}
+#work-ticket-create{scroll-margin-top:110px}

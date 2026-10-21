@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="stylekoala.css">
+  <link rel="stylesheet" href="style.css?v=20261021-v16">
+  <link rel="stylesheet" href="stylekoala.css?v=20261021-v16">
 </head>
 <body>
 
@@ -165,9 +165,6 @@
         <label>Points
           <input type="number" min="0" v-model.number="taskForm.points">
         </label>
-        <label v-if="taskForm.scope === 'work'">Nom du ticket
-          <input type="text" v-model="taskForm.ticketName" placeholder="Ex : INC-1234 ou Ticket client" maxlength="200">
-        </label>
         <label v-if="taskForm.scope === 'work'">Catégories Travail (plusieurs possibles)
           <span class="work-category-choices"><label v-for="c in workCategories" :key="c"><input type="checkbox" :value="c" v-model="taskForm.workCategoryNames"> {{ c }}</label></span>
         </label>
@@ -299,7 +296,6 @@
         <div class="quick-row" v-for="(row, i) in quickForm.rows" :key="i">
           <input class="quick-name" type="text" v-model="row.title" placeholder="Nom de la tâche"
                  @keydown.enter.prevent="addQuickRow">
-          <input v-if="quickForm.scope === 'work'" type="text" v-model="row.ticketName" class="quick-ticket-name" placeholder="Nom du ticket" title="Nom du ticket" maxlength="200">
           <input class="quick-points" type="number" min="0" v-model.number="row.points" title="Points">
           <select v-model="row.urgency" aria-label="Urgence de cette tâche" title="Urgence">
             <option value="">Sans urgence</option>
@@ -340,9 +336,6 @@
               <option :value="false">Bonus</option>
               <option :value="true">Malus</option>
             </select>
-          </label>
-          <label v-if="quickForm.scope === 'work'">Nom du ticket (commun aux tâches créées)
-            <input type="text" v-model="quickForm.paste.ticketName" placeholder="Ex : INC-1234" maxlength="200">
           </label>
           <label>Points par tâche
             <input type="number" min="0" v-model.number="quickForm.paste.points">
@@ -465,8 +458,13 @@
     </section>
 
     <section class="view view-work" v-if="view === 'work'">
-      <div class="ticket-create">
-        <h3>Créer un ticket</h3>
+      <div class="work-mode-actions" aria-label="Actions Travail">
+        <button type="button" class="work-create-task" @click="openTaskForm()">＋ Nouvelle tâche indépendante</button>
+        <a class="work-create-ticket" href="#work-ticket-create">＋ Nouveau ticket ↓</a>
+        <span class="work-release">Travail v16 · Tickets et tâches séparés</span>
+      </div>
+      <div id="work-ticket-create" class="ticket-create">
+        <h3>🎫 Créer un ticket</h3>
         <form class="ticket-inline" @submit.prevent="createTicket">
           <input v-model="ticketDraft.name" required placeholder="Nom ou référence du ticket" aria-label="Nom du ticket">
           <select v-model="ticketDraft.urgency" aria-label="Urgence du ticket"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select>
@@ -475,15 +473,41 @@
           <button type="submit">＋ Créer le ticket</button>
         </form>
       </div>
-      <h3>Tickets en cours ({{ openTickets.length }})</h3>
+      <h3>🎫 Tickets en cours ({{ openTickets.length }}) <small class="work-help">Cliquer sur un ticket pour afficher ses sous-tâches et modifier leurs points.</small></h3>
       <p v-if="!openTickets.length" class="hint">Aucun ticket ouvert.</p>
       <article class="ticket-card" v-for="ticket in openTickets" :key="ticket.id">
-        <div class="ticket-heading"><div><strong>🎫 {{ ticket.name }}</strong><small>Urgence : {{ data.workUrgencies.find(u=>u.id===ticket.urgency)?.name || 'Aucune' }} · Difficulté : {{ data.workDifficulties.find(d=>d.id===ticket.difficulty)?.name || 'Aucune' }} · {{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts</small></div><button type="button" @click="removeTicket(ticket)">Supprimer</button></div>
-        <div class="ticket-items"><div class="ticket-item" v-for="item in ticket.items.filter(x=>!x.done)" :key="item.id"><label><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label><span>{{ ticketItemValue(ticket,item) }} pts</span><button type="button" @click="removeTicketItem(ticket,item)" title="Supprimer la tâche">×</button></div><details v-if="ticket.items.some(i=>i.done)"><summary>✓ Tâches terminées ({{ ticket.items.filter(i=>i.done).length }})</summary><div class="ticket-item" v-for="item in ticket.items.filter(x=>x.done)" :key="item.id"><label class="ticket-checked"><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label><span>{{ ticketItemValue(ticket,item) }} pts</span><button type="button" @click="removeTicketItem(ticket,item)" title="Supprimer la tâche">×</button></div></details></div>
-        <form class="ticket-inline ticket-add" @submit.prevent="addTicketItem(ticket)"><input v-model="ticketInputs[ticket.id].name" required placeholder="Nouvelle tâche : intitulé"><input v-model.number="ticketInputs[ticket.id].points" type="number" min="0" placeholder="Points" aria-label="Points" class="ticket-point-input"><button type="submit">＋ Ajouter</button></form>
-        <button type="button" class="ticket-finish" :disabled="!ticket.items.length || ticket.items.some(i=>!i.done)" @click="finishTicket(ticket)">Terminer le ticket</button>
+        <div class="ticket-heading">
+          <button type="button" class="ticket-toggle" :aria-expanded="!isTicketCollapsed(ticket.id)" @click="toggleTicketCollapse(ticket.id)" :title="isTicketCollapsed(ticket.id) ? 'Déplier' : 'Replier'">
+            <span aria-hidden="true">{{ isTicketCollapsed(ticket.id) ? '▸' : '▾' }}</span>
+            <strong>🎫 {{ ticket.name }}</strong>
+            <span v-if="ticket.items.some(i => !i.done)" class="ticket-pending">● {{ ticket.items.filter(i=>!i.done).length }} tâche(s) à faire</span>
+            <span v-else-if="!ticket.items.length" class="ticket-empty">Aucune tâche</span>
+            <span v-else class="ticket-complete">✓ Tout est fait</span>
+          </button>
+          <button type="button" @click="removeTicket(ticket)">Supprimer</button>
+        </div>
+        <div v-if="!isTicketCollapsed(ticket.id)" class="ticket-body">
+          <small>Urgence : {{ data.workUrgencies.find(u=>u.id===ticket.urgency)?.name || 'Aucune' }} · Difficulté : {{ data.workDifficulties.find(d=>d.id===ticket.difficulty)?.name || 'Aucune' }} · {{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small>
+          <div class="ticket-items">
+            <div class="ticket-item" v-for="item in ticket.items.filter(x=>!x.done)" :key="item.id">
+              <label><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label>
+              <label class="ticket-point-label">Points <input class="ticket-point-input" type="number" min="0" step="1" :value="item.points" @change="updateTicketItemPoints(ticket,item,$event)" aria-label="Modifier les points de la tâche"></label>
+              <button type="button" @click="removeTicketItem(ticket,item)" title="Supprimer la tâche">×</button>
+            </div>
+            <details v-if="ticket.items.some(i=>i.done)">
+              <summary>✓ Tâches terminées ({{ ticket.items.filter(i=>i.done).length }})</summary>
+              <div class="ticket-item" v-for="item in ticket.items.filter(x=>x.done)" :key="item.id">
+                <label class="ticket-checked"><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label>
+                <label class="ticket-point-label">Points <input class="ticket-point-input" type="number" min="0" step="1" :value="item.points" @change="updateTicketItemPoints(ticket,item,$event)" aria-label="Modifier les points de la tâche terminée"></label>
+                <button type="button" @click="removeTicketItem(ticket,item)" title="Supprimer la tâche">×</button>
+              </div>
+            </details>
+          </div>
+          <form class="ticket-inline ticket-add" @submit.prevent="addTicketItem(ticket)"><input v-model="ticketInputs[ticket.id].name" required placeholder="Nouvelle tâche : intitulé"><input v-model.number="ticketInputs[ticket.id].points" type="number" min="0" placeholder="Points" aria-label="Points" class="ticket-point-input"><button type="submit">＋ Ajouter</button></form>
+          <button type="button" class="ticket-finish" :disabled="!ticket.items.length || ticket.items.some(i=>!i.done)" @click="finishTicket(ticket)">Terminer le ticket</button>
+        </div>
       </article>
-      <h3>Tâches travail indépendantes (historique)</h3>
+      <div class="work-independent-head"><h3>📋 Tâches travail indépendantes ({{ workTasks.length }})</h3><button type="button" class="btn-add" @click="openTaskForm()">＋ Nouvelle tâche indépendante</button></div>
 
       <p class="hint">Espace indépendant : tâches professionnelles, catégories et difficultés propres au travail. Les points alimentent ton solde commun.</p>
       <task-list :tasks="workTasks" :projects="[]" :categories="workCategories" :statuses="statuses" :today="today" :selected="selection"
@@ -1043,9 +1067,6 @@
       <input v-else ref="titleInput" class="task-title-input" type="text" v-model="draft"
              @keydown.enter.prevent="saveTitle" @keydown.esc.stop.prevent="cancelTitle" @blur="saveTitle">
 
-      <div v-if="task.scope === 'work'" class="work-ticket-field" @click.stop>
-        <label>Nom du ticket : <input type="text" :value="task.ticketName || ''" placeholder="Non renseigné" maxlength="200" @change="update('ticketName', $event)" @keydown.enter.prevent="$event.target.blur()"></label>
-      </div>
       <div class="task-tags">
 
         <!-- Catégorie -->
@@ -1163,6 +1184,21 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=20261021-v16"></script>
+<script>
+  // Diagnostic visible si l'application Vue ne s'est pas initialisee.
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      var root = document.getElementById('app');
+      if (root && root.hasAttribute('v-cloak')) {
+        var warning = document.createElement('div');
+        warning.setAttribute('role', 'alert');
+        warning.style.cssText = 'padding:24px;margin:30px auto;max-width:760px;background:#fff3f3;border:2px solid #bd2020;color:#711;font:16px Arial,sans-serif;line-height:1.5';
+        warning.textContent = 'Todo Quest n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, app.js, firebase-config.js, style.css, stylekoala.css), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
+        document.body.prepend(warning);
+      }
+    }, 1200);
+  });
+</script>
 </body>
 </html>
