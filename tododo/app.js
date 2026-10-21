@@ -808,6 +808,19 @@ const app = createApp({
       return taskValue({scope:'work',points:Math.max(0,Number(item.points)||0),urgency:ticket.urgency||'',difficulty:ticket.difficulty||'',malus:false});
     }
     const ticketDraft = reactive({name:'',urgency:'',difficulty:'',due:'',category:''});
+    const collapsedTickets = reactive({});
+    function toggleTicketCollapse(id) { collapsedTickets[id] = !collapsedTickets[id]; }
+    function updateTicketItemPoints(ticket, item, event) {
+      const raw = String(event.target.value).trim();
+      const parsed = Number(raw);
+      if (!raw || !Number.isFinite(parsed) || parsed < 0) {
+        event.target.value = item.points;
+        notify('Indique un nombre de points positif ou nul');
+        return;
+      }
+      item.points = Math.round(parsed);
+      event.target.value = item.points;
+    }
     const ticketInputs = reactive({});
     data.workTickets.forEach(t=>{ticketInputs[t.id]={name:'',points:10};});
     const openTickets = computed(()=>data.workTickets.filter(t=>!t.done));
@@ -928,7 +941,7 @@ const app = createApp({
         title,
         category: taskForm.scope === 'work' ? (taskForm.workCategoryNames[0] || '') : (taskForm.category || ''),
         workCategoryNames: taskForm.scope === 'work' ? [...taskForm.workCategoryNames] : [],
-        ticketName: taskForm.scope === 'work' ? taskForm.ticketName.trim() : '',
+        ticketName: '',
         scope:taskForm.scope==='work'?'work':'personal',
         points: Math.max(0, Number(taskForm.points) || 0),
         malus: !!taskForm.malus,
@@ -1011,7 +1024,7 @@ const app = createApp({
         urgency: r.urgency || '',
         difficulty: quickForm.scope === 'work' ? (r.difficulty || '') : '',
         workCategoryNames: quickForm.scope === 'work' ? [...(r.workCategoryNames || [])] : [],
-        ticketName: quickForm.scope === 'work' ? String(r.ticketName || '').trim() : '',
+        ticketName: '',
         category: quickForm.scope === 'work' ? ((r.workCategoryNames || [])[0] || '') : '',
         due: r.due || '',
       })));
@@ -1040,7 +1053,7 @@ const app = createApp({
         malus: !!quickForm.paste.malus,
         category: quickForm.scope === 'work' ? (quickForm.paste.workCategoryNames[0] || '') : (quickForm.paste.category || ''),
         workCategoryNames: quickForm.scope === 'work' ? [...quickForm.paste.workCategoryNames] : [],
-        ticketName: quickForm.scope === 'work' ? String(quickForm.paste.ticketName || '').trim() : '',
+        ticketName: '',
         urgency: quickForm.paste.urgency || '',
         difficulty: quickForm.paste.difficulty || '',
         due: quickForm.paste.due || '',
@@ -1798,7 +1811,7 @@ const app = createApp({
 
     return {
       // état
-      ticketDraft,ticketInputs,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
+      ticketDraft,ticketInputs,collapsedTickets,toggleTicketCollapse,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
       data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, navGroups: NAV_GROUPS, statuses: STATUSES, tagStyle,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
