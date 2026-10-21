@@ -484,10 +484,10 @@
             <span v-else-if="!ticket.items.length" class="ticket-empty">Aucune tâche</span>
             <span v-else class="ticket-complete">✓ Tout est fait</span>
           </button>
-          <button type="button" @click="removeTicket(ticket)">Supprimer</button>
+          <button type="button" @click="renameTicket(ticket)">Renommer</button><button type="button" @click="removeTicket(ticket)">Supprimer</button>
         </div>
         <div v-if="!isTicketCollapsed(ticket.id)" class="ticket-body">
-          <small>Urgence : {{ data.workUrgencies.find(u=>u.id===ticket.urgency)?.name || 'Aucune' }} · Difficulté : {{ data.workDifficulties.find(d=>d.id===ticket.difficulty)?.name || 'Aucune' }} · {{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small>
+          <div class="ticket-edit-levels"><label>Urgence <select v-model="ticket.urgency"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select></label><label>Difficulté <select v-model="ticket.difficulty"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select></label><small>{{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small></div>
           <div class="ticket-items">
             <div class="ticket-item" v-for="item in ticket.items.filter(x=>!x.done)" :key="item.id">
               <label><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label>
@@ -567,7 +567,7 @@
         <form class="modal form-panel" @submit.prevent="saveHabit">
           <h3>{{ habitForm.id ? 'Modifier' : 'Nouvelle' }} habitude / routine</h3>
           <label>Nom <input v-model="habitForm.title" required></label>
-          <label>Date de début <input type="date" v-model="habitForm.startDate" required></label>
+          <label>Date de début <input type="date" v-model="habitForm.startDate" required></label><label>Date de fin (facultative) <input type="date" v-model="habitForm.endDate" :min="habitForm.startDate"></label><label><input type="checkbox" v-model="habitForm.completed"> Routine définitivement terminée</label>
           <label>Points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.basePoints"></label>
           <label>Bonus par réalisation consécutive <input type="number" min="0" step="0.25" v-model.number="habitForm.comboPoints"></label>
           <label>Maximum de points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.maxPoints" placeholder="Sans plafond (anciennes habitudes)"></label>
@@ -580,9 +580,9 @@
         </form>
       </div>
       <p class="empty" v-if="!data.habits.length">Aucune habitude enregistrée.</p>
-      <article class="habit-entry" v-for="habit in data.habits" :key="habit.id" :class="{'habit-overdue':habitLateDays(habit)>0}">
-        <div><strong>{{ habit.title }}</strong> <small v-if="habitLateDays(habit)>0">{{ habitLateDays(habit) }} jour(s) de retard</small> <span v-if="habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small>{{ habitCount(habit) }} réalisation(s) · {{ habitAwards(habit).reduce((s,a)=>s+a.points,0) }} pts gagnés · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
-        <div class="habit-actions"><button type="button" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)">Terminer</button><button type="button" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)">Reporter à demain</button><button type="button" v-if="habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
+      <article class="habit-entry" v-for="habit in data.habits" :key="habit.id" :class="{'habit-overdue':habitLateDays(habit)>0,'habit-finished':habitIsFinished(habit)}">
+        <div><strong>{{ habit.title }}</strong> <span v-if="habitIsFinished(habit)">✓ Routine terminée</span> <small v-if="habitLateDays(habit)>0">{{ habitLateDays(habit) }} jour(s) de retard</small> <span v-if="habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small>{{ habitCount(habit) }} réalisation(s) · {{ habitAwards(habit).reduce((s,a)=>s+a.points,0) }} pts gagnés · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
+        <div class="habit-actions"><button type="button" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Terminer</button><button type="button" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Reporter à demain</button><button type="button" v-if="habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" v-if="!habitIsFinished(habit)" @click="markHabitFinished(habit)">Finir la routine</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
         <details><summary>Historique des réalisations et points</summary><p v-for="a in [...habitAwards(habit)].reverse()" :key="a.date">{{ formatDate(a.date) }} · +{{ a.points }} pts · série {{ a.streak }}</p><p v-if="!habitCount(habit)">Aucune réalisation</p></details>
       </article>
     </section>
@@ -891,6 +891,7 @@
               <option v-for="c in rewardCategories" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
+          <fieldset class="reward-condition-box"><legend>Conditions facultatives (à cocher pour réclamer)</legend><div class="reward-condition-edit" v-for="(c,i) in rewardForm.conditions" :key="c.id"><input v-model="c.text" placeholder="Ex : Terminer le projet" aria-label="Condition"><label><input type="checkbox" v-model="c.done"> Fait</label><button type="button" @click="rewardForm.conditions.splice(i,1)">×</button></div><button type="button" @click="addRewardCondition">＋ Ajouter une condition</button></fieldset>
           <div class="form-actions">
             <button type="submit">Enregistrer</button>
             <button type="button" @click="rewardForm.open = false">Annuler</button>
@@ -920,7 +921,7 @@
       <div class="reward-group" v-for="group in groupedRewards" :key="group.name">
        <h3 class="reward-group-title">{{ group.name }} ({{ group.rewards.length }})</h3>
        <div class="reward-list">
-        <article class="reward" v-for="r in group.rewards" :key="r.id" :class="{ affordable: balance + (Number(r.saved)||0) >= r.cost }">
+        <article class="reward" v-for="r in group.rewards" :key="r.id" :class="{ affordable: canClaimReward(r) }">
           <div class="reward-body">
             <h3 class="reward-name">{{ r.favorite ? '★ ' : '' }}{{ r.name }}</h3>
             <small>Déjà obtenue {{ rewardClaimCount(r) }} fois</small>
@@ -928,10 +929,11 @@
             <p class="reward-cost">{{ r.cost }} pts</p></div>
             <progress :value="Number(r.saved)||0" :max="r.cost"></progress>
             <p class="reward-status">Épargne : <strong>{{ r.saved || 0 }} / {{ r.cost }} pts</strong> · Reste à épargner : {{ rewardRemaining(r) }} pts</p>
-            <p v-if="balance + (Number(r.saved)||0) >= r.cost">Points suffisants pour la réclamer.</p>
+            <div v-if="(r.conditions||[]).length" class="reward-conditions"><strong>Conditions : {{ r.conditions.filter(c=>c.done).length }}/{{ r.conditions.length }}</strong><label v-for="c in r.conditions" :key="c.id"><input type="checkbox" v-model="c.done"> {{ c.text }}</label></div>
+            <p v-if="canClaimReward(r)">Récompense disponible.</p><p v-else-if="balance + (Number(r.saved)||0) >= r.cost">Valider les conditions restantes pour réclamer.</p>
           </div>
           <div class="reward-actions">
-            <button type="button" :disabled="balance + (Number(r.saved)||0) < r.cost" @click="claimReward(r)">Réclamer</button>
+            <button type="button" :disabled="!canClaimReward(r)" @click="claimReward(r)">Réclamer</button>
             <button type="button" @click="toggleRewardFavorite(r)">{{ r.favorite ? '★ Retirer favori' : '☆ Favori' }}</button>
             <button type="button" @click="depositReward(r)" :disabled="balance <= 0 || rewardRemaining(r)<=0">＋ Épargner</button>
             <button type="button" @click="withdrawReward(r)" :disabled="!(Number(r.saved)>0)">− Retirer</button>

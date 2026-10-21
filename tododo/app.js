@@ -814,6 +814,13 @@ const app = createApp({
     const collapsedTickets = reactive({});
     function isTicketCollapsed(id) { return collapsedTickets[id] !== false; }
     function toggleTicketCollapse(id) { collapsedTickets[id] = !isTicketCollapsed(id); }
+    function renameTicket(ticket) {
+      const value = prompt("Nouveau nom du ticket", ticket.name);
+      if (value === null) return;
+      const name = value.trim();
+      if (!name) { notify("Le ticket doit avoir un nom"); return; }
+      ticket.name = name;
+    }
     function updateTicketItemPoints(ticket, item, event) {
       const raw = String(event.target.value).trim();
       const parsed = Number(raw);
@@ -1392,18 +1399,21 @@ const app = createApp({
     }
 
     /* ---------- Récompenses ---------- */
-    const rewardForm = reactive({ open: false, id: null, name: '', cost: 50, category: '' });
+    const rewardForm = reactive({ open: false, id: null, name: '', cost: 50, category: '', conditions: [] });
+    function addRewardCondition() { rewardForm.conditions.push({id:uid(),text:'',done:false}); }
+    function rewardConditionsMet(r) { return (r.conditions||[]).every(c=>c.done); }
+    function canClaimReward(r) { return balance.value + (Number(r.saved)||0) >= r.cost && rewardConditionsMet(r); }
 
     function openRewardForm(reward = null) {
-      if (reward) Object.assign(rewardForm, { id: reward.id, name: reward.name, cost: reward.cost, category: reward.category || '' });
-      else Object.assign(rewardForm, { id: null, name: '', cost: 50, category: '' });
+      if (reward) Object.assign(rewardForm, { id: reward.id, name: reward.name, cost: reward.cost, category: reward.category || '', conditions:clone(reward.conditions||[]) });
+      else Object.assign(rewardForm, { id: null, name: '', cost: 50, category: '', conditions:[] });
       rewardForm.open = true;
     }
 
     function saveReward() {
       const name = rewardForm.name.trim();
       if (!name) return;
-      const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1), category: rewardForm.category || '' };
+      const payload = { name, cost: Math.max(1, Number(rewardForm.cost) || 1), category: rewardForm.category || '', conditions:rewardForm.conditions.filter(c=>String(c.text||'').trim()).map(c=>({id:c.id||uid(),text:String(c.text).trim(),done:!!c.done})) };
       if (rewardForm.id) {
         const r = data.rewards.find(x => x.id === rewardForm.id);
         if (r) { if(Number(r.saved)>payload.cost) {r.saved=payload.cost;} Object.assign(r, payload); }
@@ -1420,11 +1430,13 @@ const app = createApp({
 
     function claimReward(reward) {
       const reserved = Number(reward.saved)||0;
-      if (balance.value + reserved < reward.cost) return;
+      if (!canClaimReward(reward)) { notify("Points insuffisants ou conditions non validées"); return; }
       data.spent += reward.cost;
       reward.saved=0;
+      const achievedConditions = clone(reward.conditions||[]);
+      (reward.conditions||[]).forEach(c=>{c.done=false;});
       data.inventory.unshift({
-        id: uid(), rewardId:reward.id, name: reward.name, category: reward.category || '', cost: reward.cost, date: todayStr(), used: false, usedAt:'',
+        id: uid(), rewardId:reward.id, name: reward.name, category: reward.category || '', cost: reward.cost, conditions:achievedConditions, date: todayStr(), used: false, usedAt:'',
       });
       notify(`Récompense gagnée : ${reward.name} ! Elle est dans l'Inventaire`);
     }
@@ -1460,14 +1472,15 @@ const app = createApp({
     }
 
     /* ---------- Habitudes et routines ---------- */
-    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',basePoints:1,comboPoints:0.25,maxPoints:10});
+    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10});
     const habitWeekdays = [{id:1,label:'Lun'},{id:2,label:'Mar'},{id:3,label:'Mer'},{id:4,label:'Jeu'},{id:5,label:'Ven'},{id:6,label:'Sam'},{id:0,label:'Dim'}];
     function openHabitForm(habit = null) {
-      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),basePoints:habit.basePoints??0,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??''} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),basePoints:1,comboPoints:0.25,maxPoints:10});
+      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),endDate:habit.endDate||'',completed:!!habit.completed,basePoints:habit.basePoints??0,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??''} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10});
     }
     function saveHabit() {
       const title = habitForm.title.trim(); if (!title) return;
-      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0)};
+      if(habitForm.endDate && habitForm.endDate < habitForm.startDate) { notify("La date de fin doit être après la date de début"); return; }
+      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),endDate:habitForm.endDate||'',completed:!!habitForm.completed,basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0)};
       if (habitForm.id) {const h=data.habits.find(x=>x.id===habitForm.id);if(h) { if (!h.pointAwards) h.pointAwards = Object.fromEntries(habitAwards(h).map(a=>[a.date,a.points])); Object.assign(h,fields); }}
       else data.habits.push({id:uid(),...fields,createdAt:todayStr(),history:[],postponed:[]});
       habitForm.open=false;
@@ -1488,7 +1501,10 @@ const app = createApp({
         return {date,points:awarded,streak};
       });
     }
+    function habitIsFinished(h) { return !!h.completed || !!(h.endDate && h.endDate < today.value); }
+    function markHabitFinished(h) { if(!confirm('Marquer cette routine comme terminée ?'))return; h.completed=true; h.endDate=h.endDate||today.value; }
     function habitLateDays(h){
+      if(habitIsFinished(h))return 0;
       const start=h.startDate||h.createdAt||today.value;
       if(start>today.value || habitDoneToday(h))return 0;
       const last=[...(h.history||[])].filter(d=>d<today.value).sort().pop();
@@ -1505,6 +1521,7 @@ const app = createApp({
     }
     function habitDoneToday(h) {return (h.history||[]).includes(today.value);}
     function habitDue(h) {
+      if(habitIsFinished(h))return false;
       if ((h.startDate||h.createdAt||today.value)>today.value) return false;
       if (habitDoneToday(h)) return true;
       if (h.forceDue === today.value) return true;
@@ -1517,6 +1534,7 @@ const app = createApp({
     }
     const dashboardHabits = computed(() => data.habits.filter(h=>habitDue(h)||habitLateDays(h)>0));
     function completeHabit(h) {
+      if(habitIsFinished(h))return;
       if ((h.startDate||h.createdAt||today.value)>today.value || habitDoneToday(h)) return;
       if (!confirm('Confirmer la réalisation de « '+h.title+' » aujourd’hui ?')) return;
       if (!Array.isArray(h.history)) h.history=[];
@@ -1815,7 +1833,7 @@ const app = createApp({
 
     return {
       // état
-      ticketDraft,ticketInputs,collapsedTickets,isTicketCollapsed,toggleTicketCollapse,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
+      ticketDraft,ticketInputs,collapsedTickets,isTicketCollapsed,toggleTicketCollapse,renameTicket,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
       data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, navGroups: NAV_GROUPS, statuses: STATUSES, tagStyle,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
@@ -1839,13 +1857,13 @@ const app = createApp({
       projectSelection, onProjectClick, toggleProjectSelect, selectAllProjects, clearProjectSelection, editSelectedProject, deleteSelectedProjects,
       dragProject, onProjectDragStart, onProjectDragOver, onProjectDrop, onProjectDragEnd, moveProject,
       // récompenses
-      rewardForm, openRewardForm, saveReward, deleteReward, claimReward,
+      rewardForm, openRewardForm, saveReward, addRewardCondition, rewardConditionsMet, canClaimReward, deleteReward, claimReward,
       // inventaire
       invForm, startEditInv, saveInv, deleteInv, refundInv,
       // données
       exportData, importData, resetAll,
       CHALLENGE_KINDS, challengeForm, openChallengeForm, saveChallenge, deleteChallenge, toggleChallenge, currentChallenges, challengeHistory, challengeProgress,
-      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitTotal,
+      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitTotal,
       activityForm, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
       formatDate,

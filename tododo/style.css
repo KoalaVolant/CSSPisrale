@@ -211,3 +211,5 @@
 .ticket-toggle{cursor:pointer;width:100%;padding:10px 8px!important}
 .ticket-heading{align-items:center}.ticket-card{scroll-margin-top:110px}
 #work-ticket-create{scroll-margin-top:110px}
+
+.ticket-edit-levels{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:8px 0}.ticket-edit-levels label{display:flex;align-items:center;gap:5px}.reward-condition-box{margin:12px 0;padding:10px;border:1px solid #bbb}.reward-condition-edit{display:flex;gap:8px;margin:6px 0}.reward-condition-edit input[type=text]{flex:1}.reward-conditions{margin:10px 0}.reward-conditions label{display:block;margin:4px 0}.habit-finished{opacity:.7}
