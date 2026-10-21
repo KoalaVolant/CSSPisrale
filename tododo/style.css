@@ -172,3 +172,20 @@
 .work-ticket-field {margin:.35rem 0;font-size:.85rem;}
 .work-ticket-field input,.quick-ticket-name {max-width:210px;padding:.3rem .5rem;border:1px solid #bbb;border-radius:6px;}
 .work-ticket-field label {display:inline-flex;align-items:center;gap:.35rem;flex-wrap:wrap;}
+
+/* Tickets et statistiques */
+.ticket-create,.ticket-card,.done-summary{padding:14px;margin:12px 0;border:1px solid var(--main-color,#ccc);border-radius:12px;background:var(--fnd,#fafafa)}
+.ticket-inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.ticket-inline input:first-child{flex:1;min-width:180px}
+.ticket-inline input,.ticket-inline select{padding:8px;max-width:240px}
+.ticket-inline button,.ticket-card button{padding:7px 10px;border-radius:7px;cursor:pointer}
+.ticket-point-input{width:90px!important;min-width:0!important}
+.ticket-heading,.ticket-item,.stats-day{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ticket-heading small{display:block;margin-top:5px}
+.ticket-item,.stats-day{padding:7px 4px;border-bottom:1px solid #ccc}
+.ticket-item label{flex:1}.ticket-checked{text-decoration:line-through;opacity:.6}
+.ticket-finish{margin-top:10px}.ticket-finish:disabled{opacity:.45;cursor:not-allowed}
+.stats-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:15px 0}
+.stats-cards article{padding:14px;border:1px solid #ccc;border-radius:10px;background:var(--fnd,#fafafa)}
+.stats-cards small{display:block}.stats-cards strong{display:block;font-size:1.5rem;margin-top:5px}
+@media(max-width:700px){.ticket-inline{flex-direction:column;align-items:stretch}.ticket-inline input,.ticket-inline select{max-width:none}.ticket-heading{align-items:flex-start}}
