@@ -36,6 +36,7 @@ const TABS = [
   { id: 'gratitude',  label: 'Gratitude' },
   { id: 'habits',     label: 'Habitudes & routines' },
   { id: 'challenges', label: 'Défis' },
+  { id: 'statistics', label: 'Statistiques' },
   { id: 'done',       label: 'Terminés' },
   { id: 'projects',   label: 'Projets' },
   { id: 'categories', label: 'Catégories' },
@@ -49,7 +50,7 @@ const TABS = [
 const NAV_GROUPS = [
   { title: 'Tâches', ids: ['home','all','work','habits','done'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
-  { title: 'Autres', ids: ['gratitude','challenges'] },
+  { title: 'Autres', ids: ['gratitude','challenges','statistics'] },
   { title: 'Configuration', ids: ['projects','categories','levels','data'] },
 ].map(group => ({ ...group, tabs: group.ids.map(id => TABS.find(t => t.id === id)).filter(Boolean) }));
 
@@ -193,6 +194,7 @@ function migrateGratitudePoints(records) {
 
 function defaultData() {
   return {
+    workTickets: [],  // tickets avec sous-tâches et historique
     tasks: [],        // { id, title, category, points, malus, status, projectId, due, urgency, difficulty, doneAt }
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
     rewardCategories: [], // catégories indépendantes des récompenses et de l'inventaire
@@ -231,6 +233,7 @@ function loadData() {
     d.rewardCategories = normalizeCategories(d.rewardCategories);
     if (!Array.isArray(d.habits)) d.habits = [];
     if (!Array.isArray(d.activities)) d.activities = [];
+    if (!Array.isArray(d.workTickets)) d.workTickets = [];
     d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
     if (!Array.isArray(d.challenges)) d.challenges = [];
     if (!Array.isArray(d.challengeAwards)) d.challengeAwards = [];
@@ -439,6 +442,8 @@ const app = createApp({
 
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
+      data.workTickets = Array.isArray(src.workTickets) ? src.workTickets : [];
+      if (typeof ticketInputs !== 'undefined') data.workTickets.forEach(t=>{if(!ticketInputs[t.id])ticketInputs[t.id]={name:'',points:10};});
       data.tasks        = Array.isArray(src.tasks) ? src.tasks : [];
       data.tasks.forEach(t => { if (!t.scope) t.scope = t.category === 'Travail' ? 'work' : 'personal'; if (t.scope === 'work') { t.projectId=''; if(t.category==='Travail') t.category=''; } });
       migrateWorkTags(data.tasks);
@@ -594,6 +599,7 @@ const app = createApp({
     // Points des tâches terminées (bonus en +, malus en −) + points des tâches terminées puis supprimées
     const earned = computed(() =>
       data.tasks.filter(t => t.status === 'done').reduce((s, t) => s + taskValue(t), 0)
+      + data.workTickets.reduce((sum,ticket)=>sum+(ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0),0)
       + (Number(data.archived) || 0));
     const gratitudeTotal = computed(() => Math.round(data.gratitude.reduce((sum,g) => sum+(Number(g.points)||0),0)*100)/100);
     const savedTotal = computed(() => data.rewards.reduce((sum,r)=>sum+Math.max(0,Number(r.saved)||0),0));
@@ -797,12 +803,87 @@ const app = createApp({
     const doneWorkTasks = computed(() => data.tasks.filter(t => t.scope === 'work' && t.status === 'done')
       .sort((a,b) => (b.doneAt || '').localeCompare(a.doneAt || '')));
 
+    /* ---------- Tickets professionnels (compatibles avec les tâches historiques) ---------- */
+    function ticketItemValue(ticket, item) {
+      return taskValue({scope:'work',points:Math.max(0,Number(item.points)||0),urgency:ticket.urgency||'',difficulty:ticket.difficulty||'',malus:false});
+    }
+    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',due:'',category:''});
+    const ticketInputs = reactive({});
+    data.workTickets.forEach(t=>{ticketInputs[t.id]={name:'',points:10};});
+    const openTickets = computed(()=>data.workTickets.filter(t=>!t.done));
+    const closedTickets = computed(()=>[...data.workTickets.filter(t=>t.done)].sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||'')));
+    function createTicket() {
+      const name=ticketDraft.name.trim(); if(!name)return;
+      const id=uid();ticketInputs[id]={name:'',points:10};
+      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,due:ticketDraft.due,category:ticketDraft.category,createdAt:today.value,done:false,doneAt:'',items:[]});
+      ticketDraft.name='';ticketDraft.due='';ticketDraft.category='';
+    }
+    function addTicketItem(ticket) {
+      const draft=ticketInputs[ticket.id]||{};const name=String(draft.name||'').trim();if(!name)return;
+      ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});
+      ticketInputs[ticket.id]={name:'',points:10};
+    }
+    function toggleTicketItem(ticket,item) {
+      item.done=!item.done;item.doneAt=item.done?today.value:'';
+      if(!item.done&&ticket.done){ticket.done=false;ticket.doneAt='';}
+    }
+    function finishTicket(ticket) {
+      if(!ticket.items.length){notify('Ajoute au moins une tâche avant de terminer le ticket');return;}
+      if(ticket.items.some(x=>!x.done)){notify('Termine toutes les tâches avant de clôturer le ticket');return;}
+      ticket.done=true;ticket.doneAt=today.value;
+    }
+    function reopenTicket(ticket){ticket.done=false;ticket.doneAt='';}
+    function removeTicket(ticket){
+      if(!confirm(`Supprimer le ticket « ${ticket.name} » et toutes ses tâches ? Les points validés seront conservés.`))return;
+      data.archived+=(ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0);
+      data.workTickets=data.workTickets.filter(x=>x.id!==ticket.id);
+    }
+    function removeTicketItem(ticket,item){
+      if(!confirm(`Supprimer « ${item.name} » ?`))return;
+      if(item.done)data.archived+=ticketItemValue(ticket,item);
+      ticket.items=ticket.items.filter(x=>x.id!==item.id);
+      if(ticket.done){ticket.done=false;ticket.doneAt='';}
+    }
+    function ticketPoints(ticket){return (ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0);}
+
+    /* ---------- Statistiques (données connues uniquement) ---------- */
+    const completedEntries=computed(()=>[
+      ...data.tasks.filter(t=>t.status==='done'&&t.doneAt).map(t=>({date:t.doneAt,scope:t.scope==='work'?'work':'personal',points:taskValue(t),ticket:false})),
+      ...data.workTickets.flatMap(ticket=>(ticket.items||[]).filter(x=>x.done&&x.doneAt).map(x=>({date:x.doneAt,scope:'work',points:ticketItemValue(ticket,x),ticket:true})))
+    ]);
+    const doneStats=computed(()=>{
+      const result={};for(const scope of ['personal','work']){
+        const entries=completedEntries.value.filter(x=>x.scope===scope);
+        const byDate={};for(const item of entries)byDate[item.date]=(byDate[item.date]||0)+item.points;
+        const dates=Object.keys(byDate).sort().reverse();
+        result[scope]={count:entries.length,total:entries.reduce((s,x)=>s+x.points,0),average:entries.length?Math.round(entries.reduce((s,x)=>s+x.points,0)/entries.length*100)/100:0,days:dates.map(date=>({date,points:Math.round(byDate[date]*100)/100}))};
+      }return result;
+    });
+    const statistics=computed(()=>{
+      const tasks=data.tasks;const tickets=data.workTickets;
+      const done=completedEntries.value;const todayDone=done.filter(x=>x.date===today.value);
+      const active=tasks.filter(t=>t.status!=='done');
+      const perDay={};done.forEach(x=>{perDay[x.date]=(perDay[x.date]||0)+x.points;});
+      const series=Object.keys(perDay).sort().reverse().map(date=>({date,points:Math.round(perDay[date]*100)/100,count:done.filter(x=>x.date===date).length}));
+      const sum=done.reduce((s,x)=>s+x.points,0);
+      const total=tickets.reduce((s,t)=>s+(t.items||[]).length,0);
+      const ticketDone=tickets.reduce((s,t)=>s+(t.items||[]).filter(x=>x.done).length,0);
+      const categories=Object.entries(tasks.reduce((acc,t)=>{const k=t.scope==='work'?'Travail':t.category||'Sans catégorie';acc[k]=(acc[k]||0)+1;return acc;},{})).sort((a,b)=>b[1]-a[1]);
+      return {tasks:tasks.length,active:active.length,completed:done.length,overdue:active.filter(t=>t.due&&t.due<today.value).length,completionRate:tasks.length?Math.round(tasks.filter(t=>t.status==='done').length/tasks.length*100):0,points:Math.round(sum*100)/100,average:done.length?Math.round(sum/done.length*100)/100:0,todayPoints:todayDone.reduce((s,x)=>s+x.points,0),todayCount:todayDone.length,days:series,mostProductive:series.reduce((best,d)=>!best||d.points>best.points?d:best,null),tickets:tickets.length,ticketsOpen:tickets.filter(t=>!t.done).length,ticketsClosed:tickets.filter(t=>t.done).length,ticketItems:total,ticketItemsDone:ticketDone,projects:data.projects.length,habits:data.habits.length,challenges:data.challenges.length,rewards:data.rewards.length,inventory:data.inventory.length,gratitude:data.gratitude.length,spent:data.spent,saved:savedTotal.value,categories,byStatus:STATUSES.map(s=>({name:s.label,count:tasks.filter(t=>t.status===s.value).length}))};
+    });
+
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
       open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
       urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '',
     });
 
+    const DRAFT_KEY='todo-quest-form-drafts-v2';
+    let persistedDrafts={};
+    try{persistedDrafts=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}')||{};}catch(e){}
+    function saveDrafts(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify({task:persistedDrafts.task,quick:persistedDrafts.quick,ticket:clone(ticketDraft)}));}catch(e){}}
+    function clearDraft(key){delete persistedDrafts[key];saveDrafts();}
+    Object.assign(ticketDraft,persistedDrafts.ticket||{});
     function openTaskForm(task = null, projectId = '') {
       if (task) {
         Object.assign(taskForm, {
@@ -816,6 +897,7 @@ const app = createApp({
           due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [], ticketName: '',
         });
       }
+      if(!task && persistedDrafts.task && persistedDrafts.task.scope===taskForm.scope)Object.assign(taskForm,persistedDrafts.task,{open:false,id:null});
       quickForm.open = false;
       taskForm.open = true;
     }
@@ -874,7 +956,7 @@ const app = createApp({
         value = taskValue(t);
       }
       if (becameDone) notify(`${fmtPts(value)} · tâche déplacée dans Terminés`);
-      taskForm.open = false;
+      taskForm.open = false;clearDraft('task');
     }
 
     /* ---------- To do rapide (plusieurs tâches d'un coup) ---------- */
@@ -891,6 +973,7 @@ const app = createApp({
       quickForm.paste = { text: '', points: 10, malus: false, category: '', workCategoryNames: [], ticketName: '', urgency: '', difficulty: '', due: today.value, project: '' };
       quickForm.due = today.value;
       quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value, urgency: '', difficulty: '', workCategoryNames: [], ticketName: '' }));
+      if(persistedDrafts.quick&&persistedDrafts.quick.scope===quickForm.scope)Object.assign(quickForm,persistedDrafts.quick,{open:false});
       quickForm.open = true;
       focusLastQuickRow(0);
     }
@@ -933,7 +1016,7 @@ const app = createApp({
         due: r.due || '',
       })));
       notify(rows.length ? `${rows.length} tâche(s) ajoutée(s)` : 'Aucune tâche à ajouter');
-      quickForm.open = false;
+      quickForm.open = false;clearDraft('quick');
     }
 
     function savePaste() {
@@ -963,7 +1046,7 @@ const app = createApp({
         due: quickForm.paste.due || '',
       })));
       notify(`${items.length} tâche(s) ajoutée(s)`);
-      quickForm.open = false;
+      quickForm.open = false;clearDraft('quick');
     }
 
     /* ---------- Sélection (clic sur le bloc d'une tâche) ---------- */
@@ -1057,11 +1140,16 @@ const app = createApp({
       selection.value = selection.value.filter(id => data.tasks.some(t => t.id === id));
     });
 
+    // Brouillons enregistrés localement, indépendamment des synchronisations Firebase.
+    watch(taskForm,()=>{if(taskForm.open&&!taskForm.id){persistedDrafts.task=clone(taskForm);saveDrafts();}},{deep:true});
+    watch(quickForm,()=>{if(quickForm.open){persistedDrafts.quick=clone(quickForm);saveDrafts();}},{deep:true});
+    watch(ticketDraft,()=>saveDrafts(),{deep:true});
     // Échap ferme les popups
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
-      const popup = [bulkForm, taskForm, quickForm, projectForm, categoryForm, rewardForm, balanceForm].find(f => f.open);
-      if (popup) popup.open = false;
+      // Ne jamais fermer accidentellement un formulaire avec des données en cours.
+      if (e.target && e.target.closest && e.target.closest('.modal')) return;
+      // Fermeture par Échap désactivée pour préserver toute saisie en cours.
     });
 
     // Points à gagner dans les listes Aujourd'hui / À venir (les malus comptent en négatif)
@@ -1710,6 +1798,7 @@ const app = createApp({
 
     return {
       // état
+      ticketDraft,ticketInputs,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
       data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, navGroups: NAV_GROUPS, statuses: STATUSES, tagStyle,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
