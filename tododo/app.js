@@ -34,6 +34,7 @@ const TABS = [
   { id: 'all',        label: 'Toutes les tâches' },
   { id: 'work',       label: 'Travail' },
   { id: 'gratitude',  label: 'Gratitude' },
+  { id: 'evening', label: 'To do du soir' },
   { id: 'habits',     label: 'Habitudes & routines' },
   { id: 'challenges', label: 'Défis' },
   { id: 'statistics', label: 'Statistiques' },
@@ -48,7 +49,7 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','all','work','habits','done'] },
+  { title: 'Tâches', ids: ['home','all','work','habits','evening','done'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','challenges','statistics'] },
   { title: 'Configuration', ids: ['projects','categories','levels','data'] },
@@ -185,7 +186,7 @@ function migrateGratitudePoints(records) {
   for (const g of ordered) {
     const current = Date.parse(g.date + 'T12:00:00Z');
     const prior = previous ? Date.parse(previous + 'T12:00:00Z') : NaN;
-    streak = Number.isFinite(prior) && current - prior === 86400000 ? streak + 1 : 1;
+    streak = Number.isFinite(prior) && current - prior === 86400000 && previous.slice(0,7)===g.date.slice(0,7) ? streak + 1 : 1;
     g.points = 1 + (streak - 1) * 0.25;
     previous = g.date;
   }
@@ -194,6 +195,7 @@ function migrateGratitudePoints(records) {
 
 function defaultData() {
   return {
+    eveningNotes: '', // liste textuelle du soir
     workTickets: [],  // tickets avec sous-tâches et historique
     tasks: [],        // { id, title, category, points, malus, status, projectId, due, urgency, difficulty, doneAt }
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
@@ -203,7 +205,7 @@ function defaultData() {
     challenges: [], // défis paramétrables
     challengeAwards: [], // journal immuable des points attribués
     gratitude: [], // { date, text, points } : une par jour
-    gratitudePointsVersion: 2,
+    gratitudePointsVersion: 3,
     workCategories: [],
     workDifficulties: clone(DEFAULT_DIFFICULTIES),
     workUrgencies: clone(DEFAULT_URGENCIES),
@@ -234,11 +236,12 @@ function loadData() {
     if (!Array.isArray(d.habits)) d.habits = [];
     if (!Array.isArray(d.activities)) d.activities = [];
     if (!Array.isArray(d.workTickets)) d.workTickets = [];
-    d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
+    d.eveningNotes = typeof d.eveningNotes === 'string' ? d.eveningNotes : '';
+     d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
     if (!Array.isArray(d.challenges)) d.challenges = [];
     if (!Array.isArray(d.challengeAwards)) d.challengeAwards = [];
     if (!Array.isArray(d.gratitude)) d.gratitude = [];
-    if (d.gratitudePointsVersion !== 2) { migrateGratitudePoints(d.gratitude); d.gratitudePointsVersion = 2; }
+    if (d.gratitudePointsVersion !== 3) { migrateGratitudePoints(d.gratitude); d.gratitudePointsVersion = 3; }
     if (!Array.isArray(d.workCategories)) d.workCategories = [];
     d.workCategories = normalizeCategories(d.workCategories);
     if (!Array.isArray(d.workDifficulties)) d.workDifficulties = clone(DEFAULT_DIFFICULTIES);
@@ -442,6 +445,7 @@ const app = createApp({
 
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
+      data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
       data.workTickets = Array.isArray(src.workTickets) ? src.workTickets : [];
       // Les tickets synchronisés doivent également disposer de champs de saisie locaux.
       if (typeof ticketInputs !== 'undefined') {
@@ -464,8 +468,8 @@ const app = createApp({
       data.challenges = Array.isArray(src.challenges) ? src.challenges : [];
       data.challengeAwards = Array.isArray(src.challengeAwards) ? src.challengeAwards : [];
       data.gratitude = Array.isArray(src.gratitude) ? src.gratitude : [];
-      if (src.gratitudePointsVersion !== 2) migrateGratitudePoints(data.gratitude);
-      data.gratitudePointsVersion = 2;
+      if (src.gratitudePointsVersion !== 3) migrateGratitudePoints(data.gratitude);
+      data.gratitudePointsVersion = 3;
       data.workCategories = normalizeCategories(src.workCategories);
       data.workDifficulties = Array.isArray(src.workDifficulties) ? src.workDifficulties : clone(DEFAULT_DIFFICULTIES);
       data.workUrgencies = Array.isArray(src.workUrgencies) ? src.workUrgencies : clone(Array.isArray(src.urgencies) ? src.urgencies : DEFAULT_URGENCIES);
@@ -667,7 +671,7 @@ const app = createApp({
       const yesterday=new Date(today.value+'T12:00:00Z');yesterday.setUTCDate(yesterday.getUTCDate()-1);
       let run=0, cursor=yesterday.toISOString().slice(0,10);
       const dates=new Set(data.gratitude.map(g=>g.date));
-      while(dates.has(cursor)) {run++; const d=new Date(cursor+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-1);cursor=d.toISOString().slice(0,10);}
+      while(cursor.slice(0,7)===today.value.slice(0,7) && dates.has(cursor)) {run++; const d=new Date(cursor+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-1);cursor=d.toISOString().slice(0,10);}
       const points=1 + run * 0.25;
       data.gratitude.push({date:today.value,text:value,points});
       gratitudeDraft.value='';notify('Gratitude enregistrée : +'+points+' pt');
@@ -783,6 +787,8 @@ const app = createApp({
       switch (filters.sort) {
         case 'points-desc':     res.sort((a, b) => taskValue(b) - taskValue(a) || byDue(a, b)); break;
         case 'points-asc':      res.sort((a, b) => taskValue(a) - taskValue(b) || byDue(a, b)); break;
+        case 'urgency-asc':     res.sort((a, b) => levelRank(data.urgencies, effectiveUrgency(a)) - levelRank(data.urgencies, effectiveUrgency(b)) || byDue(a, b)); break;
+        case 'difficulty-asc':  res.sort((a, b) => levelRank(data.difficulties, a.difficulty) - levelRank(data.difficulties, b.difficulty) || byDue(a, b)); break;
         case 'urgency-desc':    res.sort((a, b) => levelRank(data.urgencies, effectiveUrgency(b)) - levelRank(data.urgencies, effectiveUrgency(a)) || byDue(a, b)); break;
         case 'difficulty-desc': res.sort((a, b) => levelRank(data.difficulties, b.difficulty) - levelRank(data.difficulties, a.difficulty) || byDue(a, b)); break;
         case 'title':           res.sort((a, b) => a.title.localeCompare(b.title)); break;
@@ -834,12 +840,43 @@ const app = createApp({
     }
     const ticketInputs = reactive({});
     data.workTickets.forEach(t=>{ticketInputs[t.id]={name:'',points:10};});
-    const openTickets = computed(()=>data.workTickets.filter(t=>!t.done));
+    const ticketSort = ref('manual');
+    const ticketDragged = ref(null);
+    const openTickets = computed(()=>{
+      const list=data.workTickets.filter(t=>!t.done);
+      const urgency=t=>levelRank(data.workUrgencies,t.urgency);
+      const difficulty=t=>levelRank(data.workDifficulties,t.difficulty);
+      switch(ticketSort.value){
+        case 'urgency-desc': return [...list].sort((a,b)=>urgency(b)-urgency(a));
+        case 'urgency-asc': return [...list].sort((a,b)=>urgency(a)-urgency(b));
+        case 'difficulty-desc': return [...list].sort((a,b)=>difficulty(b)-difficulty(a));
+        case 'difficulty-asc': return [...list].sort((a,b)=>difficulty(a)-difficulty(b));
+        case 'due-asc': return [...list].sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
+        case 'due-desc': return [...list].sort((a,b)=>(b.due||'0000').localeCompare(a.due||'0000'));
+        case 'name': return [...list].sort((a,b)=>a.name.localeCompare(b.name));
+        default: return list;
+      }
+    });
+    function ticketDragStart(event,ticket){
+      if(ticketSort.value!=='manual'){event.preventDefault();return;}
+      ticketDragged.value=ticket.id;
+      event.dataTransfer.effectAllowed='move';
+      event.dataTransfer.setData('text/plain',ticket.id);
+    }
+    function ticketDrop(event,target){
+      event.preventDefault();
+      const from=data.workTickets.findIndex(t=>t.id===ticketDragged.value);
+      const to=data.workTickets.findIndex(t=>t.id===target.id);
+      if(from<0||to<0||from===to)return;
+      const [moved]=data.workTickets.splice(from,1);
+      data.workTickets.splice(to,0,moved);
+      ticketDragged.value=null;
+    }
     const closedTickets = computed(()=>[...data.workTickets.filter(t=>t.done)].sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||'')));
     function createTicket() {
       const name=ticketDraft.name.trim(); if(!name)return;
       const id=uid();ticketInputs[id]={name:'',points:10};
-      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,due:ticketDraft.due,category:ticketDraft.category,createdAt:today.value,done:false,doneAt:'',items:[]});
+      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,due:ticketDraft.due,category:ticketDraft.category,createdAt:today.value,customStatus:'',done:false,doneAt:'',items:[]});
       ticketDraft.name='';ticketDraft.due='';ticketDraft.category='';
     }
     function addTicketItem(ticket) {
@@ -1472,15 +1509,15 @@ const app = createApp({
     }
 
     /* ---------- Habitudes et routines ---------- */
-    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10});
+    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,quantityEnabled:false,quantityMax:3,quantityBonus:0.10});
     const habitWeekdays = [{id:1,label:'Lun'},{id:2,label:'Mar'},{id:3,label:'Mer'},{id:4,label:'Jeu'},{id:5,label:'Ven'},{id:6,label:'Sam'},{id:0,label:'Dim'}];
     function openHabitForm(habit = null) {
-      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),endDate:habit.endDate||'',completed:!!habit.completed,basePoints:habit.basePoints??0,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??''} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10});
+      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),endDate:habit.endDate||'',completed:!!habit.completed,basePoints:habit.basePoints??0,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??'',quantityEnabled:!!habit.quantityEnabled,quantityMax:habit.quantityMax||3,quantityBonus:habit.quantityBonus??0.10} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,quantityEnabled:false,quantityMax:3,quantityBonus:0.10});
     }
     function saveHabit() {
       const title = habitForm.title.trim(); if (!title) return;
       if(habitForm.endDate && habitForm.endDate < habitForm.startDate) { notify("La date de fin doit être après la date de début"); return; }
-      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),endDate:habitForm.endDate||'',completed:!!habitForm.completed,basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0)};
+      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),endDate:habitForm.endDate||'',completed:!!habitForm.completed,basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0),quantityEnabled:!!habitForm.quantityEnabled,quantityMax:Math.max(1,Number(habitForm.quantityMax)||1),quantityBonus:Math.max(0,Number(habitForm.quantityBonus)||0)};
       if (habitForm.id) {const h=data.habits.find(x=>x.id===habitForm.id);if(h) { if (!h.pointAwards) h.pointAwards = Object.fromEntries(habitAwards(h).map(a=>[a.date,a.points])); Object.assign(h,fields); }}
       else data.habits.push({id:uid(),...fields,createdAt:todayStr(),history:[],postponed:[]});
       habitForm.open=false;
@@ -1519,6 +1556,18 @@ const app = createApp({
       }
       return h.frequency==='weekly'?Math.max(0,Math.floor(dayDiff(start,today.value)/7)*(h.weeklyTarget||3)-(h.history||[]).length):n;
     }
+    function habitQuantity(h){
+      if(!h.quantityEnabled)return null;
+      const day=(h.dailyQuantities||{})[today.value]||{};
+      return {done:day.done??0,max:day.max??h.quantityMax??1};
+    }
+    function setHabitQuantity(h,field,value){
+      if(!h.dailyQuantities)h.dailyQuantities={};
+      const day=h.dailyQuantities[today.value]||{done:0,max:h.quantityMax||1};
+      day[field]=Math.max(field==='max'?1:0,Number(value)||0);
+      if(day.done>day.max)day.done=day.max;
+      h.dailyQuantities[today.value]=day;
+    }
     function habitDoneToday(h) {return (h.history||[]).includes(today.value);}
     function habitDue(h) {
       if(habitIsFinished(h))return false;
@@ -1540,7 +1589,10 @@ const app = createApp({
       if (!Array.isArray(h.history)) h.history=[];
       h.history.push(today.value);
       if (!h.pointAwards) h.pointAwards={};
-      h.pointAwards[today.value]=habitAwards(h).find(a=>a.date===today.value)?.points ?? 0;
+      const baseAward=habitAwards(h).find(a=>a.date===today.value)?.points ?? 0;
+      const q=habitQuantity(h);
+      // Bonus proportionnel aux unités effectuées, même si l'objectif n'est pas atteint.
+      h.pointAwards[today.value]=Math.round((baseAward+(q ? q.done*Math.max(0,Number(h.quantityBonus)||0) : 0))*100)/100;
       h.postponed=(h.postponed||[]).filter(d=>d!==today.value);
       notify('Habitude enregistrée');
     }
@@ -1572,26 +1624,30 @@ const app = createApp({
       {id:'all-tasks',label:'Terminer toutes les tâches prévues'},
       {id:'habit-count',label:'Effectuer X habitudes'},
       {id:'all-habits',label:'Effectuer toutes les habitudes prévues'},
-      {id:'project-count',label:'Terminer X tâches d’un projet'}
+      {id:'project-count',label:'Terminer X tâches d’un projet'},
+      {id:'selected-tasks',label:'Terminer les tâches sélectionnées'},
+      {id:'level-deadline',label:'Terminer les tâches d’une urgence / difficulté avant une date'}
     ];
-    const challengeForm = reactive({open:false,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true});
+    const challengeForm = reactive({open:false,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true,selectedTaskIds:[],urgency:'',difficulty:'',deadline:''});
     function openChallengeForm(ch = null) {
       Object.assign(challengeForm, ch ? {
         open:true,id:ch.id,name:ch.name,kind:ch.kind,scope:ch.scope||'personal',
         projectId:ch.projectId||'',target:ch.target||1,period:ch.period||'daily',
-        points:ch.points||0,enabled:ch.enabled!==false
-      } : {open:true,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true});
+        points:ch.points||0,enabled:ch.enabled!==false,selectedTaskIds:[...(ch.selectedTaskIds||[])],urgency:ch.urgency||'',difficulty:ch.difficulty||'',deadline:ch.deadline||''
+      } : {open:true,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true,selectedTaskIds:[],urgency:'',difficulty:'',deadline:''});
     }
     function saveChallenge() {
       const name=String(challengeForm.name||'').trim();
       const target=Math.floor(Number(challengeForm.target));
       const points=Number(challengeForm.points);
       if (!name || !Number.isFinite(points) || points<0 || !Number.isFinite(target) || target<1 || target>100000) {notify('Nom, objectif et points invalides');return;}
+      if (challengeForm.kind==='selected-tasks' && !challengeForm.selectedTaskIds.length) {notify('Sélectionne au moins une tâche');return;}
+      if (challengeForm.kind==='level-deadline' && (!challengeForm.deadline || (!challengeForm.urgency && !challengeForm.difficulty))) {notify('Indique une date et au moins un niveau');return;}
       if (challengeForm.kind==='project-count' && !data.projects.some(p=>p.id===challengeForm.projectId)) {notify('Sélectionne un projet');return;}
-      const fields={name,kind:challengeForm.kind,scope:challengeForm.scope,projectId:challengeForm.kind==='project-count'?challengeForm.projectId:'',target,period:challengeForm.period,points:Math.round(points*100)/100,enabled:challengeForm.enabled};
+      const fields={name,kind:challengeForm.kind,scope:challengeForm.scope,projectId:challengeForm.kind==='project-count'?challengeForm.projectId:'',target,period:['selected-tasks','level-deadline'].includes(challengeForm.kind)?'once':challengeForm.period,points:Math.round(points*100)/100,enabled:challengeForm.enabled,selectedTaskIds:[...challengeForm.selectedTaskIds],urgency:challengeForm.urgency,difficulty:challengeForm.difficulty,deadline:challengeForm.deadline,deadlineTaskIds:challengeForm.kind==='level-deadline'?data.tasks.filter(t=>(!challengeForm.urgency||t.urgency===challengeForm.urgency)&&(!challengeForm.difficulty||t.difficulty===challengeForm.difficulty)).map(t=>t.id):[]};
       if (challengeForm.id) {
         const item=data.challenges.find(c=>c.id===challengeForm.id);
-        if(item) Object.assign(item,fields,{activationDate:today.value});
+        if(item) Object.assign(item,fields,{activationDate:today.value,hiddenHome:false});
       } else data.challenges.push({id:uid(),...fields,activationDate:today.value});
       challengeForm.open=false;
       evaluateChallenges();
@@ -1600,6 +1656,7 @@ const app = createApp({
       if(!confirm('Supprimer ce défi ? Les points déjà gagnés seront conservés.'))return;
       data.challenges=data.challenges.filter(x=>x.id!==c.id);
     }
+    function hideChallengeHome(c) { const original=data.challenges.find(x=>x.id===c.id); if(original) original.hiddenHome=true; }
     function toggleChallenge(c) {c.enabled=!c.enabled;if(c.enabled){c.activationDate=today.value;evaluateChallenges();}}
     const weekStart = date => {
       const d=new Date(date+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);
@@ -1611,6 +1668,18 @@ const app = createApp({
       const end=c.period==='weekly' ? (()=>{const d=new Date(start+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+6);return d.toISOString().slice(0,10);})() : date;
       const scopeOk=t=>c.scope==='both'||(c.scope==='work'?t.scope==='work':t.scope!=='work');
       const completed=t=>t.status==='done'&&t.doneAt>=start&&t.doneAt<=end;
+      if(c.kind==='selected-tasks') {
+        const ids=c.selectedTaskIds||[];
+        const tasks=ids.map(id=>data.tasks.find(t=>t.id===id));
+        const done=tasks.filter(t=>t&&t.status==='done').length;
+        return {current:done,target:ids.length,complete:ids.length>0&&done===ids.length};
+      }
+      if(c.kind==='level-deadline') {
+        const tasks=data.tasks.filter(t=>!Array.isArray(c.deadlineTaskIds)||c.deadlineTaskIds.includes(t.id)).filter(t=>
+          (!c.urgency||t.urgency===c.urgency)&&(!c.difficulty||t.difficulty===c.difficulty));
+        const done=tasks.filter(t=>t.status==='done'&&t.doneAt && t.doneAt<=c.deadline).length;
+        return {current:done,target:tasks.length,complete:tasks.length>0&&done===tasks.length && today.value<=c.deadline};
+      }
       if(c.kind==='all-habits'||c.kind==='habit-count') {
         // Une habitude prévue aujourd'hui compte dans le dénominateur.
         // Pour la semaine, les réalisations de la semaine sont comptées par habitude.
@@ -1833,7 +1902,7 @@ const app = createApp({
 
     return {
       // état
-      ticketDraft,ticketInputs,collapsedTickets,isTicketCollapsed,toggleTicketCollapse,renameTicket,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
+      ticketSort,ticketDragged,ticketDragStart,ticketDrop,ticketDraft,ticketInputs,collapsedTickets,isTicketCollapsed,toggleTicketCollapse,renameTicket,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
       data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, navGroups: NAV_GROUPS, statuses: STATUSES, tagStyle,
       // cloud
       firebaseReady, user, syncState, syncLabel, signIn, signOut,
@@ -1862,8 +1931,8 @@ const app = createApp({
       invForm, startEditInv, saveInv, deleteInv, refundInv,
       // données
       exportData, importData, resetAll,
-      CHALLENGE_KINDS, challengeForm, openChallengeForm, saveChallenge, deleteChallenge, toggleChallenge, currentChallenges, challengeHistory, challengeProgress,
-      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitTotal,
+      CHALLENGE_KINDS, challengeForm, openChallengeForm, saveChallenge, deleteChallenge, toggleChallenge, hideChallengeHome, currentChallenges, challengeHistory, challengeProgress,
+      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal,
       activityForm, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
       formatDate,

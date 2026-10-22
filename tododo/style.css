@@ -213,3 +213,13 @@
 #work-ticket-create{scroll-margin-top:110px}
 
 .ticket-edit-levels{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:8px 0}.ticket-edit-levels label{display:flex;align-items:center;gap:5px}.reward-condition-box{margin:12px 0;padding:10px;border:1px solid #bbb}.reward-condition-edit{display:flex;gap:8px;margin:6px 0}.reward-condition-edit input[type=text]{flex:1}.reward-conditions{margin:10px 0}.reward-conditions label{display:block;margin:4px 0}.habit-finished{opacity:.7}
+
+/* Todo Quest V17 */
+.ticket-sort-bar{display:flex;justify-content:flex-end;margin:12px 0}.ticket-sort-bar select{padding:6px}
+.ticket-drag-handle{cursor:grab;user-select:none;padding:8px;font-size:22px}.ticket-drag-handle:active{cursor:grabbing}
+.ticket-custom-status{width:170px;max-width:100%;padding:6px;border:1px solid #bbb;border-radius:7px}
+.ticket-heading .ticket-toggle{flex:1;min-width:220px}
+.evening-notes{box-sizing:border-box;width:100%;min-height:320px;padding:15px;resize:vertical;border-radius:10px;font:inherit}
+.challenge-task-picker{max-height:220px;overflow:auto;padding:10px;border:1px solid #ccc}.challenge-task-picker label{display:block}
+.habit-quantity{display:inline-flex;gap:5px;align-items:center}.habit-quantity input{width:55px;min-width:0;padding:4px}
+.challenge-summary button{margin-left:10px}

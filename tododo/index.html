@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261021-v16">
-  <link rel="stylesheet" href="stylekoala.css?v=20261021-v16">
+  <link rel="stylesheet" href="style.css?v=20261022-v17">
+  <link rel="stylesheet" href="stylekoala.css?v=20261022-v17">
 </head>
 <body>
 
@@ -140,7 +140,9 @@
             <option value="points-desc">Trier : points ↓</option>
             <option value="points-asc">Trier : points ↑</option>
             <option value="urgency-desc">Trier : urgence ↓</option>
+            <option value="urgency-asc">Trier : urgence ↑</option>
             <option value="difficulty-desc">Trier : difficulté ↓</option>
+            <option value="difficulty-asc">Trier : difficulté ↑</option>
             <option value="title">Trier : titre A→Z</option>
           </select>
 
@@ -391,23 +393,14 @@
     <!-- ============ ACCUEIL : prochaine récompense + Aujourd'hui / À venir ============ -->
     <section class="view view-home" v-if="view === 'home'">
 
-      <!-- "Encore X pts avant…" : affiché uniquement ici -->
-      <div class="next-reward" v-if="data.rewards.length">
-        <template v-if="nextReward">
-          <span class="next-reward-label">Encore <strong>{{ nextReward.cost - balance }} pts</strong> avant « {{ nextReward.name }} »</span>
-          <progress :value="Math.max(0, balance)" :max="nextReward.cost"></progress>
-        </template>
-        <span class="next-reward-label" v-else>Toutes tes récompenses sont accessibles !</span>
-      </div>
-
-      <section class="challenge-dashboard" v-if="currentChallenges.some(c=>c.enabled!==false && !c.awarded)">
+      <section class="challenge-dashboard" v-if="currentChallenges.some(c=>c.enabled!==false && !c.hiddenHome)">
         <h2>Défis en cours</h2>
-        <div v-for="c in currentChallenges.filter(x=>x.enabled!==false && !x.awarded)" :key="c.id" class="challenge-summary"><strong>{{ c.name }}</strong> · {{ c.current }}/{{ c.target }} · +{{ c.points }} pts</div>
+        <div v-for="c in currentChallenges.filter(x=>x.enabled!==false && !x.hiddenHome)" :key="c.id" class="challenge-summary"><strong>{{ c.name }}</strong> · {{ c.current }}/{{ c.target }} · +{{ c.points }} pts <span v-if="c.awarded">✓ Terminé</span><button v-if="c.awarded" type="button" @click="hideChallengeHome(c)">Retirer de l’accueil</button></div>
       </section>
       <section class="habit-dashboard" v-if="data.habits.length">
         <h2>Habitudes <small>({{ dashboardHabits.length }})</small></h2>
         <div class="habit-entry" v-for="habit in dashboardHabits" :key="habit.id" :class="{ 'habit-completed': habitDoneToday(habit), 'habit-overdue': habitLateDays(habit)>0 }">
-          <span>{{ habit.title }} <small v-if="habitLateDays(habit)>0">({{ habitLateDays(habit) }} jour(s) de retard)</small></span><div class="habit-actions"><button type="button" v-if="!habitDoneToday(habit)" @click="completeHabit(habit)">✓</button><span v-else>Effectuée ✓</span><button type="button" v-if="!habitDoneToday(habit)" @click="postponeHabit(habit)">Demain</button></div>
+          <span>{{ habit.title }} <strong v-if="habitQuantity(habit)">({{ habitQuantity(habit).done }}/{{ habitQuantity(habit).max }})</strong> <small v-if="habitLateDays(habit)>0">({{ habitLateDays(habit) }} jour(s) de retard)</small></span><div class="habit-actions"><span v-if="habitQuantity(habit) && !habitDoneToday(habit)" class="habit-quantity">Fait <input type="number" min="0" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" @change="setHabitQuantity(habit,'done',$event.target.value)"> / <input type="number" min="1" :value="habitQuantity(habit).max" @change="setHabitQuantity(habit,'max',$event.target.value)"></span><button type="button" v-if="!habitDoneToday(habit)" @click="completeHabit(habit)">✓</button><span v-else>Effectuée ✓</span><button type="button" v-if="!habitDoneToday(habit)" @click="postponeHabit(habit)">Demain</button></div>
         </div>
       </section>
       <div class="dashboard">
@@ -457,6 +450,10 @@
       </div>
     </section>
 
+    <section class="view view-evening" v-if="view === 'evening'">
+      <p>Liste libre pour ce soir, enregistrée automatiquement et synchronisée avec les autres données.</p>
+      <textarea class="evening-notes" v-model="data.eveningNotes" rows="14" placeholder="Ce soir, je veux…"></textarea>
+    </section>
     <section class="view view-work" v-if="view === 'work'">
       <div class="work-mode-actions" aria-label="Actions Travail">
         <button type="button" class="work-create-task" @click="openTaskForm()">＋ Nouvelle tâche indépendante</button>
@@ -473,10 +470,12 @@
           <button type="submit">＋ Créer le ticket</button>
         </form>
       </div>
+      <div class="ticket-sort-bar"><label>Tri des tickets <select v-model="ticketSort"><option value="manual">Ordre manuel (glisser-déposer)</option><option value="urgency-desc">Urgence décroissante</option><option value="urgency-asc">Urgence croissante</option><option value="difficulty-desc">Difficulté décroissante</option><option value="difficulty-asc">Difficulté croissante</option><option value="due-asc">Date croissante</option><option value="due-desc">Date décroissante</option><option value="name">Nom A → Z</option></select></label></div>
       <h3>🎫 Tickets en cours ({{ openTickets.length }}) <small class="work-help">Cliquer sur un ticket pour afficher ses sous-tâches et modifier leurs points.</small></h3>
       <p v-if="!openTickets.length" class="hint">Aucun ticket ouvert.</p>
-      <article class="ticket-card" v-for="ticket in openTickets" :key="ticket.id">
+      <article class="ticket-card" v-for="ticket in openTickets" :key="ticket.id" @dragover.prevent @drop="ticketDrop($event,ticket)">
         <div class="ticket-heading">
+          <span class="ticket-drag-handle" :draggable="ticketSort==='manual'" @dragstart="ticketDragStart($event,ticket)" @dragend="ticketDragged=null" title="Glisser pour réordonner">⠿</span>
           <button type="button" class="ticket-toggle" :aria-expanded="!isTicketCollapsed(ticket.id)" @click="toggleTicketCollapse(ticket.id)" :title="isTicketCollapsed(ticket.id) ? 'Déplier' : 'Replier'">
             <span aria-hidden="true">{{ isTicketCollapsed(ticket.id) ? '▸' : '▾' }}</span>
             <strong>🎫 {{ ticket.name }}</strong>
@@ -484,7 +483,7 @@
             <span v-else-if="!ticket.items.length" class="ticket-empty">Aucune tâche</span>
             <span v-else class="ticket-complete">✓ Tout est fait</span>
           </button>
-          <button type="button" @click="renameTicket(ticket)">Renommer</button><button type="button" @click="removeTicket(ticket)">Supprimer</button>
+          <input class="ticket-custom-status" v-model="ticket.customStatus" maxlength="100" placeholder="Statut personnalisé" aria-label="Statut du ticket" title="Statut libre du ticket"><button type="button" @click="renameTicket(ticket)">Renommer</button><button type="button" @click="removeTicket(ticket)">Supprimer</button>
         </div>
         <div v-if="!isTicketCollapsed(ticket.id)" class="ticket-body">
           <div class="ticket-edit-levels"><label>Urgence <select v-model="ticket.urgency"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select></label><label>Difficulté <select v-model="ticket.difficulty"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select></label><small>{{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small></div>
@@ -570,6 +569,8 @@
           <label>Date de début <input type="date" v-model="habitForm.startDate" required></label><label>Date de fin (facultative) <input type="date" v-model="habitForm.endDate" :min="habitForm.startDate"></label><label><input type="checkbox" v-model="habitForm.completed"> Routine définitivement terminée</label>
           <label>Points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.basePoints"></label>
           <label>Bonus par réalisation consécutive <input type="number" min="0" step="0.25" v-model.number="habitForm.comboPoints"></label>
+          <label><input type="checkbox" v-model="habitForm.quantityEnabled"> Suivre une quantité (ex : 2/3)</label>
+          <template v-if="habitForm.quantityEnabled"><label>Objectif initial <input type="number" min="1" step="1" v-model.number="habitForm.quantityMax"></label><label>Points bonus par unité <input type="number" min="0" step="0.01" v-model.number="habitForm.quantityBonus"></label></template>
           <label>Maximum de points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.maxPoints" placeholder="Sans plafond (anciennes habitudes)"></label>
           <small>Exemple : base 3 pts, bonus 0,5 pt, plafond 5 pts. Chaque réalisation rapportera au maximum 5 pts. Les points déjà gagnés sont conservés.</small>
           <label>Fréquence <select v-model="habitForm.frequency"><option value="daily">Tous les jours</option><option value="weekdays">Certains jours</option><option value="interval">Tous les X jours</option><option value="weekly">X fois par semaine</option></select></label>
@@ -581,8 +582,8 @@
       </div>
       <p class="empty" v-if="!data.habits.length">Aucune habitude enregistrée.</p>
       <article class="habit-entry" v-for="habit in data.habits" :key="habit.id" :class="{'habit-overdue':habitLateDays(habit)>0,'habit-finished':habitIsFinished(habit)}">
-        <div><strong>{{ habit.title }}</strong> <span v-if="habitIsFinished(habit)">✓ Routine terminée</span> <small v-if="habitLateDays(habit)>0">{{ habitLateDays(habit) }} jour(s) de retard</small> <span v-if="habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small>{{ habitCount(habit) }} réalisation(s) · {{ habitAwards(habit).reduce((s,a)=>s+a.points,0) }} pts gagnés · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
-        <div class="habit-actions"><button type="button" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Terminer</button><button type="button" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Reporter à demain</button><button type="button" v-if="habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" v-if="!habitIsFinished(habit)" @click="markHabitFinished(habit)">Finir la routine</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
+        <div><strong>{{ habit.title }}</strong> <strong v-if="habitQuantity(habit)">({{ habitQuantity(habit).done }}/{{ habitQuantity(habit).max }})</strong> <span v-if="habitIsFinished(habit)">✓ Routine terminée</span> <small v-if="habitLateDays(habit)>0">{{ habitLateDays(habit) }} jour(s) de retard</small> <span v-if="habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small>{{ habitCount(habit) }} réalisation(s) · {{ habitAwards(habit).reduce((s,a)=>s+a.points,0) }} pts gagnés · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
+        <div class="habit-actions"><span v-if="habitQuantity(habit) && !habitDoneToday(habit)" class="habit-quantity">Fait <input type="number" min="0" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" @change="setHabitQuantity(habit,'done',$event.target.value)"> / <input type="number" min="1" :value="habitQuantity(habit).max" @change="setHabitQuantity(habit,'max',$event.target.value)"></span><button type="button" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Terminer</button><button type="button" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Reporter à demain</button><button type="button" v-if="habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" v-if="!habitIsFinished(habit)" @click="markHabitFinished(habit)">Finir la routine</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
         <details><summary>Historique des réalisations et points</summary><p v-for="a in [...habitAwards(habit)].reverse()" :key="a.date">{{ formatDate(a.date) }} · +{{ a.points }} pts · série {{ a.streak }}</p><p v-if="!habitCount(habit)">Aucune réalisation</p></details>
       </article>
     </section>
@@ -597,9 +598,11 @@
           <label>Nom <input v-model="challengeForm.name" maxlength="120" required placeholder="Ex : Journée productive"></label>
           <label>Objectif <select v-model="challengeForm.kind"><option v-for="kind in CHALLENGE_KINDS" :key="kind.id" :value="kind.id">{{ kind.label }}</option></select></label>
           <label v-if="challengeForm.kind==='task-count' || challengeForm.kind==='all-tasks'">Type de tâches <select v-model="challengeForm.scope"><option value="personal">Personnelles</option><option value="work">Travail</option><option value="both">Toutes</option></select></label>
+          <div v-if="challengeForm.kind==='selected-tasks'" class="challenge-task-picker"><strong>Tâches à terminer</strong><label v-for="task in data.tasks.filter(t=>t.status!=='done')" :key="task.id"><input type="checkbox" :value="task.id" v-model="challengeForm.selectedTaskIds"> {{ task.title }}</label></div>
+          <template v-if="challengeForm.kind==='level-deadline'"><label>Urgence <select v-model="challengeForm.urgency"><option value="">Toutes</option><option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select></label><label>Difficulté <select v-model="challengeForm.difficulty"><option value="">Toutes</option><option v-for="d in data.difficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select></label><label>Date limite <input type="date" v-model="challengeForm.deadline" required></label></template>
           <label v-if="challengeForm.kind==='project-count'">Projet <select v-model="challengeForm.projectId" required><option value="">Choisir...</option><option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option></select></label>
           <label v-if="['task-count','habit-count','project-count'].includes(challengeForm.kind)">Nombre à atteindre <input type="number" min="1" max="100000" v-model.number="challengeForm.target" required></label>
-          <label>Fréquence <select v-model="challengeForm.period"><option value="daily">Tous les jours</option><option value="weekly">Toutes les semaines</option><option value="once">Une seule fois</option></select></label>
+          <label v-if="!['selected-tasks','level-deadline'].includes(challengeForm.kind)">Fréquence <select v-model="challengeForm.period"><option value="daily">Tous les jours</option><option value="weekly">Toutes les semaines</option><option value="once">Une seule fois</option></select></label>
           <label>Points gagnés <input type="number" min="0" max="100000" step="0.25" v-model.number="challengeForm.points" required></label>
           <label><input type="checkbox" v-model="challengeForm.enabled"> Défi actif</label>
           <div class="form-actions"><button type="submit">Enregistrer</button><button type="button" @click="challengeForm.open=false">Annuler</button></div>
@@ -1186,7 +1189,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261021-v16"></script>
+<script src="app.js?v=20261022-v17"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
