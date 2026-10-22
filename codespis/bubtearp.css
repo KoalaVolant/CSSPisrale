@@ -14,7 +14,7 @@ line-height:28px; width:50%; }
 .bubtea-rp .bubt-cnt{ background:#fff; margin-top:10px;
 border-bottom-right-radius: 250px;
 border-bottom-left-radius: 250px; font-family:var(--bubt-fontxt); 
-font-size:14px; line-height:1.5em; font-weight:500; }
+font-size:14px; line-height:1.5em; font-weight:500; color:#222 !important;}
 
 .bubtea-rp .bubt-dfeat{ width:50%; font-size:12px;  text-align:center; 
 font-weight:700; padding-top:20px; padding-left:60px;}
