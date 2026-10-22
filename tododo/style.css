@@ -223,3 +223,16 @@
 .challenge-task-picker{max-height:220px;overflow:auto;padding:10px;border:1px solid #ccc}.challenge-task-picker label{display:block}
 .habit-quantity{display:inline-flex;gap:5px;align-items:center}.habit-quantity input{width:55px;min-width:0;padding:4px}
 .challenge-summary button{margin-left:10px}
+
+/* V18 : tickets et listes habituelles */
+.ticket-link-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 8px 30px;font-size:12px}
+.ticket-link-row input{flex:1;min-width:180px;max-width:420px;font-size:12px;padding:4px 7px}
+.ticket-link-row a{overflow-wrap:anywhere}
+.usual-list{padding:14px;margin:12px 0;border:1px solid var(--main-color,#ccc);border-radius:12px}
+.usual-lists-head,.usual-list-head,.usual-list-item,.usual-add{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.usual-list-head input{flex:1;min-width:170px;font-weight:bold;padding:7px}
+.usual-list-head small{margin-left:auto}
+.usual-list-body{padding:12px 0}.usual-list-body textarea{width:100%;box-sizing:border-box}
+.usual-list-item{padding:7px 0;border-bottom:1px solid #ddd}
+.usual-list-item input[type=text],.usual-list-item input:not([type]){flex:1;min-width:150px;padding:6px}
+.usual-done{text-decoration:line-through;opacity:.65}.usual-add{margin-top:12px}.usual-add input{flex:1;padding:7px}

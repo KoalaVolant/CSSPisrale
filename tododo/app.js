@@ -33,6 +33,7 @@ const TABS = [
   { id: 'home',       label: 'Accueil' },
   { id: 'all',        label: 'Toutes les tâches' },
   { id: 'work',       label: 'Travail' },
+  { id: 'usual-lists', label: 'Listes de tâches habituelles' },
   { id: 'gratitude',  label: 'Gratitude' },
   { id: 'evening', label: 'To do du soir' },
   { id: 'habits',     label: 'Habitudes & routines' },
@@ -49,7 +50,7 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','all','work','habits','evening','done'] },
+  { title: 'Tâches', ids: ['home','all','work','habits','usual-lists','evening','done'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','challenges','statistics'] },
   { title: 'Configuration', ids: ['projects','categories','levels','data'] },
@@ -196,6 +197,8 @@ function migrateGratitudePoints(records) {
 function defaultData() {
   return {
     eveningNotes: '', // liste textuelle du soir
+    usualLists: [], // listes de suivi sans points
+    workTicketTypes: [], // types avec bonus de points
     workTickets: [],  // tickets avec sous-tâches et historique
     tasks: [],        // { id, title, category, points, malus, status, projectId, due, urgency, difficulty, doneAt }
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
@@ -236,6 +239,8 @@ function loadData() {
     if (!Array.isArray(d.habits)) d.habits = [];
     if (!Array.isArray(d.activities)) d.activities = [];
     if (!Array.isArray(d.workTickets)) d.workTickets = [];
+    if (!Array.isArray(d.workTicketTypes)) d.workTicketTypes = [];
+    if (!Array.isArray(d.usualLists)) d.usualLists = [];
     d.eveningNotes = typeof d.eveningNotes === 'string' ? d.eveningNotes : '';
      d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
     if (!Array.isArray(d.challenges)) d.challenges = [];
@@ -446,6 +451,8 @@ const app = createApp({
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
+      data.usualLists = Array.isArray(src.usualLists) ? src.usualLists : [];
+      data.workTicketTypes = Array.isArray(src.workTicketTypes) ? src.workTicketTypes : [];
       data.workTickets = Array.isArray(src.workTickets) ? src.workTickets : [];
       // Les tickets synchronisés doivent également disposer de champs de saisie locaux.
       if (typeof ticketInputs !== 'undefined') {
@@ -814,9 +821,27 @@ const app = createApp({
 
     /* ---------- Tickets professionnels (compatibles avec les tâches historiques) ---------- */
     function ticketItemValue(ticket, item) {
-      return taskValue({scope:'work',points:Math.max(0,Number(item.points)||0),urgency:ticket.urgency||'',difficulty:ticket.difficulty||'',malus:false});
+      let points = taskValue({scope:'work',points:Math.max(0,Number(item.points)||0),urgency:ticket.urgency||'',difficulty:ticket.difficulty||'',malus:false});
+      const type = data.workTicketTypes.find(x => x.id === ticket.typeId);
+      if (type && Number.isFinite(Number(type.pointValue))) {
+        const value = Math.max(0, Number(type.pointValue));
+        points = type.pointMode === 'multiply' ? points * value : points + value;
+      }
+      return Math.round(Math.max(0, points) * 100) / 100;
     }
-    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',due:'',category:''});
+    function addTicketType() { data.workTicketTypes.push({id:uid(),name:'Nouveau type',color:'#64748b',pointMode:'add',pointValue:0}); }
+    function deleteTicketType(type) {
+      if (!confirm('Supprimer ce type de ticket ?')) return;
+      data.workTickets.forEach(t => { if(t.typeId===type.id) t.typeId=''; });
+      data.workTicketTypes=data.workTicketTypes.filter(t=>t.id!==type.id);
+    }
+    function safeTicketUrl(url) {
+      const value=String(url||'').trim();
+      if(!value)return '';
+      try { const u=new URL(value);return ['https:','http:'].includes(u.protocol) ? u.href : ''; }
+      catch(e){return '';}
+    }
+    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',due:'',category:'',typeId:'',url:''});
     const collapsedTickets = reactive({});
     function isTicketCollapsed(id) { return collapsedTickets[id] !== false; }
     function toggleTicketCollapse(id) { collapsedTickets[id] = !isTicketCollapsed(id); }
@@ -876,8 +901,8 @@ const app = createApp({
     function createTicket() {
       const name=ticketDraft.name.trim(); if(!name)return;
       const id=uid();ticketInputs[id]={name:'',points:10};
-      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,due:ticketDraft.due,category:ticketDraft.category,createdAt:today.value,customStatus:'',done:false,doneAt:'',items:[]});
-      ticketDraft.name='';ticketDraft.due='';ticketDraft.category='';
+      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,typeId:ticketDraft.typeId,url:ticketDraft.url.trim(),due:ticketDraft.due,category:ticketDraft.category,createdAt:today.value,customStatus:'',done:false,doneAt:'',items:[]});
+      ticketDraft.name='';ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';
     }
     function addTicketItem(ticket) {
       const draft=ticketInputs[ticket.id]||(ticketInputs[ticket.id]={name:'',points:10});const name=String(draft.name||'').trim();if(!name)return;
@@ -906,6 +931,34 @@ const app = createApp({
       if(ticket.done){ticket.done=false;ticket.doneAt='';}
     }
     function ticketPoints(ticket){return (ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0);}
+
+    /* Listes habituelles : aucun impact sur les points, sans remise à zéro automatique. */
+    const usualDragged = ref(null);
+    const usualNewItem = reactive({});
+    function addUsualList() {
+      data.usualLists.push({id:uid(),title:'Nouvelle liste',info:'',collapsed:false,items:[]});
+    }
+    function removeUsualList(list) {
+      if(confirm(`Supprimer la liste « ${list.title} » ?`)) data.usualLists=data.usualLists.filter(x=>x.id!==list.id);
+    }
+    function addUsualItem(list) {
+      const name=String(usualNewItem[list.id]||'').trim();if(!name)return;
+      list.items.push({id:uid(),name,done:false,doneAt:''});usualNewItem[list.id]='';
+    }
+    function toggleUsualItem(item) { item.done=!item.done;item.doneAt=item.done?new Date().toISOString():''; }
+    function resetUsualList(list) { list.items.forEach(item=>{item.done=false;item.doneAt='';}); }
+    function deleteUsualItem(list,item) { list.items=list.items.filter(x=>x.id!==item.id); }
+    function startUsualDrag(event,list,item) {
+      usualDragged.value={listId:list.id,itemId:item.id};
+      event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',item.id);
+    }
+    function dropUsualItem(event,list,target) {
+      event.preventDefault();const source=usualDragged.value;usualDragged.value=null;
+      if(!source||source.listId!==list.id)return;
+      const from=list.items.findIndex(x=>x.id===source.itemId),to=list.items.findIndex(x=>x.id===target.id);
+      if(from<0||to<0||from===to)return;
+      const [item]=list.items.splice(from,1);list.items.splice(to,0,item);
+    }
 
     /* ---------- Statistiques (données connues uniquement) ---------- */
     const completedEntries=computed(()=>[
@@ -1902,6 +1955,8 @@ const app = createApp({
 
     return {
       // état
+      usualDragged,usualNewItem,addUsualList,removeUsualList,addUsualItem,toggleUsualItem,resetUsualList,deleteUsualItem,startUsualDrag,dropUsualItem,
+      addTicketType,deleteTicketType,safeTicketUrl,
       ticketSort,ticketDragged,ticketDragStart,ticketDrop,ticketDraft,ticketInputs,collapsedTickets,isTicketCollapsed,toggleTicketCollapse,renameTicket,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
       data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, navGroups: NAV_GROUPS, statuses: STATUSES, tagStyle,
       // cloud

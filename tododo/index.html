@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261022-v17">
-  <link rel="stylesheet" href="stylekoala.css?v=20261022-v17">
+  <link rel="stylesheet" href="style.css?v=20261022-v18">
+  <link rel="stylesheet" href="stylekoala.css?v=20261022-v18">
 </head>
 <body>
 
@@ -454,6 +454,30 @@
       <p>Liste libre pour ce soir, enregistrée automatiquement et synchronisée avec les autres données.</p>
       <textarea class="evening-notes" v-model="data.eveningNotes" rows="14" placeholder="Ce soir, je veux…"></textarea>
     </section>
+    <section class="view view-usual-lists" v-if="view === 'usual-lists'">
+      <div class="usual-lists-head"><p>Listes réutilisables sans points. Les cases restent cochées jusqu'à leur réinitialisation.</p><button type="button" @click="addUsualList">＋ Nouvelle liste</button></div>
+      <article class="usual-list" v-for="(list,index) in data.usualLists" :key="list.id">
+        <div class="usual-list-head">
+          <button type="button" @click="list.collapsed=!list.collapsed" :aria-expanded="!list.collapsed" aria-label="Replier ou déplier">{{ list.collapsed ? '▸' : '▾' }}</button>
+          <strong>{{ String.fromCharCode(65 + index % 26) }}.</strong>
+          <input v-model="list.title" placeholder="Titre de la liste" aria-label="Titre de la liste">
+          <small>{{ list.items.filter(x=>x.done).length }}/{{ list.items.length }}</small>
+          <button type="button" @click="resetUsualList(list)">Réinitialiser</button>
+          <button type="button" @click="removeUsualList(list)">Supprimer</button>
+        </div>
+        <div v-if="!list.collapsed" class="usual-list-body">
+          <textarea v-model="list.info" rows="2" placeholder="Informations, instructions, contexte…" aria-label="Informations de la liste"></textarea>
+          <div v-for="item in list.items" :key="item.id" class="usual-list-item" @dragover.prevent @drop="dropUsualItem($event,list,item)">
+            <span draggable="true" class="drag-handle" @dragstart="startUsualDrag($event,list,item)" @dragend="usualDragged=null" title="Réordonner">⠿</span>
+            <input type="checkbox" :checked="item.done" @change="toggleUsualItem(item)" aria-label="Cocher la tâche">
+            <input v-model="item.name" :class="{'usual-done':item.done}" aria-label="Nom de la tâche">
+            <small v-if="item.doneAt">{{ new Date(item.doneAt).toLocaleString('fr-FR') }}</small>
+            <button type="button" @click="deleteUsualItem(list,item)" aria-label="Supprimer la tâche">×</button>
+          </div>
+          <form @submit.prevent="addUsualItem(list)" class="usual-add"><input v-model="usualNewItem[list.id]" placeholder="Nouvelle case à cocher" required><button type="submit">Ajouter</button></form>
+        </div>
+      </article>
+    </section>
     <section class="view view-work" v-if="view === 'work'">
       <div class="work-mode-actions" aria-label="Actions Travail">
         <button type="button" class="work-create-task" @click="openTaskForm()">＋ Nouvelle tâche indépendante</button>
@@ -466,6 +490,8 @@
           <input v-model="ticketDraft.name" required placeholder="Nom ou référence du ticket" aria-label="Nom du ticket">
           <select v-model="ticketDraft.urgency" aria-label="Urgence du ticket"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select>
           <select v-model="ticketDraft.difficulty" aria-label="Difficulté du ticket"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select>
+          <select v-model="ticketDraft.typeId" aria-label="Type de ticket"><option value="">Sans type</option><option v-for="type in data.workTicketTypes" :key="type.id" :value="type.id">{{ type.name }}</option></select>
+          <input type="url" v-model="ticketDraft.url" placeholder="Lien du ticket (https://…)" aria-label="Lien du ticket">
           <input type="date" v-model="ticketDraft.due" title="Échéance du ticket">
           <button type="submit">＋ Créer le ticket</button>
         </form>
@@ -485,8 +511,13 @@
           </button>
           <input class="ticket-custom-status" v-model="ticket.customStatus" maxlength="100" placeholder="Statut personnalisé" aria-label="Statut du ticket" title="Statut libre du ticket"><button type="button" @click="renameTicket(ticket)">Renommer</button><button type="button" @click="removeTicket(ticket)">Supprimer</button>
         </div>
+        <div class="ticket-link-row">
+          <a v-if="safeTicketUrl(ticket.url)" :href="safeTicketUrl(ticket.url)" target="_blank" rel="noopener noreferrer" @click.stop :title="ticket.url">↗ Ouvrir le ticket</a>
+          <span v-else-if="ticket.url" class="hint">Lien invalide (http/https requis)</span>
+          <input type="url" v-model="ticket.url" placeholder="Ajouter ou modifier le lien (https://…)" aria-label="Lien du ticket" @click.stop>
+        </div>
         <div v-if="!isTicketCollapsed(ticket.id)" class="ticket-body">
-          <div class="ticket-edit-levels"><label>Urgence <select v-model="ticket.urgency"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select></label><label>Difficulté <select v-model="ticket.difficulty"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select></label><small>{{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small></div>
+          <div class="ticket-edit-levels"><label>Type <select v-model="ticket.typeId"><option value="">Sans type</option><option v-for="type in data.workTicketTypes" :key="type.id" :value="type.id">{{ type.name }}</option></select></label><label>Urgence <select v-model="ticket.urgency"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select></label><label>Difficulté <select v-model="ticket.difficulty"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select></label><small>{{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small></div>
           <div class="ticket-items">
             <div class="ticket-item" v-for="item in ticket.items.filter(x=>!x.done)" :key="item.id">
               <label><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label>
@@ -517,6 +548,17 @@
           <summary>Catégories Travail</summary>
           <form @submit.prevent="addWorkCategory"><label>Ajouter une catégorie de travail <input v-model="newWorkCategory" placeholder="Ex : Clients, Administratif"></label> <button type="submit">Ajouter</button></form>
           <div class="category-chips"><span v-for="c in workCategories" :key="c">{{ c }} <button type="button" @click="deleteWorkCategory(c)">×</button></span></div>
+        </details>
+        <details class="config-fold">
+          <summary>Types de tickets et bonus de points</summary>
+          <p>Le type ajuste les points de chaque sous-tâche, en plus de l'urgence et de la difficulté.</p>
+          <article class="work-difficulty" v-for="type in data.workTicketTypes" :key="type.id">
+            <input v-model="type.name" aria-label="Nom du type de ticket">
+            <select v-model="type.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
+            <input type="number" min="0" step="0.25" v-model.number="type.pointValue" aria-label="Bonus du type">
+            <button type="button" @click="deleteTicketType(type)">Supprimer</button>
+          </article>
+          <button type="button" @click="addTicketType">＋ Ajouter un type de ticket</button>
         </details>
         <details class="config-fold">
           <summary>Difficultés Travail et bonus de points</summary>
@@ -1189,7 +1231,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261022-v17"></script>
+<script src="app.js?v=20261022-v18"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
