@@ -13,6 +13,8 @@
     --project:#cde2ca;
     --points:;
     --cours:#d9b983;
+    --afaire:#f4e3e3;
+    --global:#d6d6ec;
 }
 
 body{ font-family:var(--fnt) !important; 
@@ -133,3 +135,22 @@ margin:5px; padding:10px; }
 .habit-dashboard{ display:flex; flex-wrap:wrap; }
 .habit-dashboard h2{ width:100%; }
 .habit-dashboard div{ width:30%; margin:3px; }
+
+.habit-entry > span{ width:44%;  }
+.habit-actions{  background:var(--fnd); padding:5px; 
+    border-radius:10px}
+    
+.tag.tag-late{ border:3px solid red; color:red; font-weight:bold;
+width:100%; text-align:center; font-size:13px; display:block;}
+
+.ticket-create, .ticket-card, .done-summary{ padding:0px;}
+.ticket-link-row a{ color:var(--tit); font-weight:bold; }
+.ticket-link-row input{ font-size:8px; padding:0;}
+
+.ticket-afaire{ background:var(--afaire);}
+.ticket-global{ background:var(--global);}
+
+.view.view-habits{ display:flex; flex-wrap:wrap; justify-content:space-between; }
+.view.view-habits > button{ width:100%; margin:10px 0; padding:20px; font-size:25px; }
+.view.view-habits article{ width:31%; }
+.view.view-habits .habit-actions{ width:100% !important;}
