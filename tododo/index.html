@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261022-v18">
+  <link rel="stylesheet" href="style.css?v=20261026-v19">
   <link rel="stylesheet" href="stylekoala.css?v=20261022-v18">
 </head>
 <body>
@@ -33,6 +33,7 @@
       <div class="points-badge" title="Solde de points">{{ balance }}</div>
       <span class="points-label">pts</span>
     </div>
+    <button type="button" class="random-reward-save" @click="depositRandomReward" :disabled="balance<=0 || !data.rewards.some(r=>rewardRemaining(r)>0)">🎲 Épargner sur une récompense aléatoire</button>
     <div class="favorite-reward" v-if="favoriteReward">
             <strong>★ Récompense favorite : {{ favoriteReward.name }}</strong>
             <span>{{ favoriteReward.saved || 0 }} / {{ favoriteReward.cost }} pts réservés · {{ rewardRemaining(favoriteReward) }} pts restant à épargner</span>
@@ -400,7 +401,7 @@
       <section class="habit-dashboard" v-if="data.habits.length">
         <h2>Habitudes <small>({{ dashboardHabits.length }})</small></h2>
         <div class="habit-entry" v-for="habit in dashboardHabits" :key="habit.id" :class="{ 'habit-completed': habitDoneToday(habit), 'habit-overdue': habitLateDays(habit)>0 }">
-          <span>{{ habit.title }} <strong v-if="habitQuantity(habit)">({{ habitQuantity(habit).done }}/{{ habitQuantity(habit).max }})</strong> <small v-if="habitLateDays(habit)>0">({{ habitLateDays(habit) }} jour(s) de retard)</small></span><div class="habit-actions"><span v-if="habitQuantity(habit) && !habitDoneToday(habit)" class="habit-quantity">Fait <input type="number" min="0" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" @change="setHabitQuantity(habit,'done',$event.target.value)"> / <input type="number" min="1" :value="habitQuantity(habit).max" @change="setHabitQuantity(habit,'max',$event.target.value)"></span><button type="button" v-if="!habitDoneToday(habit)" @click="completeHabit(habit)">✓</button><span v-else>Effectuée ✓</span><button type="button" v-if="!habitDoneToday(habit)" @click="postponeHabit(habit)">Demain</button></div>
+          <span>{{ habit.title }} <strong v-if="habit.malus">(−{{ habit.basePoints }} pts · {{ habitPenaltiesToday(habit) }} fois aujourd’hui)</strong> <strong v-if="!habit.malus && habitQuantity(habit)">({{ habitQuantity(habit).done }}/{{ habitQuantity(habit).max }})</strong> <small v-if="habitLateDays(habit)>0">({{ habitLateDays(habit) }} jour(s) de retard)</small></span><div class="habit-actions"><button type="button" v-if="habit.malus" @click="penalizeHabit(habit)">− {{ habit.basePoints }} pts</button><button type="button" v-if="habit.malus && habitPenaltiesToday(habit)" @click="undoHabitPenalty(habit)">Annuler −</button><span v-if="!habit.malus && habitQuantity(habit) && !habitDoneToday(habit)" class="habit-quantity">Fait <input type="number" min="0" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" @change="setHabitQuantity(habit,'done',$event.target.value)"> / <input type="number" min="1" :value="habitQuantity(habit).max" @change="setHabitQuantity(habit,'max',$event.target.value)"></span><button type="button" v-if="!habit.malus && !habitDoneToday(habit)" @click="completeHabit(habit)">✓</button><span v-if="!habit.malus && habitDoneToday(habit)">Effectuée ✓</span><button type="button" v-if="!habit.malus && !habitDoneToday(habit)" @click="postponeHabit(habit)">Demain</button></div>
         </div>
       </section>
       <div class="dashboard">
@@ -452,16 +453,17 @@
 
     <section class="view view-evening" v-if="view === 'evening'">
       <p>Liste libre pour ce soir, enregistrée automatiquement et synchronisée avec les autres données.</p>
-      <textarea class="evening-notes" v-model="data.eveningNotes" rows="14" placeholder="Ce soir, je veux…"></textarea>
+      <div class="evening-actions"><button type="button" @click="eveningPreview=!eveningPreview">{{ eveningPreview ? "Modifier" : "Aperçu Markdown" }}</button></div>
+      <textarea v-if="!eveningPreview" class="evening-notes" v-model="data.eveningNotes" rows="14" placeholder="# Mon soir&#10;- [ ] Première chose&#10;- [x] Déjà faite&#10;**Important**"></textarea>
+      <div v-else class="evening-markdown" v-html="renderEveningMarkdown(data.eveningNotes)"></div>
     </section>
     <section class="view view-usual-lists" v-if="view === 'usual-lists'">
       <div class="usual-lists-head"><p>Listes réutilisables sans points. Les cases restent cochées jusqu'à leur réinitialisation.</p><button type="button" @click="addUsualList">＋ Nouvelle liste</button></div>
       <article class="usual-list" v-for="(list,index) in data.usualLists" :key="list.id">
         <div class="usual-list-head">
           <button type="button" @click="list.collapsed=!list.collapsed" :aria-expanded="!list.collapsed" aria-label="Replier ou déplier">{{ list.collapsed ? '▸' : '▾' }}</button>
-          <strong>{{ String.fromCharCode(65 + index % 26) }}.</strong>
           <input v-model="list.title" placeholder="Titre de la liste" aria-label="Titre de la liste">
-          <small>{{ list.items.filter(x=>x.done).length }}/{{ list.items.length }}</small>
+          <small>{{ list.items.filter(x=>!x.heading && x.done).length }}/{{ list.items.filter(x=>!x.heading).length }}</small>
           <button type="button" @click="resetUsualList(list)">Réinitialiser</button>
           <button type="button" @click="removeUsualList(list)">Supprimer</button>
         </div>
@@ -469,11 +471,12 @@
           <textarea v-model="list.info" rows="2" placeholder="Informations, instructions, contexte…" aria-label="Informations de la liste"></textarea>
           <div v-for="item in list.items" :key="item.id" class="usual-list-item" @dragover.prevent @drop="dropUsualItem($event,list,item)">
             <span draggable="true" class="drag-handle" @dragstart="startUsualDrag($event,list,item)" @dragend="usualDragged=null" title="Réordonner">⠿</span>
-            <input type="checkbox" :checked="item.done" @change="toggleUsualItem(item)" aria-label="Cocher la tâche">
-            <input v-model="item.name" :class="{'usual-done':item.done}" aria-label="Nom de la tâche">
+            <input v-if="!item.heading" type="checkbox" :checked="item.done" @change="toggleUsualItem(item)" aria-label="Cocher la tâche">
+            <input v-model="item.name" :class="{'usual-done':item.done,'usual-heading-input':item.heading}" :aria-label="item.heading ? 'Titre de section' : 'Nom de la tâche'">
             <small v-if="item.doneAt">{{ new Date(item.doneAt).toLocaleString('fr-FR') }}</small>
             <button type="button" @click="deleteUsualItem(list,item)" aria-label="Supprimer la tâche">×</button>
           </div>
+          <button type="button" @click="addUsualHeading(list)">＋ Titre de section</button>
           <form @submit.prevent="addUsualItem(list)" class="usual-add"><input v-model="usualNewItem[list.id]" placeholder="Nouvelle case à cocher" required><button type="submit">Ajouter</button></form>
         </div>
       </article>
@@ -556,7 +559,7 @@
             <input v-model="type.name" aria-label="Nom du type de ticket">
             <select v-model="type.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
             <input type="number" min="0" step="0.25" v-model.number="type.pointValue" aria-label="Bonus du type">
-            <button type="button" @click="deleteTicketType(type)">Supprimer</button>
+            <button type="button" @click="moveTicketType(data.workTicketTypes.indexOf(type),-1)" :disabled="data.workTicketTypes.indexOf(type)===0">↑</button><button type="button" @click="moveTicketType(data.workTicketTypes.indexOf(type),1)" :disabled="data.workTicketTypes.indexOf(type)===data.workTicketTypes.length-1">↓</button><button type="button" @click="deleteTicketType(type)">Supprimer</button>
           </article>
           <button type="button" @click="addTicketType">＋ Ajouter un type de ticket</button>
         </details>
@@ -609,24 +612,25 @@
           <h3>{{ habitForm.id ? 'Modifier' : 'Nouvelle' }} habitude / routine</h3>
           <label>Nom <input v-model="habitForm.title" required></label>
           <label>Date de début <input type="date" v-model="habitForm.startDate" required></label><label>Date de fin (facultative) <input type="date" v-model="habitForm.endDate" :min="habitForm.startDate"></label><label><input type="checkbox" v-model="habitForm.completed"> Routine définitivement terminée</label>
-          <label>Points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.basePoints"></label>
-          <label>Bonus par réalisation consécutive <input type="number" min="0" step="0.25" v-model.number="habitForm.comboPoints"></label>
-          <label><input type="checkbox" v-model="habitForm.quantityEnabled"> Suivre une quantité (ex : 2/3)</label>
-          <template v-if="habitForm.quantityEnabled"><label>Objectif initial <input type="number" min="1" step="1" v-model.number="habitForm.quantityMax"></label><label>Points bonus par unité <input type="number" min="0" step="0.01" v-model.number="habitForm.quantityBonus"></label></template>
-          <label>Maximum de points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.maxPoints" placeholder="Sans plafond (anciennes habitudes)"></label>
-          <small>Exemple : base 3 pts, bonus 0,5 pt, plafond 5 pts. Chaque réalisation rapportera au maximum 5 pts. Les points déjà gagnés sont conservés.</small>
-          <label>Fréquence <select v-model="habitForm.frequency"><option value="daily">Tous les jours</option><option value="weekdays">Certains jours</option><option value="interval">Tous les X jours</option><option value="weekly">X fois par semaine</option></select></label>
-          <div v-if="habitForm.frequency === 'weekdays'" class="habit-days"><label v-for="d in habitWeekdays" :key="d.id"><input type="checkbox" :value="d.id" v-model="habitForm.weekdays"> {{ d.label }}</label></div>
-          <label v-if="habitForm.frequency === 'interval'">Tous les <input type="number" min="1" v-model.number="habitForm.every"> jours</label>
-          <label v-if="habitForm.frequency === 'weekly'">Nombre par semaine <input type="number" min="1" max="7" v-model.number="habitForm.weeklyTarget"></label>
+          <label>Type <select v-model="habitForm.malus"><option :value="false">Bonne habitude (bonus)</option><option :value="true">Mauvaise habitude (malus)</option></select></label>
+          <label>{{ habitForm.malus ? "Points retirés par clic" : "Points par réalisation" }} <input type="number" min="0" step="0.25" v-model.number="habitForm.basePoints"></label>
+          <label v-if="!habitForm.malus">Bonus par réalisation consécutive <input type="number" min="0" step="0.25" v-model.number="habitForm.comboPoints"></label>
+          <label v-if="!habitForm.malus"><input type="checkbox" v-model="habitForm.quantityEnabled"> Suivre une quantité (ex : 2/3)</label>
+          <template v-if="habitForm.quantityEnabled && !habitForm.malus"><label>Objectif initial <input type="number" min="1" step="1" v-model.number="habitForm.quantityMax"></label><label>Points bonus par unité <input type="number" min="0" step="0.01" v-model.number="habitForm.quantityBonus"></label></template>
+          <label v-if="!habitForm.malus">Maximum de points par réalisation <input type="number" min="0" step="0.25" v-model.number="habitForm.maxPoints" placeholder="Sans plafond (anciennes habitudes)"></label>
+          <small v-if="!habitForm.malus">Exemple : base 3 pts, bonus 0,5 pt, plafond 5 pts. Chaque réalisation rapportera au maximum 5 pts. Les points déjà gagnés sont conservés.</small>
+          <label v-if="!habitForm.malus">Fréquence <select v-model="habitForm.frequency"><option value="daily">Tous les jours</option><option value="weekdays">Certains jours</option><option value="interval">Tous les X jours</option><option value="weekly">X fois par semaine</option></select></label>
+          <div v-if="!habitForm.malus && habitForm.frequency === 'weekdays'" class="habit-days"><label v-for="d in habitWeekdays" :key="d.id"><input type="checkbox" :value="d.id" v-model="habitForm.weekdays"> {{ d.label }}</label></div>
+          <label v-if="!habitForm.malus && habitForm.frequency === 'interval'">Tous les <input type="number" min="1" v-model.number="habitForm.every"> jours</label>
+          <label v-if="!habitForm.malus && habitForm.frequency === 'weekly'">Nombre par semaine <input type="number" min="1" max="7" v-model.number="habitForm.weeklyTarget"></label>
           <div class="form-actions"><button type="submit">Enregistrer</button><button type="button" @click="habitForm.open=false">Annuler</button></div>
         </form>
       </div>
       <p class="empty" v-if="!data.habits.length">Aucune habitude enregistrée.</p>
       <article class="habit-entry" v-for="habit in data.habits" :key="habit.id" :class="{'habit-overdue':habitLateDays(habit)>0,'habit-finished':habitIsFinished(habit)}">
-        <div><strong>{{ habit.title }}</strong> <strong v-if="habitQuantity(habit)">({{ habitQuantity(habit).done }}/{{ habitQuantity(habit).max }})</strong> <span v-if="habitIsFinished(habit)">✓ Routine terminée</span> <small v-if="habitLateDays(habit)>0">{{ habitLateDays(habit) }} jour(s) de retard</small> <span v-if="habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small>{{ habitCount(habit) }} réalisation(s) · {{ habitAwards(habit).reduce((s,a)=>s+a.points,0) }} pts gagnés · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
-        <div class="habit-actions"><span v-if="habitQuantity(habit) && !habitDoneToday(habit)" class="habit-quantity">Fait <input type="number" min="0" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" @change="setHabitQuantity(habit,'done',$event.target.value)"> / <input type="number" min="1" :value="habitQuantity(habit).max" @change="setHabitQuantity(habit,'max',$event.target.value)"></span><button type="button" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Terminer</button><button type="button" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Reporter à demain</button><button type="button" v-if="habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" v-if="!habitIsFinished(habit)" @click="markHabitFinished(habit)">Finir la routine</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
-        <details><summary>Historique des réalisations et points</summary><p v-for="a in [...habitAwards(habit)].reverse()" :key="a.date">{{ formatDate(a.date) }} · +{{ a.points }} pts · série {{ a.streak }}</p><p v-if="!habitCount(habit)">Aucune réalisation</p></details>
+        <div><strong>{{ habit.title }}</strong> <strong v-if="!habit.malus && habitQuantity(habit)">({{ habitQuantity(habit).done }}/{{ habitQuantity(habit).max }})</strong> <span v-if="habitIsFinished(habit)">✓ Routine terminée</span> <small v-if="habitLateDays(habit)>0">{{ habitLateDays(habit) }} jour(s) de retard</small> <span v-if="!habit.malus && habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br><small v-if="habit.malus">{{ (habit.penalties||[]).length }} malus · −{{ (habit.penalties||[]).reduce((s,p)=>s+Number(p.points||0),0) }} pts</small><small v-else>{{ habitCount(habit) }} réalisation(s) · {{ habitAwards(habit).reduce((s,a)=>s+a.points,0) }} pts gagnés · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
+        <div class="habit-actions"><button type="button" v-if="habit.malus" @click="penalizeHabit(habit)" :disabled="habitIsFinished(habit)">− {{ habit.basePoints }} pts</button><button type="button" v-if="habit.malus && habitPenaltiesToday(habit)" @click="undoHabitPenalty(habit)">Annuler dernier −</button><span v-if="!habit.malus && habitQuantity(habit) && !habitDoneToday(habit)" class="habit-quantity">Fait <input type="number" min="0" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" @change="setHabitQuantity(habit,'done',$event.target.value)"> / <input type="number" min="1" :value="habitQuantity(habit).max" @change="setHabitQuantity(habit,'max',$event.target.value)"></span><button type="button" v-if="!habit.malus" @click="completeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Terminer</button><button type="button" v-if="!habit.malus" @click="postponeHabit(habit)" :disabled="habitDoneToday(habit)||habitIsFinished(habit)">Reporter à demain</button><button type="button" v-if="!habit.malus && habitDoneToday(habit)" @click="undoHabit(habit)">Annuler le suivi</button><button type="button" v-if="!habitIsFinished(habit)" @click="markHabitFinished(habit)">Finir la routine</button><button type="button" @click="openHabitForm(habit)">Modifier</button><button type="button" @click="deleteHabit(habit)">Supprimer</button></div>
+        <details v-if="habit.malus"><summary>Historique des malus</summary><p v-for="p in [...(habit.penalties||[])].reverse()" :key="p.id">{{ formatDate(p.date) }} · −{{ p.points }} pts</p></details><details v-else><summary>Historique des réalisations et points</summary><p v-for="a in [...habitAwards(habit)].reverse()" :key="a.date">{{ formatDate(a.date) }} · +{{ a.points }} pts · série {{ a.streak }}</p><p v-if="!habitCount(habit)">Aucune réalisation</p></details>
       </article>
     </section>
 
@@ -1231,7 +1235,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261022-v18"></script>
+<script src="app.js?v=20261026-v19"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

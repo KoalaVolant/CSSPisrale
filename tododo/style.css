@@ -236,3 +236,13 @@
 .usual-list-item{padding:7px 0;border-bottom:1px solid #ddd}
 .usual-list-item input[type=text],.usual-list-item input:not([type]){flex:1;min-width:150px;padding:6px}
 .usual-done{text-decoration:line-through;opacity:.65}.usual-add{margin-top:12px}.usual-add input{flex:1;padding:7px}
+
+/* V19 : aperçu Markdown du soir et épargne surprise */
+.evening-actions {margin: .6rem 0;}
+.evening-notes {width:100%;max-width:100%;box-sizing:border-box;}
+.evening-markdown {border:1px solid #bbb;border-radius:8px;padding:1rem;min-height:12rem;overflow-wrap:anywhere;}
+.evening-markdown p {margin:.5rem 0;}
+.evening-markdown ul {padding-left:1.6rem;}
+.random-reward-save {margin:.5rem;padding:.5rem .8rem;cursor:pointer;}
+
+.usual-heading-input {font-weight:700;font-size:1.05em;flex:1;}

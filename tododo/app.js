@@ -617,7 +617,7 @@ const app = createApp({
       + (Number(data.archived) || 0));
     const gratitudeTotal = computed(() => Math.round(data.gratitude.reduce((sum,g) => sum+(Number(g.points)||0),0)*100)/100);
     const savedTotal = computed(() => data.rewards.reduce((sum,r)=>sum+Math.max(0,Number(r.saved)||0),0));
-    const habitTotal = computed(() => Math.round(data.habits.reduce((sum,h)=>sum+habitAwards(h).reduce((s,a)=>s+a.points,0),0)*100)/100);
+    const habitTotal = computed(() => Math.round(data.habits.reduce((sum,h)=>sum+habitAwards(h).reduce((s,a)=>s+a.points,0) - (h.penalties||[]).reduce((s,a)=>s+Math.max(0,Number(a.points)||0),0),0)*100)/100);
     const challengeTotal = computed(() => Math.round(data.challengeAwards.reduce((sum,a) => sum + (Number(a.points)||0), 0)*100)/100);
     const balance = computed(() => Math.round((earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
 
@@ -649,6 +649,11 @@ const app = createApp({
       const wasFavorite=!!reward.favorite;
       data.rewards.forEach(r => {r.favorite=false;});
       reward.favorite=!wasFavorite;
+    }
+    function depositRandomReward() {
+      const eligible=data.rewards.filter(r=>rewardRemaining(r)>0);
+      if (!eligible.length || balance.value<=0) {notify('Aucune récompense à financer ou aucun point disponible');return;}
+      depositReward(eligible[Math.floor(Math.random()*eligible.length)]);
     }
     function depositReward(reward) {
       const max = Math.min(balance.value, rewardRemaining(reward));
@@ -829,6 +834,12 @@ const app = createApp({
       }
       return Math.round(Math.max(0, points) * 100) / 100;
     }
+    function moveTicketType(index, direction) {
+      const next=index+direction;
+      if(next<0 || next>=data.workTicketTypes.length)return;
+      const [item]=data.workTicketTypes.splice(index,1);
+      data.workTicketTypes.splice(next,0,item);
+    }
     function addTicketType() { data.workTicketTypes.push({id:uid(),name:'Nouveau type',color:'#64748b',pointMode:'add',pointValue:0}); }
     function deleteTicketType(type) {
       if (!confirm('Supprimer ce type de ticket ?')) return;
@@ -932,6 +943,24 @@ const app = createApp({
     }
     function ticketPoints(ticket){return (ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0);}
 
+    const eveningPreview = ref(false);
+    function renderEveningMarkdown(source) {
+      const escape = text => String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+      const inline = text => escape(text).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>');
+      let result='', inList=false;
+      const closeList=()=>{if(inList){result+='</ul>';inList=false;}};
+      for(const line of String(source||'').split(/\r?\n/)) {
+        const heading=line.match(/^(#{1,3})\s+(.+)$/);
+        const checkbox=line.match(/^\s*[-*]\s+\[([ xX])\]\s*(.*)$/);
+        const bullet=line.match(/^\s*[-*]\s+(.+)$/);
+        if(checkbox||bullet){
+          if(!inList){result+='<ul>';inList=true;}
+          result+='<li>'+(checkbox?(checkbox[1].toLowerCase()==='x'?'☑ ':'☐ ')+inline(checkbox[2]):inline(bullet[1]))+'</li>';
+        }else {closeList();if(heading){const n=heading[1].length;result+='<h'+n+'>'+inline(heading[2])+'</h'+n+'>';}
+          else if(line.trim())result+='<p>'+inline(line)+'</p>';else result+='<p></p>';}
+      }
+      closeList();return result;
+    }
     /* Listes habituelles : aucun impact sur les points, sans remise à zéro automatique. */
     const usualDragged = ref(null);
     const usualNewItem = reactive({});
@@ -941,11 +970,15 @@ const app = createApp({
     function removeUsualList(list) {
       if(confirm(`Supprimer la liste « ${list.title} » ?`)) data.usualLists=data.usualLists.filter(x=>x.id!==list.id);
     }
+    function addUsualHeading(list) {
+      const title=prompt('Titre de la section :');
+      if(title && title.trim())list.items.push({id:uid(),name:title.trim(),heading:true,done:false,doneAt:''});
+    }
     function addUsualItem(list) {
       const name=String(usualNewItem[list.id]||'').trim();if(!name)return;
       list.items.push({id:uid(),name,done:false,doneAt:''});usualNewItem[list.id]='';
     }
-    function toggleUsualItem(item) { item.done=!item.done;item.doneAt=item.done?new Date().toISOString():''; }
+    function toggleUsualItem(item) { if(item.heading)return; item.done=!item.done;item.doneAt=item.done?new Date().toISOString():''; }
     function resetUsualList(list) { list.items.forEach(item=>{item.done=false;item.doneAt='';}); }
     function deleteUsualItem(list,item) { list.items=list.items.filter(x=>x.id!==item.id); }
     function startUsualDrag(event,list,item) {
@@ -1562,21 +1595,34 @@ const app = createApp({
     }
 
     /* ---------- Habitudes et routines ---------- */
-    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,quantityEnabled:false,quantityMax:3,quantityBonus:0.10});
+    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,malus:false,quantityEnabled:false,quantityMax:3,quantityBonus:0.10});
     const habitWeekdays = [{id:1,label:'Lun'},{id:2,label:'Mar'},{id:3,label:'Mer'},{id:4,label:'Jeu'},{id:5,label:'Ven'},{id:6,label:'Sam'},{id:0,label:'Dim'}];
     function openHabitForm(habit = null) {
-      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),endDate:habit.endDate||'',completed:!!habit.completed,basePoints:habit.basePoints??0,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??'',quantityEnabled:!!habit.quantityEnabled,quantityMax:habit.quantityMax||3,quantityBonus:habit.quantityBonus??0.10} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,quantityEnabled:false,quantityMax:3,quantityBonus:0.10});
+      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),endDate:habit.endDate||'',completed:!!habit.completed,basePoints:habit.basePoints??0,malus:!!habit.malus,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??'',quantityEnabled:!!habit.quantityEnabled,quantityMax:habit.quantityMax||3,quantityBonus:habit.quantityBonus??0.10} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,malus:false,quantityEnabled:false,quantityMax:3,quantityBonus:0.10});
     }
     function saveHabit() {
       const title = habitForm.title.trim(); if (!title) return;
       if(habitForm.endDate && habitForm.endDate < habitForm.startDate) { notify("La date de fin doit être après la date de début"); return; }
-      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),endDate:habitForm.endDate||'',completed:!!habitForm.completed,basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0),quantityEnabled:!!habitForm.quantityEnabled,quantityMax:Math.max(1,Number(habitForm.quantityMax)||1),quantityBonus:Math.max(0,Number(habitForm.quantityBonus)||0)};
+      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),endDate:habitForm.endDate||'',completed:!!habitForm.completed,malus:!!habitForm.malus,basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0),quantityEnabled:!!habitForm.quantityEnabled,quantityMax:Math.max(1,Number(habitForm.quantityMax)||1),quantityBonus:Math.max(0,Number(habitForm.quantityBonus)||0)};
       if (habitForm.id) {const h=data.habits.find(x=>x.id===habitForm.id);if(h) { if (!h.pointAwards) h.pointAwards = Object.fromEntries(habitAwards(h).map(a=>[a.date,a.points])); Object.assign(h,fields); }}
       else data.habits.push({id:uid(),...fields,createdAt:todayStr(),history:[],postponed:[]});
       habitForm.open=false;
     }
     const dayDiff = (a,b) => Math.round((Date.parse(b+'T12:00:00Z')-Date.parse(a+'T12:00:00Z'))/86400000);
     const monday = date => {const d=new Date(date+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);return d.toISOString().slice(0,10);};
+    function habitPenaltiesToday(h) {return (h.penalties||[]).filter(x=>x.date===today.value).length;}
+    function penalizeHabit(h) {
+      if(!h.malus || habitIsFinished(h) || (h.startDate||h.createdAt||today.value)>today.value)return;
+      const points=Math.max(0,Number(h.basePoints)||0);
+      if(!points)return notify('Définis un malus supérieur à zéro');
+      if(!Array.isArray(h.penalties))h.penalties=[];
+      h.penalties.push({id:uid(),date:today.value,points});
+      notify('−'+points+' pts · '+h.title);
+    }
+    function undoHabitPenalty(h) {
+      const i=(h.penalties||[]).map((p,i)=>({p,i})).filter(x=>x.p.date===today.value).pop();
+      if(i && confirm('Annuler le dernier malus du jour ?'))h.penalties.splice(i.i,1);
+    }
     function habitAwards(h) {
       const dates=[...new Set(h.history||[])].filter(d=>d && d>=(h.startDate||h.createdAt||'0000')).sort();
       let streak=0,previous='';
@@ -1594,7 +1640,7 @@ const app = createApp({
     function habitIsFinished(h) { return !!h.completed || !!(h.endDate && h.endDate < today.value); }
     function markHabitFinished(h) { if(!confirm('Marquer cette routine comme terminée ?'))return; h.completed=true; h.endDate=h.endDate||today.value; }
     function habitLateDays(h){
-      if(habitIsFinished(h))return 0;
+      if(h.malus || habitIsFinished(h))return 0;
       const start=h.startDate||h.createdAt||today.value;
       if(start>today.value || habitDoneToday(h))return 0;
       const last=[...(h.history||[])].filter(d=>d<today.value).sort().pop();
@@ -1624,6 +1670,7 @@ const app = createApp({
     function habitDoneToday(h) {return (h.history||[]).includes(today.value);}
     function habitDue(h) {
       if(habitIsFinished(h))return false;
+      if(h.malus)return (h.startDate||h.createdAt||today.value)<=today.value;
       if ((h.startDate||h.createdAt||today.value)>today.value) return false;
       if (habitDoneToday(h)) return true;
       if (h.forceDue === today.value) return true;
@@ -1636,7 +1683,7 @@ const app = createApp({
     }
     const dashboardHabits = computed(() => data.habits.filter(h=>habitDue(h)||habitLateDays(h)>0));
     function completeHabit(h) {
-      if(habitIsFinished(h))return;
+      if(h.malus || habitIsFinished(h))return;
       if ((h.startDate||h.createdAt||today.value)>today.value || habitDoneToday(h)) return;
       if (!confirm('Confirmer la réalisation de « '+h.title+' » aujourd’hui ?')) return;
       if (!Array.isArray(h.history)) h.history=[];
@@ -1955,7 +2002,7 @@ const app = createApp({
 
     return {
       // état
-      usualDragged,usualNewItem,addUsualList,removeUsualList,addUsualItem,toggleUsualItem,resetUsualList,deleteUsualItem,startUsualDrag,dropUsualItem,
+      usualDragged,usualNewItem,addUsualList,removeUsualList,addUsualHeading,addUsualItem,toggleUsualItem,resetUsualList,deleteUsualItem,startUsualDrag,dropUsualItem,
       addTicketType,deleteTicketType,safeTicketUrl,
       ticketSort,ticketDragged,ticketDragStart,ticketDrop,ticketDraft,ticketInputs,collapsedTickets,isTicketCollapsed,toggleTicketCollapse,renameTicket,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
       data, ui, view, setTab, pageTitle, today, toast, tabs: TABS, navGroups: NAV_GROUPS, statuses: STATUSES, tagStyle,
@@ -1966,7 +2013,7 @@ const app = createApp({
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
-      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, depositRandomReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, moveTicketType, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, groupedRewards, visibleInventory, unusedInventory, usedInventory, rewardClaimCount, setInventoryUsed,
       // filtres
       filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
@@ -1987,10 +2034,10 @@ const app = createApp({
       // données
       exportData, importData, resetAll,
       CHALLENGE_KINDS, challengeForm, openChallengeForm, saveChallenge, deleteChallenge, toggleChallenge, hideChallengeHome, currentChallenges, challengeHistory, challengeProgress,
-      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal,
+      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
       activityForm, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
-      formatDate,
+      formatDate, eveningPreview, renderEveningMarkdown,
     };
   },
 });
