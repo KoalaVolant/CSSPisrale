@@ -560,33 +560,33 @@
         <details class="config-fold">
           <summary>Types de tickets et bonus de points</summary>
           <p>Le type ajuste les points de chaque sous-tâche, en plus de l'urgence et de la difficulté.</p>
-          <article class="work-difficulty" v-for="type in data.workTicketTypes" :key="type.id">
+          <article class="work-difficulty sortable-row" v-for="type in data.workTicketTypes" :key="type.id" @dragover.prevent @drop="dropReorder($event,'ticket',type.id)">
             <input v-model="type.name" aria-label="Nom du type de ticket">
             <select v-model="type.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
             <input type="number" min="0" step="0.25" v-model.number="type.pointValue" aria-label="Bonus du type">
-            <button type="button" @click="moveTicketType(data.workTicketTypes.indexOf(type),-1)" :disabled="data.workTicketTypes.indexOf(type)===0">↑</button><button type="button" @click="moveTicketType(data.workTicketTypes.indexOf(type),1)" :disabled="data.workTicketTypes.indexOf(type)===data.workTicketTypes.length-1">↓</button><button type="button" @click="deleteTicketType(type)">Supprimer</button>
+            <span class="drag-handle" draggable="true" @dragstart="startReorder($event,'ticket',type.id)" @dragend="reorderDrag=null" title="Réordonner">⠿</span><button type="button" @click="deleteTicketType(type)">Supprimer</button>
           </article>
           <button type="button" @click="addTicketType">＋ Ajouter un type de ticket</button>
         </details>
         <details class="config-fold">
           <summary>Difficultés Travail et bonus de points</summary>
-          <article class="work-difficulty" v-for="d in data.workDifficulties" :key="d.id">
+          <article class="work-difficulty sortable-row" v-for="d in data.workDifficulties" :key="d.id" @dragover.prevent @drop="dropReorder($event,'workDifficulty',d.id)">
             <input v-model="d.name" aria-label="Nom de la difficulté">
             <select v-model="d.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
             <input type="number" min="0" step="0.25" v-model.number="d.pointValue" aria-label="Bonus">
-            <button type="button" @click="moveWorkLevel('difficulty',data.workDifficulties.indexOf(d),-1)" :disabled="data.workDifficulties.indexOf(d)===0">↑</button><button type="button" @click="moveWorkLevel('difficulty',data.workDifficulties.indexOf(d),1)" :disabled="data.workDifficulties.indexOf(d)===data.workDifficulties.length-1">↓</button><button type="button" @click="deleteWorkDifficulty(d)">Supprimer</button>
+            <span class="drag-handle" draggable="true" @dragstart="startReorder($event,'workDifficulty',d.id)" @dragend="reorderDrag=null" title="Réordonner">⠿</span><button type="button" @click="deleteWorkDifficulty(d)">Supprimer</button>
           </article>
           <button type="button" @click="addWorkDifficulty">＋ Ajouter une difficulté de travail</button>
         </details>
         <details class="config-fold">
           <summary>Urgences des tâches Travail</summary>
           <p>Les niveaux et bonus ci-dessous sont indépendants des urgences personnelles.</p>
-          <article class="work-difficulty" v-for="u in data.workUrgencies" :key="u.id">
+          <article class="work-difficulty sortable-row" v-for="u in data.workUrgencies" :key="u.id" @dragover.prevent @drop="dropReorder($event,'workUrgency',u.id)">
             <input type="color" v-model="u.color" title="Couleur de l'urgence" aria-label="Couleur de l'urgence">
             <input v-model="u.name" aria-label="Nom de l'urgence">
             <select v-model="u.pointMode"><option value="add">+ points</option><option value="multiply">× coefficient</option></select>
             <input type="number" min="0" step="0.25" v-model.number="u.pointValue" aria-label="Bonus urgence">
-            <button type="button" @click="moveWorkLevel('urgency',data.workUrgencies.indexOf(u),-1)" :disabled="data.workUrgencies.indexOf(u)===0">↑</button><button type="button" @click="moveWorkLevel('urgency',data.workUrgencies.indexOf(u),1)" :disabled="data.workUrgencies.indexOf(u)===data.workUrgencies.length-1">↓</button><button type="button" @click="deleteWorkUrgency(u)">Supprimer</button>
+            <span class="drag-handle" draggable="true" @dragstart="startReorder($event,'workUrgency',u.id)" @dragend="reorderDrag=null" title="Réordonner">⠿</span><button type="button" @click="deleteWorkUrgency(u)">Supprimer</button>
           </article>
           <button type="button" @click="addWorkUrgency">＋ Ajouter une urgence de travail</button>
         </details>
@@ -789,7 +789,7 @@
           <button type="button" class="project-toolbar-delete" @click="deleteSelectedProjects">Supprimer</button>
         </template>
       </div>
-      <p class="hint" v-if="data.projects.length > 1 && ui.projectSort === 'manual'">Glisse un projet par sa poignée (⠿) ou utilise les flèches pour changer l'ordre.</p>
+      <p class="hint" v-if="data.projects.length > 1 && ui.projectSort === 'manual'">Glisse un projet par sa poignée (⠿) pour changer l'ordre.</p>
       <p class="hint" v-else-if="data.projects.length > 1">Projets triés par urgence (urgence définie dans les propriétés du projet). Repasse en « Ordre manuel » pour les réorganiser.</p>
 
       <article class="project" v-for="(p, i) in sortedProjects" :key="p.id" tabindex="0"
@@ -806,10 +806,7 @@
                    @change="setProjectColor(p, $event.target.value)">
             <h3 class="project-name">{{ p.name }}</h3>
             
-            <span class="project-order-buttons" v-if="ui.projectSort === 'manual'">
-              <button type="button" :disabled="i === 0" @click="moveProject(i, -1)" title="Monter">↑</button>
-              <button type="button" :disabled="i === data.projects.length - 1" @click="moveProject(i, 1)" title="Descendre">↓</button>
-            </span>
+            
             <button type="button" class="project-toggle" :aria-expanded="isProjectOpen(p.id)" @click="toggleProjectOpen(p.id)">
               {{ isProjectOpen(p.id) ? 'Replier' : 'Déplier' }}
             </button>
@@ -890,7 +887,7 @@
           <summary>{{ block.title }}</summary>
           <p class="empty" v-if="!data[block.key].length">Aucun niveau.</p>
 
-          <article class="level-item" v-for="(l, i) in data[block.key]" :key="l.id" :style="l.color ? { '--item-color': l.color } : {}">
+          <article class="level-item sortable-row" v-for="(l, i) in data[block.key]" :key="l.id" @dragover.prevent @drop="dropReorder($event,block.key,l.id)" :style="l.color ? { '--item-color': l.color } : {}">
             <input class="level-color" type="color" :value="l.color || '#888888'" title="Couleur"
                    @change="setLevelColor(l, $event.target.value)">
             <input class="level-name" type="text" :value="l.name" title="Renommer"
@@ -899,8 +896,7 @@
             <label class="level-point-mode">Bonus <select v-model="l.pointMode"><option value="add">+ fixe</option><option value="multiply">× multiplicateur</option></select></label>
             <input class="level-point-value" type="number" step="0.1" min="0" v-model.number="l.pointValue" placeholder="0" title="Valeur du bonus">
             <span class="level-actions">
-              <button type="button" :disabled="i === 0" @click="moveLevel(block.key, i, -1)" title="Monter">↑</button>
-              <button type="button" :disabled="i === data[block.key].length - 1" @click="moveLevel(block.key, i, 1)" title="Descendre">↓</button>
+              <span class="drag-handle" draggable="true" @dragstart="startReorder($event,block.key,l.id)" @dragend="reorderDrag=null" title="Réordonner">⠿</span>
               <button type="button" @click="deleteLevel(block.key, l)">Supprimer</button>
             </span>
           </article>
@@ -1105,12 +1101,12 @@
     <!-- ============ BUDGET ============ -->
     <section class="view view-budget" v-if="view === 'budget'">
       <div class="budget-toolbar"><button type="button" @click="changeBudgetMonth(-1)" aria-label="Mois précédent">◀</button><strong>{{ budgetMonth }}</strong><button type="button" @click="changeBudgetMonth(1)" aria-label="Mois suivant">▶</button></div>
-      <div class="budget-tabs"><button type="button" v-for="tab in [{id:'month',title:'Vue mensuelle'},{id:'recurring',title:'Charges récurrentes'},{id:'swile',title:'Swile'}]" :key="tab.id" :class="{active:budgetSection===tab.id}" @click="budgetSection=tab.id">{{ tab.title }}</button></div>
+      <div class="budget-tabs"><button type="button" v-for="tab in [{id:'month',title:'Vue mensuelle'},{id:'recurring',title:'Charges récurrentes'},{id:'swile',title:'Swile'},{id:'cash',title:'Espèces'}]" :key="tab.id" :class="{active:budgetSection===tab.id}" @click="budgetSection=tab.id">{{ tab.title }}</button></div>
       <template v-if="budgetSection==='month'">
         <div class="budget-summary budget-summary-main"><article><small>Revenus</small><strong>{{ money(budgetSummary.income) }}</strong></article><article><small>Dépenses</small><strong>{{ money(budgetSummary.expenses) }}</strong></article><article><small>Solde du mois</small><strong>{{ money(budgetSummary.balance) }}</strong></article><article><small>Dépenses alimentation</small><strong>{{ money(budgetSummary.food) }}</strong></article><article><small>Dépenses essence</small><strong>{{ money(budgetSummary.fuel) }}</strong></article><article><small>Dépenses loisirs</small><strong>{{ money(budgetSummary.leisure) }}</strong></article></div>
         <details class="config-fold budget-manage-categories"><summary>Gérer mes catégories</summary>
           <form class="budget-form" @submit.prevent="addBudgetCategory"><label>Nouvelle catégorie <input v-model="budgetCategoryName" placeholder="Ex : Animaux" required></label><button type="submit">Ajouter</button></form>
-          <div v-for="(c, index) in budgetCategories" :key="c" class="budget-manager-line"><span>{{c}}</span><button type="button" :disabled="index===0" @click="moveBudgetCategory(c,-1)" :aria-label="'Monter '+c">↑</button><button type="button" :disabled="index===budgetCategories.length-1" @click="moveBudgetCategory(c,1)" :aria-label="'Descendre '+c">↓</button><button type="button" @click="renameBudgetCategory(c)">Renommer</button><button type="button" @click="deleteBudgetCategory(c)">Supprimer</button></div>
+          <div v-for="(c, index) in budgetCategories" :key="c" class="budget-manager-line sortable-row" @dragover.prevent @drop="dropReorder($event,'budget',c)"><span class="drag-handle" draggable="true" @dragstart="startReorder($event,'budget',c)" @dragend="reorderDrag=null" title="Réordonner">⠿</span><span>{{c}}</span><button type="button" @click="renameBudgetCategory(c)">Renommer</button><button type="button" @click="deleteBudgetCategory(c)">Supprimer</button></div>
           <p class="hint">Une catégorie déjà utilisée doit être renommée pour conserver ses opérations.</p>
         </details>
         <h3>Ajouter une opération</h3>
@@ -1118,7 +1114,7 @@
         <h3>Opérations et charges du mois</h3>
         <p class="hint">Les charges récurrentes sont regroupées en une seule ligne, automatiquement comptée dès le début du mois. Les achats Swile du mois précédent sont déduits à 50 %.</p>
         <div class="budget-operations">
-          <div class="budget-item" v-for="item in budgetDisplayItems" :key="item.id">
+          <div class="budget-item sortable-row" v-for="item in budgetDisplayItems" :key="item.id" @dragover.prevent="item.kind==='manual'" @drop="item.kind==='manual' && dropReorder($event,'manual',item.id)"><span v-if="item.kind==='manual'" class="drag-handle" draggable="true" @dragstart="startReorder($event,'manual',item.id)" @dragend="reorderDrag=null" title="Réordonner">⠿</span>
             <div><strong>{{item.label}}</strong><small>{{item.kind==='recurring-total'?'Charge récurrente · Début du mois':item.kind==='swile'?'Swile du mois précédent':item.category+' · '+item.date}}</small></div>
             <strong>{{money(item.amount)}}</strong>
             <button v-if="item.kind==='manual'" type="button" @click="removeBudgetEntry(item.id)">Supprimer</button>
@@ -1130,13 +1126,23 @@
         <h3>Créer une charge mensuelle</h3><p class="hint">Saisis une dépense négative, par exemple −75 pour un paiement en quatre fois. Une date de fin est facultative. Chaque charge est comptée dès le 1er jour du mois concerné.</p>
         <form class="budget-form" @submit.prevent="addBudgetRecurring"><label>Libellé <input v-model="budgetRecurringForm.label" required></label><label>Montant mensuel <input type="number" step="0.01" v-model.number="budgetRecurringForm.amount" required></label><label>Catégorie (visible uniquement dans Charges récurrentes) <select v-model="budgetRecurringForm.category"><option v-for="c in budgetCategories" :key="c">{{c}}</option></select></label><label>Premier mois <input type="month" v-model="budgetRecurringForm.start" required></label><label>Dernier mois (facultatif) <input type="month" v-model="budgetRecurringForm.end"></label><button type="submit">Créer</button></form>
         <h3>Charges actives en {{budgetMonth}}</h3><div class="budget-item" v-for="rec in recurringForMonth" :key="rec.id"><div><strong>{{rec.label}}</strong><small>{{rec.category}} · {{rec.start}} → {{rec.end||'sans fin'}}</small></div><label>Montant de ce mois <input type="number" step="0.01" :value="rec.amount" @change="overrideRecurring(rec,$event)"></label><button type="button" @click="resetRecurringOverride(rec)">Montant initial</button></div><p v-if="!recurringForMonth.length">Aucune charge active pour ce mois.</p>
-        <h3>Toutes les charges</h3><div class="budget-item" v-for="rec in data.budgetRecurring" :key="rec.id"><div><strong>{{rec.label}}</strong><small>{{money(rec.amount)}} / mois · {{rec.start}} → {{rec.end||'sans fin'}}</small></div><label><input type="checkbox" v-model="rec.active"> Activée</label><button type="button" @click="removeBudgetRecurring(rec.id)">Supprimer</button></div>
+        <h3>Toutes les charges</h3><div class="budget-item sortable-row" v-for="rec in data.budgetRecurring" :key="rec.id" @dragover.prevent @drop="dropReorder($event,'recurring',rec.id)"><span class="drag-handle" draggable="true" @dragstart="startReorder($event,'recurring',rec.id)" @dragend="reorderDrag=null" title="Réordonner">⠿</span><div><strong>{{rec.label}}</strong><small>{{money(rec.amount)}} / mois · {{rec.start}} → {{rec.end||'sans fin'}}</small></div><label><input type="checkbox" v-model="rec.active"> Activée</label><button type="button" @click="removeBudgetRecurring(rec.id)">Supprimer</button></div>
       </template>
-      <template v-else>
+      <template v-else-if="budgetSection==='swile'">
         <h3>Achats Swile du mois</h3><p class="hint">Chaque achat Swile est enregistré au mois de l'achat. Seulement 50 % de son montant sera débité du budget du <strong>mois suivant</strong>.</p>
         <div class="budget-summary"><article><small>Achats du mois</small><strong>{{money(budgetSummary.swileTotal)}}</strong></article><article><small>Part qui comptera le mois prochain</small><strong>{{money(budgetSummary.swileTotal/2)}}</strong></article></div>
         <form class="budget-form" @submit.prevent="addBudgetSwile"><label>Date <input type="date" v-model="budgetSwileForm.date" required></label><label>Libellé <input v-model="budgetSwileForm.label" required></label><label>Montant de l'achat <input type="number" step="0.01" max="-0.01" placeholder="Ex : -136.60" v-model.number="budgetSwileForm.amount" required></label><label>Catégorie <select v-model="budgetSwileForm.category"><option v-for="c in budgetCategories" :key="c">{{c}}</option></select></label><button type="submit">Ajouter l'achat</button></form>
-        <div class="budget-item" v-for="item in budgetSwileSource" :key="item.id"><div><strong>{{item.label}}</strong><small>{{item.date}} · {{item.category}}</small></div><strong>{{money(item.amount)}} → {{money(item.amount/2)}} le mois suivant</strong><button type="button" @click="removeBudgetSwile(item.id)">Supprimer</button></div><p v-if="!budgetSwileSource.length">Aucun achat Swile enregistré ce mois.</p>
+        <div class="budget-item sortable-row" v-for="item in budgetSwileSource" :key="item.id" @dragover.prevent @drop="dropReorder($event,'swile',item.id)"><span class="drag-handle" draggable="true" @dragstart="startReorder($event,'swile',item.id)" @dragend="reorderDrag=null" title="Réordonner">⠿</span><div><strong>{{item.label}}</strong><small>{{item.date}} · {{item.category}}</small></div><strong>{{money(item.amount)}} → {{money(item.amount/2)}} le mois suivant</strong><button type="button" @click="removeBudgetSwile(item.id)">Supprimer</button></div><p v-if="!budgetSwileSource.length">Aucun achat Swile enregistré ce mois.</p>
+      </template>
+      <template v-else-if="budgetSection==='cash'">
+        <h3>Espèces</h3>
+        <p class="hint">Caisse indépendante : aucune opération en espèces n'est comptabilisée dans les revenus, dépenses ou solde du budget mensuel. Le solde est cumulatif.</p>
+        <div class="budget-summary budget-summary-main"><article><small>Espèces reçues</small><strong>{{money(cashIncome)}}</strong></article><article><small>Espèces dépensées</small><strong>{{money(cashExpenses)}}</strong></article><article><small>Espèces disponibles</small><strong>{{money(cashBalance)}}</strong></article></div>
+        <h3>Ajouter un mouvement d'espèces</h3>
+        <form class="budget-form" @submit.prevent="addCashEntry"><label>Date <input type="date" v-model="cashForm.date" required></label><label>Libellé <input v-model="cashForm.label" required placeholder="Retrait, cadeau, achat…"></label><label>Montant (+ reçu / − dépensé) <input type="number" step="0.01" v-model.number="cashForm.amount" required></label><label>Catégorie <select v-model="cashForm.category"><option v-for="c in budgetCategories" :key="c">{{c}}</option></select></label><button type="submit">Ajouter</button></form>
+        <h3>Historique espèces</h3>
+        <div class="budget-operations"><div class="budget-item sortable-row" v-for="item in data.cashEntries" :key="item.id" @dragover.prevent @drop="dropReorder($event,'cash',item.id)"><span class="drag-handle" draggable="true" @dragstart="startReorder($event,'cash',item.id)" @dragend="reorderDrag=null" title="Réordonner">⠿</span><div><strong>{{item.label}}</strong><small>{{item.category}} · {{item.date}}</small></div><strong>{{money(item.amount)}}</strong><button type="button" @click="removeCashEntry(item.id)">Supprimer</button></div></div>
+        <p v-if="!data.cashEntries.length">Aucun mouvement d'espèces enregistré.</p>
       </template>
     </section>
 

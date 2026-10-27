@@ -288,3 +288,7 @@
 /* V25 : liste chronologique par saisie, sans regroupement en catégories */
 .budget-manager-line button:disabled{opacity:.4;cursor:not-allowed}
 .budget-operations .budget-item>strong{white-space:nowrap}
+
+/* V26 : poignées de réorganisation et registre espèces */
+.sortable-row .drag-handle{cursor:grab;flex:0 0 auto;user-select:none;font-size:1.25rem;padding:4px 8px;touch-action:none}
+.sortable-row .drag-handle:active{cursor:grabbing}

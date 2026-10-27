@@ -203,6 +203,7 @@ function defaultData() {
     budgetRecurring: [], // charges mensuelles automatiques
     budgetOverrides: {}, // montants adaptés sur un mois précis
     budgetSwile: [], // dépenses Swile décalées au mois suivant à 50 %
+    cashEntries: [], // espèces indépendantes du budget mensuel
     textareas: [], // blocs Markdown nommés
     usualLists: [], // listes de suivi sans points
     workTicketTypes: [], // types avec bonus de points
@@ -255,6 +256,7 @@ function loadData() {
     if (!Array.isArray(d.budgetRecurring)) d.budgetRecurring = [];
     if (!d.budgetOverrides || typeof d.budgetOverrides !== 'object' || Array.isArray(d.budgetOverrides)) d.budgetOverrides = {};
     if (!Array.isArray(d.budgetSwile)) d.budgetSwile = [];
+    if (!Array.isArray(d.cashEntries)) d.cashEntries = [];
     d.budgetSwile = d.budgetSwile.map(x => ({...x, amount: -Math.abs(Number(x.amount) || 0)}));
     if (!Array.isArray(d.textareas)) d.textareas = [];
     if (d.eveningNotes.trim()) { if (!d.textareas.length) d.textareas.push({id:uid(),title:'To do du soir',content:d.eveningNotes}); d.eveningNotes=''; }
@@ -472,6 +474,7 @@ const app = createApp({
       data.budgetRecurring = Array.isArray(src.budgetRecurring) ? src.budgetRecurring : [];
       data.budgetOverrides = src.budgetOverrides && typeof src.budgetOverrides === 'object' && !Array.isArray(src.budgetOverrides) ? src.budgetOverrides : {};
       data.budgetSwile = Array.isArray(src.budgetSwile) ? src.budgetSwile.map(x => ({...x, amount: -Math.abs(Number(x.amount) || 0)})) : [];
+      data.cashEntries = Array.isArray(src.cashEntries) ? src.cashEntries : [];
       data.textareas = Array.isArray(src.textareas) ? src.textareas : [];
       if (data.eveningNotes.trim()) { if (!data.textareas.length) data.textareas.push({id:uid(),title:'To do du soir',content:data.eveningNotes}); data.eveningNotes=''; }
       data.usualLists = Array.isArray(src.usualLists) ? src.usualLists : [];
@@ -526,16 +529,16 @@ const app = createApp({
       if(!name||name===oldName||name==='Charge récurrente'||data.budgetCategories.some(c=>c!==oldName&&c.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr')))return;
       const i=data.budgetCategories.indexOf(oldName);if(i<0)return;
       data.budgetCategories[i]=name;
-      for(const collection of [data.budgetEntries,data.budgetRecurring,data.budgetSwile]) collection.forEach(x=>{if(x.category===oldName)x.category=name;});
-      for(const form of [budgetEntryForm,budgetRecurringForm,budgetSwileForm])if(form.category===oldName)form.category=name;
+      for(const collection of [data.budgetEntries,data.budgetRecurring,data.budgetSwile,data.cashEntries]) collection.forEach(x=>{if(x.category===oldName)x.category=name;});
+      for(const form of [budgetEntryForm,budgetRecurringForm,budgetSwileForm,cashForm])if(form.category===oldName)form.category=name;
     }
     function deleteBudgetCategory(name){
       if(data.budgetCategories.length<=1)return;
-      const used=[...data.budgetEntries,...data.budgetRecurring,...data.budgetSwile].some(x=>x.category===name);
+      const used=[...data.budgetEntries,...data.budgetRecurring,...data.budgetSwile,...data.cashEntries].some(x=>x.category===name);
       if(used){alert('Catégorie utilisée : renomme-la pour conserver son historique.');return;}
       if(!confirm('Supprimer la catégorie « '+name+' » ?'))return;
       data.budgetCategories=data.budgetCategories.filter(x=>x!==name);
-      for(const form of [budgetEntryForm,budgetRecurringForm,budgetSwileForm])if(form.category===name)form.category=data.budgetCategories[0];
+      for(const form of [budgetEntryForm,budgetRecurringForm,budgetSwileForm,cashForm])if(form.category===name)form.category=data.budgetCategories[0];
     }
     function moveBudgetCategory(name, delta){
       const index=data.budgetCategories.indexOf(name);
@@ -545,9 +548,37 @@ const app = createApp({
       [categories[index],categories[next]]=[categories[next],categories[index]];
       data.budgetCategories=categories;
     }
+    const reorderDrag = ref(null);
+    function startReorder(event, kind, id){
+      reorderDrag.value={kind,id};
+      if(event.dataTransfer){event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',String(id));}
+    }
+    function dropReorder(event, kind, targetId){
+      event.preventDefault();
+      const drag=reorderDrag.value;
+      if(!drag||drag.kind!==kind||drag.id===targetId){reorderDrag.value=null;return;}
+      const keys={budget:'budgetCategories',ticket:'workTicketTypes',workUrgency:'workUrgencies',workDifficulty:'workDifficulties',urgencies:'urgencies',difficulties:'difficulties',recurring:'budgetRecurring',swile:'budgetSwile',cash:'cashEntries',manual:'budgetEntries'};
+      const key=keys[kind];if(!key){reorderDrag.value=null;return;}
+      const arr=data[key];if(!Array.isArray(arr))return;
+      const idOf=item=>typeof item==='string'?item:item.id;
+      const from=arr.findIndex(x=>String(idOf(x))===String(drag.id)),to=arr.findIndex(x=>String(idOf(x))===String(targetId));
+      if(from>=0&&to>=0){const [v]=arr.splice(from,1);arr.splice(to,0,v);}
+      reorderDrag.value=null;
+    }
     const budgetEntryForm = reactive({date:todayStr(),label:'',amount:null,category:'Autres'});
     const budgetRecurringForm = reactive({label:'',amount:null,category:'Abonnements',start:todayStr().slice(0,7),end:''});
     const budgetSwileForm = reactive({date:todayStr(),label:'',amount:null,category:'Alimentation'});
+    const cashForm = reactive({date:todayStr(),label:'',amount:null,category:'Autres'});
+    const cashBalance = computed(() => data.cashEntries.reduce((sum,x)=>sum+(Number(x.amount)||0),0));
+    const cashIncome = computed(() => data.cashEntries.reduce((sum,x)=>sum+Math.max(0,Number(x.amount)||0),0));
+    const cashExpenses = computed(() => data.cashEntries.reduce((sum,x)=>sum+Math.min(0,Number(x.amount)||0),0));
+    function addCashEntry(){
+      const amount=Number(cashForm.amount);
+      if(!cashForm.label.trim()||cashForm.amount===null||cashForm.amount===''||!Number.isFinite(amount)||!cashForm.date)return;
+      data.cashEntries.push({id:uid(),date:cashForm.date,label:cashForm.label.trim(),amount,category:cashForm.category});
+      cashForm.label='';cashForm.amount=null;
+    }
+    function removeCashEntry(id){if(confirm('Supprimer cette opération en espèces ?'))data.cashEntries=data.cashEntries.filter(x=>x.id!==id);}
     function money(v) { return (Number(v)||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR'}); }
     function shiftMonth(month,offset){const match=/^(\d{4})-(\d{2})$/.exec(month||'');if(!match)return todayStr().slice(0,7);const n=Number(match[1])*12+Number(match[2])-1+offset;const year=Math.floor(n/12);return String(year).padStart(4,'0')+'-'+String(n-year*12+1).padStart(2,'0');}
     function monthBefore(month){return shiftMonth(month,-1);}
@@ -2131,7 +2162,7 @@ const app = createApp({
 
     return {
       // état
-      budgetMonth,budgetSection,budgetCategories,budgetCategoryName,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
+      budgetMonth,budgetSection,budgetCategories,budgetCategoryName,reorderDrag,startReorder,dropReorder,cashForm,cashBalance,cashIncome,cashExpenses,addCashEntry,removeCashEntry,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
       usualDragged,usualNewItem,addUsualList,removeUsualList,addUsualHeading,addUsualItem,toggleUsualItem,resetUsualList,deleteUsualItem,startUsualDrag,dropUsualItem,
       addTicketType,deleteTicketType,safeTicketUrl,
       ticketSort,ticketDragged,ticketDragStart,ticketDrop,ticketDraft,ticketInputs,collapsedTickets,isTicketCollapsed,toggleTicketCollapse,renameTicket,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
