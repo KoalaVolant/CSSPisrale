@@ -269,3 +269,14 @@
 
 /* V21 - Budget (styles fonctionnels, stylekoala.css intact) */
 .view-budget{max-width:1100px}.budget-toolbar,.budget-tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}.budget-toolbar button,.budget-tabs button,.budget-form button,.budget-item button{padding:7px 12px;border:1px solid #aaa;border-radius:8px;cursor:pointer}.budget-tabs .active{font-weight:bold;background:var(--fnd2,#accac4)}.budget-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:15px 0}.budget-summary article{padding:15px;border:1px solid #ccc;border-radius:10px}.budget-summary small,.budget-summary strong,.budget-item small{display:block}.budget-summary strong{font-size:1.4rem}.budget-form{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:14px 0}.budget-form label{display:flex;flex-direction:column;gap:4px;min-width:160px;flex:1}.budget-form input,.budget-form select,.budget-item input[type=number]{box-sizing:border-box;padding:8px;max-width:100%;border:1px solid #bbb;border-radius:6px}.budget-item{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid #ddd;padding:10px 0}.budget-item>div{flex:1;min-width:180px}.budget-item small{font-size:.78rem;opacity:.75}.budget-category{display:grid;grid-template-columns:minmax(100px,1fr) auto;gap:4px 10px;margin:8px 0}.budget-category progress{grid-column:1/-1;width:100%}
+
+/* V22 : outils et panneaux catégories budget */
+.budget-summary-main article{background:var(--fnd,#f5f5f5);border-left:4px solid var(--fnd3,#88a7a1)}
+.budget-summary-main strong{font-size:clamp(1.4rem,2vw,2rem)}
+.budget-category-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.budget-category-head button,.budget-manager-line button,.budget-category-toggle{cursor:pointer;padding:8px;border:1px solid #bbb;border-radius:7px;background:var(--fnd,#f8f8f8)}
+.budget-manager-line{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #ddd}.budget-manager-line span{flex:1}
+.budget-category-fold{border:1px solid #ddd;padding:10px;border-radius:9px;margin:8px 0}
+.budget-category-toggle{width:100%;display:flex;justify-content:space-between;gap:12px;text-align:left;font-weight:600}
+.budget-category-fold>progress{width:100%;height:8px;margin-top:6px}
+.budget-category-details{padding:8px 4px}.budget-category-detail{display:flex;justify-content:space-between;gap:14px;padding:5px 0;border-bottom:1px solid #eee}
