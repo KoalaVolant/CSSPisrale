@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261026-v19">
+  <link rel="stylesheet" href="style.css?v=20261027-v21">
   <link rel="stylesheet" href="stylekoala.css?v=20261022-v18">
 </head>
 <body>
@@ -1102,6 +1102,33 @@
         <button type="button" @click="createFromActivity(a)">Créer une tâche</button><button type="button" @click="openActivityForm(a)">Modifier</button><button type="button" @click="deleteActivity(a)">Supprimer</button></article>
     </section>
 
+    <!-- ============ BUDGET ============ -->
+    <section class="view view-budget" v-if="view === 'budget'">
+      <div class="budget-toolbar"><button type="button" @click="changeBudgetMonth(-1)" aria-label="Mois précédent">◀</button><strong>{{ budgetMonth }}</strong><button type="button" @click="changeBudgetMonth(1)" aria-label="Mois suivant">▶</button></div>
+      <div class="budget-tabs"><button type="button" v-for="tab in [{id:'month',title:'Vue mensuelle'},{id:'recurring',title:'Charges récurrentes'},{id:'swile',title:'Swile'}]" :key="tab.id" :class="{active:budgetSection===tab.id}" @click="budgetSection=tab.id">{{ tab.title }}</button></div>
+      <template v-if="budgetSection==='month'">
+        <div class="budget-summary"><article><small>Revenus</small><strong>{{ money(budgetSummary.income) }}</strong></article><article><small>Dépenses</small><strong>{{ money(budgetSummary.expenses) }}</strong></article><article><small>Solde du mois</small><strong>{{ money(budgetSummary.balance) }}</strong></article></div>
+        <h3>Ajouter une opération</h3>
+        <form class="budget-form" @submit.prevent="addBudgetEntry"><label>Date <input type="date" v-model="budgetEntryForm.date" required></label><label>Libellé <input v-model="budgetEntryForm.label" required placeholder="Salaire, courses…"></label><label>Montant (+ revenu / − dépense) <input type="number" step="0.01" v-model.number="budgetEntryForm.amount" required></label><label>Catégorie <select v-model="budgetEntryForm.category"><option v-for="c in budgetCategories" :key="c">{{c}}</option></select></label><button type="submit">Ajouter</button></form>
+        <h3>Dépenses par catégorie</h3><div class="budget-categories"><div v-for="g in budgetSummary.groups" :key="g.category" class="budget-category"><span>{{g.category}}</span><strong>{{money(g.amount)}}</strong><progress :value="g.amount" :max="Math.max(1,budgetSummary.expenses)"></progress></div></div>
+        <h3>Opérations et charges du mois</h3><p class="hint">Les charges récurrentes du mois sont automatiquement comptées, même sans confirmation. Les achats Swile du mois précédent sont ajoutés à 50 %.</p>
+        <div class="budget-item" v-for="item in budgetItems" :key="item.id"><div><strong>{{item.label}}</strong><small>{{item.category}} · {{item.kind==='recurring'?'Charge récurrente':item.kind==='swile'?'Swile du mois précédent':item.date}}</small></div><strong>{{money(item.amount)}}</strong><button v-if="item.kind==='manual'" type="button" @click="removeBudgetEntry(item.id)">Supprimer</button></div>
+        <p v-if="!budgetItems.length">Aucune opération pour ce mois.</p>
+      </template>
+      <template v-else-if="budgetSection==='recurring'">
+        <h3>Créer une charge mensuelle</h3><p class="hint">Saisis une dépense négative, par exemple −75 pour un paiement en quatre fois. Une date de fin est facultative. Chaque charge est comptée dès le 1er jour du mois concerné.</p>
+        <form class="budget-form" @submit.prevent="addBudgetRecurring"><label>Libellé <input v-model="budgetRecurringForm.label" required></label><label>Montant mensuel <input type="number" step="0.01" v-model.number="budgetRecurringForm.amount" required></label><label>Catégorie <select v-model="budgetRecurringForm.category"><option v-for="c in budgetCategories" :key="c">{{c}}</option></select></label><label>Premier mois <input type="month" v-model="budgetRecurringForm.start" required></label><label>Dernier mois (facultatif) <input type="month" v-model="budgetRecurringForm.end"></label><button type="submit">Créer</button></form>
+        <h3>Charges actives en {{budgetMonth}}</h3><div class="budget-item" v-for="rec in recurringForMonth" :key="rec.id"><div><strong>{{rec.label}}</strong><small>{{rec.category}} · {{rec.start}} → {{rec.end||'sans fin'}}</small></div><label>Montant de ce mois <input type="number" step="0.01" :value="rec.amount" @change="overrideRecurring(rec,$event)"></label><button type="button" @click="resetRecurringOverride(rec)">Montant initial</button></div><p v-if="!recurringForMonth.length">Aucune charge active pour ce mois.</p>
+        <h3>Toutes les charges</h3><div class="budget-item" v-for="rec in data.budgetRecurring" :key="rec.id"><div><strong>{{rec.label}}</strong><small>{{money(rec.amount)}} / mois · {{rec.start}} → {{rec.end||'sans fin'}}</small></div><label><input type="checkbox" v-model="rec.active"> Activée</label><button type="button" @click="removeBudgetRecurring(rec.id)">Supprimer</button></div>
+      </template>
+      <template v-else>
+        <h3>Achats Swile du mois</h3><p class="hint">Chaque achat Swile est enregistré au mois de l'achat. Seulement 50 % de son montant sera débité du budget du <strong>mois suivant</strong>.</p>
+        <div class="budget-summary"><article><small>Achats du mois</small><strong>{{money(budgetSummary.swileTotal)}}</strong></article><article><small>Part qui comptera le mois prochain</small><strong>{{money(budgetSummary.swileTotal/2)}}</strong></article></div>
+        <form class="budget-form" @submit.prevent="addBudgetSwile"><label>Date <input type="date" v-model="budgetSwileForm.date" required></label><label>Libellé <input v-model="budgetSwileForm.label" required></label><label>Montant de l'achat <input type="number" step="0.01" min="0.01" v-model.number="budgetSwileForm.amount" required></label><label>Catégorie <select v-model="budgetSwileForm.category"><option v-for="c in budgetCategories" :key="c">{{c}}</option></select></label><button type="submit">Ajouter l'achat</button></form>
+        <div class="budget-item" v-for="item in budgetSwileSource" :key="item.id"><div><strong>{{item.label}}</strong><small>{{item.date}} · {{item.category}}</small></div><strong>{{money(item.amount)}} → {{money(item.amount/2)}} le mois suivant</strong><button type="button" @click="removeBudgetSwile(item.id)">Supprimer</button></div><p v-if="!budgetSwileSource.length">Aucun achat Swile enregistré ce mois.</p>
+      </template>
+    </section>
+
     <!-- ============ SAUVEGARDE ============ -->
     <section class="view view-data" v-if="view === 'data'">
       <p v-if="user">Tes données sont synchronisées dans ton cloud Firebase ({{ user.email }}) et copiées sur cet appareil.</p>
@@ -1250,7 +1277,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261026-v19"></script>
+<script src="app.js?v=20261027-v21"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
