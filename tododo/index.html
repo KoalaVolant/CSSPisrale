@@ -452,10 +452,14 @@
     </section>
 
     <section class="view view-evening" v-if="view === 'evening'">
-      <p>Liste libre pour ce soir, enregistrée automatiquement et synchronisée avec les autres données.</p>
-      <div class="evening-actions"><button type="button" @click="eveningPreview=!eveningPreview">{{ eveningPreview ? "Modifier" : "Aperçu Markdown" }}</button></div>
-      <textarea v-if="!eveningPreview" class="evening-notes" v-model="data.eveningNotes" rows="14" placeholder="# Mon soir&#10;- [ ] Première chose&#10;- [x] Déjà faite&#10;**Important**"></textarea>
-      <div v-else class="evening-markdown" v-html="renderEveningMarkdown(data.eveningNotes)"></div>
+      <p>Crée plusieurs notes Markdown indépendantes, avec un titre et une sauvegarde automatique.</p>
+      <div class="evening-actions"><button type="button" @click="addTextarea">＋ Nouvelle textarea</button><button type="button" @click="eveningPreview=!eveningPreview">{{ eveningPreview ? 'Mode édition' : 'Aperçu Markdown' }}</button></div>
+      <p v-if="!data.textareas.length" class="hint">Aucune note pour le moment.</p>
+      <article v-for="note in data.textareas" :key="note.id" class="textarea-card">
+        <div class="textarea-card-head"><input v-model="note.title" aria-label="Titre de la textarea" placeholder="Titre de la note"><button type="button" @click="removeTextarea(note)">Supprimer</button></div>
+        <textarea v-if="!eveningPreview" class="evening-notes" v-model="note.content" rows="9" placeholder="# Titre&#10;- [ ] À faire&#10;**Important**"></textarea>
+        <div v-else class="evening-markdown" v-html="renderEveningMarkdown(note.content)"></div>
+      </article>
     </section>
     <section class="view view-usual-lists" v-if="view === 'usual-lists'">
       <div class="usual-lists-head"><p>Listes réutilisables sans points. Les cases restent cochées jusqu'à leur réinitialisation.</p><button type="button" @click="addUsualList">＋ Nouvelle liste</button></div>
@@ -484,6 +488,7 @@
     <section class="view view-work" v-if="view === 'work'">
       <div class="work-mode-actions" aria-label="Actions Travail">
         <button type="button" class="work-create-task" @click="openTaskForm()">＋ Nouvelle tâche indépendante</button>
+        <button type="button" @click="openWorkQuickPaste">＋ Coller une liste de tâches</button>
         <a class="work-create-ticket" href="#work-ticket-create">＋ Nouveau ticket ↓</a>
         <span class="work-release">Travail v16 · Tickets et tâches séparés</span>
       </div>
@@ -685,7 +690,17 @@
       </div>
       <h3>Répartition personnel et travail</h3>
       <div class="stats-cards"><article v-for="scope in ['personal','work']" :key="scope"><strong>{{ scope==='personal'?'Personnel':'Travail' }}</strong><p>{{ doneStats[scope].count }} tâches · {{ doneStats[scope].total }} pts · moyenne {{ doneStats[scope].average }} pts</p></article></div>
-      <h3>Points gagnés par jour</h3>
+      <h3>Activité des 14 derniers jours</h3>
+      <div class="statistics-graph"><div class="statistics-bars">
+        <div v-for="d in statistics.trend" :key="d.date" class="statistics-column" :title="formatDate(d.date)+' : '+d.points+' pts, '+d.count+' tâches'">
+          <strong>{{ d.points }}</strong><div class="statistics-bar-track"><div class="statistics-bar" :class="{'negative':d.points<0}" :style="{height:(Math.abs(d.points)/statistics.trendMax*100)+'%'}"></div></div><small>{{ d.date.slice(8) }}/{{ d.date.slice(5,7) }}</small>
+        </div>
+      </div></div>
+      <h3>Répartition des statuts</h3>
+      <div class="statistics-distribution"><div v-for="s in statistics.byStatus" :key="s.name" class="statistics-distribution-row"><span>{{ s.name }} ({{ s.count }})</span><div class="statistics-progress"><div :style="{width:(s.count/statistics.statusTotal*100)+'%'}"></div></div></div></div>
+      <h3>Catégories les plus utilisées</h3>
+      <div class="statistics-distribution"><div v-for="c in statistics.categories.slice(0,10)" :key="c[0]" class="statistics-distribution-row"><span>{{ c[0] }} ({{ c[1] }})</span><div class="statistics-progress"><div :style="{width:(c[1]/statistics.categoryMax*100)+'%'}"></div></div></div></div>
+      <h3>Points gagnés par jour (historique détaillé)</h3>
       <p v-if="statistics.mostProductive">Meilleure journée enregistrée : {{ formatDate(statistics.mostProductive.date) }} ({{ statistics.mostProductive.points }} pts).</p>
       <div class="stats-day" v-for="day in statistics.days" :key="day.date"><span>{{ formatDate(day.date) }} · {{ day.count }} tâches</span><strong>{{ day.points }} pts</strong></div>
       <h3>Statuts des tâches</h3><div class="stats-day" v-for="s in statistics.byStatus" :key="s.name"><span>{{ s.name }}</span><strong>{{ s.count }}</strong></div>

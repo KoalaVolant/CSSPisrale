@@ -246,3 +246,23 @@
 .random-reward-save {margin:.5rem;padding:.5rem .8rem;cursor:pointer;}
 
 .usual-heading-input {font-weight:700;font-size:1.05em;flex:1;}
+
+/* V20 : textareas & statistiques. Stylekoala reste intact. */
+.textarea-card{border:1px solid #ccc;border-radius:12px;padding:12px;margin:12px 0}
+.textarea-card-head{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.textarea-card-head input{flex:1;min-width:0;font-size:1.1rem;font-weight:600;padding:8px}
+.textarea-card-head button,.evening-actions button{padding:8px 12px;cursor:pointer}
+.textarea-card .evening-notes{width:100%;box-sizing:border-box;min-height:160px}
+.statistics-graph{overflow-x:auto;border:1px solid #ddd;border-radius:12px;padding:14px;margin-bottom:18px}
+.statistics-bars{display:flex;align-items:flex-end;gap:8px;min-width:560px;height:210px}
+.statistics-column{flex:1;min-width:28px;height:100%;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px}
+.statistics-column strong{font-size:11px;font-weight:600}
+.statistics-bar-track{flex:1;width:100%;display:flex;align-items:flex-end;background:#eee;border-radius:4px;overflow:hidden}
+.statistics-bar{width:100%;background:#688d85;min-height:0}
+.statistics-bar.negative{background:#c55858}
+.statistics-column small{white-space:nowrap;font-size:10px}
+.statistics-distribution{display:grid;gap:12px;margin:12px 0 20px}
+.statistics-distribution-row{display:grid;grid-template-columns:minmax(130px,230px) 1fr;gap:10px;align-items:center;font-size:13px}
+.statistics-progress{height:16px;background:#e6e6e6;border-radius:8px;overflow:hidden}
+.statistics-progress div{height:100%;background:#88a7a1;border-radius:8px}
+@media(max-width:600px){.statistics-distribution-row{grid-template-columns:1fr;gap:3px}}

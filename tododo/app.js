@@ -35,7 +35,7 @@ const TABS = [
   { id: 'work',       label: 'Travail' },
   { id: 'usual-lists', label: 'Listes de tâches habituelles' },
   { id: 'gratitude',  label: 'Gratitude' },
-  { id: 'evening', label: 'To do du soir' },
+  { id: 'evening', label: 'Textareas' },
   { id: 'habits',     label: 'Habitudes & routines' },
   { id: 'challenges', label: 'Défis' },
   { id: 'statistics', label: 'Statistiques' },
@@ -196,7 +196,8 @@ function migrateGratitudePoints(records) {
 
 function defaultData() {
   return {
-    eveningNotes: '', // liste textuelle du soir
+    eveningNotes: '', // ancien champ conservé pour migration
+    textareas: [], // blocs Markdown nommés
     usualLists: [], // listes de suivi sans points
     workTicketTypes: [], // types avec bonus de points
     workTickets: [],  // tickets avec sous-tâches et historique
@@ -242,6 +243,8 @@ function loadData() {
     if (!Array.isArray(d.workTicketTypes)) d.workTicketTypes = [];
     if (!Array.isArray(d.usualLists)) d.usualLists = [];
     d.eveningNotes = typeof d.eveningNotes === 'string' ? d.eveningNotes : '';
+    if (!Array.isArray(d.textareas)) d.textareas = [];
+    if (d.eveningNotes.trim()) { if (!d.textareas.length) d.textareas.push({id:uid(),title:'To do du soir',content:d.eveningNotes}); d.eveningNotes=''; }
      d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
     if (!Array.isArray(d.challenges)) d.challenges = [];
     if (!Array.isArray(d.challengeAwards)) d.challengeAwards = [];
@@ -451,6 +454,8 @@ const app = createApp({
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
+      data.textareas = Array.isArray(src.textareas) ? src.textareas : [];
+      if (data.eveningNotes.trim()) { if (!data.textareas.length) data.textareas.push({id:uid(),title:'To do du soir',content:data.eveningNotes}); data.eveningNotes=''; }
       data.usualLists = Array.isArray(src.usualLists) ? src.usualLists : [];
       data.workTicketTypes = Array.isArray(src.workTicketTypes) ? src.workTicketTypes : [];
       data.workTickets = Array.isArray(src.workTickets) ? src.workTickets : [];
@@ -653,12 +658,13 @@ const app = createApp({
     function depositRandomReward() {
       const eligible=data.rewards.filter(r=>rewardRemaining(r)>0);
       if (!eligible.length || balance.value<=0) {notify('Aucune récompense à financer ou aucun point disponible');return;}
-      depositReward(eligible[Math.floor(Math.random()*eligible.length)]);
+      const reward=eligible[Math.floor(Math.random()*eligible.length)];
+      depositReward(reward, true);
     }
-    function depositReward(reward) {
+    function depositReward(reward, random=false) {
       const max = Math.min(balance.value, rewardRemaining(reward));
       if (max <= 0) { notify('Aucun point disponible à épargner'); return; }
-      const response = prompt('Points à épargner pour « '+reward.name+' » (max '+max+') :', String(Math.min(5,max)));
+      const response = prompt(random ? ('Combien de points épargner sur une récompense surprise ? (max '+max+')') : ('Points à épargner pour « '+reward.name+' » (max '+max+') :'), String(Math.min(5,max)));
       if (response === null) return;
       const amount = Number(response.replace(',','.'));
       if (!Number.isFinite(amount) || amount <= 0 || amount > max || Math.round(amount*100)!==amount*100) { alert('Montant invalide ou supérieur au solde disponible.'); return; }
@@ -944,6 +950,8 @@ const app = createApp({
     function ticketPoints(ticket){return (ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0);}
 
     const eveningPreview = ref(false);
+    function addTextarea(){data.textareas.push({id:uid(),title:'Nouvelle note',content:''});}
+    function removeTextarea(note){if(confirm('Supprimer « '+(note.title||'Sans titre')+' » ?'))data.textareas=data.textareas.filter(x=>x.id!==note.id);}
     function renderEveningMarkdown(source) {
       const escape = text => String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
       const inline = text => escape(text).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>');
@@ -1016,7 +1024,12 @@ const app = createApp({
       const total=tickets.reduce((s,t)=>s+(t.items||[]).length,0);
       const ticketDone=tickets.reduce((s,t)=>s+(t.items||[]).filter(x=>x.done).length,0);
       const categories=Object.entries(tasks.reduce((acc,t)=>{const k=t.scope==='work'?'Travail':t.category||'Sans catégorie';acc[k]=(acc[k]||0)+1;return acc;},{})).sort((a,b)=>b[1]-a[1]);
-      return {tasks:tasks.length,active:active.length,completed:done.length,overdue:active.filter(t=>t.due&&t.due<today.value).length,completionRate:tasks.length?Math.round(tasks.filter(t=>t.status==='done').length/tasks.length*100):0,points:Math.round(sum*100)/100,average:done.length?Math.round(sum/done.length*100)/100:0,todayPoints:todayDone.reduce((s,x)=>s+x.points,0),todayCount:todayDone.length,days:series,mostProductive:series.reduce((best,d)=>!best||d.points>best.points?d:best,null),tickets:tickets.length,ticketsOpen:tickets.filter(t=>!t.done).length,ticketsClosed:tickets.filter(t=>t.done).length,ticketItems:total,ticketItemsDone:ticketDone,projects:data.projects.length,habits:data.habits.length,challenges:data.challenges.length,rewards:data.rewards.length,inventory:data.inventory.length,gratitude:data.gratitude.length,spent:data.spent,saved:savedTotal.value,categories,byStatus:STATUSES.map(s=>({name:s.label,count:tasks.filter(t=>t.status===s.value).length}))};
+      const trendDates=Array.from({length:14},(_,i)=>{const d=new Date(today.value+'T12:00:00');d.setDate(d.getDate()-(13-i));return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;});
+      const trend=trendDates.map(date=>({date,points:Math.round((perDay[date]||0)*100)/100,count:done.filter(x=>x.date===date).length}));
+      const trendMax=Math.max(1,...trend.map(x=>Math.abs(x.points)));
+      const statusTotal=Math.max(1,tasks.length);
+      const categoryMax=Math.max(1,...categories.map(x=>x[1]));
+      return {trend,trendMax,statusTotal,categoryMax,tasks:tasks.length,active:active.length,completed:done.length,overdue:active.filter(t=>t.due&&t.due<today.value).length,completionRate:tasks.length?Math.round(tasks.filter(t=>t.status==='done').length/tasks.length*100):0,points:Math.round(sum*100)/100,average:done.length?Math.round(sum/done.length*100)/100:0,todayPoints:todayDone.reduce((s,x)=>s+x.points,0),todayCount:todayDone.length,days:series,mostProductive:series.reduce((best,d)=>!best||d.points>best.points?d:best,null),tickets:tickets.length,ticketsOpen:tickets.filter(t=>!t.done).length,ticketsClosed:tickets.filter(t=>t.done).length,ticketItems:total,ticketItemsDone:ticketDone,projects:data.projects.length,habits:data.habits.length,challenges:data.challenges.length,rewards:data.rewards.length,inventory:data.inventory.length,gratitude:data.gratitude.length,spent:data.spent,saved:savedTotal.value,categories,byStatus:STATUSES.map(s=>({name:s.label,count:tasks.filter(t=>t.status===s.value).length}))};
     });
 
     /* ---------- Tâches ---------- */
@@ -1055,6 +1068,7 @@ const app = createApp({
       else openTaskForm();
     }
 
+    function openWorkQuickPaste(){openQuickForm();quickForm.mode='paste';}
     function toggleQuickForm() {
       if (quickForm.open) quickForm.open = false;
       else openQuickForm();
@@ -2037,7 +2051,7 @@ const app = createApp({
       habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
       activityForm, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
-      formatDate, eveningPreview, renderEveningMarkdown,
+      formatDate, eveningPreview, renderEveningMarkdown, addTextarea, removeTextarea, openWorkQuickPaste,
     };
   },
 });
