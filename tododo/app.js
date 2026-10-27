@@ -255,6 +255,7 @@ function loadData() {
     if (!Array.isArray(d.budgetRecurring)) d.budgetRecurring = [];
     if (!d.budgetOverrides || typeof d.budgetOverrides !== 'object' || Array.isArray(d.budgetOverrides)) d.budgetOverrides = {};
     if (!Array.isArray(d.budgetSwile)) d.budgetSwile = [];
+    d.budgetSwile = d.budgetSwile.map(x => ({...x, amount: -Math.abs(Number(x.amount) || 0)}));
     if (!Array.isArray(d.textareas)) d.textareas = [];
     if (d.eveningNotes.trim()) { if (!d.textareas.length) d.textareas.push({id:uid(),title:'To do du soir',content:d.eveningNotes}); d.eveningNotes=''; }
      d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
@@ -470,7 +471,7 @@ const app = createApp({
       data.budgetEntries = Array.isArray(src.budgetEntries) ? src.budgetEntries : [];
       data.budgetRecurring = Array.isArray(src.budgetRecurring) ? src.budgetRecurring : [];
       data.budgetOverrides = src.budgetOverrides && typeof src.budgetOverrides === 'object' && !Array.isArray(src.budgetOverrides) ? src.budgetOverrides : {};
-      data.budgetSwile = Array.isArray(src.budgetSwile) ? src.budgetSwile : [];
+      data.budgetSwile = Array.isArray(src.budgetSwile) ? src.budgetSwile.map(x => ({...x, amount: -Math.abs(Number(x.amount) || 0)})) : [];
       data.textareas = Array.isArray(src.textareas) ? src.textareas : [];
       if (data.eveningNotes.trim()) { if (!data.textareas.length) data.textareas.push({id:uid(),title:'To do du soir',content:data.eveningNotes}); data.eveningNotes=''; }
       data.usualLists = Array.isArray(src.usualLists) ? src.usualLists : [];
@@ -515,8 +516,6 @@ const app = createApp({
     const budgetSection = ref('month');
     const budgetCategories = computed(()=>data.budgetCategories);
     const budgetCategoryName = ref('');
-    const budgetExpandedCategories = ref([]);
-    const budgetAllExpanded = ref(false);
     function addBudgetCategory(){
       const name=budgetCategoryName.value.trim();
       if(!name||name==='Charge récurrente'||data.budgetCategories.some(c=>c.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr')))return;
@@ -528,7 +527,6 @@ const app = createApp({
       const i=data.budgetCategories.indexOf(oldName);if(i<0)return;
       data.budgetCategories[i]=name;
       for(const collection of [data.budgetEntries,data.budgetRecurring,data.budgetSwile]) collection.forEach(x=>{if(x.category===oldName)x.category=name;});
-      budgetExpandedCategories.value=budgetExpandedCategories.value.map(x=>x===oldName?name:x);
       for(const form of [budgetEntryForm,budgetRecurringForm,budgetSwileForm])if(form.category===oldName)form.category=name;
     }
     function deleteBudgetCategory(name){
@@ -539,10 +537,13 @@ const app = createApp({
       data.budgetCategories=data.budgetCategories.filter(x=>x!==name);
       for(const form of [budgetEntryForm,budgetRecurringForm,budgetSwileForm])if(form.category===name)form.category=data.budgetCategories[0];
     }
-    function toggleBudgetCategory(name){budgetExpandedCategories.value=budgetExpandedCategories.value.includes(name)?budgetExpandedCategories.value.filter(x=>x!==name):[...budgetExpandedCategories.value,name];}
-    function toggleAllBudgetCategories(){
-      budgetAllExpanded.value=!budgetAllExpanded.value;
-      budgetExpandedCategories.value=budgetAllExpanded.value?budgetSummary.value.groups.map(g=>g.category):[];
+    function moveBudgetCategory(name, delta){
+      const index=data.budgetCategories.indexOf(name);
+      const next=index+delta;
+      if(index<0||next<0||next>=data.budgetCategories.length)return;
+      const categories=[...data.budgetCategories];
+      [categories[index],categories[next]]=[categories[next],categories[index]];
+      data.budgetCategories=categories;
     }
     const budgetEntryForm = reactive({date:todayStr(),label:'',amount:null,category:'Autres'});
     const budgetRecurringForm = reactive({label:'',amount:null,category:'Abonnements',start:todayStr().slice(0,7),end:''});
@@ -572,7 +573,7 @@ const app = createApp({
     }
     function addBudgetSwile(){
       const n=Number(budgetSwileForm.amount);
-      if(!budgetSwileForm.label.trim()||budgetSwileForm.amount===null||budgetSwileForm.amount===''||!Number.isFinite(n)||n<=0)return;
+      if(!budgetSwileForm.label.trim()||budgetSwileForm.amount===null||budgetSwileForm.amount===''||!Number.isFinite(n)||n>=0)return;
       data.budgetSwile.push({id:uid(),date:budgetSwileForm.date||todayStr(),label:budgetSwileForm.label.trim(),amount:n,category:budgetSwileForm.category});
       budgetSwileForm.label='';budgetSwileForm.amount=null;
     }
@@ -586,6 +587,17 @@ const app = createApp({
       ...recurringForMonth.value.map(x=>({...x,id:'rec-'+x.monthlyKey,date:budgetMonth.value+'-01',category:'Charge récurrente',kind:'recurring'})),
       ...budgetSwileNext.value.map(x=>({...x,id:'swile-'+x.id,amount:-Math.abs(Number(x.amount)||0)/2,label:'Swile (50 %) : '+x.label,kind:'swile'}))
     ]);
+    // Affichage en liste simple, sans regroupement par catégorie.
+    // Les charges automatiques sont agrégées en une seule ligne datée au début du mois.
+    // Les opérations manuelles conservent strictement leur ordre de création.
+    const budgetDisplayItems=computed(()=>{
+      const recurring=recurringForMonth.value;
+      const recurringTotal=recurring.reduce((sum,r)=>sum+(Number(r.amount)||0),0);
+      const automatic=recurring.length ? [{id:'recurring-total-'+budgetMonth.value,kind:'recurring-total',label:'Charges récurrentes',category:'Charge récurrente',date:budgetMonth.value+'-01',amount:recurringTotal}] : [];
+      const manual=data.budgetEntries.filter(x=>x.date?.slice(0,7)===budgetMonth.value).map(x=>({...x,kind:'manual'}));
+      const swile=budgetSwileNext.value.map(x=>({...x,id:'swile-'+x.id,amount:-Math.abs(Number(x.amount)||0)/2,label:'Swile (50 %) : '+x.label,kind:'swile'}));
+      return [...automatic,...manual,...swile];
+    });
     const budgetSummary=computed(()=>{
       const items=budgetItems.value;
       const income=items.reduce((v,x)=>v+Math.max(0,Number(x.amount)||0),0);
@@ -593,7 +605,7 @@ const app = createApp({
       const names=[...new Set([...budgetCategories.value,'Charge récurrente',...items.map(x=>x.category)])];
       const groups=names.map(category=>({category,amount:items.filter(x=>x.category===category).reduce((v,x)=>v+Math.max(0,-(Number(x.amount)||0)),0),items:items.filter(x=>x.category===category)}));
       const categoryTotal=name=>items.filter(x=>x.category?.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr')).reduce((v,x)=>v+Math.max(0,-(Number(x.amount)||0)),0);
-      return {income,expenses,balance:income-expenses,groups,food:categoryTotal('Alimentation'),fuel:categoryTotal('Essence'),leisure:categoryTotal('Loisirs'),swileTotal:budgetSwileSource.value.reduce((v,x)=>v+(Number(x.amount)||0),0)};
+      return {income,expenses,balance:income-expenses,groups,food:categoryTotal('Alimentation'),fuel:categoryTotal('Essence'),leisure:categoryTotal('Loisirs'),swileTotal:budgetSwileSource.value.reduce((v,x)=>v-Math.abs(Number(x.amount)||0),0)};
     });
 
     /* ---------- Préférences d'affichage (mémorisées) ---------- */
@@ -2119,7 +2131,7 @@ const app = createApp({
 
     return {
       // état
-      budgetMonth,budgetSection,budgetCategories,budgetCategoryName,budgetExpandedCategories,budgetAllExpanded,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,toggleBudgetCategory,toggleAllBudgetCategories,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
+      budgetMonth,budgetSection,budgetCategories,budgetCategoryName,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
       usualDragged,usualNewItem,addUsualList,removeUsualList,addUsualHeading,addUsualItem,toggleUsualItem,resetUsualList,deleteUsualItem,startUsualDrag,dropUsualItem,
       addTicketType,deleteTicketType,safeTicketUrl,
       ticketSort,ticketDragged,ticketDragStart,ticketDrop,ticketDraft,ticketInputs,collapsedTickets,isTicketCollapsed,toggleTicketCollapse,renameTicket,updateTicketItemPoints,openTickets,closedTickets,createTicket,addTicketItem,toggleTicketItem,finishTicket,reopenTicket,removeTicket,removeTicketItem,ticketPoints,ticketItemValue,doneStats,statistics,
