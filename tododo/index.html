@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="todoquest.css?v=20261029-v33">
+  <link rel="stylesheet" href="todoquest.css?v=20261029-responsive1">
 </head>
 <body>
 
@@ -12,6 +12,7 @@
 
   <!-- ============ BARRE DU HAUT : titre + synchro | points ============ -->
   <header class="app-header">
+    <button class="mobile-nav-toggle" type="button" aria-label="Ouvrir le menu" aria-controls="tq-sidebar" aria-expanded="false">☰</button>
 
     <div class="app-brand">
       <h1 class="app-title">Todo Quest</h1>
@@ -47,7 +48,9 @@
   <div class="layout">
 
     <!-- ============ MENU DE GAUCHE ============ -->
-    <aside class="sidebar">
+    <div class="nav-backdrop" aria-hidden="true"></div>
+    <aside class="sidebar" id="tq-sidebar">
+      <button class="mobile-nav-close" type="button" aria-label="Fermer le menu">×</button>
       <nav class="app-nav" aria-label="Navigation principale">
         <div class="nav-group" v-for="group in navGroups" :key="group.title">
           <h3 class="nav-group-title">{{ group.title }}</h3>
@@ -1381,6 +1384,32 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="app.js?v=20261029-v31"></script>
+<script>
+  // Navigation mobile découplée de Vue : aucune modification des données ni de la synchro.
+  (function () {
+    const openBtn = document.querySelector('.mobile-nav-toggle');
+    const closeBtn = document.querySelector('.mobile-nav-close');
+    const backdrop = document.querySelector('.nav-backdrop');
+    const sidebar = document.querySelector('.sidebar');
+    const setOpen = (value) => {
+      document.body.classList.toggle('nav-open', value);
+      openBtn.setAttribute('aria-expanded', String(value));
+      if (!value) openBtn.focus({preventScroll:true});
+    };
+    openBtn.addEventListener('click', () => setOpen(!document.body.classList.contains('nav-open')));
+    closeBtn.addEventListener('click', () => setOpen(false));
+    backdrop.addEventListener('click', () => setOpen(false));
+    sidebar.addEventListener('click', event => {
+      if (event.target.closest('.app-nav button')) setOpen(false);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && document.body.classList.contains('nav-open')) setOpen(false);
+    });
+    window.matchMedia('(min-width: 761px)').addEventListener('change', e => {
+      if (e.matches && document.body.classList.contains('nav-open')) setOpen(false);
+    });
+  })();
+</script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
