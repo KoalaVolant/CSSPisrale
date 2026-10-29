@@ -292,3 +292,76 @@
 /* V26 : poignées de réorganisation et registre espèces */
 .sortable-row .drag-handle{cursor:grab;flex:0 0 auto;user-select:none;font-size:1.25rem;padding:4px 8px;touch-action:none}
 .sortable-row .drag-handle:active{cursor:grabbing}
+
+/* V22 : groupes habitudes, planning repas, projets et validation directe */
+.home-habits{display:grid;gap:12px;margin:12px 0}
+.home-habit-group{border:1px solid var(--main-color,#ddd);border-radius:12px;overflow:hidden}
+.habit-group-toggle{display:block;width:100%;text-align:left;padding:12px;font-weight:700;background:var(--fnd2,#ddd);border:0;cursor:pointer}
+.home-habit-group .habit-dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin:0;border:0}
+.home-habit-group .habit-entry{min-width:0;display:flex;flex-wrap:wrap}
+.weekly-menu{border:1px solid var(--main-color,#ddd);border-radius:14px;padding:14px;margin:16px 0;background:var(--fnd,#fafafa)}
+.menu-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.menu-heading button,.meal-checks button{padding:6px 9px;border:1px solid #bbb;border-radius:7px;background:#fff;cursor:pointer}
+.menu-conditions{margin:10px 0}.menu-conditions textarea{display:block;width:100%;box-sizing:border-box;margin-top:8px}
+.menu-days{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,minmax(0,auto));grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.menu-day{min-width:0;border:1px solid #d2d2d2;border-radius:10px;background:#fff;padding:10px}
+.menu-day h3{margin:0 0 9px;font-size:14px}.menu-day h3 small{display:block;font-weight:400}
+.menu-meal{border:1px dashed #ccc;border-radius:8px;padding:7px;margin:7px 0;min-width:0}
+.meal-header{display:flex;justify-content:space-between;align-items:center}.meal-header .drag-handle{padding:3px 10px;cursor:grab}
+.menu-meal input{width:100%;box-sizing:border-box;padding:6px;margin:4px 0;border:1px solid #ddd;border-radius:6px}
+.meal-checks{display:flex;gap:5px;flex-wrap:wrap}.meal-checks button{font-size:11px}.meal-done{border-color:#30844c;background:#eef9ef}.meal-missed{border-color:#b54a4a;background:#fff1f1}
+.meal-done button:first-child,.meal-missed button:last-child{background:var(--fnd2,#accac4);font-weight:700}
+.project-groups{width:100%;display:flex;flex-wrap:wrap}.project-group-title{width:100%;margin:15px 0 6px}
+.task-finish-button{background:#e0f3e4;border:1px solid #72ac80;color:#175629;border-radius:8px;padding:5px 10px;font-weight:700}
+@media(max-width:1100px){.menu-days{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,auto))}}
+@media(max-width:620px){.menu-days{grid-auto-flow:row;grid-template-columns:1fr;grid-template-rows:none}}
+
+/* V23 : modules repas / courses / jalons / corbeille. stylekoala.css inchangé. */
+.today-meals,.priority-box,.week-summary,.catalogue,.view-shopping,.view-trash{padding:12px;margin:12px 0;border:1px solid #ccc;border-radius:10px}
+.subtabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.subtabs button{padding:9px 15px;border-radius:8px;border:1px solid #bbb}.subtabs .active{font-weight:700;background:var(--fnd2,#cbdcd8)}
+.catalogue-form{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;margin:12px 0}.catalogue-form>input{flex:1;min-width:180px}.catalogue-scroll{width:100%;max-height:170px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;padding:7px;border:1px solid #ddd}.catalogue-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #ddd;padding:10px 4px}.catalogue-row strong{flex:1}.catalogue-row small{color:#555}.catalogue-row input[type=checkbox]{width:auto}.catalogue>input[type=search],.view-shopping>input[type=search]{width:100%;padding:9px;box-sizing:border-box}.meal-dish-select{width:100%;max-width:100%;padding:6px}.meal-confirm{min-width:min(400px,85vw)}.inventory-check{display:block;margin:10px 0}.shopping-checked{text-decoration:line-through;opacity:.6}.project-milestones{padding:8px;border:1px dashed #bbb;border-radius:8px;margin:8px 0}.project-milestones>label{display:block;margin:4px 0}.project-milestones>div{display:flex;gap:5px;flex-wrap:wrap}
+
+/* V24 : catalogue compact et liste de courses catégorisée. Ne pas toucher à stylekoala.css. */
+.ingredient-picker{width:100%;border:1px solid #ccc;border-radius:9px;padding:9px;box-sizing:border-box}
+.ingredient-picker>summary,.ingredient-group>summary{cursor:pointer;font-weight:600;padding:8px}
+.ingredient-picker>input{width:100%;box-sizing:border-box;padding:8px;margin:7px 0}
+.ingredient-group{border:1px solid #ddd;border-radius:8px;margin:8px 0;padding:4px}
+.ingredient-choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;padding:9px;max-height:260px;overflow:auto}
+.ingredient-choices label{display:flex;align-items:center;gap:5px}
+.shopping-category{border:1px solid #ddd;border-radius:9px;margin:14px 0;padding:8px}
+.shopping-category>h3{cursor:grab;background:var(--fnd2,#e4e4e4);padding:9px;border-radius:6px;margin:0 0 4px;user-select:none}
+.shopping-quantity{width:175px;max-width:100%;padding:7px;box-sizing:border-box}
+.habit-statistics{margin:15px 0;padding:12px;border:1px solid #ddd;border-radius:10px}
+@media(max-width:700px){.shopping-quantity{width:125px}.catalogue-form>select{max-width:100%}}
+
+/* V25 : jalons et bilans */
+.project-milestones progress {display:block;width:100%;max-width:420px;margin:.5rem 0}.project-milestones label{display:flex;align-items:center;gap:.5rem;margin:.35rem 0}.week-summary{margin:1rem 0;padding:1rem;border:1px solid var(--main-color,#ccc);border-radius:10px}.priority-box button{font-size:.8rem}
+
+/* V26 : formulaire courses à deux modes */
+.shopping-add-form {display:flex; flex-wrap:wrap; gap:10px; align-items:end;}
+.shopping-add-form > label {display:flex; flex-direction:column;gap:4px;}
+.shopping-add-form .shopping-ingredient-picker {display:flex;flex:1 1 280px;flex-wrap:wrap;gap:6px;}
+.shopping-add-form .shopping-ingredient-picker input {min-width:130px; flex:1;}
+.shopping-add-form .shopping-ingredient-picker select {min-width:180px; flex:1;}
+
+/* V27 : magasins et emplacements (stylekoala.css inchangé) */
+.shopping-filters{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.shopping-filters>input{flex:1;min-width:220px;padding:8px}.shopping-filters label{display:flex;gap:8px;align-items:center}.shopping-store{max-width:150px;padding:6px}.shopping-add-form>select{min-width:140px}
+
+/* V29 : nouvelles fonctionnalités, stylekoala.css reste inchangé */
+.v29-panel{border:1px solid var(--main-color,#ddd);padding:12px;border-radius:10px;margin:12px 0;background:var(--fnd,#f8f8f8)}
+.v29-widget-choice{display:inline-flex;align-items:center;gap:7px;margin:5px 12px 5px 0}
+.v29-line{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px;border-bottom:1px solid #ddd}
+.v29-line strong{flex:1;min-width:160px}.v29-line input[type=number]{max-width:80px}.v29-line small{color:#b33}
+.v29-toolbar{display:flex;gap:15px;align-items:center;margin:12px 0}
+.v29-calendar{display:grid;grid-template-columns:repeat(7,minmax(115px,1fr));gap:6px;overflow:auto}
+.v29-day{border:1px solid #ccc;border-radius:6px;min-height:105px;padding:6px}.v29-day>strong{font-size:12px}
+.v29-calendar-task{font-size:12px;background:var(--fnd2,#dcebe7);padding:5px;border-radius:4px;margin:4px 0;cursor:grab;overflow-wrap:anywhere}
+.v29-done{text-decoration:line-through;opacity:.65}.v29-achievements{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.v29-achievements progress{width:100%}.v29-suggestions{display:flex;flex-wrap:wrap;gap:8px}.v29-suggestions article{display:flex;flex-direction:column;gap:7px;min-width:200px;max-width:330px;border:1px solid #ddd;padding:10px;border-radius:7px}
+.v29-price{width:75px!important}
+@media(max-width:850px){.v29-calendar{grid-template-columns:repeat(2,minmax(140px,1fr))}}
+
+.view-home{display:flex;flex-direction:column}.view-home>.config-fold{order:0}.view-home>.challenge-dashboard{order:1}.v29-widget-choice{display:flex;gap:6px;align-items:center;justify-content:flex-start}.v29-widget-choice button{padding:3px 8px}
+
+/* V30 : champs d’édition visibles uniquement à la demande */
+.v30-dependency{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px}.v30-dependency select{max-width:240px}.catalogue-row{flex-wrap:wrap;align-items:center}.catalogue-row>small{margin-right:8px}.v29-line{flex-wrap:wrap}
