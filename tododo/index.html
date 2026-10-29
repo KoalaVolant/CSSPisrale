@@ -408,21 +408,8 @@
           </div>
         </section>
       </section>
-      <section class="weekly-menu">
-        <div class="menu-heading"><h2>Menu de la semaine</h2><div><button type="button" @click="menuWeekOffset--">← Précédente</button><button type="button" @click="menuWeekOffset=0">Cette semaine</button><button type="button" @click="menuWeekOffset++">Suivante →</button></div></div>
-        <p>Semaine du {{ formatDate(menuWeekStart) }} · Glisser un repas sur un autre pour échanger leurs places.</p>
-        <details class="menu-conditions"><summary>Conditions / consignes du menu</summary><textarea v-model="data.menuRules" rows="3" placeholder="Ex. Budget maximal, contraintes alimentaires, cuisine rapide le mercredi…"></textarea></details>
-        <div class="menu-days">
-          <article class="menu-day" v-for="day in menuWeekDays" :key="day.date">
-            <h3>{{ day.label }} <small>{{ formatDate(day.date) }}</small></h3>
-            <div class="menu-meal" v-for="kind in ['lunch','dinner']" :key="kind" :class="'meal-'+(mealSlot(day.date,kind).state||'pending')" @dragover.prevent @drop="dropMeal($event,day.date,kind)">
-              <div class="meal-header"><strong>{{ kind==='lunch'?'Déjeuner':'Dîner' }}</strong><span draggable="true" class="drag-handle" @dragstart="dragMeal($event,day.date,kind)" @dragend="menuDragged=null" title="Déplacer / échanger le repas">⠿</span></div>
-              <input :value="mealSlot(day.date,kind).name" @change="setMeal(day.date,kind,'name',$event.target.value)" placeholder="Plat prévu…" aria-label="Nom du plat">
-              <div class="meal-checks"><button type="button" :class="{active:mealSlot(day.date,kind).state==='done'}" @click="setMealState(day.date,kind,'done')">✓ Fait</button><button type="button" :class="{active:mealSlot(day.date,kind).state==='missed'}" @click="setMealState(day.date,kind,'missed')">✕ Non respecté</button></div>
-            </div>
-          </article>
-        </div>
-      </section>
+      <section class="today-meals"><h2>Repas du jour</h2><p><strong>Déjeuner :</strong> {{ todayMeals.lunch.name || 'Non prévu' }} · <strong>Dîner :</strong> {{ todayMeals.dinner.name || 'Non prévu' }}</p><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
+      <section class="priority-box" v-if="suggestedTasks.length"><h2>Priorités suggérées</h2><small>Propositions calculées à partir de l'urgence et de l'échéance.</small><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ item.task.due ? '· échéance '+formatDate(item.task.due) : '' }}</small></li></ol></section>
       <div class="dashboard">
 
         <section class="view view-today">
@@ -757,6 +744,34 @@
       </div>
     </section>
 
+    <section class="view view-menu" v-if="view==='menu'">
+      <div class="subtabs"><button v-for="t in [{id:'planning',name:'Planning'},{id:'dishes',name:'Plats'},{id:'ingredients',name:'Ingrédients'}]" :key="t.id" type="button" :class="{active:menuTab===t.id}" @click="menuTab=t.id">{{ t.name }}</button></div>
+      <template v-if="menuTab==='planning'">
+      <section class="weekly-menu">
+        <div class="menu-heading"><h2>Menu de la semaine</h2><div><button type="button" @click="menuWeekOffset--">← Précédente</button><button type="button" @click="menuWeekOffset=0">Cette semaine</button><button type="button" @click="menuWeekOffset++">Suivante →</button></div></div>
+        <p>Semaine du {{ formatDate(menuWeekStart) }} · Glisser un repas sur un autre pour échanger leurs places.</p>
+        <details class="menu-conditions"><summary>Conditions / consignes du menu</summary><textarea v-model="data.menuRules" rows="3" placeholder="Ex. Budget maximal, contraintes alimentaires, cuisine rapide le mercredi…"></textarea></details>
+        <div class="menu-days">
+          <article class="menu-day" v-for="day in menuWeekDays" :key="day.date">
+            <h3>{{ day.label }} <small>{{ formatDate(day.date) }}</small></h3>
+            <div class="menu-meal" v-for="kind in ['lunch','dinner']" :key="kind" :class="'meal-'+(mealSlot(day.date,kind).state||'pending')" @dragover.prevent @drop="dropMeal($event,day.date,kind)">
+              <div class="meal-header"><strong>{{ kind==='lunch'?'Déjeuner':'Dîner' }}</strong><span draggable="true" class="drag-handle" @dragstart="dragMeal($event,day.date,kind)" @dragend="menuDragged=null" title="Déplacer / échanger le repas">⠿</span></div>
+              <select class="meal-dish-select" :value="mealSlot(day.date,kind).dishId || ''" @change="assignDish(day.date,kind,$event.target.value)"><option value="">Choisir un plat enregistré…</option><option v-for="dish in data.dishes" :key="dish.id" :value="dish.id">{{ dish.name }}</option></select>
+              <input :value="mealSlot(day.date,kind).name" @change="setMeal(day.date,kind,'name',$event.target.value);setMeal(day.date,kind,'dishId','')" placeholder="Plat prévu…" aria-label="Nom du plat">
+              <div class="meal-checks"><button type="button" :class="{active:mealSlot(day.date,kind).state==='done'}" @click="setMealState(day.date,kind,'done')">✓ Fait</button><button type="button" :class="{active:mealSlot(day.date,kind).state==='missed'}" @click="setMealState(day.date,kind,'missed')">✕ Non respecté</button></div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="week-summary"><h3>Bilan de cette semaine</h3><p>Taux de respect des menus enregistrés : <strong>{{ mealStats.rate }} %</strong> ({{ mealStats.done }} respectés / {{ mealStats.missed }} non respectés). Calcul sur les repas explicitement évalués.</p><p>{{ weekSummary.tasks }} tâches terminées · {{ weekSummary.tickets }} tickets clôturés · {{ weekSummary.points }} points · {{ weekSummary.meals }} repas respectés</p></section>
+      </template>
+      <section v-if="menuTab==='dishes'" class="catalogue"><h2>Catalogue des plats</h2><p>Un plat peut ne contenir aucun ingrédient.</p><div class="catalogue-form"><input v-model="dishDraft.name" placeholder="Nom du plat" @keyup.enter="addDish"><input type="search" v-model="dishIngredientQuery" placeholder="Filtrer les ingrédients à sélectionner…"><div class="catalogue-scroll"><label v-for="i in dishIngredientChoices" :key="i.id"><input type="checkbox" :value="i.id" v-model="dishDraft.ingredientIds"> {{ i.name }} <small>{{ i.owned?'(en stock)':'(manquant)' }}</small></label></div><button type="button" @click="addDish">Ajouter le plat</button></div><input v-model="dishQuery" type="search" placeholder="Rechercher un plat…"><article v-for="d in filteredDishes" :key="d.id" class="catalogue-row"><strong>{{ d.name }}</strong><small>{{ dishIngredients(d).map(i=>i.name).join(', ')||'Aucun ingrédient' }}</small><button type="button" @click="removeDish(d)">Supprimer</button></article></section>
+      <section v-if="menuTab==='ingredients'" class="catalogue"><h2>Ingrédients et disponibilité</h2><div class="catalogue-form"><input v-model="ingredientDraft" placeholder="Nouvel ingrédient" @keyup.enter="addIngredient"><button type="button" @click="addIngredient">Ajouter</button></div><input v-model="ingredientQuery" type="search" placeholder="Rechercher un ingrédient…"><article v-for="i in filteredIngredients" :key="i.id" class="catalogue-row"><strong>{{ i.name }}</strong><label><input type="checkbox" v-model="i.owned"> En ma possession</label><button type="button" @click="removeIngredient(i)">Supprimer</button></article></section>
+      <div class="modal-backdrop" v-if="pendingMeal"><div class="modal meal-confirm" role="dialog" aria-modal="true"><h2>Ingrédients à vérifier</h2><p>Ces ingrédients sont marqués comme absents. Coche ceux que tu possèdes avant de confirmer.</p><label v-for="id in pendingMeal.missingIds" :key="id" class="inventory-check"><input type="checkbox" v-model="data.ingredients.find(i=>i.id===id).owned"> {{ data.ingredients.find(i=>i.id===id)?.name }}</label><p>Les ingrédients restant absents seront ajoutés à la liste de courses.</p><button type="button" @click="confirmDishMissing">Confirmer et placer le plat</button><button type="button" @click="pendingMeal=null">Annuler</button></div></div>
+    </section>
+    <section class="view view-shopping" v-if="view==='shopping'"><h2>Liste de courses</h2><p>Les ingrédients manquants confirmés apparaissent ici. Tu peux aussi ajouter des articles manuellement.</p><div class="catalogue-form"><input v-model="shoppingDraft" placeholder="Ajouter un article…" @keyup.enter="addShoppingItem"><button type="button" @click="addShoppingItem">Ajouter</button></div><input type="search" v-model="shoppingQuery" placeholder="Rechercher dans la liste…"><article v-for="item in shoppingVisible" :key="item.id" class="catalogue-row"><label><input type="checkbox" :checked="item.checked" @change="checkShoppingItem(item)"> <span :class="{'shopping-checked':item.checked}">{{ item.name }}</span></label><small>{{ item.manual?'Ajout manuel':'Depuis le menu' }}</small><button type="button" @click="removeShoppingItem(item)">Retirer</button></article><p v-if="!data.shoppingItems.length">La liste de courses est vide.</p></section>
+    <section class="view view-trash" v-if="view==='trash'"><h2>Corbeille</h2><p>Les éléments supprimés peuvent être restaurés. Vider la corbeille est définitif.</p><button type="button" :disabled="!data.trash.length" @click="emptyTrash">Vider définitivement</button><article v-for="item in data.trash" :key="item.id" class="catalogue-row"><span><strong>{{ item.payload?.name || item.payload?.title || item.type }}</strong> <small>({{ item.type }} · {{ new Date(item.deletedAt).toLocaleDateString('fr-FR') }})</small></span><button type="button" @click="restoreTrash(item)">Restaurer</button></article></section>
+
     <!-- ============ PROJETS ============ -->
     <section class="view view-projects" v-if="view === 'projects'">
       <!-- Formulaire projet -->
@@ -834,6 +849,7 @@
             </button>
           </div>
           <p class="project-desc" v-if="p.description">{{ p.description }}</p>
+          <div class="project-milestones"><strong>Jalons</strong><label v-for="m in milestones(p)" :key="m.id"><input type="checkbox" v-model="m.done"> {{ m.title }} <button type="button" @click.stop="removeMilestone(m)">×</button></label><div><input v-model="milestoneDraft[p.id]" placeholder="Nouveau jalon" @click.stop @keyup.enter.stop="addMilestone(p)"><button type="button" @click.stop="addMilestone(p)">Ajouter</button></div></div>
           <div class="project-progress">
             <progress :value="projectStats(p).done" :max="Math.max(1, projectStats(p).total)"></progress>
             <span>{{ projectStats(p).done }} / {{ projectStats(p).total }} tâches · {{ projectStats(p).points }} pts à gagner</span>
@@ -1314,7 +1330,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261029-v22"></script>
+<script src="app.js?v=20261029-v23"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
