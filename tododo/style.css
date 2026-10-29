@@ -362,3 +362,6 @@
 @media(max-width:850px){.v29-calendar{grid-template-columns:repeat(2,minmax(140px,1fr))}}
 
 .view-home{display:flex;flex-direction:column}.view-home>.config-fold{order:0}.view-home>.challenge-dashboard{order:1}.v29-widget-choice{display:flex;gap:6px;align-items:center;justify-content:flex-start}.v29-widget-choice button{padding:3px 8px}
+
+/* V30 : champs d’édition visibles uniquement à la demande */
+.v30-dependency{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px}.v30-dependency select{max-width:240px}.catalogue-row{flex-wrap:wrap;align-items:center}.catalogue-row>small{margin-right:8px}.v29-line{flex-wrap:wrap}
