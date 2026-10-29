@@ -36,7 +36,6 @@ const TABS = [
   { id: 'usual-lists', label: 'Listes de tâches habituelles' },
   { id: 'menu', label: 'Menu de la semaine' },
   { id: 'shopping', label: 'Liste de courses' },
-  { id: 'planner', label: 'Planificateur' },
   { id: 'achievements', label: 'Succès & objectifs' },
   { id: 'trash', label: 'Corbeille' },
   { id: 'gratitude',  label: 'Gratitude' },
@@ -56,7 +55,7 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','planner','all','work','habits','usual-lists','evening','done'] },
+  { title: 'Tâches', ids: ['home','all','work','habits','usual-lists','evening','done'] },
   { title: 'Repas', ids: ['menu','shopping'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','challenges','achievements','statistics','budget'] },
@@ -204,7 +203,7 @@ function migrateGratitudePoints(records) {
 function defaultData() {
   return {
     achievements: [], // succès attribués, une seule fois
-    dashboardWidgets: ['habits','meals','priorities','planner','tasks'],
+    dashboardWidgets: ['habits','meals','priorities','tasks'],
     groceryBudget: 0, // budget facultatif de courses
     eveningNotes: '', // ancien champ conservé pour migration
     budgetCategories: ['Alimentation','Essence','Loisirs','Logement','Abonnements','Impôts','Santé','Transport','Salaire','Autres'],
@@ -280,7 +279,7 @@ function loadData() {
     d.shoppingItems.forEach(x=>{if(typeof x.quantity!=='string') x.quantity=String(x.quantity??'');x.store=String(x.store||'');x.category=String(x.category||'Sans catégorie');});
     if (typeof d.menuRules !== 'string') d.menuRules = '';
     if (!Array.isArray(d.achievements)) d.achievements=[];
-    if (!Array.isArray(d.dashboardWidgets)) d.dashboardWidgets=['habits','meals','priorities','planner','tasks'];
+    if (!Array.isArray(d.dashboardWidgets)) d.dashboardWidgets=['habits','meals','priorities','tasks'];
     d.groceryBudget=Number.isFinite(Number(d.groceryBudget))?Number(d.groceryBudget):0;
     if (!Array.isArray(d.budgetEntries)) d.budgetEntries = [];
     if (!Array.isArray(d.budgetRecurring)) d.budgetRecurring = [];
@@ -507,7 +506,7 @@ const app = createApp({
       data.weeklyMenus = src.weeklyMenus && typeof src.weeklyMenus === 'object' && !Array.isArray(src.weeklyMenus) ? src.weeklyMenus : {};
       data.menuRules = typeof src.menuRules === 'string' ? src.menuRules : '';
       data.achievements=Array.isArray(src.achievements)?src.achievements:[];
-      data.dashboardWidgets=Array.isArray(src.dashboardWidgets)?src.dashboardWidgets:['habits','meals','priorities','planner','tasks'];
+      data.dashboardWidgets=Array.isArray(src.dashboardWidgets)?src.dashboardWidgets:['habits','meals','priorities','tasks'];
       data.groceryBudget=Number.isFinite(Number(src.groceryBudget))?Number(src.groceryBudget):0;
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
       data.budgetCategories = Array.isArray(src.budgetCategories) ? [...new Set([...src.budgetCategories, ...[...(src.budgetEntries||[]),...(src.budgetRecurring||[]),...(src.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))] : [...new Set([...defaultData().budgetCategories, ...[...(src.budgetEntries||[]),...(src.budgetRecurring||[]),...(src.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))];
@@ -2390,9 +2389,9 @@ const app = createApp({
 
     // V29 : dépendances, planification, calendrier, repas, budget courses, succès et widgets.
     const v29Date = (date, offset=0) => {const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+offset);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
-    const dashboardCatalogue=[{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas du jour'},{id:'priorities',name:'Priorités suggérées'},{id:'planner',name:'Plan de journée'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
+    const dashboardCatalogue=[{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas du jour'},{id:'priorities',name:'Priorités suggérées'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
     const dashboardEdit=ref(false);
-    function widgetVisible(id){return data.dashboardWidgets.includes(id);}
+    function widgetVisible(id){return id!=='planner'&&data.dashboardWidgets.includes(id);}
     function setWidgetVisible(id,on){data.dashboardWidgets=on?[...new Set([...data.dashboardWidgets,id])]:data.dashboardWidgets.filter(x=>x!==id);}
     function moveDashboardWidget(id,direction){const a=data.dashboardWidgets;const i=a.indexOf(id),j=i+direction;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];}
     const dashboardSorted=computed(()=>data.dashboardWidgets.filter(x=>dashboardCatalogue.some(w=>w.id===x)));

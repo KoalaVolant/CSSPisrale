@@ -6,7 +6,7 @@
   <title>Todo Quest</title>
   <link rel="stylesheet" href="style.css?v=20261029-v26">
   <link rel="stylesheet" href="stylekoala.css?v=20261029-v22">
-  <link rel="stylesheet" href="styletest.css?v=20261029-v31">
+  <link rel="stylesheet" href="styletest.css?v=20261029-v32">
 </head>
 <body>
 
@@ -408,7 +408,7 @@
     <!-- ============ ACCUEIL : prochaine récompense + Aujourd'hui / À venir ============ -->
     <section class="view view-home" v-if="view === 'home'">
       <details class="config-fold"><summary>Personnaliser le dashboard</summary><p>Afficher ou masquer les blocs. Leur ordre sera utilisé dans une prochaine évolution de la grille.</p><div v-for="w in dashboardCatalogue" :key="w.id" class="v29-widget-choice"><label><input type="checkbox" :checked="widgetVisible(w.id)" @change="setWidgetVisible(w.id,$event.target.checked)"> {{ w.name }}</label><button type="button" @click="moveDashboardWidget(w.id,-1)" :disabled="data.dashboardWidgets.indexOf(w.id)<1">↑</button><button type="button" @click="moveDashboardWidget(w.id,1)" :disabled="data.dashboardWidgets.indexOf(w.id)===data.dashboardWidgets.length-1">↓</button></div></details>
-      <section class="v29-panel" :style="{order:data.dashboardWidgets.indexOf('planner')+10}" v-if="widgetVisible('planner')"><h2>Plan de journée suggéré</h2><p>{{ plannedTasks.length }} tâches proposées, classées par échéance et priorité</p><button type="button" @click="setTab('planner')">Ouvrir le planificateur</button></section>
+
 
       <section class="challenge-dashboard" v-if="currentChallenges.some(c=>c.enabled!==false && !c.hiddenHome)">
         <h2>Défis en cours</h2>
@@ -488,17 +488,17 @@
       <article class="usual-list" v-for="(list,index) in data.usualLists" :key="list.id">
         <div class="usual-list-head">
           <button type="button" @click="list.collapsed=!list.collapsed" :aria-expanded="!list.collapsed" aria-label="Replier ou déplier">{{ list.collapsed ? '▸' : '▾' }}</button>
-          <input v-model="list.title" placeholder="Titre de la liste" aria-label="Titre de la liste">
+          <strong v-if="!list._editingTitle" class="tq-usual-text">{{ list.title || "Sans titre" }}</strong><input v-else v-model="list.title" placeholder="Titre de la liste" aria-label="Titre de la liste" @keyup.enter="list._editingTitle=false"><button type="button" @click="list._editingTitle=!list._editingTitle">{{list._editingTitle ? "✓ OK" : "✎ Renommer"}}</button>
           <small>{{ list.items.filter(x=>!x.heading && x.done).length }}/{{ list.items.filter(x=>!x.heading).length }}</small>
           <button type="button" @click="resetUsualList(list)">Réinitialiser</button>
           <button type="button" @click="removeUsualList(list)">Supprimer</button>
         </div>
         <div v-if="!list.collapsed" class="usual-list-body">
-          <textarea v-model="list.info" rows="2" placeholder="Informations, instructions, contexte…" aria-label="Informations de la liste"></textarea>
+          <div class="tq-usual-info"><p v-if="!list._editingInfo">{{list.info || "Aucune information"}}</p><textarea v-else v-model="list.info" rows="2" placeholder="Informations, instructions, contexte…" aria-label="Informations de la liste"></textarea><button type="button" @click="list._editingInfo=!list._editingInfo">{{list._editingInfo ? "✓ OK" : "✎ Modifier les informations"}}</button></div>
           <div v-for="item in list.items" :key="item.id" class="usual-list-item" @dragover.prevent @drop="dropUsualItem($event,list,item)">
             <span draggable="true" class="drag-handle" @dragstart="startUsualDrag($event,list,item)" @dragend="usualDragged=null" title="Réordonner">⠿</span>
             <input v-if="!item.heading" type="checkbox" :checked="item.done" @change="toggleUsualItem(item)" aria-label="Cocher la tâche">
-            <input v-model="item.name" :class="{'usual-done':item.done,'usual-heading-input':item.heading}" :aria-label="item.heading ? 'Titre de section' : 'Nom de la tâche'">
+            <span v-if="!item._editing" class="tq-usual-text" :class="{'usual-done':item.done,'usual-heading-input':item.heading}">{{ item.name || "Sans titre" }}</span><input v-else v-model="item.name" :aria-label="item.heading ? 'Titre de section' : 'Nom de la tâche'" @keyup.enter="item._editing=false"><button type="button" @click="item._editing=!item._editing">{{item._editing ? "✓ OK" : "✎"}}</button>
             <small v-if="item.doneAt">{{ new Date(item.doneAt).toLocaleString('fr-FR') }}</small>
             <button type="button" @click="deleteUsualItem(list,item)" aria-label="Supprimer la tâche">×</button>
           </div>
@@ -1187,13 +1187,6 @@
     </section>
 
 
-    <section class="view v29-view" v-if="view==='planner'">
-      <h2>Planificateur intelligent</h2><p>Proposition déterministe basée sur les échéances et tes niveaux configurés. Les tâches bloquées par une dépendance sont exclues.</p>
-      <label>Journée <input type="date" v-model="plannerDate"></label>
-      <p><strong>{{ plannedTasks.length }} tâches proposées</strong> · sans durée ni quota horaire.</p>
-      <h3>Proposition de journée</h3><article v-for="(x,i) in plannedTasks" :key="x.task.id" class="v29-line"><strong>{{ i+1 }}. {{ x.task.title }}</strong><span>{{ x.task.due ? 'Échéance '+formatDate(x.task.due) : 'Sans échéance' }}</span><button type="button" @click="changeStatus(x.task,'done')">✓ Terminé</button></article>
-      <h3>Dépendances des tâches</h3><p>Une tâche peut commencer seulement lorsque sa tâche préalable est terminée. Les tâches des projets sont également configurables directement dans le projet.</p><article v-for="t in data.tasks.filter(x=>x.status!=='done')" :key="t.id" class="v29-line"><strong>{{t.title}}</strong><button type="button" @click="openTaskForm(t)">Configurer dépendance</button><small v-if="blockingTask(t)">Bloquée par : {{ blockingTask(t).title }}</small></article>
-    </section>
     <section class="view v29-view" v-if="view==='achievements'"><h2>Succès et objectifs</h2><p>Succès obtenus automatiquement d'après les tâches, projets et repas enregistrés. Aucun point supplémentaire n'est attribué pour éviter de modifier le solde existant.</p><div class="v29-achievements"><article v-for="x in successProgress" :key="x.id" class="v29-panel"><strong>{{ x.unlocked?'🏆':'🔒' }} {{x.name}}</strong><p>{{x.detail}}</p><progress :value="Math.min(x.current,x.target)" :max="x.target"></progress><small>{{ x.current }} / {{x.target}} <template v-if="data.achievements.find(a=>a.id===x.id)">· Débloqué le {{formatDate(data.achievements.find(a=>a.id===x.id).unlockedAt)}}</template></small></article></div></section>
 
     <!-- ============ BUDGET ============ -->
@@ -1275,10 +1268,7 @@
       <input v-else ref="titleInput" class="task-title-input" type="text" v-model="draft"
              @keydown.enter.prevent="saveTitle" @keydown.esc.stop.prevent="cancelTitle" @blur="saveTitle">
 
-      <button v-if="!compact" type="button" class="tq-edit-toggle" @click.stop="editingDetails=!editingDetails">{{editingDetails ? "Fermer les modifications" : "✎ Modifier les détails"}}</button>
-      <div class="tq-read-summary" v-if="!compact&&!editingDetails">{{task.category||"Sans catégorie"}} · {{task.points}} pts · {{task.due ? dueLabel : "Sans échéance"}}</div>
-      <button v-if="!compact&&!editingDetails" type="button" class="task-finish-button" :disabled="!!blockedBy" @click.stop="$emit('status',task,'done')">✓ Terminé</button><span v-if="blockedBy&&!compact" class="tq-blocked">🔒 Après : {{blockedBy.title}}</span><button type="button" v-if="!compact&&!editingDetails" class="task-duplicate" @click.stop="$emit('duplicate',task,'tomorrow')">+ Demain</button><button type="button" v-if="!compact&&!editingDetails" class="task-duplicate" @click.stop="$emit('duplicate',task,'followup')">+ Suite</button>
-      <div class="task-tags" :class="{'tq-edit-hidden':!editingDetails&&!compact}">
+      <div class="task-tags">
 
         <!-- Catégorie -->
         <details v-if="task.scope === 'work'" class="tag tag-category work-tag-picker" @click.stop>
