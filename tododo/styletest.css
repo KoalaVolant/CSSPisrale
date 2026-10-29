@@ -1,0 +1,110 @@
+/* Todo Quest / Koala v2 | retouches structurelles uniquement.
+   Charger APRÈS style.css et stylekoala.css.
+   Ne pas réinitialiser les polices ni les tailles des textes existants. */
+:root { --koala-gap:10px; --koala-border:var(--main-color,#dedede); }
+*,*::before,*::after{box-sizing:border-box}
+html{overflow-x:hidden}
+body{width:100%;max-width:none;overflow-x:hidden}
+/* L'en-tête, le titre et les points défilent naturellement. */
+.app-header,.app-brand,.app-title,.points-box,.points-badge{position:static!important;top:auto!important}
+.app-header{display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap;padding:7px 10px;background:var(--fnd)}
+.app-brand{padding:0;gap:12px;flex:1 1 320px;min-width:0;flex-wrap:wrap;justify-content:flex-start}
+.app-title{padding:0 3px;margin:0}
+.sync-box{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}
+.sync-box .sync-user{overflow-wrap:anywhere}
+.points-box{padding:5px 9px;border-radius:8px;align-items:center;white-space:nowrap}
+.random-reward-save{padding:6px 9px;border:1px solid var(--fnd3);border-radius:8px;background:#fff}
+.favorite-reward{flex:1 1 250px;margin:0;padding:7px 10px;max-width:360px}
+.layout{display:flex;align-items:flex-start;gap:0;min-height:calc(100vh - 75px)}
+.sidebar{width:232px;flex:0 0 232px;min-width:0;padding:10px 8px;border-right:1px solid var(--koala-border);background:#fafbfa;align-self:stretch}
+.app-nav{display:flex;flex-direction:column;gap:0}
+.app-nav .nav-group{min-width:0;flex:none;gap:2px;margin:0 0 10px}
+.nav-group-title{margin:4px 4px 5px;padding:0 2px 4px;border-bottom:1px solid var(--fnd2)}
+.app-nav .nav-group button{display:block;width:100%;max-width:100%;text-align:left;padding:6px 9px;margin:0 0 2px;border:1px solid transparent!important;border-radius:8px;background:transparent;color:inherit;line-height:1.4;white-space:normal;overflow-wrap:anywhere;transition:background .15s,border-color .15s}
+.app-nav .nav-group button:hover{background:var(--fnd);border-color:var(--fnd2)!important}
+.app-nav .nav-group button.active{background:var(--fnd2);color:#223d36;border-color:var(--fnd3)!important;font-weight:650}
+.app-main{flex:1 1 auto;min-width:0;padding:10px 12px;max-width:100%}
+.page-header,.task-toolbar{position:static!important;top:auto!important;z-index:auto;background:transparent;padding:4px 0 8px}
+.page-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;border-bottom:1px solid var(--koala-border);margin-bottom:8px}
+.page-title{margin:0}
+.page-actions,.task-toolbar,.filters-row{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px}
+.page-actions button,.task-toolbar button{margin-right:0;padding:5px 9px}
+.filters{padding:8px;margin:8px 0;background:var(--fnd);border:1px solid var(--koala-border);border-radius:8px}
+.filters-row input,.filters-row select{max-width:100%;min-width:0}
+.dashboard{gap:10px;margin-top:10px;align-items:flex-start}
+.view-today{width:33%;min-width:0}.view-upcoming{width:67%;min-width:0}
+.dashboard section{min-width:0;padding:8px}
+.task-list-box{gap:6px}
+.task-list-box [class*="status"]{margin:0;padding:7px;min-width:0;max-width:100%}
+.task-list-box .task-toolbar{width:100%;margin-bottom:3px}
+.task{min-width:0;gap:6px;border-radius:7px}
+.task-main,.task-title,.task-tags{min-width:0;overflow-wrap:anywhere}
+.task-tags{gap:4px;align-items:center}
+.tag{max-width:100%}
+.tag select,.tag input{max-width:100%}
+.view-projects{gap:8px;align-items:flex-start}
+.view-projects .project{width:calc(50% - 8px);margin:0;min-width:0}
+.project{padding:8px}
+.view-done .task-group{gap:8px}
+.view-done .task-group article{width:calc(33.333% - 6px)}
+.reward-list,.inventory-list{gap:8px;justify-content:flex-start}
+.reward-list .reward,.inventory-list article{width:calc(33.333% - 6px);min-width:0;margin:0;padding:9px}
+.view.view-habits{gap:8px}.view.view-habits article{width:calc(33.333% - 6px);min-width:0}
+.habit-entry{padding:7px;margin:4px 0}.habit-actions{padding:5px;gap:5px}
+.ticket-card,.ticket-create,.done-summary{padding:8px;margin:8px 0}
+.ticket-heading,.ticket-item,.ticket-inline{gap:7px}
+.config-fold,.v29-panel,.today-meals,.priority-box,.week-summary,.catalogue,.view-shopping,.view-trash{padding:8px;margin:8px 0}
+.quick-row,.draft-task,.project-task,.shopping-add-form,.catalogue-form{gap:6px}
+.modal-backdrop{padding:10px}
+.modal{width:min(100%,520px);max-width:100%;padding:10px;max-height:calc(100dvh - 20px);border-radius:10px}
+.modal-wide{width:min(100%,760px)}
+.task-form,.quick-form{margin:0;max-width:100%}
+.form-panel input:not([type=checkbox]):not([type=radio]),.form-panel select,.form-panel textarea{max-width:100%}
+.form-actions{display:flex;flex-wrap:wrap;gap:6px}
+.mobile-nav-bar,.sidebar-mobile-head,.nav-backdrop{display:none}
+@media(max-width:1100px){
+ .sidebar{width:208px;flex-basis:208px}
+ .dashboard{flex-wrap:wrap}.view-today,.view-upcoming{width:100%}
+ .view-done .task-group article,.reward-list .reward,.inventory-list article{width:calc(50% - 5px)}
+}
+@media(max-width:800px){
+ .layout{display:block;min-height:0}
+ .app-main{width:100%;padding:8px 10px}
+ .mobile-nav-bar{display:flex;align-items:center;gap:10px;padding:6px 10px;background:#fafbfa;border-bottom:1px solid var(--koala-border)}
+ .mobile-nav-toggle{padding:6px 10px;border:1px solid var(--fnd3);background:var(--fnd2);border-radius:8px;color:#223d36;font-weight:600}
+ .mobile-view-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--tit)}
+ .sidebar{position:fixed;z-index:102;top:0;bottom:0;left:0;width:min(290px,86vw);height:100dvh;overflow-y:auto;overscroll-behavior:contain;transform:translateX(-105%);visibility:hidden;transition:transform .2s,visibility .2s;box-shadow:3px 0 18px #0002;padding:9px 10px;display:block}
+ .sidebar-mobile-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:3px 3px 9px;border-bottom:1px solid var(--fnd2);margin-bottom:7px}
+ .mobile-nav-close{padding:4px 10px;border:1px solid var(--koala-border);border-radius:7px;background:white}
+ .nav-backdrop{display:none;position:fixed;inset:0;z-index:101;background:rgba(0,0,0,.35);border:0;width:100%;height:100dvh}
+ .nav-open .sidebar{transform:translateX(0);visibility:visible}
+ .nav-open .nav-backdrop{display:block}
+ .app-nav{display:flex;flex-direction:column;flex-wrap:nowrap}
+ .app-nav .nav-group{min-width:0;flex:none}
+ .app-header{padding:7px 10px}
+ .app-brand{flex-basis:100%;justify-content:space-between}
+ .page-header{padding:3px 0 7px}
+ .view-projects .project{width:calc(50% - 5px)}
+ .view.view-habits article{width:calc(50% - 5px)}
+ .task-list-box [class*="status"]{width:calc(50% - 4px)}
+ .view-today .task-list-box [class*="status"]{width:100%}
+}
+@media(max-width:560px){
+ .app-main{padding:7px 8px}
+ .app-header{gap:6px}
+ .app-brand{justify-content:flex-start;gap:7px 10px}
+ .points-box{padding:4px 8px}
+ .page-actions{width:100%}
+ .filters-row>input,.filters-row>select{flex:1 1 145px}
+ .task-list-box [class*="status"],.view-projects .project,.view-done .task-group article,.reward-list .reward,.inventory-list article,.view.view-habits article{width:100%}
+ .dashboard,.habit-dashboard{display:block}
+ .habit-entry{display:flex;flex-wrap:wrap;gap:5px}
+ .habit-entry>span{width:100%}
+ .quick-row{display:flex;flex-wrap:wrap}
+ .quick-row .quick-name{flex:1 1 100%;min-width:0}
+ .menu-days{grid-auto-flow:row;grid-template-columns:1fr;grid-template-rows:none}
+ .stats-cards,.levels-grid{grid-template-columns:1fr}
+ .ticket-inline{flex-wrap:wrap}
+ .modal{padding:9px}
+}
+@media(prefers-reduced-motion:reduce){.sidebar{transition:none}}

@@ -6,7 +6,7 @@
   <title>Todo Quest</title>
   <link rel="stylesheet" href="style.css?v=20261029-v26">
   <link rel="stylesheet" href="stylekoala.css?v=20261029-v22">
-  <link rel="stylesheet" href="styletest.css?v=20261029-v32">
+  <link rel="stylesheet" href="styletest.css?v=20261029-koala-v2">
 </head>
 <body>
 
@@ -46,10 +46,17 @@
 
   <p class="toast" v-if="toast">{{ toast }}</p>
 
+  <div class="mobile-nav-bar">
+    <button type="button" class="mobile-nav-toggle" aria-label="Ouvrir le menu" aria-controls="main-sidebar" aria-expanded="false">☰ <span>Menu</span></button>
+    <span class="mobile-view-label">{{ pageTitle }}</span>
+  </div>
+  <button type="button" class="nav-backdrop" aria-label="Fermer le menu" tabindex="-1"></button>
+
   <div class="layout">
 
     <!-- ============ MENU DE GAUCHE ============ -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="main-sidebar">
+      <div class="sidebar-mobile-head"><strong>Navigation</strong><button type="button" class="mobile-nav-close" aria-label="Fermer le menu">✕</button></div>
       <nav class="app-nav" aria-label="Navigation principale">
         <div class="nav-group" v-for="group in navGroups" :key="group.title">
           <h3 class="nav-group-title">{{ group.title }}</h3>
@@ -1397,6 +1404,26 @@
       }
     }, 1200);
   });
+</script>
+<script>
+  // Navigation responsive : aucune modification de la logique Vue/Firebase.
+  (function () {
+    var root = document.getElementById('app');
+    var toggle = root.querySelector('.mobile-nav-toggle');
+    function setOpen(open) {
+      root.classList.toggle('nav-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+    }
+    toggle.addEventListener('click', function () {setOpen(!root.classList.contains('nav-open'));});
+    root.querySelector('.nav-backdrop').addEventListener('click', function () {setOpen(false);});
+    root.querySelector('.mobile-nav-close').addEventListener('click', function () {setOpen(false);});
+    root.querySelector('.sidebar').addEventListener('click', function(e) {
+      if (e.target.closest('.app-nav button')) setOpen(false);
+    });
+    document.addEventListener('keydown', function(e) {if(e.key === 'Escape') setOpen(false);});
+    window.addEventListener('resize', function() {if(window.innerWidth > 800) setOpen(false);});
+  }());
 </script>
 </body>
 </html>
