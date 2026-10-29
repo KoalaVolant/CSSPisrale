@@ -205,7 +205,8 @@ function defaultData() {
     budgetCategories: ['Alimentation','Essence','Loisirs','Logement','Abonnements','Impôts','Santé','Transport','Salaire','Autres'],
     ingredients: [], // {id,name,owned}
     dishes: [], // {id,name,ingredientIds}
-    shoppingItems: [], // {id,name,ingredientId,manual,checked,sourceKeys}
+    shoppingItems: [], // {id,name,ingredientId,manual,checked,sourceKeys,quantity}
+    ingredientCategories: ['Sans catégorie'],
     trash: [], // objets supprimés, restaurables
     projectMilestones: [], // {id,projectId,title,done}
     weeklyMenus: {}, // menus indexés par lundi YYYY-MM-DD
@@ -265,6 +266,9 @@ function loadData() {
     d.budgetCategories = [...new Set([...d.budgetCategories, ...[...(d.budgetEntries||[]),...(d.budgetRecurring||[]),...(d.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))];
     if (!d.weeklyMenus || typeof d.weeklyMenus !== 'object' || Array.isArray(d.weeklyMenus)) d.weeklyMenus = {};
     for (const k of ['ingredients','dishes','shoppingItems','trash','projectMilestones']) if (!Array.isArray(d[k])) d[k]=[];
+    if(!Array.isArray(d.ingredientCategories)) d.ingredientCategories=['Sans catégorie'];
+    d.ingredientCategories=[...new Set(['Sans catégorie',...d.ingredientCategories.filter(x=>typeof x==='string'&&x.trim()),...d.ingredients.map(x=>x.category).filter(Boolean)])];
+    d.shoppingItems.forEach(x=>{if(typeof x.quantity!=='string') x.quantity=String(x.quantity??'');});
     if (typeof d.menuRules !== 'string') d.menuRules = '';
     if (!Array.isArray(d.budgetEntries)) d.budgetEntries = [];
     if (!Array.isArray(d.budgetRecurring)) d.budgetRecurring = [];
@@ -482,7 +486,7 @@ const app = createApp({
 
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
-      for (const k of ['ingredients','dishes','shoppingItems','trash','projectMilestones']) data[k]=Array.isArray(src[k])?src[k]:[];
+      for (const k of ['ingredients','dishes','shoppingItems','trash','projectMilestones','ingredientCategories']) data[k]=Array.isArray(src[k])?src[k]:[];
       data.weeklyMenus = src.weeklyMenus && typeof src.weeklyMenus === 'object' && !Array.isArray(src.weeklyMenus) ? src.weeklyMenus : {};
       data.menuRules = typeof src.menuRules === 'string' ? src.menuRules : '';
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
@@ -2224,14 +2228,22 @@ const app = createApp({
     const menuTab=ref('planning');
     const dishQuery=ref(''), ingredientQuery=ref(''), dishIngredientQuery=ref(''), shoppingQuery=ref('');
     const dishDraft=reactive({name:'',ingredientIds:[]});
-    const ingredientDraft=ref('');
-    const shoppingDraft=ref('');
-    const pendingMeal=ref(null);
+    const ingredientDraft=ref(''), ingredientCategoryDraft=ref('Sans catégorie'), newIngredientCategory=ref('');
+    const shoppingDraft=ref(''), shoppingQuantityDraft=ref(''), shoppingIngredientId=ref('');
+    const pendingMeal=ref(null), shoppingCategoryDragged=ref('');
+    const normalizeIngredientCategory = i => i?.category || 'Sans catégorie';
+    const ingredientCategoryList=computed(()=>[...new Set([...data.ingredientCategories,...data.ingredients.map(normalizeIngredientCategory)])]);
+    const groupedDishIngredients=computed(()=>ingredientCategoryList.value.map(name=>({name,items:dishIngredientChoices.value.filter(i=>normalizeIngredientCategory(i)===name)})).filter(g=>g.items.length));
+    const groupedIngredients=computed(()=>ingredientCategoryList.value.map(name=>({name,items:filteredIngredients.value.filter(i=>normalizeIngredientCategory(i)===name)})).filter(g=>g.items.length));
+    const groupedShopping=computed(()=>ingredientCategoryList.value.map(name=>({name,items:shoppingVisible.value.filter(x=>{const i=data.ingredients.find(i=>i.id===x.ingredientId);return (i?normalizeIngredientCategory(i):(x.category||'Sans catégorie'))===name})})).filter(g=>g.items.length));
     const shoppingVisible=computed(()=>data.shoppingItems.filter(x=>x.name.toLocaleLowerCase().includes(shoppingQuery.value.toLocaleLowerCase())));
     const filteredDishes=computed(()=>data.dishes.filter(x=>x.name.toLocaleLowerCase().includes(dishQuery.value.toLocaleLowerCase())).sort((a,b)=>a.name.localeCompare(b.name,'fr')));
     const dishIngredientChoices=computed(()=>data.ingredients.filter(x=>x.name.toLocaleLowerCase().includes(dishIngredientQuery.value.toLocaleLowerCase())));
     const filteredIngredients=computed(()=>data.ingredients.filter(x=>x.name.toLocaleLowerCase().includes(ingredientQuery.value.toLocaleLowerCase())).sort((a,b)=>a.name.localeCompare(b.name,'fr')));
-    function addIngredient(){const name=ingredientDraft.value.trim();if(!name)return; if(data.ingredients.some(i=>i.name.toLocaleLowerCase()===name.toLocaleLowerCase())){notify('Ingrédient déjà présent');return;}data.ingredients.push({id:uid(),name,owned:false});ingredientDraft.value='';}
+    function addIngredientCategory(){const name=newIngredientCategory.value.trim();if(!name)return;if(!data.ingredientCategories.some(x=>x.toLocaleLowerCase()===name.toLocaleLowerCase()))data.ingredientCategories.push(name);ingredientCategoryDraft.value=name;newIngredientCategory.value='';}
+    function addIngredient(){const name=ingredientDraft.value.trim();if(!name)return; if(data.ingredients.some(i=>i.name.toLocaleLowerCase()===name.toLocaleLowerCase())){notify('Ingrédient déjà présent');return;}data.ingredients.push({id:uid(),name,category:ingredientCategoryDraft.value||'Sans catégorie',owned:false});ingredientDraft.value='';}
+    function setIngredientOwned(i,owned){i.owned=owned;if(owned)data.shoppingItems=data.shoppingItems.filter(x=>x.ingredientId!==i.id);}
+    function moveShoppingCategory(target){const from=shoppingCategoryDragged.value;shoppingCategoryDragged.value='';if(!from||from===target)return;const order=data.ingredientCategories;const src=order.indexOf(from),dest=order.indexOf(target);if(src<0||dest<0)return;order.splice(src,1);order.splice(dest,0,from);}
     function addDish(){const name=dishDraft.name.trim();if(!name)return;data.dishes.push({id:uid(),name,ingredientIds:[...new Set(dishDraft.ingredientIds)]});dishDraft.name='';dishDraft.ingredientIds=[];}
     function dishName(id){return data.dishes.find(d=>d.id===id)?.name||'';}
     function dishIngredients(dish){return (dish?.ingredientIds||[]).map(id=>data.ingredients.find(i=>i.id===id)).filter(Boolean);}
@@ -2250,12 +2262,15 @@ const app = createApp({
       dishIngredients(dish).filter(i=>!i.owned).forEach(i=>{
         let item=data.shoppingItems.find(s=>s.ingredientId===i.id&&!s.checked);
         if(item){item.sourceKeys=[...new Set([...(item.sourceKeys||[]),key])];}
-        else data.shoppingItems.push({id:uid(),name:i.name,ingredientId:i.id,manual:false,checked:false,sourceKeys:[key]});
+        else data.shoppingItems.push({id:uid(),name:i.name,ingredientId:i.id,manual:false,checked:false,quantity:'',sourceKeys:[key]});
       });
       commitDish(p.date,p.kind,dish);pendingMeal.value=null;
     }
-    function addShoppingItem(){const name=shoppingDraft.value.trim();if(!name)return;data.shoppingItems.push({id:uid(),name,ingredientId:'',manual:true,checked:false,sourceKeys:[]});shoppingDraft.value='';}
-    function checkShoppingItem(item){item.checked=!item.checked;if(item.checked&&item.ingredientId){const i=data.ingredients.find(x=>x.id===item.ingredientId);if(i)i.owned=true;}}
+    function addShoppingItem(){const selected=data.ingredients.find(i=>i.id===shoppingIngredientId.value);const name=selected?.name||shoppingDraft.value.trim();if(!name)return;
+      if(selected){const existing=data.shoppingItems.find(x=>x.ingredientId===selected.id);if(existing){if(shoppingQuantityDraft.value.trim())existing.quantity=shoppingQuantityDraft.value.trim();shoppingIngredientId.value='';shoppingQuantityDraft.value='';notify('Ingrédient déjà dans la liste');return;}}
+      data.shoppingItems.push({id:uid(),name,ingredientId:selected?.id||'',category:selected?normalizeIngredientCategory(selected):'Sans catégorie',manual:true,checked:false,quantity:shoppingQuantityDraft.value.trim(),sourceKeys:[]});shoppingDraft.value='';shoppingQuantityDraft.value='';shoppingIngredientId.value='';}
+    function addIngredientToShopping(i){let item=data.shoppingItems.find(s=>s.ingredientId===i.id);if(!item)data.shoppingItems.push({id:uid(),name:i.name,ingredientId:i.id,category:normalizeIngredientCategory(i),manual:true,checked:false,quantity:'',sourceKeys:[]});else notify('Déjà dans la liste de courses');}
+    function checkShoppingItem(item){item.checked=!item.checked;if(item.checked&&item.ingredientId){const i=data.ingredients.find(x=>x.id===item.ingredientId);if(i)setIngredientOwned(i,true);}}
     function removeShoppingItem(item){data.trash.unshift({id:uid(),type:'shopping',deletedAt:new Date().toISOString(),payload:clone(item)});data.shoppingItems=data.shoppingItems.filter(x=>x.id!==item.id);}
     function removeDish(dish){if(!confirm('Supprimer le plat « '+dish.name+' » ? Les menus déjà planifiés conservent leur libellé.'))return;data.trash.unshift({id:uid(),type:'dish',deletedAt:new Date().toISOString(),payload:clone(dish)});data.dishes=data.dishes.filter(x=>x.id!==dish.id);}
     function removeIngredient(item){if(!confirm('Supprimer cet ingrédient du catalogue ?'))return;data.trash.unshift({id:uid(),type:'ingredient',deletedAt:new Date().toISOString(),payload:clone(item)});data.ingredients=data.ingredients.filter(x=>x.id!==item.id);data.dishes.forEach(d=>d.ingredientIds=d.ingredientIds.filter(id=>id!==item.id));}
@@ -2263,7 +2278,20 @@ const app = createApp({
     function emptyTrash(){if(confirm('Vider définitivement la corbeille ?'))data.trash=[];}
     const todayMeals=computed(()=>({lunch:mealSlot(today.value,'lunch'),dinner:mealSlot(today.value,'dinner')}));
     const mealStats=computed(()=>{const v=Object.values(data.weeklyMenus).flatMap(day=>Object.values(day));const done=v.filter(x=>x.state==='done').length,missed=v.filter(x=>x.state==='missed').length;return {done,missed,rate:done+missed?Math.round(done/(done+missed)*100):0};});
-    const habitStats=computed(()=>{const days=Object.values(data.habits).reduce((s,h)=>s+Object.keys(h.history||{}).length,0);return days;});
+    const habitStats=computed(()=>{
+      const end=today.value, since=new Date(end+'T12:00:00Z');since.setUTCDate(since.getUTCDate()-27);
+      const start=since.toISOString().slice(0,10), good=[],bad=[];
+      for(const h of data.habits){const begin=[start,h.startDate||h.createdAt||start].sort().pop();const finish=[end,h.endDate||end].sort()[0];if(begin>finish)continue;
+        const dates=[];for(let d=begin;d<=finish;){dates.push(d);const x=new Date(d+'T12:00:00Z');x.setUTCDate(x.getUTCDate()+1);d=x.toISOString().slice(0,10);}
+        if(h.malus){const incidents=(h.penalties||[]).filter(p=>p.date>=begin&&p.date<=finish).length;bad.push({title:h.title,expected:dates.length,achieved:Math.max(0,dates.length-new Set((h.penalties||[]).filter(p=>p.date>=begin&&p.date<=finish).map(p=>p.date)).size),incidents});continue;}
+        const completed=new Set((h.history||[]).filter(d=>d>=begin&&d<=finish));const postponed=new Set(h.postponed||[]);let expected=0,achieved=0;
+        if(h.frequency==='weekly'){const weeks=new Map();for(const d of dates){const k=monday(d);weeks.set(k,(weeks.get(k)||0)+1);}for(const [week,count] of weeks){const target=Math.min(Number(h.weeklyTarget)||3,count);expected+=target;achieved+=Math.min(target,[...completed].filter(d=>monday(d)===week).length);}}
+        else for(const d of dates){const date=new Date(d+'T12:00:00Z'),dow=date.getUTCDay();const scheduled=h.frequency==='weekdays'?(h.weekdays||[]).includes(dow):h.frequency==='interval'?dayDiff(h.startDate||h.createdAt||begin,d)%Math.max(1,Number(h.every)||2)===0:true;if((scheduled&&!postponed.has(d))||completed.has(d)){expected++;if(completed.has(d))achieved++;}}
+        good.push({title:h.title,expected,achieved,incidents:0});
+      }
+      const summarize=items=>{const expected=items.reduce((s,x)=>s+x.expected,0),achieved=items.reduce((s,x)=>s+x.achieved,0);return {items,expected,achieved,rate:expected?Math.round(100*achieved/expected):null};};
+      return {good:summarize(good),bad:summarize(bad),period:'28 derniers jours (jusqu’à aujourd’hui)'};
+    });
     // Priorisation indicative, sans modification automatique des tâches
     const suggestedTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work').map(t=>{const u=data.urgencies.findIndex(x=>x.id===t.urgency);const due=t.due?Math.round((new Date(t.due+'T12:00:00')-new Date(today.value+'T12:00:00'))/86400000):999;return {task:t,score:(u+1)*10+(due<0?50:due===0?35:due<=2?20:0)};}).sort((a,b)=>b.score-a.score).slice(0,5));
     const milestoneDraft=reactive({});
@@ -2274,7 +2302,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,shoppingDraft,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,milestoneDraft,addMilestone,removeMilestone,milestones,weekSummary,
+      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,milestoneDraft,addMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
       // état
       budgetMonth,budgetSection,budgetCategories,budgetCategoryName,reorderDrag,startReorder,dropReorder,cashForm,cashBalance,cashIncome,cashExpenses,addCashEntry,removeCashEntry,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,

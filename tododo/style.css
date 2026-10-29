@@ -320,3 +320,16 @@
 .today-meals,.priority-box,.week-summary,.catalogue,.view-shopping,.view-trash{padding:12px;margin:12px 0;border:1px solid #ccc;border-radius:10px}
 .subtabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.subtabs button{padding:9px 15px;border-radius:8px;border:1px solid #bbb}.subtabs .active{font-weight:700;background:var(--fnd2,#cbdcd8)}
 .catalogue-form{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;margin:12px 0}.catalogue-form>input{flex:1;min-width:180px}.catalogue-scroll{width:100%;max-height:170px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;padding:7px;border:1px solid #ddd}.catalogue-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #ddd;padding:10px 4px}.catalogue-row strong{flex:1}.catalogue-row small{color:#555}.catalogue-row input[type=checkbox]{width:auto}.catalogue>input[type=search],.view-shopping>input[type=search]{width:100%;padding:9px;box-sizing:border-box}.meal-dish-select{width:100%;max-width:100%;padding:6px}.meal-confirm{min-width:min(400px,85vw)}.inventory-check{display:block;margin:10px 0}.shopping-checked{text-decoration:line-through;opacity:.6}.project-milestones{padding:8px;border:1px dashed #bbb;border-radius:8px;margin:8px 0}.project-milestones>label{display:block;margin:4px 0}.project-milestones>div{display:flex;gap:5px;flex-wrap:wrap}
+
+/* V24 : catalogue compact et liste de courses catégorisée. Ne pas toucher à stylekoala.css. */
+.ingredient-picker{width:100%;border:1px solid #ccc;border-radius:9px;padding:9px;box-sizing:border-box}
+.ingredient-picker>summary,.ingredient-group>summary{cursor:pointer;font-weight:600;padding:8px}
+.ingredient-picker>input{width:100%;box-sizing:border-box;padding:8px;margin:7px 0}
+.ingredient-group{border:1px solid #ddd;border-radius:8px;margin:8px 0;padding:4px}
+.ingredient-choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;padding:9px;max-height:260px;overflow:auto}
+.ingredient-choices label{display:flex;align-items:center;gap:5px}
+.shopping-category{border:1px solid #ddd;border-radius:9px;margin:14px 0;padding:8px}
+.shopping-category>h3{cursor:grab;background:var(--fnd2,#e4e4e4);padding:9px;border-radius:6px;margin:0 0 4px;user-select:none}
+.shopping-quantity{width:175px;max-width:100%;padding:7px;box-sizing:border-box}
+.habit-statistics{margin:15px 0;padding:12px;border:1px solid #ddd;border-radius:10px}
+@media(max-width:700px){.shopping-quantity{width:125px}.catalogue-form>select{max-width:100%}}
