@@ -108,3 +108,75 @@ body{width:100%;max-width:none;overflow-x:hidden}
  .modal{padding:9px}
 }
 @media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
+
+/* Koala V3 : harmonisation des commandes et navigation, sans modifier
+   la taille standard de la typographie ou l'identité graphique. */
+@media(min-width:801px){
+  .sidebar{position:sticky;top:0;max-height:100dvh;overflow-y:auto;align-self:flex-start;scrollbar-width:thin}
+}
+/* L'en-tête de marque et les points restent dans le flux normal. */
+.app-header,.app-brand,.app-title,.points-box,.points-badge{position:static!important}
+/* Barres d'actions dans les vues, sans rendre sticky le titre de l'application. */
+.page-header{position:sticky!important;top:0!important;z-index:40!important;background:var(--fnd,#f0f0f0)!important;padding:7px 8px!important;border-radius:0 0 8px 8px}
+.view-work .work-mode-actions{position:sticky;top:56px;z-index:35;background:var(--fnd,#f0f0f0);padding:7px 8px;margin:0 0 9px;border:1px solid var(--main-color);border-radius:8px}
+.view-home .task-toolbar,.view-all .task-toolbar,.view-done .task-toolbar{position:sticky!important;top:62px!important;z-index:30!important;background:var(--fnd,#f0f0f0)!important;padding:6px 8px!important;border:1px solid var(--main-color);border-radius:8px}
+#work-ticket-create{scroll-margin-top:130px}
+/* Champs et listes natifs : jamais du blanc sur blanc */
+select,select option,select optgroup,.tag select,.meal-dish-select{color:#27332f!important;background-color:#fff!important}
+select option:checked{color:#172a24!important;background-color:#accac4!important}
+input:not([type=checkbox]):not([type=radio]),textarea{color:#27332f}
+/* Boutons : palette Koala, dimensions régulières et états lisibles. */
+button:not(.app-nav button):not(.drag-handle),.page-actions button,.task-toolbar button,.work-mode-actions a,.subtabs button{font-family:var(--fnt);border:1px solid var(--fnd3,#88a7a1);border-radius:8px;padding:6px 10px;line-height:1.45;background:var(--fnd2,#accac4);color:#1d3730;font-weight:600;box-shadow:none;transition:background-color .14s,border-color .14s,filter .14s}
+button:not(.app-nav button):hover,.work-mode-actions a:hover{filter:brightness(.95)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--tit,#688d85);outline-offset:2px}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.active,.subtabs button.active,.page-actions .btn-add{background:var(--fnd3,#88a7a1);color:#fff;border-color:var(--tit,#688d85)}
+.task button,.tag button,.project-task button,.ticket-card button{padding:4px 8px}
+/* Pas de padding géant : grille sur échelle 4/6/8/10/12. */
+.project,.ticket-card,.ticket-create,.done-summary,.reward,.inventory-item,.textarea-card,.menu-day,.habit-entry{padding:10px;max-width:100%;min-width:0}
+.project-task{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 6px;margin:3px 0;border-bottom:1px solid var(--main-color);line-height:1.5;min-width:0}
+.project-task-title{flex:1 1 210px;min-width:0;overflow-wrap:anywhere}
+.project-task input,.project-task select{min-width:0;max-width:100%}
+.project-task button{flex:0 0 auto}
+.project-task.status-done{opacity:.72}
+.project-milestones{margin-top:10px;padding:8px;border:1px solid var(--main-color);background:var(--fnd);border-radius:8px}
+.tq-milestone{padding:7px 5px;border-top:1px solid var(--main-color)}
+.tq-milestone-children{margin:5px 0 0 12px;padding-left:8px;border-left:2px solid var(--fnd3)}
+.tq-milestone-children>div{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:4px 0}
+.milestone-progress{display:flex;align-items:center;gap:7px;color:var(--tit)}
+.milestone-progress progress{width:110px;max-width:35%;height:7px}
+/* Menu repas : choix exclusif, champs unifiés. */
+.meal-entry-mode{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:5px 0}
+.meal-entry-mode label{display:inline-flex;gap:4px;align-items:center;white-space:nowrap;cursor:pointer}
+.menu-meal>.meal-dish-select,.menu-meal>input{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+.menu-heading h2{display:none} /* titre déjà présent dans l'entête de page */
+/* Notes et sommaire automatique. */
+.textarea-toc{display:flex;align-items:center;flex-wrap:wrap;gap:5px 10px;padding:8px;margin:8px 0;background:var(--fnd);border:1px solid var(--main-color);border-radius:8px}
+.textarea-toc strong{margin-right:6px}
+.textarea-toc a{display:inline-flex;padding:3px 7px;text-decoration:none;color:#2d5c50;background:#fff;border:1px solid var(--fnd3);border-radius:6px}
+.textarea-toc a:hover{text-decoration:underline}
+.textarea-card{scroll-margin-top:125px;margin:9px 0}
+.textarea-card-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.textarea-card-head input{flex:1 1 180px;min-width:0}
+.evening-markdown{overflow-wrap:anywhere}
+/* Vue terminée : lisible et moins compacte horizontalement. */
+.view-done .task-group{display:block}
+.view-done .task-group article{width:100%;margin:5px 0}
+.view-done .task-group-title{padding:6px 7px;border-bottom:1px solid var(--fnd3);background:var(--fnd)}
+.view-done .task-list-box [class*="status"]{width:100%}
+.view-done .done-summary{padding:8px 10px;margin:8px 0}
+.view-done .ticket-closed{padding:8px 10px}
+.random-activity{display:inline-flex;flex-wrap:wrap;gap:7px;align-items:center;margin:6px;padding:7px 10px;background:var(--fnd);border:1px solid var(--fnd3);border-radius:8px}
+@media(max-width:800px){
+ .sidebar{position:fixed!important}
+ .page-header{top:0!important}
+ .view-work .work-mode-actions{top:56px}
+ .page-actions{gap:5px}
+ .project-task-title{flex-basis:100%}
+}
+@media(max-width:560px){
+ .view-work .work-mode-actions{top:55px}
+ .view-home .task-toolbar,.view-all .task-toolbar,.view-done .task-toolbar{top:64px!important}
+ .project,.ticket-card,.textarea-card{padding:8px}
+ .meal-entry-mode{gap:6px}
+}

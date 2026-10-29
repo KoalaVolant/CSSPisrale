@@ -667,7 +667,8 @@ const app = createApp({
       const automatic=recurring.length ? [{id:'recurring-total-'+budgetMonth.value,kind:'recurring-total',label:'Charges récurrentes',category:'Charge récurrente',date:budgetMonth.value+'-01',amount:recurringTotal}] : [];
       const manual=data.budgetEntries.filter(x=>x.date?.slice(0,7)===budgetMonth.value).map(x=>({...x,kind:'manual'}));
       const swile=budgetSwileNext.value.map(x=>({...x,id:'swile-'+x.id,amount:-Math.abs(Number(x.amount)||0)/2,label:'Swile (50 %) : '+x.label,kind:'swile'}));
-      return [...automatic,...manual,...swile];
+      const swileGrouped=swile.length ? [{id:'swile-total-'+budgetMonth.value,kind:'swile-total',label:'Swile (50 % du mois précédent)',category:'Swile',date:budgetMonth.value+'-01',amount:swile.reduce((s,x)=>s+x.amount,0)}] : [];
+      return [...automatic,...swileGrouped,...manual];
     });
     const budgetSummary=computed(()=>{
       const items=budgetItems.value;
@@ -687,7 +688,7 @@ const app = createApp({
 
     // Onglet ouvert : mémorisé avec les autres préférences
     const view = computed({ get: () => ui.tab, set: v => { ui.tab = v; } });
-    function setTab(id) { view.value = id; }
+    function setTab(id) { view.value = id; nextTick(() => window.scrollTo({top:0,left:0,behavior:'instant'})); }
     const pageTitle = computed(() => view.value === 'home' ? 'Tableau de bord' : (TABS.find(t => t.id === view.value) || {}).label);
     const today = ref(todayStr());
     setInterval(() => { today.value = todayStr(); }, 60 * 1000);
@@ -947,7 +948,7 @@ const app = createApp({
     const rewardClaimCount = r => data.inventory.filter(i=>i.rewardId===r.id || (!i.rewardId && i.name===r.name)).length;
 
     /* ---------- Filtres & tris des tâches ---------- */
-    const FILTER_DEFAULTS = { search: '', category: '', status: '', project: '', urgency: '', difficulty: '', kind: '', dueMode: 'any', dueFrom: '', dueTo: '', sort: 'due' };
+    const FILTER_DEFAULTS = { search: '', category: '', status: '', project: '', urgency: '', difficulty: '', kind: '', dueMode: 'any', dueExact: '', dueFrom: '', dueTo: '', sort: 'due' };
     const filters = reactive({ ...FILTER_DEFAULTS });
 
     function resetFilters() {
@@ -965,8 +966,9 @@ const app = createApp({
       if (filters.difficulty) n++;
       if (filters.kind) n++;
       if (filters.dueMode !== 'any') n++;
-      if (filters.dueFrom) n++;
-      if (filters.dueTo) n++;
+      if (filters.dueExact) n++;
+      if (filters.dueFrom && !filters.dueExact) n++;
+      if (filters.dueTo && !filters.dueExact) n++;
       if (filters.sort !== 'due') n++;
       return n;
     });
@@ -977,8 +979,9 @@ const app = createApp({
         if (filters.status && t.status !== filters.status) return false;
         if (filters.dueMode==='none' && t.due) return false;
         if (filters.dueMode==='dated' && !t.due) return false;
-        if (filters.dueFrom && (!t.due || t.due<filters.dueFrom)) return false;
-        if (filters.dueTo && (!t.due || t.due>filters.dueTo)) return false;
+        if (filters.dueExact && t.due!==filters.dueExact) return false;
+        if (!filters.dueExact && filters.dueFrom && (!t.due || t.due<filters.dueFrom)) return false;
+        if (!filters.dueExact && filters.dueTo && (!t.due || t.due>filters.dueTo)) return false;
         if (filters.category === '__none' && t.category) return false;
         if (filters.category && filters.category !== '__none' && t.category !== filters.category) return false;
         if (filters.project === '__none' && t.projectId) return false;
@@ -1145,7 +1148,10 @@ const app = createApp({
     }
     function ticketPoints(ticket){return (ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0);}
 
-    const eveningPreview = ref(false);
+    const mealModes = reactive({});
+    function mealMode(date, kind) { const key=date+'-'+kind; return mealModes[key] || (mealSlot(date,kind).dishId ? 'saved' : 'manual'); }
+    function setMealMode(date,kind,mode) { mealModes[date+'-'+kind]=mode; }
+    const eveningPreview = ref(true);
     function addTextarea(){data.textareas.push({id:uid(),title:'Nouvelle note',content:''});}
     function removeTextarea(note){if(confirm('Supprimer « '+(note.title||'Sans titre')+' » ?')){data.trash.unshift({id:uid(),type:'textarea',deletedAt:new Date().toISOString(),payload:clone(note)});data.textareas=data.textareas.filter(x=>x.id!==note.id);}}
     function renderEveningMarkdown(source) {
@@ -1331,12 +1337,13 @@ const app = createApp({
 
     function openQuickForm() {
       taskForm.open = false;
-      quickForm.mode = 'rows';
+      quickForm.mode = 'paste';
       quickForm.scope = view.value === 'work' ? 'work' : 'personal';
       quickForm.paste = { text: '', points: 10, malus: false, category: '', workCategoryNames: [], ticketName: '', urgency: '', difficulty: '', due: today.value, project: '' };
       quickForm.due = today.value;
       quickForm.rows = [0, 1, 2].map(() => ({ title: '', points: 10, due: today.value, urgency: '', difficulty: '', workCategoryNames: [], ticketName: '' }));
       if(persistedDrafts.quick&&persistedDrafts.quick.scope===quickForm.scope)Object.assign(quickForm,persistedDrafts.quick,{open:false});
+      quickForm.mode = 'paste';
       quickForm.open = true;
       focusLastQuickRow(0);
     }
@@ -1937,6 +1944,8 @@ const app = createApp({
     const habitCount = h => (h.history||[]).length;
 
     /* ---------- Idées d'activités ---------- */
+    const randomActivity=ref(null);
+    function pickRandomActivity(){if(!data.activities.length){randomActivity.value=null;return;}randomActivity.value=data.activities[Math.floor(Math.random()*data.activities.length)];}
     const activityForm=reactive({open:false,id:null,title:'',points:10});
     function openActivityForm(a=null){Object.assign(activityForm,a?{open:true,id:a.id,title:a.title,points:a.points??10}:{open:true,id:null,title:'',points:10});}
     function saveActivity(){const title=activityForm.title.trim();if(!title)return;const payload={title,points:Math.max(0,Number(activityForm.points)||0)};
@@ -2433,9 +2442,15 @@ const app = createApp({
       {id:'first-project',name:'Projet bouclé',detail:'Terminer un projet',target:1,kind:'projects'},
       {id:'five-projects',name:'Chef de projets',detail:'Terminer 5 projets',target:5,kind:'projects'},
       {id:'first-meal',name:'Aux fourneaux',detail:'Respecter 1 repas planifié',target:1,kind:'meals'},
-      {id:'ten-meals',name:'Menu tenu',detail:'Respecter 10 repas planifiés',target:10,kind:'meals'}
+      {id:'ten-meals',name:'Menu tenu',detail:'Respecter 10 repas planifiés',target:10,kind:'meals'},
+      {id:'hundred-tasks',name:'Centurion',detail:'Terminer 100 tâches',target:100,kind:'tasks'},
+      {id:'twentyfive-tasks',name:'En route',detail:'Terminer 25 tâches',target:25,kind:'tasks'},
+      {id:'twenty-meals',name:'Cuisine régulière',detail:'Respecter 20 repas planifiés',target:20,kind:'meals'},
+      {id:'ten-projects',name:'Architecte',detail:'Terminer 10 projets',target:10,kind:'projects'},
+      {id:'first-habit',name:'Première routine',detail:'Effectuer une habitude au moins une fois',target:1,kind:'habits'},
+      {id:'ten-habits',name:'Régularité',detail:'Effectuer 10 validations d’habitudes',target:10,kind:'habits'}
     ];
-    const successCounts=computed(()=>({tasks:data.tasks.filter(t=>t.status==='done').length,projects:data.projects.filter(p=>p.completed).length,meals:Object.values(data.weeklyMenus).reduce((n,d)=>n+['lunch','dinner'].filter(k=>d?.[k]?.state==='done').length,0)}));
+    const successCounts=computed(()=>({tasks:data.tasks.filter(t=>t.status==='done').length,projects:data.projects.filter(p=>p.completed).length,habits:data.habits.reduce((n,h)=>n+(Array.isArray(h.history)?h.history.length:0),0),meals:Object.values(data.weeklyMenus).reduce((n,d)=>n+['lunch','dinner'].filter(k=>d?.[k]?.state==='done').length,0)}));
     const successProgress=computed(()=>successDefinitions.map(def=>({...def,current:successCounts.value[def.kind],unlocked:successCounts.value[def.kind]>=def.target})));
     watch(successProgress,items=>{for(const def of items){if(def.unlocked&&!data.achievements.some(a=>a.id===def.id)){data.achievements.push({id:def.id,unlockedAt:today.value});}}},{immediate:true,flush:'post'});
 
@@ -2480,9 +2495,9 @@ const app = createApp({
       exportData, importData, resetAll,
       CHALLENGE_KINDS, challengeForm, openChallengeForm, saveChallenge, deleteChallenge, toggleChallenge, hideChallengeHome, currentChallenges, challengeHistory, challengeProgress,
       habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
-      activityForm, openActivityForm, saveActivity, deleteActivity, createFromActivity,
+      activityForm, randomActivity, pickRandomActivity, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
-      formatDate, eveningPreview, renderEveningMarkdown, addTextarea, removeTextarea, openWorkQuickPaste,
+      formatDate, mealMode, setMealMode, eveningPreview, renderEveningMarkdown, addTextarea, removeTextarea, openWorkQuickPaste,
     };
   },
 });
