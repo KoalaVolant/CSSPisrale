@@ -267,6 +267,7 @@ function loadData() {
     if (!d.weeklyMenus || typeof d.weeklyMenus !== 'object' || Array.isArray(d.weeklyMenus)) d.weeklyMenus = {};
     for (const k of ['ingredients','dishes','shoppingItems','trash','projectMilestones']) if (!Array.isArray(d[k])) d[k]=[];
     if(!Array.isArray(d.ingredientCategories)) d.ingredientCategories=['Sans catégorie'];
+    d.ingredients=d.ingredients.filter(x=>x&&typeof x==='object').map(x=>({...x,name:String(x.name||''),category:typeof x.category==='string'&&x.category.trim()?x.category:'Sans catégorie',owned:!!x.owned}));
     d.ingredientCategories=[...new Set(['Sans catégorie',...d.ingredientCategories.filter(x=>typeof x==='string'&&x.trim()),...d.ingredients.map(x=>x.category).filter(Boolean)])];
     d.shoppingItems.forEach(x=>{if(typeof x.quantity!=='string') x.quantity=String(x.quantity??'');});
     if (typeof d.menuRules !== 'string') d.menuRules = '';
@@ -487,6 +488,8 @@ const app = createApp({
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
       for (const k of ['ingredients','dishes','shoppingItems','trash','projectMilestones','ingredientCategories']) data[k]=Array.isArray(src[k])?src[k]:[];
+      data.ingredients=data.ingredients.filter(x=>x&&typeof x==='object').map(x=>({...x,name:String(x.name||''),category:typeof x.category==='string'&&x.category.trim()?x.category:'Sans catégorie',owned:!!x.owned}));
+      data.ingredientCategories=[...new Set(['Sans catégorie',...data.ingredientCategories.filter(x=>typeof x==='string'&&x.trim()),...data.ingredients.map(i=>i.category)])];
       data.weeklyMenus = src.weeklyMenus && typeof src.weeklyMenus === 'object' && !Array.isArray(src.weeklyMenus) ? src.weeklyMenus : {};
       data.menuRules = typeof src.menuRules === 'string' ? src.menuRules : '';
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
@@ -629,9 +632,9 @@ const app = createApp({
       data.budgetSwile.push({id:uid(),date:budgetSwileForm.date||todayStr(),label:budgetSwileForm.label.trim(),amount:n,category:budgetSwileForm.category});
       budgetSwileForm.label='';budgetSwileForm.amount=null;
     }
-    function removeBudgetEntry(id){if(confirm('Supprimer cette opération ?'))data.budgetEntries=data.budgetEntries.filter(x=>x.id!==id);}
+    function removeBudgetEntry(id){if(confirm('Supprimer cette opération ?')){const x=data.budgetEntries.find(x=>x.id===id);if(x)data.trash.unshift({id:uid(),type:'budgetEntry',deletedAt:new Date().toISOString(),payload:clone(x)});data.budgetEntries=data.budgetEntries.filter(x=>x.id!==id);}}
     function removeBudgetRecurring(id){if(confirm('Supprimer cette charge récurrente ?')){data.budgetRecurring=data.budgetRecurring.filter(x=>x.id!==id);Object.keys(data.budgetOverrides).filter(k=>k.endsWith('|'+id)).forEach(k=>delete data.budgetOverrides[k]);}}
-    function removeBudgetSwile(id){if(confirm('Supprimer cet achat Swile ?'))data.budgetSwile=data.budgetSwile.filter(x=>x.id!==id);}
+    function removeBudgetSwile(id){if(confirm('Supprimer cet achat Swile ?')){const x=data.budgetSwile.find(x=>x.id===id);if(x)data.trash.unshift({id:uid(),type:'budgetSwile',deletedAt:new Date().toISOString(),payload:clone(x)});data.budgetSwile=data.budgetSwile.filter(x=>x.id!==id);}}
     const budgetSwileSource=computed(()=>data.budgetSwile.filter(x=>x.date?.slice(0,7)===budgetMonth.value));
     const budgetSwileNext=computed(()=>data.budgetSwile.filter(x=>x.date?.slice(0,7)===monthBefore(budgetMonth.value)));
     const budgetItems=computed(()=>[
@@ -1608,6 +1611,8 @@ const app = createApp({
         total: list.length,
         done: list.filter(t => t.status === 'done').length,
         points: list.reduce((s, t) => s + taskValue(t), 0),
+        milestonesTotal:data.projectMilestones.filter(m=>m.projectId===project.id).length,
+        milestonesDone:data.projectMilestones.filter(m=>m.projectId===project.id&&m.done).length,
       };
     }
 
@@ -1738,6 +1743,7 @@ const app = createApp({
 
     function deleteReward(reward) {
       if (!confirm(`Supprimer la récompense « ${reward.name} » ? (Celles déjà gagnées restent dans l'inventaire.)`)) return;
+      data.trash.unshift({id:uid(),type:'reward',deletedAt:new Date().toISOString(),payload:clone(reward)});
       data.rewards = data.rewards.filter(r => r.id !== reward.id);
     }
 
@@ -1774,12 +1780,14 @@ const app = createApp({
 
     function deleteInv(item) {
       if (!confirm(`Retirer « ${item.name} » de l'inventaire ? (Les points ne sont pas rendus.)`)) return;
+      data.trash.unshift({id:uid(),type:'inventory',deletedAt:new Date().toISOString(),payload:clone(item),refunded:false});
       data.inventory = data.inventory.filter(i => i.id !== item.id);
     }
 
     function refundInv(item) {
       if (!confirm(`Retirer « ${item.name} » et rendre ${item.cost} pts ?`)) return;
       data.spent = Math.max(0, data.spent - item.cost);
+      data.trash.unshift({id:uid(),type:'inventory',deletedAt:new Date().toISOString(),payload:clone(item),refunded:true});
       data.inventory = data.inventory.filter(i => i.id !== item.id);
       notify(`+${item.cost} pts remboursés`);
     }
@@ -2232,14 +2240,14 @@ const app = createApp({
     const shoppingDraft=ref(''), shoppingQuantityDraft=ref(''), shoppingIngredientId=ref('');
     const pendingMeal=ref(null), shoppingCategoryDragged=ref('');
     const normalizeIngredientCategory = i => i?.category || 'Sans catégorie';
-    const ingredientCategoryList=computed(()=>[...new Set([...data.ingredientCategories,...data.ingredients.map(normalizeIngredientCategory)])]);
+    const ingredientCategoryList=computed(()=>[...new Set(['Sans catégorie',...(Array.isArray(data.ingredientCategories)?data.ingredientCategories:[]).filter(c=>typeof c==='string'&&c.trim()),...(Array.isArray(data.ingredients)?data.ingredients:[]).filter(Boolean).map(normalizeIngredientCategory)])]);
     const groupedDishIngredients=computed(()=>ingredientCategoryList.value.map(name=>({name,items:dishIngredientChoices.value.filter(i=>normalizeIngredientCategory(i)===name)})).filter(g=>g.items.length));
     const groupedIngredients=computed(()=>ingredientCategoryList.value.map(name=>({name,items:filteredIngredients.value.filter(i=>normalizeIngredientCategory(i)===name)})).filter(g=>g.items.length));
     const groupedShopping=computed(()=>ingredientCategoryList.value.map(name=>({name,items:shoppingVisible.value.filter(x=>{const i=data.ingredients.find(i=>i.id===x.ingredientId);return (i?normalizeIngredientCategory(i):(x.category||'Sans catégorie'))===name})})).filter(g=>g.items.length));
     const shoppingVisible=computed(()=>data.shoppingItems.filter(x=>x.name.toLocaleLowerCase().includes(shoppingQuery.value.toLocaleLowerCase())));
     const filteredDishes=computed(()=>data.dishes.filter(x=>x.name.toLocaleLowerCase().includes(dishQuery.value.toLocaleLowerCase())).sort((a,b)=>a.name.localeCompare(b.name,'fr')));
-    const dishIngredientChoices=computed(()=>data.ingredients.filter(x=>x.name.toLocaleLowerCase().includes(dishIngredientQuery.value.toLocaleLowerCase())));
-    const filteredIngredients=computed(()=>data.ingredients.filter(x=>x.name.toLocaleLowerCase().includes(ingredientQuery.value.toLocaleLowerCase())).sort((a,b)=>a.name.localeCompare(b.name,'fr')));
+    const dishIngredientChoices=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&String(x.name||'').toLocaleLowerCase().includes(dishIngredientQuery.value.toLocaleLowerCase())));
+    const filteredIngredients=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&String(x.name||'').toLocaleLowerCase().includes(ingredientQuery.value.toLocaleLowerCase())).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'fr')));
     function addIngredientCategory(){const name=newIngredientCategory.value.trim();if(!name)return;if(!data.ingredientCategories.some(x=>x.toLocaleLowerCase()===name.toLocaleLowerCase()))data.ingredientCategories.push(name);ingredientCategoryDraft.value=name;newIngredientCategory.value='';}
     function addIngredient(){const name=ingredientDraft.value.trim();if(!name)return; if(data.ingredients.some(i=>i.name.toLocaleLowerCase()===name.toLocaleLowerCase())){notify('Ingrédient déjà présent');return;}data.ingredients.push({id:uid(),name,category:ingredientCategoryDraft.value||'Sans catégorie',owned:false});ingredientDraft.value='';}
     function setIngredientOwned(i,owned){i.owned=owned;if(owned)data.shoppingItems=data.shoppingItems.filter(x=>x.ingredientId!==i.id);}
@@ -2273,8 +2281,23 @@ const app = createApp({
     function checkShoppingItem(item){item.checked=!item.checked;if(item.checked&&item.ingredientId){const i=data.ingredients.find(x=>x.id===item.ingredientId);if(i)setIngredientOwned(i,true);}}
     function removeShoppingItem(item){data.trash.unshift({id:uid(),type:'shopping',deletedAt:new Date().toISOString(),payload:clone(item)});data.shoppingItems=data.shoppingItems.filter(x=>x.id!==item.id);}
     function removeDish(dish){if(!confirm('Supprimer le plat « '+dish.name+' » ? Les menus déjà planifiés conservent leur libellé.'))return;data.trash.unshift({id:uid(),type:'dish',deletedAt:new Date().toISOString(),payload:clone(dish)});data.dishes=data.dishes.filter(x=>x.id!==dish.id);}
-    function removeIngredient(item){if(!confirm('Supprimer cet ingrédient du catalogue ?'))return;data.trash.unshift({id:uid(),type:'ingredient',deletedAt:new Date().toISOString(),payload:clone(item)});data.ingredients=data.ingredients.filter(x=>x.id!==item.id);data.dishes.forEach(d=>d.ingredientIds=d.ingredientIds.filter(id=>id!==item.id));}
-    function restoreTrash(item){const p=clone(item.payload);const maps={task:'tasks',project:'projects',ticket:'workTickets',dish:'dishes',ingredient:'ingredients',shopping:'shoppingItems',milestone:'projectMilestones',habit:'habits',activity:'activities',reward:'rewards',textarea:'textareas'};const k=maps[item.type];if(!k)return;if(!data[k].some(x=>x.id===p.id))data[k].push(p);if(item.type==='project'&&item.milestones)(item.milestones||[]).forEach(m=>{if(!data.projectMilestones.some(x=>x.id===m.id))data.projectMilestones.push(m);});if(item.type==='task'&&p.status==='done')data.archived-=taskValue(p);if(item.type==='ticket')data.archived-=(p.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(p,x),0);data.trash=data.trash.filter(x=>x.id!==item.id);}
+    function removeIngredient(item){if(!confirm('Supprimer cet ingrédient du catalogue ?'))return;data.trash.unshift({id:uid(),type:'ingredient',deletedAt:new Date().toISOString(),payload:clone(item),dishIds:data.dishes.filter(d=>(d.ingredientIds||[]).includes(item.id)).map(d=>d.id)});data.ingredients=data.ingredients.filter(x=>x.id!==item.id);data.dishes.forEach(d=>d.ingredientIds=d.ingredientIds.filter(id=>id!==item.id));}
+    function restoreTrash(item){
+      const p=clone(item.payload);
+      const maps={task:'tasks',project:'projects',ticket:'workTickets',dish:'dishes',ingredient:'ingredients',shopping:'shoppingItems',milestone:'projectMilestones',habit:'habits',activity:'activities',reward:'rewards',inventory:'inventory',textarea:'textareas',budgetEntry:'budgetEntries',budgetSwile:'budgetSwile'};
+      const k=maps[item.type];if(!k)return;
+      if(item.type==='milestone'&&!data.projects.some(x=>x.id===p.projectId)){notify('Restaure d’abord le projet parent');return;}
+      if(item.type==='task'&&p.projectId&&!data.projects.some(x=>x.id===p.projectId)){notify('Restaure d’abord le projet parent');return;}
+      if(item.type==='shopping'&&p.ingredientId&&!data.ingredients.some(x=>x.id===p.ingredientId)){notify('Restaure d’abord l’ingrédient');return;}
+      const already=data[k].some(x=>x.id===p.id);
+      if(!already)data[k].push(p);
+      if(item.type==='project'&&item.milestones)(item.milestones||[]).forEach(m=>{if(!data.projectMilestones.some(x=>x.id===m.id))data.projectMilestones.push(m);});
+      if(item.type==='ingredient'&&item.dishIds)(item.dishIds||[]).forEach(id=>{const dish=data.dishes.find(d=>d.id===id);if(dish){dish.ingredientIds=dish.ingredientIds||[];if(!dish.ingredientIds.includes(p.id))dish.ingredientIds.push(p.id);}});
+      if(!already&&item.type==='task'&&p.status==='done')data.archived=(Number(data.archived)||0)-taskValue(p);
+      if(!already&&item.type==='ticket')data.archived=(Number(data.archived)||0)-(p.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(p,x),0);
+      if(!already&&item.type==='inventory'&&item.refunded)data.spent=(Number(data.spent)||0)+(Number(p.cost)||0);
+      data.trash=data.trash.filter(x=>x.id!==item.id);
+    }
     function emptyTrash(){if(confirm('Vider définitivement la corbeille ?'))data.trash=[];}
     const todayMeals=computed(()=>({lunch:mealSlot(today.value,'lunch'),dinner:mealSlot(today.value,'dinner')}));
     const mealStats=computed(()=>{const v=Object.values(data.weeklyMenus).flatMap(day=>Object.values(day));const done=v.filter(x=>x.state==='done').length,missed=v.filter(x=>x.state==='missed').length;return {done,missed,rate:done+missed?Math.round(done/(done+missed)*100):0};});
@@ -2293,16 +2316,25 @@ const app = createApp({
       return {good:summarize(good),bad:summarize(bad),period:'28 derniers jours (jusqu’à aujourd’hui)'};
     });
     // Priorisation indicative, sans modification automatique des tâches
-    const suggestedTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work').map(t=>{const u=data.urgencies.findIndex(x=>x.id===t.urgency);const due=t.due?Math.round((new Date(t.due+'T12:00:00')-new Date(today.value+'T12:00:00'))/86400000):999;return {task:t,score:(u+1)*10+(due<0?50:due===0?35:due<=2?20:0)};}).sort((a,b)=>b.score-a.score).slice(0,5));
+    const suggestedTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work').map(t=>{
+      const urgencyRank=data.urgencies.findIndex(x=>x.id===t.urgency);
+      const difficultyRank=data.difficulties.findIndex(x=>x.id===t.difficulty);
+      const due=t.due?Math.round((new Date(t.due+'T12:00:00')-new Date(today.value+'T12:00:00'))/86400000):999;
+      const score=(urgencyRank+1)*12+(due<0?65:due===0?45:due<=2?28:due<=7?12:0)+(difficultyRank>=0?difficultyRank:0);
+      return {task:t,score};
+    }).sort((a,b)=>b.score-a.score || (a.task.due||'9999').localeCompare(b.task.due||'9999')).slice(0,5));
+    function refreshPriorities(){today.value=todayStr();notify('Priorités recalculées');}
+    if(typeof document!=='undefined')document.addEventListener('visibilitychange',()=>{if(!document.hidden)today.value=todayStr();});
     const milestoneDraft=reactive({});
     function addMilestone(project){const title=(milestoneDraft[project.id]||'').trim();if(!title)return;data.projectMilestones.push({id:uid(),projectId:project.id,title,done:false});milestoneDraft[project.id]='';}
+    function toggleMilestone(m){m.done=!m.done;m.doneAt=m.done?today.value:'';}
     function removeMilestone(m){data.trash.unshift({id:uid(),type:'milestone',deletedAt:new Date().toISOString(),payload:clone(m)});data.projectMilestones=data.projectMilestones.filter(x=>x.id!==m.id);}
     function milestones(project){return data.projectMilestones.filter(m=>m.projectId===project.id);}
-    const weekSummary=computed(()=>{const start=menuWeekStart.value;const end=new Date(start+'T12:00:00');end.setDate(end.getDate()+6);const toDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const endS=toDate(end);const tasks=data.tasks.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.status==='done');const tickets=data.workTickets.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.done);return {tasks:tasks.length,tickets:tickets.length,points:tasks.reduce((s,t)=>s+taskValue(t),0),meals:menuWeekDays.value.flatMap(day=>['lunch','dinner'].map(k=>mealSlot(day.date,k))).filter(m=>m.state==='done').length};});
+    const weekSummary=computed(()=>{const start=monday(today.value);const end=new Date(start+'T12:00:00');end.setDate(end.getDate()+6);const toDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const endS=toDate(end);const tasks=data.tasks.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.status==='done');const tickets=data.workTickets.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.done);return {tasks:tasks.length,tickets:tickets.length,points:tasks.reduce((s,t)=>s+taskValue(t),0),meals:Array.from({length:7},(_,i)=>{const d=new Date(start+'T12:00:00');d.setDate(d.getDate()+i);const date=toDate(d);return ['lunch','dinner'].map(k=>mealSlot(date,k));}).flat().filter(m=>m.state==='done').length};});
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,milestoneDraft,addMilestone,removeMilestone,milestones,weekSummary,
+      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,addMilestone,toggleMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
       // état
       budgetMonth,budgetSection,budgetCategories,budgetCategoryName,reorderDrag,startReorder,dropReorder,cashForm,cashBalance,cashIncome,cashExpenses,addCashEntry,removeCashEntry,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,

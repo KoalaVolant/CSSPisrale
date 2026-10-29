@@ -409,7 +409,7 @@
         </section>
       </section>
       <section class="today-meals"><h2>Repas du jour</h2><p><strong>Déjeuner :</strong> {{ todayMeals.lunch.name || 'Non prévu' }} · <strong>Dîner :</strong> {{ todayMeals.dinner.name || 'Non prévu' }}</p><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
-      <section class="priority-box" v-if="suggestedTasks.length"><h2>Priorités suggérées</h2><small>Propositions calculées à partir de l'urgence et de l'échéance.</small><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ item.task.due ? '· échéance '+formatDate(item.task.due) : '' }}</small></li></ol></section>
+      <section class="priority-box"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement dynamique selon urgence, difficulté et échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ item.task.due ? '· échéance '+formatDate(item.task.due) : '' }}</small></li></ol></section>
       <div class="dashboard">
 
         <section class="view view-today">
@@ -695,6 +695,7 @@
           {name:'Gratitudes',value:statistics.gratitude},{name:'Récompenses',value:statistics.rewards},{name:'Objets obtenus',value:statistics.inventory}
         ]" :key="card.name"><small>{{ card.name }}</small><strong>{{ card.value }}</strong></article>
       </div>
+      <section class="week-summary"><h3>Bilan de la semaine en cours</h3><p>{{ weekSummary.tasks }} tâches terminées · {{ weekSummary.tickets }} tickets clôturés · {{ weekSummary.points }} points · {{ weekSummary.meals }} repas respectés</p><p>Respect des menus évalués (historique global) : <strong>{{ mealStats.rate }} %</strong> ({{ mealStats.done }} faits, {{ mealStats.missed }} non respectés).</p></section>
       <h3>Répartition personnel et travail</h3>
       <div class="stats-cards"><article v-for="scope in ['personal','work']" :key="scope"><strong>{{ scope==='personal'?'Personnel':'Travail' }}</strong><p>{{ doneStats[scope].count }} tâches · {{ doneStats[scope].total }} pts · moyenne {{ doneStats[scope].average }} pts</p></article></div>
       <section class="habit-statistics"><h3>Régularité des habitudes : {{ habitStats.period }}</h3><p>Bonnes habitudes : <strong>{{ habitStats.good.rate===null?'Aucune occurrence prévue':habitStats.good.rate+' %' }}</strong> ({{ habitStats.good.achieved }} / {{ habitStats.good.expected }} occasions réalisées).</p><p>Mauvaises habitudes : <strong>{{ habitStats.bad.rate===null?'Aucune journée':habitStats.bad.rate+' %' }}</strong> de journées sans malus ({{ habitStats.bad.items.reduce((s,x)=>s+x.incidents,0) }} malus consignés).</p><details><summary>Détail par habitude</summary><p v-for="h in habitStats.good.items" :key="h.title">✓ {{ h.title }} : {{ h.achieved }} / {{ h.expected }}</p><p v-for="h in habitStats.bad.items" :key="h.title">✕ {{ h.title }} : {{ h.achieved }} / {{ h.expected }} journées sans malus, {{ h.incidents }} malus</p></details><small>Calcul sur les dates actives connues ; les reports de bonnes habitudes sont exclus. Les semaines partielles plafonnent l'objectif hebdomadaire aux jours actifs.</small></section>
@@ -764,13 +765,13 @@
           </article>
         </div>
       </section>
-      <section class="week-summary"><h3>Bilan de cette semaine</h3><p>Taux de respect des menus enregistrés : <strong>{{ mealStats.rate }} %</strong> ({{ mealStats.done }} respectés / {{ mealStats.missed }} non respectés). Calcul sur les repas explicitement évalués.</p><p>{{ weekSummary.tasks }} tâches terminées · {{ weekSummary.tickets }} tickets clôturés · {{ weekSummary.points }} points · {{ weekSummary.meals }} repas respectés</p></section>
+      
       </template>
       <section v-if="menuTab==='dishes'" class="catalogue"><h2>Catalogue des plats</h2><p>Un plat peut ne contenir aucun ingrédient.</p>
         <div class="catalogue-form"><input v-model="dishDraft.name" placeholder="Nom du plat" @keyup.enter="addDish">
           <details class="ingredient-picker"><summary>Choisir les ingrédients ({{ dishDraft.ingredientIds.length }} sélectionnés)</summary>
             <input type="search" v-model="dishIngredientQuery" placeholder="Rechercher un ingrédient…">
-            <details v-for="group in groupedDishIngredients" :key="group.name" class="ingredient-group" :open="!!dishIngredientQuery"><summary>{{ group.name }} ({{ group.items.length }})</summary>
+            <details v-for="group in groupedDishIngredients" :key="group.name" class="ingredient-group"><summary>{{ group.name }} ({{ group.items.length }})</summary>
               <div class="ingredient-choices"><label v-for="i in group.items" :key="i.id"><input type="checkbox" :value="i.id" v-model="dishDraft.ingredientIds"> {{ i.name }} <small>{{ i.owned?'(en stock)':'(manquant)' }}</small></label></div>
             </details>
           </details><button type="button" @click="addDish">Ajouter le plat</button></div>
@@ -779,7 +780,7 @@
         <div class="catalogue-form"><input v-model="newIngredientCategory" placeholder="Nouvelle catégorie…" @keyup.enter="addIngredientCategory"><button type="button" @click="addIngredientCategory">Créer la catégorie</button></div>
         <div class="catalogue-form"><input v-model="ingredientDraft" placeholder="Nouvel ingrédient" @keyup.enter="addIngredient"><select v-model="ingredientCategoryDraft"><option v-for="c in ingredientCategoryList" :key="c">{{ c }}</option></select><button type="button" @click="addIngredient">Ajouter</button></div>
         <input v-model="ingredientQuery" type="search" placeholder="Rechercher un ingrédient…">
-        <details v-for="group in groupedIngredients" :key="group.name" class="ingredient-group" :open="!!ingredientQuery"><summary>{{ group.name }} ({{ group.items.length }})</summary>
+        <details v-for="group in groupedIngredients" :key="group.name" class="ingredient-group"><summary>{{ group.name }} ({{ group.items.length }})</summary>
           <article v-for="i in group.items" :key="i.id" class="catalogue-row"><strong>{{ i.name }}</strong><select :value="i.category||'Sans catégorie'" @change="i.category=$event.target.value"><option v-for="c in ingredientCategoryList" :key="c">{{ c }}</option></select><label><input type="checkbox" :checked="!!i.owned" @change="setIngredientOwned(i,$event.target.checked)"> En ma possession</label><button type="button" @click="addIngredientToShopping(i)">+ Courses</button><button type="button" @click="removeIngredient(i)">Supprimer</button></article>
         </details></section>
       <div class="modal-backdrop" v-if="pendingMeal"><div class="modal meal-confirm" role="dialog" aria-modal="true"><h2>Ingrédients à vérifier</h2><p>Ces ingrédients sont marqués comme absents. Coche ceux que tu possèdes avant de confirmer.</p><label v-for="id in pendingMeal.missingIds" :key="id" class="inventory-check"><input type="checkbox" v-model="data.ingredients.find(i=>i.id===id).owned"> {{ data.ingredients.find(i=>i.id===id)?.name }}</label><p>Les ingrédients restant absents seront ajoutés à la liste de courses.</p><button type="button" @click="confirmDishMissing">Confirmer et placer le plat</button><button type="button" @click="pendingMeal=null">Annuler</button></div></div>
@@ -870,14 +871,14 @@
             </button>
           </div>
           <p class="project-desc" v-if="p.description">{{ p.description }}</p>
-          <div class="project-milestones"><strong>Jalons</strong><label v-for="m in milestones(p)" :key="m.id"><input type="checkbox" v-model="m.done"> {{ m.title }} <button type="button" @click.stop="removeMilestone(m)">×</button></label><div><input v-model="milestoneDraft[p.id]" placeholder="Nouveau jalon" @click.stop @keyup.enter.stop="addMilestone(p)"><button type="button" @click.stop="addMilestone(p)">Ajouter</button></div></div>
+          <div class="project-milestones"><strong>Jalons ({{ projectStats(p).milestonesDone }}/{{ projectStats(p).milestonesTotal }})</strong><progress :value="projectStats(p).done + projectStats(p).milestonesDone" :max="Math.max(1, projectStats(p).total + projectStats(p).milestonesTotal)"></progress><label v-for="m in milestones(p)" :key="m.id"><input type="checkbox" :checked="!!m.done" @change="toggleMilestone(m)"> {{ m.title }} <button type="button" @click.stop="removeMilestone(m)">×</button></label><div><input v-model="milestoneDraft[p.id]" placeholder="Nouveau jalon" @click.stop @keyup.enter.stop="addMilestone(p)"><button type="button" @click.stop="addMilestone(p)">Ajouter</button></div></div>
           <div class="project-progress">
             <progress :value="projectStats(p).done" :max="Math.max(1, projectStats(p).total)"></progress>
-            <span>{{ projectStats(p).done }} / {{ projectStats(p).total }} tâches · {{ projectStats(p).points }} pts à gagner</span>
+            <span>{{ projectStats(p).done }} / {{ projectStats(p).total }} tâches · {{ projectStats(p).milestonesDone }} / {{ projectStats(p).milestonesTotal }} jalons · {{ projectStats(p).points }} pts à gagner</span>
           </div>
           <div class="project-actions">
             <button type="button" @click.stop="setProjectCompleted(p,!p.completed)">{{ p.completed ? "↶ Rouvrir le projet" : "✓ Terminer le projet" }}</button>
-            <button type="button" v-if="!p.completed" @click="openTaskForm(null, p.id)">＋ Tâche</button>
+            <button type="button" v-if="!p.completed" @click="openTaskForm(null, p.id)">＋ Tâche</button><button type="button" @click.stop="projectSelection=[p.id];deleteSelectedProjects()">Supprimer le projet</button>
           </div>
         </header>
 
@@ -1351,7 +1352,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261029-v23"></script>
+<script src="app.js?v=20261029-v25"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

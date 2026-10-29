@@ -333,3 +333,6 @@
 .shopping-quantity{width:175px;max-width:100%;padding:7px;box-sizing:border-box}
 .habit-statistics{margin:15px 0;padding:12px;border:1px solid #ddd;border-radius:10px}
 @media(max-width:700px){.shopping-quantity{width:125px}.catalogue-form>select{max-width:100%}}
+
+/* V25 : jalons et bilans */
+.project-milestones progress {display:block;width:100%;max-width:420px;margin:.5rem 0}.project-milestones label{display:flex;align-items:center;gap:.5rem;margin:.35rem 0}.week-summary{margin:1rem 0;padding:1rem;border:1px solid var(--main-color,#ccc);border-radius:10px}.priority-box button{font-size:.8rem}
