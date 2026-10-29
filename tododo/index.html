@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261029-v22">
+  <link rel="stylesheet" href="style.css?v=20261029-v26">
   <link rel="stylesheet" href="stylekoala.css?v=20261029-v22">
 </head>
 <body>
@@ -409,7 +409,7 @@
         </section>
       </section>
       <section class="today-meals"><h2>Repas du jour</h2><p><strong>Déjeuner :</strong> {{ todayMeals.lunch.name || 'Non prévu' }} · <strong>Dîner :</strong> {{ todayMeals.dinner.name || 'Non prévu' }}</p><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
-      <section class="priority-box"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement dynamique selon urgence, difficulté et échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ item.task.due ? '· échéance '+formatDate(item.task.due) : '' }}</small></li></ol></section>
+      <section class="priority-box"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ item.task.due ? '· échéance '+formatDate(item.task.due) : '' }}</small></li></ol></section>
       <div class="dashboard">
 
         <section class="view view-today">
@@ -786,7 +786,12 @@
       <div class="modal-backdrop" v-if="pendingMeal"><div class="modal meal-confirm" role="dialog" aria-modal="true"><h2>Ingrédients à vérifier</h2><p>Ces ingrédients sont marqués comme absents. Coche ceux que tu possèdes avant de confirmer.</p><label v-for="id in pendingMeal.missingIds" :key="id" class="inventory-check"><input type="checkbox" v-model="data.ingredients.find(i=>i.id===id).owned"> {{ data.ingredients.find(i=>i.id===id)?.name }}</label><p>Les ingrédients restant absents seront ajoutés à la liste de courses.</p><button type="button" @click="confirmDishMissing">Confirmer et placer le plat</button><button type="button" @click="pendingMeal=null">Annuler</button></div></div>
     </section>
     <section class="view view-shopping" v-if="view==='shopping'"><h2>Liste de courses</h2><p>Ajoute un ingrédient du catalogue ou un article libre. Les catégories peuvent être réordonnées par glisser-déposer.</p>
-      <div class="catalogue-form"><select v-model="shoppingIngredientId"><option value="">Article libre (saisie ci-dessous)</option><option v-for="i in [...data.ingredients].sort((a,b)=>a.name.localeCompare(b.name,'fr'))" :key="i.id" :value="i.id">{{ i.name }}</option></select><input v-model="shoppingDraft" :disabled="!!shoppingIngredientId" placeholder="Nom de l'article libre…" @keyup.enter="addShoppingItem"><input v-model="shoppingQuantityDraft" placeholder="Quantité (ex : 2 kg, 3, 1 paquet)" @keyup.enter="addShoppingItem"><button type="button" @click="addShoppingItem">Ajouter</button></div>
+      <div class="catalogue-form shopping-add-form">
+        <label>Type d'ajout <select v-model="shoppingAddMode"><option value="free">Article libre</option><option value="ingredient">Ingrédients</option></select></label>
+        <input v-if="shoppingAddMode==='free'" v-model="shoppingDraft" placeholder="Nom de l'article libre…" @keyup.enter="addShoppingItem">
+        <div v-else class="shopping-ingredient-picker"><input v-model="shoppingIngredientSearch" type="search" placeholder="Rechercher un ingrédient…"><select v-model="shoppingIngredientId"><option value="">Choisir un ingrédient…</option><option v-for="i in shoppingIngredientChoices" :key="i.id" :value="i.id">{{ i.name }} ({{ i.category || 'Sans catégorie' }})</option></select></div>
+        <input v-model="shoppingQuantityDraft" placeholder="Quantité (ex : 2 kg, 3, 1 paquet)" @keyup.enter="addShoppingItem"><button type="button" @click="addShoppingItem">Ajouter</button>
+      </div>
       <input type="search" v-model="shoppingQuery" placeholder="Rechercher dans la liste…">
       <div v-for="group in groupedShopping" :key="group.name" class="shopping-category" @dragover.prevent @drop.prevent="moveShoppingCategory(group.name)">
         <h3 draggable="true" @dragstart="shoppingCategoryDragged=group.name;$event.dataTransfer.setData('text/plain',group.name)" @dragend="shoppingCategoryDragged=''" title="Glisser pour déplacer cette catégorie">⠿ {{ group.name }} ({{ group.items.length }})</h3>
@@ -1352,7 +1357,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261029-v25"></script>
+<script src="app.js?v=20261029-v26"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

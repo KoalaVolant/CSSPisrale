@@ -336,3 +336,10 @@
 
 /* V25 : jalons et bilans */
 .project-milestones progress {display:block;width:100%;max-width:420px;margin:.5rem 0}.project-milestones label{display:flex;align-items:center;gap:.5rem;margin:.35rem 0}.week-summary{margin:1rem 0;padding:1rem;border:1px solid var(--main-color,#ccc);border-radius:10px}.priority-box button{font-size:.8rem}
+
+/* V26 : formulaire courses à deux modes */
+.shopping-add-form {display:flex; flex-wrap:wrap; gap:10px; align-items:end;}
+.shopping-add-form > label {display:flex; flex-direction:column;gap:4px;}
+.shopping-add-form .shopping-ingredient-picker {display:flex;flex:1 1 280px;flex-wrap:wrap;gap:6px;}
+.shopping-add-form .shopping-ingredient-picker input {min-width:130px; flex:1;}
+.shopping-add-form .shopping-ingredient-picker select {min-width:180px; flex:1;}

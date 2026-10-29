@@ -2237,7 +2237,9 @@ const app = createApp({
     const dishQuery=ref(''), ingredientQuery=ref(''), dishIngredientQuery=ref(''), shoppingQuery=ref('');
     const dishDraft=reactive({name:'',ingredientIds:[]});
     const ingredientDraft=ref(''), ingredientCategoryDraft=ref('Sans catégorie'), newIngredientCategory=ref('');
-    const shoppingDraft=ref(''), shoppingQuantityDraft=ref(''), shoppingIngredientId=ref('');
+    const shoppingDraft=ref(''), shoppingQuantityDraft=ref(''), shoppingIngredientId=ref(''), shoppingAddMode=ref('free'), shoppingIngredientSearch=ref('');
+    const shoppingIngredientChoices=computed(()=>data.ingredients.filter(i=>String(i.name||'').toLocaleLowerCase().includes(shoppingIngredientSearch.value.trim().toLocaleLowerCase())).sort((a,b)=>a.name.localeCompare(b.name,'fr')));
+    watch(shoppingAddMode,()=>{shoppingIngredientId.value='';shoppingDraft.value='';});
     const pendingMeal=ref(null), shoppingCategoryDragged=ref('');
     const normalizeIngredientCategory = i => i?.category || 'Sans catégorie';
     const ingredientCategoryList=computed(()=>[...new Set(['Sans catégorie',...(Array.isArray(data.ingredientCategories)?data.ingredientCategories:[]).filter(c=>typeof c==='string'&&c.trim()),...(Array.isArray(data.ingredients)?data.ingredients:[]).filter(Boolean).map(normalizeIngredientCategory)])]);
@@ -2274,7 +2276,7 @@ const app = createApp({
       });
       commitDish(p.date,p.kind,dish);pendingMeal.value=null;
     }
-    function addShoppingItem(){const selected=data.ingredients.find(i=>i.id===shoppingIngredientId.value);const name=selected?.name||shoppingDraft.value.trim();if(!name)return;
+    function addShoppingItem(){const selected=shoppingAddMode.value==='ingredient'?data.ingredients.find(i=>i.id===shoppingIngredientId.value):null;const name=shoppingAddMode.value==='ingredient'?selected?.name:shoppingDraft.value.trim();if(!name){notify(shoppingAddMode.value==='ingredient'?'Sélectionne un ingrédient':'Saisis le nom de l’article');return;}
       if(selected){const existing=data.shoppingItems.find(x=>x.ingredientId===selected.id);if(existing){if(shoppingQuantityDraft.value.trim())existing.quantity=shoppingQuantityDraft.value.trim();shoppingIngredientId.value='';shoppingQuantityDraft.value='';notify('Ingrédient déjà dans la liste');return;}}
       data.shoppingItems.push({id:uid(),name,ingredientId:selected?.id||'',category:selected?normalizeIngredientCategory(selected):'Sans catégorie',manual:true,checked:false,quantity:shoppingQuantityDraft.value.trim(),sourceKeys:[]});shoppingDraft.value='';shoppingQuantityDraft.value='';shoppingIngredientId.value='';}
     function addIngredientToShopping(i){let item=data.shoppingItems.find(s=>s.ingredientId===i.id);if(!item)data.shoppingItems.push({id:uid(),name:i.name,ingredientId:i.id,category:normalizeIngredientCategory(i),manual:true,checked:false,quantity:'',sourceKeys:[]});else notify('Déjà dans la liste de courses');}
@@ -2315,14 +2317,16 @@ const app = createApp({
       const summarize=items=>{const expected=items.reduce((s,x)=>s+x.expected,0),achieved=items.reduce((s,x)=>s+x.achieved,0);return {items,expected,achieved,rate:expected?Math.round(100*achieved/expected):null};};
       return {good:summarize(good),bad:summarize(bad),period:'28 derniers jours (jusqu’à aujourd’hui)'};
     });
-    // Priorisation indicative, sans modification automatique des tâches
+    // Priorisation par échéance avant toute pondération : retard > aujourd'hui > futur > sans date.
+    // Les tâches à échéance égale sont classées par urgence puis difficulté.
     const suggestedTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work').map(t=>{
       const urgencyRank=data.urgencies.findIndex(x=>x.id===t.urgency);
       const difficultyRank=data.difficulties.findIndex(x=>x.id===t.difficulty);
-      const due=t.due?Math.round((new Date(t.due+'T12:00:00')-new Date(today.value+'T12:00:00'))/86400000):999;
-      const score=(urgencyRank+1)*12+(due<0?65:due===0?45:due<=2?28:due<=7?12:0)+(difficultyRank>=0?difficultyRank:0);
-      return {task:t,score};
-    }).sort((a,b)=>b.score-a.score || (a.task.due||'9999').localeCompare(b.task.due||'9999')).slice(0,5));
+      const hasDue=typeof t.due==='string' && /^\d{4}-\d{2}-\d{2}$/.test(t.due);
+      const delta=hasDue?Math.round((new Date(t.due+'T12:00:00')-new Date(today.value+'T12:00:00'))/86400000):Infinity;
+      const category=delta<0?0:delta===0?1:Number.isFinite(delta)?2:3;
+      return {task:t,category,delta,urgencyRank,difficultyRank};
+    }).sort((a,b)=>a.category-b.category || a.delta-b.delta || b.urgencyRank-a.urgencyRank || b.difficultyRank-a.difficultyRank || String(a.task.title).localeCompare(String(b.task.title),'fr')).slice(0,5));
     function refreshPriorities(){today.value=todayStr();notify('Priorités recalculées');}
     if(typeof document!=='undefined')document.addEventListener('visibilitychange',()=>{if(!document.hidden)today.value=todayStr();});
     const milestoneDraft=reactive({});
@@ -2334,7 +2338,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,addMilestone,toggleMilestone,removeMilestone,milestones,weekSummary,
+      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,addMilestone,toggleMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
       // état
       budgetMonth,budgetSection,budgetCategories,budgetCategoryName,reorderDrag,startReorder,dropReorder,cashForm,cashBalance,cashIncome,cashExpenses,addCashEntry,removeCashEntry,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
