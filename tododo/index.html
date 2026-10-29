@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261027-v21">
-  <link rel="stylesheet" href="stylekoala.css?v=20261022-v18">
+  <link rel="stylesheet" href="style.css?v=20261029-v22">
+  <link rel="stylesheet" href="stylekoala.css?v=20261029-v22">
 </head>
 <body>
 
@@ -189,7 +189,7 @@
             <option v-for="d in (taskForm.scope === 'work' ? data.workDifficulties : data.difficulties)" :key="d.id" :value="d.id">{{ d.name }}</option>
           </select>
         </label>
-        <label>Statut
+        <label v-if="false">Statut
           <select v-model="taskForm.status">
             <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
           </select>
@@ -255,7 +255,7 @@
               <option v-for="d in (bulkForm.ids.length && data.tasks.find(t=>t.id===bulkForm.ids[0])?.scope === 'work' ? data.workDifficulties : data.difficulties)" :key="d.id" :value="d.id">{{ d.name }}</option>
             </select>
           </label>
-          <label>Statut
+          <label v-if="false">Statut
             <select v-model="bulkForm.status">
               <option value="">(inchangé)</option>
               <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
@@ -398,10 +398,29 @@
         <h2>Défis en cours</h2>
         <div v-for="c in currentChallenges.filter(x=>x.enabled!==false && !x.hiddenHome)" :key="c.id" class="challenge-summary"><strong>{{ c.name }}</strong> · {{ c.current }}/{{ c.target }} · +{{ c.points }} pts <span v-if="c.awarded">✓ Terminé</span><button v-if="c.awarded" type="button" @click="hideChallengeHome(c)">Retirer de l’accueil</button></div>
       </section>
-      <section class="habit-dashboard" v-if="data.habits.length">
-        <h2>Habitudes <small>({{ dashboardHabits.length }})</small></h2>
-        <div class="habit-entry" v-for="habit in dashboardHabits" :key="habit.id" :class="{ 'habit-completed': habitDoneToday(habit), 'habit-overdue': habitLateDays(habit)>0 }">
+      <section class="home-habits" v-if="dashboardHabits.length">
+        <section class="home-habit-group" v-for="group in [{malus:false,title:'Bonnes habitudes',open:goodHabitsHomeOpen},{malus:true,title:'Mauvaises habitudes',open:badHabitsHomeOpen}]" :key="group.title">
+          <button class="habit-group-toggle" type="button" @click="group.malus ? badHabitsHomeOpen=!badHabitsHomeOpen : goodHabitsHomeOpen=!goodHabitsHomeOpen" :aria-expanded="group.malus ? badHabitsHomeOpen : goodHabitsHomeOpen">{{ group.malus ? (badHabitsHomeOpen?'▾':'▸') : (goodHabitsHomeOpen?'▾':'▸') }} {{ group.title }} ({{ dashboardHabits.filter(h=>!!h.malus===group.malus).length }})</button>
+          <div class="habit-dashboard" v-if="group.malus ? badHabitsHomeOpen : goodHabitsHomeOpen">
+        <div class="habit-entry" v-for="habit in dashboardHabits.filter(h=>!!h.malus===group.malus)" :key="habit.id" :class="{ 'habit-completed': habitDoneToday(habit), 'habit-overdue': habitLateDays(habit)>0 }">
           <span>{{ habit.title }} <strong v-if="habit.malus">(−{{ habit.basePoints }} pts · {{ habitPenaltiesToday(habit) }} fois aujourd’hui)</strong> <strong v-if="!habit.malus && habitQuantity(habit)">({{ habitQuantity(habit).done }}/{{ habitQuantity(habit).max }})</strong> <small v-if="habitLateDays(habit)>0">({{ habitLateDays(habit) }} jour(s) de retard)</small></span><div class="habit-actions"><button type="button" v-if="habit.malus" @click="penalizeHabit(habit)">− {{ habit.basePoints }} pts</button><button type="button" v-if="habit.malus && habitPenaltiesToday(habit)" @click="undoHabitPenalty(habit)">Annuler −</button><span v-if="!habit.malus && habitQuantity(habit) && !habitDoneToday(habit)" class="habit-quantity">Fait <input type="number" min="0" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" @change="setHabitQuantity(habit,'done',$event.target.value)"> / <input type="number" min="1" :value="habitQuantity(habit).max" @change="setHabitQuantity(habit,'max',$event.target.value)"></span><button type="button" v-if="!habit.malus && !habitDoneToday(habit)" @click="completeHabit(habit)">✓</button><span v-if="!habit.malus && habitDoneToday(habit)">Effectuée ✓</span><button type="button" v-if="!habit.malus && !habitDoneToday(habit)" @click="postponeHabit(habit)">Demain</button></div>
+        </div>
+          </div>
+        </section>
+      </section>
+      <section class="weekly-menu">
+        <div class="menu-heading"><h2>Menu de la semaine</h2><div><button type="button" @click="menuWeekOffset--">← Précédente</button><button type="button" @click="menuWeekOffset=0">Cette semaine</button><button type="button" @click="menuWeekOffset++">Suivante →</button></div></div>
+        <p>Semaine du {{ formatDate(menuWeekStart) }} · Glisser un repas sur un autre pour échanger leurs places.</p>
+        <details class="menu-conditions"><summary>Conditions / consignes du menu</summary><textarea v-model="data.menuRules" rows="3" placeholder="Ex. Budget maximal, contraintes alimentaires, cuisine rapide le mercredi…"></textarea></details>
+        <div class="menu-days">
+          <article class="menu-day" v-for="day in menuWeekDays" :key="day.date">
+            <h3>{{ day.label }} <small>{{ formatDate(day.date) }}</small></h3>
+            <div class="menu-meal" v-for="kind in ['lunch','dinner']" :key="kind" :class="'meal-'+(mealSlot(day.date,kind).state||'pending')" @dragover.prevent @drop="dropMeal($event,day.date,kind)">
+              <div class="meal-header"><strong>{{ kind==='lunch'?'Déjeuner':'Dîner' }}</strong><span draggable="true" class="drag-handle" @dragstart="dragMeal($event,day.date,kind)" @dragend="menuDragged=null" title="Déplacer / échanger le repas">⠿</span></div>
+              <input :value="mealSlot(day.date,kind).name" @change="setMeal(day.date,kind,'name',$event.target.value)" placeholder="Plat prévu…" aria-label="Nom du plat">
+              <div class="meal-checks"><button type="button" :class="{active:mealSlot(day.date,kind).state==='done'}" @click="setMealState(day.date,kind,'done')">✓ Fait</button><button type="button" :class="{active:mealSlot(day.date,kind).state==='missed'}" @click="setMealState(day.date,kind,'missed')">✕ Non respecté</button></div>
+            </div>
+          </article>
         </div>
       </section>
       <div class="dashboard">
@@ -500,11 +519,12 @@
           <select v-model="ticketDraft.difficulty" aria-label="Difficulté du ticket"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select>
           <select v-model="ticketDraft.typeId" aria-label="Type de ticket"><option value="">Sans type</option><option v-for="type in data.workTicketTypes" :key="type.id" :value="type.id">{{ type.name }}</option></select>
           <input type="url" v-model="ticketDraft.url" placeholder="Lien du ticket (https://…)" aria-label="Lien du ticket">
+          <label>Début <input type="date" v-model="ticketDraft.startDate" title="Date de début du ticket"></label>
           <input type="date" v-model="ticketDraft.due" title="Échéance du ticket">
           <button type="submit">＋ Créer le ticket</button>
         </form>
       </div>
-      <div class="ticket-sort-bar"><label>Tri des tickets <select v-model="ticketSort"><option value="manual">Ordre manuel (glisser-déposer)</option><option value="urgency-desc">Urgence décroissante</option><option value="urgency-asc">Urgence croissante</option><option value="difficulty-desc">Difficulté décroissante</option><option value="difficulty-asc">Difficulté croissante</option><option value="due-asc">Date croissante</option><option value="due-desc">Date décroissante</option><option value="name">Nom A → Z</option></select></label></div>
+      <div class="ticket-sort-bar"><label>Tri des tickets <select v-model="ticketSort"><option value="manual">Ordre manuel (glisser-déposer)</option><option value="urgency-desc">Urgence décroissante</option><option value="urgency-asc">Urgence croissante</option><option value="difficulty-desc">Difficulté décroissante</option><option value="difficulty-asc">Difficulté croissante</option><option value="start-asc">Début croissant</option><option value="start-desc">Début décroissant</option><option value="due-asc">Date butoir croissante</option><option value="due-desc">Date décroissante</option><option value="name">Nom A → Z</option></select></label></div>
       <h3>🎫 Tickets en cours ({{ openTickets.length }}) <small class="work-help">Cliquer sur un ticket pour afficher ses sous-tâches et modifier leurs points.</small></h3>
       <p v-if="!openTickets.length" class="hint">Aucun ticket ouvert.</p>
       <article class="ticket-card" v-for="ticket in openTickets" :key="ticket.id" @dragover.prevent @drop="ticketDrop($event,ticket)">
@@ -525,7 +545,7 @@
           <input type="url" v-model="ticket.url" placeholder="Ajouter ou modifier le lien (https://…)" aria-label="Lien du ticket" @click.stop>
         </div>
         <div v-if="!isTicketCollapsed(ticket.id)" class="ticket-body">
-          <div class="ticket-edit-levels"><label>Type <select v-model="ticket.typeId"><option value="">Sans type</option><option v-for="type in data.workTicketTypes" :key="type.id" :value="type.id">{{ type.name }}</option></select></label><label>Urgence <select v-model="ticket.urgency"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select></label><label>Difficulté <select v-model="ticket.difficulty"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select></label><small>{{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small></div>
+          <div class="ticket-edit-levels"><label>Début <input type="date" v-model="ticket.startDate" :max="ticket.due || undefined" title="Date de départ"></label><label>Type <select v-model="ticket.typeId"><option value="">Sans type</option><option v-for="type in data.workTicketTypes" :key="type.id" :value="type.id">{{ type.name }}</option></select></label><label>Urgence <select v-model="ticket.urgency"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select></label><label>Difficulté <select v-model="ticket.difficulty"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select></label><small>{{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small></div>
           <div class="ticket-items">
             <div class="ticket-item" v-for="item in ticket.items.filter(x=>!x.done)" :key="item.id">
               <label><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label>
@@ -696,20 +716,20 @@
           <strong>{{ d.points }}</strong><div class="statistics-bar-track"><div class="statistics-bar" :class="{'negative':d.points<0}" :style="{height:(Math.abs(d.points)/statistics.trendMax*100)+'%'}"></div></div><small>{{ d.date.slice(8) }}/{{ d.date.slice(5,7) }}</small>
         </div>
       </div></div>
-      <h3>Répartition des statuts</h3>
+      <h3>Avancement des tâches</h3>
       <div class="statistics-distribution"><div v-for="s in statistics.byStatus" :key="s.name" class="statistics-distribution-row"><span>{{ s.name }} ({{ s.count }})</span><div class="statistics-progress"><div :style="{width:(s.count/statistics.statusTotal*100)+'%'}"></div></div></div></div>
       <h3>Catégories les plus utilisées</h3>
       <div class="statistics-distribution"><div v-for="c in statistics.categories.slice(0,10)" :key="c[0]" class="statistics-distribution-row"><span>{{ c[0] }} ({{ c[1] }})</span><div class="statistics-progress"><div :style="{width:(c[1]/statistics.categoryMax*100)+'%'}"></div></div></div></div>
       <h3>Points gagnés par jour (historique détaillé)</h3>
       <p v-if="statistics.mostProductive">Meilleure journée enregistrée : {{ formatDate(statistics.mostProductive.date) }} ({{ statistics.mostProductive.points }} pts).</p>
       <div class="stats-day" v-for="day in statistics.days" :key="day.date"><span>{{ formatDate(day.date) }} · {{ day.count }} tâches</span><strong>{{ day.points }} pts</strong></div>
-      <h3>Statuts des tâches</h3><div class="stats-day" v-for="s in statistics.byStatus" :key="s.name"><span>{{ s.name }}</span><strong>{{ s.count }}</strong></div>
+      <h3>Avancement des tâches</h3><div class="stats-day" v-for="s in statistics.byStatus" :key="s.name"><span>{{ s.name }}</span><strong>{{ s.count }}</strong></div>
       <h3>Catégories les plus utilisées</h3><div class="stats-day" v-for="c in statistics.categories" :key="c[0]"><span>{{ c[0] }}</span><strong>{{ c[1] }}</strong></div>
     </section>
 
     <!-- ============ TERMINÉS : rangés par date de fin, seulement catégorie et projet ============ -->
     <section class="view view-done" v-if="view === 'done'">
-      <p class="hint">{{ doneTasks.length + doneWorkTasks.length }} tâche{{ (doneTasks.length + doneWorkTasks.length) > 1 ? 's' : '' }} terminée{{ (doneTasks.length + doneWorkTasks.length) > 1 ? 's' : '' }}, de la plus récente à la plus ancienne. Supprimer une tâche terminée ne retire pas ses points. Pour la rouvrir ou changer son statut : sélectionne-la puis « Modifier ».</p>
+      <p class="hint">{{ doneTasks.length + doneWorkTasks.length }} tâche{{ (doneTasks.length + doneWorkTasks.length) > 1 ? 's' : '' }} terminée{{ (doneTasks.length + doneWorkTasks.length) > 1 ? 's' : '' }}, de la plus récente à la plus ancienne. Supprimer une tâche terminée ne retire pas ses points. Pour la rouvrir, utilise le bouton « Rouvrir ».</p>
       <p class="empty" v-if="!doneTasks.length && !doneWorkTasks.length">Aucune tâche terminée pour l'instant.</p>
       <h3 v-if="doneTasks.length">Personnel</h3>
       <div class="task-list">
@@ -792,16 +812,18 @@
       <p class="hint" v-if="data.projects.length > 1 && ui.projectSort === 'manual'">Glisse un projet par sa poignée (⠿) pour changer l'ordre.</p>
       <p class="hint" v-else-if="data.projects.length > 1">Projets triés par urgence (urgence définie dans les propriétés du projet). Repasse en « Ordre manuel » pour les réorganiser.</p>
 
-      <article class="project" v-for="(p, i) in sortedProjects" :key="p.id" tabindex="0"
-               :class="{ selected: projectSelection.includes(p.id), dragging: dragProject.from === i, 'drag-over': dragProject.over === i && dragProject.from !== i }"
+      <section class="project-groups" v-for="section in [{name:'Projets en cours',items:activeProjects},{name:'Projets terminés',items:finishedProjects}]" :key="section.name">
+      <h3 class="project-group-title">{{ section.name }} ({{ section.items.length }})</h3>
+      <article class="project" v-for="(p, i) in section.items" :key="p.id" tabindex="0"
+               :class="{ selected: projectSelection.includes(p.id), dragging: dragProject.from === data.projects.indexOf(p), 'drag-over': dragProject.over === data.projects.indexOf(p) && dragProject.from !== data.projects.indexOf(p) }"
                :style="p.color ? { '--item-color': p.color } : {}"
                @click="onProjectClick($event, p)"
                @keydown.space.self.prevent="toggleProjectSelect(p.id)" @keydown.enter.self.prevent="toggleProjectSelect(p.id)"
-               @dragover.prevent="onProjectDragOver(i)" @drop.prevent="onProjectDrop(i)">
+               @dragover.prevent="onProjectDragOver(data.projects.indexOf(p))" @drop.prevent="onProjectDrop(data.projects.indexOf(p))">
         <header class="project-header">
           <div class="project-title-row">
             <span class="drag-handle" v-if="ui.projectSort === 'manual'" draggable="true" title="Glisser pour changer l'ordre"
-                  @dragstart="onProjectDragStart($event, i)" @dragend="onProjectDragEnd">⠿</span>
+                  @dragstart="onProjectDragStart($event, data.projects.indexOf(p))" @dragend="onProjectDragEnd">⠿</span>
             <input class="project-color" type="color" :value="p.color || '#888888'" title="Couleur du projet"
                    @change="setProjectColor(p, $event.target.value)">
             <h3 class="project-name">{{ p.name }}</h3>
@@ -817,7 +839,8 @@
             <span>{{ projectStats(p).done }} / {{ projectStats(p).total }} tâches · {{ projectStats(p).points }} pts à gagner</span>
           </div>
           <div class="project-actions">
-            <button type="button" @click="openTaskForm(null, p.id)">＋ Tâche</button>
+            <button type="button" @click.stop="setProjectCompleted(p,!p.completed)">{{ p.completed ? "↶ Rouvrir le projet" : "✓ Terminer le projet" }}</button>
+            <button type="button" v-if="!p.completed" @click="openTaskForm(null, p.id)">＋ Tâche</button>
           </div>
         </header>
 
@@ -831,6 +854,7 @@
           </div>
         </div>
       </article>
+      </section>
     </section>
 
     <!-- ============ CATÉGORIES ============ -->
@@ -1200,15 +1224,11 @@
           </select>
         </label>
 
+        <button type="button" class="task-finish-button" v-if="compact && task.status==='done'" @click.stop="$emit('status',task,'todo')">↶ Rouvrir</button>
         <!-- En mode compact (onglet Terminés) on s'arrête ici -->
         <template v-if="!compact">
 
-          <!-- Statut -->
-          <label class="tag tag-status" :class="'status-' + task.status">
-            <select :value="task.status" @change="$emit('status', task, $event.target.value)">
-              <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
-            </select>
-          </label>
+          <button type="button" class="task-finish-button" @click.stop="$emit('status',task,'done')">✓ Terminé</button>
 
           <!-- Points : + (bonus) ou − (malus), puis le nombre -->
           <label class="tag tag-points" :class="{ 'tag-malus': task.malus }">
@@ -1294,7 +1314,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261027-v21"></script>
+<script src="app.js?v=20261029-v22"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

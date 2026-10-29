@@ -199,6 +199,8 @@ function defaultData() {
   return {
     eveningNotes: '', // ancien champ conservé pour migration
     budgetCategories: ['Alimentation','Essence','Loisirs','Logement','Abonnements','Impôts','Santé','Transport','Salaire','Autres'],
+    weeklyMenus: {}, // menus indexés par lundi YYYY-MM-DD
+    menuRules: '', // conditions personnelles de préparation des menus
     budgetEntries: [], // opérations saisies (montants signés)
     budgetRecurring: [], // charges mensuelles automatiques
     budgetOverrides: {}, // montants adaptés sur un mois précis
@@ -252,6 +254,8 @@ function loadData() {
     d.eveningNotes = typeof d.eveningNotes === 'string' ? d.eveningNotes : '';
     if (!Array.isArray(d.budgetCategories)) d.budgetCategories = defaultData().budgetCategories;
     d.budgetCategories = [...new Set([...d.budgetCategories, ...[...(d.budgetEntries||[]),...(d.budgetRecurring||[]),...(d.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))];
+    if (!d.weeklyMenus || typeof d.weeklyMenus !== 'object' || Array.isArray(d.weeklyMenus)) d.weeklyMenus = {};
+    if (typeof d.menuRules !== 'string') d.menuRules = '';
     if (!Array.isArray(d.budgetEntries)) d.budgetEntries = [];
     if (!Array.isArray(d.budgetRecurring)) d.budgetRecurring = [];
     if (!d.budgetOverrides || typeof d.budgetOverrides !== 'object' || Array.isArray(d.budgetOverrides)) d.budgetOverrides = {};
@@ -468,6 +472,8 @@ const app = createApp({
 
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
+      data.weeklyMenus = src.weeklyMenus && typeof src.weeklyMenus === 'object' && !Array.isArray(src.weeklyMenus) ? src.weeklyMenus : {};
+      data.menuRules = typeof src.menuRules === 'string' ? src.menuRules : '';
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
       data.budgetCategories = Array.isArray(src.budgetCategories) ? [...new Set([...src.budgetCategories, ...[...(src.budgetEntries||[]),...(src.budgetRecurring||[]),...(src.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))] : [...new Set([...defaultData().budgetCategories, ...[...(src.budgetEntries||[]),...(src.budgetRecurring||[]),...(src.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))];
       data.budgetEntries = Array.isArray(src.budgetEntries) ? src.budgetEntries : [];
@@ -1004,7 +1010,7 @@ const app = createApp({
       try { const u=new URL(value);return ['https:','http:'].includes(u.protocol) ? u.href : ''; }
       catch(e){return '';}
     }
-    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',due:'',category:'',typeId:'',url:''});
+    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',startDate:todayStr(),due:'',category:'',typeId:'',url:''});
     const collapsedTickets = reactive({});
     function isTicketCollapsed(id) { return collapsedTickets[id] !== false; }
     function toggleTicketCollapse(id) { collapsedTickets[id] = !isTicketCollapsed(id); }
@@ -1039,6 +1045,8 @@ const app = createApp({
         case 'urgency-asc': return [...list].sort((a,b)=>urgency(a)-urgency(b));
         case 'difficulty-desc': return [...list].sort((a,b)=>difficulty(b)-difficulty(a));
         case 'difficulty-asc': return [...list].sort((a,b)=>difficulty(a)-difficulty(b));
+        case 'start-asc': return [...list].sort((a,b)=>(a.startDate||a.createdAt||'9999').localeCompare(b.startDate||b.createdAt||'9999'));
+        case 'start-desc': return [...list].sort((a,b)=>(b.startDate||b.createdAt||'0000').localeCompare(a.startDate||a.createdAt||'0000'));
         case 'due-asc': return [...list].sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
         case 'due-desc': return [...list].sort((a,b)=>(b.due||'0000').localeCompare(a.due||'0000'));
         case 'name': return [...list].sort((a,b)=>a.name.localeCompare(b.name));
@@ -1064,8 +1072,8 @@ const app = createApp({
     function createTicket() {
       const name=ticketDraft.name.trim(); if(!name)return;
       const id=uid();ticketInputs[id]={name:'',points:10};
-      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,typeId:ticketDraft.typeId,url:ticketDraft.url.trim(),due:ticketDraft.due,category:ticketDraft.category,createdAt:today.value,customStatus:'',done:false,doneAt:'',items:[]});
-      ticketDraft.name='';ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';
+      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,typeId:ticketDraft.typeId,url:ticketDraft.url.trim(),due:ticketDraft.due,startDate:ticketDraft.startDate||today.value,category:ticketDraft.category,createdAt:today.value,customStatus:'',done:false,doneAt:'',items:[]});
+      ticketDraft.name='';ticketDraft.startDate=today.value;ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';
     }
     function addTicketItem(ticket) {
       const draft=ticketInputs[ticket.id]||(ticketInputs[ticket.id]={name:'',points:10});const name=String(draft.name||'').trim();if(!name)return;
@@ -1593,6 +1601,9 @@ const app = createApp({
     }
 
     // Tri des projets : ordre manuel (glisser-déposer) ou par urgence
+    const activeProjects = computed(() => sortedProjects.value.filter(p=>!p.completed));
+    const finishedProjects = computed(() => sortedProjects.value.filter(p=>p.completed));
+    function setProjectCompleted(project,completed){ project.completed=!!completed; project.completedAt=completed?today.value:''; }
     const sortedProjects = computed(() => {
       if (ui.projectSort !== 'urgency') return data.projects;
       const rank = p => { const u = projectTopUrgency(p); return u ? levelRank(data.urgencies, u.id) : 0; };
@@ -2160,7 +2171,44 @@ const app = createApp({
       notify('Déconnecté (tes données restent sur cet appareil)');
     }
 
+    // Planning repas : 7 jours, lundi à dimanche. Les déplacements échangent les deux cases.
+    const menuWeekOffset = ref(0);
+    const menuDragged = ref(null);
+    const menuDays = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+    const menuWeekStart = computed(() => {
+      const d=new Date(today.value+'T12:00:00');
+      d.setDate(d.getDate()-((d.getDay()+6)%7)+7*menuWeekOffset.value);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    });
+    const menuWeekDays = computed(() => menuDays.map((label,i)=>{
+      const d=new Date(menuWeekStart.value+'T12:00:00');d.setDate(d.getDate()+i);
+      const date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      return {date,label};
+    }));
+    function mealSlot(date,kind) {
+      return data.weeklyMenus[date]?.[kind] || {name:'',state:''};
+    }
+    function setMeal(date,kind,field,value){
+      if(!data.weeklyMenus[date])data.weeklyMenus[date]={};
+      if(!data.weeklyMenus[date][kind])data.weeklyMenus[date][kind]={name:'',state:''};
+      data.weeklyMenus[date][kind][field]=value;
+      if(field==='name') data.weeklyMenus[date][kind].state='';
+    }
+    function dragMeal(event,date,kind){menuDragged.value={date,kind};event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',date+':'+kind);}
+    function dropMeal(event,date,kind){
+      event.preventDefault();const from=menuDragged.value;menuDragged.value=null;
+      if(!from||(from.date===date&&from.kind===kind))return;
+      const a=clone(mealSlot(from.date,from.kind)),b=clone(mealSlot(date,kind));
+      if(!data.weeklyMenus[from.date])data.weeklyMenus[from.date]={};
+      if(!data.weeklyMenus[date])data.weeklyMenus[date]={};
+      data.weeklyMenus[from.date][from.kind]=b;
+      data.weeklyMenus[date][kind]=a;
+    }
+    function setMealState(date,kind,state){setMeal(date,kind,'state',mealSlot(date,kind).state===state?'':state);}
+    const goodHabitsHomeOpen = ref(true);
+    const badHabitsHomeOpen = ref(true);
     return {
+      menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
       // état
       budgetMonth,budgetSection,budgetCategories,budgetCategoryName,reorderDrag,startReorder,dropReorder,cashForm,cashBalance,cashIncome,cashExpenses,addCashEntry,removeCashEntry,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
       usualDragged,usualNewItem,addUsualList,removeUsualList,addUsualHeading,addUsualItem,toggleUsualItem,resetUsualList,deleteUsualItem,startUsualDrag,dropUsualItem,
@@ -2185,7 +2233,7 @@ const app = createApp({
       todayPoints, upcomingPoints,
       // projets
       projectForm, openProjectForm, addDraftTask, saveProject, setProjectColor, projectTasks, projectStats, projectTopUrgency,
-      sortedProjects, isProjectOpen, toggleProjectOpen, setAllProjectsOpen,
+      sortedProjects, activeProjects, finishedProjects, setProjectCompleted, isProjectOpen, toggleProjectOpen, setAllProjectsOpen,
       projectSelection, onProjectClick, toggleProjectSelect, selectAllProjects, clearProjectSelection, editSelectedProject, deleteSelectedProjects,
       dragProject, onProjectDragStart, onProjectDragOver, onProjectDrop, onProjectDragEnd, moveProject,
       // récompenses
