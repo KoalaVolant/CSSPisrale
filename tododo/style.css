@@ -346,3 +346,19 @@
 
 /* V27 : magasins et emplacements (stylekoala.css inchangé) */
 .shopping-filters{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.shopping-filters>input{flex:1;min-width:220px;padding:8px}.shopping-filters label{display:flex;gap:8px;align-items:center}.shopping-store{max-width:150px;padding:6px}.shopping-add-form>select{min-width:140px}
+
+/* V29 : nouvelles fonctionnalités, stylekoala.css reste inchangé */
+.v29-panel{border:1px solid var(--main-color,#ddd);padding:12px;border-radius:10px;margin:12px 0;background:var(--fnd,#f8f8f8)}
+.v29-widget-choice{display:inline-flex;align-items:center;gap:7px;margin:5px 12px 5px 0}
+.v29-line{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px;border-bottom:1px solid #ddd}
+.v29-line strong{flex:1;min-width:160px}.v29-line input[type=number]{max-width:80px}.v29-line small{color:#b33}
+.v29-toolbar{display:flex;gap:15px;align-items:center;margin:12px 0}
+.v29-calendar{display:grid;grid-template-columns:repeat(7,minmax(115px,1fr));gap:6px;overflow:auto}
+.v29-day{border:1px solid #ccc;border-radius:6px;min-height:105px;padding:6px}.v29-day>strong{font-size:12px}
+.v29-calendar-task{font-size:12px;background:var(--fnd2,#dcebe7);padding:5px;border-radius:4px;margin:4px 0;cursor:grab;overflow-wrap:anywhere}
+.v29-done{text-decoration:line-through;opacity:.65}.v29-achievements{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.v29-achievements progress{width:100%}.v29-suggestions{display:flex;flex-wrap:wrap;gap:8px}.v29-suggestions article{display:flex;flex-direction:column;gap:7px;min-width:200px;max-width:330px;border:1px solid #ddd;padding:10px;border-radius:7px}
+.v29-price{width:75px!important}
+@media(max-width:850px){.v29-calendar{grid-template-columns:repeat(2,minmax(140px,1fr))}}
+
+.view-home{display:flex;flex-direction:column}.view-home>.config-fold{order:0}.view-home>.challenge-dashboard{order:1}.v29-widget-choice{display:flex;gap:6px;align-items:center;justify-content:flex-start}.v29-widget-choice button{padding:3px 8px}
