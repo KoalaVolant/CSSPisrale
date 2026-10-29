@@ -1,0 +1,29 @@
+/* Todo Quest V31. Feuille de thème indépendante ; style.css et stylekoala.css inchangés. */
+:root{--tq-ink:#233843;--tq-muted:#566f78;--tq-surface:#fff;--tq-canvas:#eef4f4;--tq-primary:#286d75;--tq-outline:#cbdcdd;--tq-shadow:0 5px 23px rgba(32,75,83,.08)}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--tq-canvas)!important;color:var(--tq-ink)!important;font-size:14px;overflow-x:hidden}
+.app-header{background:#f9fcfc!important;border-bottom:1px solid var(--tq-outline);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.app-brand{border-radius:12px!important;flex:1 1 290px;min-width:0}
+.app-title{color:var(--tq-primary)!important;background:none!important}
+.layout{max-width:1600px;margin:0 auto;gap:14px;padding:14px;align-items:flex-start}
+.sidebar{position:sticky;top:14px;background:var(--tq-surface);border:1px solid var(--tq-outline);border-radius:16px;padding:14px;box-shadow:var(--tq-shadow)}
+.app-main{min-width:0!important;background:var(--tq-surface);border:1px solid var(--tq-outline);border-radius:16px;padding:18px!important;box-shadow:var(--tq-shadow)}
+.app-nav button{display:block!important;width:100%;text-align:left!important;padding:9px 12px!important;border:0!important;border-radius:9px!important;margin:0 0 4px!important;color:var(--tq-ink)!important;transition:background .15s}
+.app-nav button:hover{background:#edf6f4!important}.app-nav button.active{background:#d5ece8!important;color:#15525a!important}
+h2,.page-title{color:var(--tq-primary)!important;letter-spacing:.02em}
+button{touch-action:manipulation;transition:filter .15s,background .15s}
+button:hover{filter:brightness(.96)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #499aa8!important;outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,select,textarea{max-width:100%;border:1px solid var(--tq-outline);border-radius:8px;padding:7px 9px;background:#fff;color:var(--tq-ink)}
+.task,.project,.reward,.ticket-card,.habit-entry,.v29-panel,.view-today,.view-upcoming{background:#fff!important;border:1px solid var(--tq-outline)!important;border-radius:12px!important;box-shadow:var(--tq-shadow);min-width:0}
+.task{padding:10px!important;flex-wrap:wrap;overflow-wrap:anywhere}.task-title{overflow-wrap:anywhere}
+.project{max-width:100%!important}.project-milestones{padding:10px;background:#f5faf9;border:1px solid var(--tq-outline);border-radius:10px;margin:10px 0}
+.tq-milestone{border-bottom:1px solid var(--tq-outline);padding:8px 0}.tq-milestone-children{padding:8px 4px 8px 20px;display:grid;gap:7px}.tq-milestone-children>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tq-dependency-picker{width:100%;min-width:0;border:1px solid var(--tq-outline);border-radius:12px;padding:10px;margin:10px 0}.tq-dependency-picker summary{cursor:pointer;color:var(--tq-primary);font-weight:600;padding:8px}.tq-dependency-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding:8px}.tq-dependency-results{max-height:230px;overflow:auto;display:grid;gap:5px;padding:8px}.tq-dependency-results button{text-align:left;padding:8px;border:1px solid var(--tq-outline);background:#fff;border-radius:8px}.tq-dependency-results small{display:block;color:var(--tq-muted)}
+.tq-blocked{display:inline-block;color:#99540b;font-size:12px;background:#fff2dc;padding:5px;border-radius:6px}
+.tq-edit-toggle{border:1px solid var(--tq-outline);background:#f1f7f6;border-radius:8px;padding:4px 8px;font-size:12px}
+.tq-edit-hidden{display:none!important}.tq-read-summary{font-size:12px;color:var(--tq-muted);margin:6px 0}
+.modal-backdrop{padding:12px!important}.modal{width:min(95vw,720px)!important;max-width:95vw!important;border-radius:16px!important;box-shadow:0 14px 70px #0003}.form-panel label{max-width:100%}
+.dashboard{gap:12px!important}.task-list-box>*{min-width:0!important}.task-list-box [class*="status"]{min-width:0!important;overflow-wrap:anywhere}
+@media(max-width:900px){.layout{display:block!important;padding:8px!important}.sidebar{width:100%!important;position:static!important;margin-bottom:10px!important;padding:8px!important}.app-nav{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:5px}.app-nav .nav-group{flex:1 1 180px;min-width:0}.app-main{padding:12px!important}.dashboard{display:block!important}.view-today,.view-upcoming{width:100%!important;margin:0 0 12px}.page-header{position:static!important;flex-wrap:wrap}.page-actions{display:flex;flex-wrap:wrap;gap:5px}.task-toolbar{position:static!important}}
+@media(max-width:600px){body{font-size:13px}.app-header{padding:8px!important}.app-brand{display:block!important}.app-title{font-size:19px!important}.sidebar{border-radius:10px}.app-nav .nav-group{flex:1 1 130px}.app-nav button{font-size:12px!important;padding:8px!important}.app-main{padding:9px!important;border-radius:10px}.page-title{font-size:18px}.task-list-box [class*="status"]{width:100%!important}.view-projects .project,.view-done .task-group article,.view.view-habits article,.reward-list .reward,.inventory-list article{width:100%!important;margin:5px 0!important}.task-tags{gap:5px;max-width:100%;flex-wrap:wrap}.tag{max-width:100%;white-space:normal}.tag select{max-width:100%;font-size:12px}.quick-row,.ticket-inline,.project-title-row,.ticket-item,.ticket-heading{flex-wrap:wrap!important}.quick-row input,.quick-row select{max-width:100%!important;min-width:0}.tq-dependency-filters{grid-template-columns:1fr}.modal{width:100%!important;max-height:94dvh!important;padding:12px!important}.form-actions{display:flex;flex-wrap:wrap;gap:8px}.project-milestones{padding:7px}.tq-milestone-children{padding-left:8px}.filters-row{display:flex;flex-wrap:wrap}.filters-row>*{min-width:0}.app-main button{min-height:32px}}

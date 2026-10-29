@@ -6,6 +6,7 @@
   <title>Todo Quest</title>
   <link rel="stylesheet" href="style.css?v=20261029-v26">
   <link rel="stylesheet" href="stylekoala.css?v=20261029-v22">
+  <link rel="stylesheet" href="styletest.css?v=20261029-v31">
 </head>
 <body>
 
@@ -203,6 +204,19 @@
             <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
         </label>
+        <label v-if="taskForm.scope !== 'work' && taskForm.projectId">Jalon
+          <select v-model="taskForm.milestoneId"><option value="">Sans jalon</option><option v-for="m in data.projectMilestones.filter(x=>x.projectId===taskForm.projectId)" :value="m.id" :key="m.id">{{m.title}}</option></select>
+        </label>
+        <fieldset class="tq-dependency-picker"><legend>Dépendance préalable (facultative)</legend>
+          <details><summary>{{ taskForm.dependsOn ? (data.tasks.find(x=>x.id===taskForm.dependsOn)?.title||'Tâche introuvable') : 'Choisir une tâche préalable' }}</summary>
+            <div class="tq-dependency-filters"><input type="search" v-model="depPicker.search" placeholder="Rechercher un titre…">
+              <select v-model="depPicker.project"><option value="">Tous projets</option><option v-for="p in data.projects" :key="p.id" :value="p.id">{{p.name}}</option></select>
+              <select v-model="depPicker.category"><option value="">Toutes catégories</option><option v-for="c in categories" :key="c" :value="c">{{c}}</option></select>
+              <select v-model="depPicker.urgency"><option value="">Toutes urgences</option><option v-for="u in data.urgencies" :key="u.id" :value="u.id">{{u.name}}</option></select>
+              <select v-model="depPicker.difficulty"><option value="">Toutes difficultés</option><option v-for="d in data.difficulties" :key="d.id" :value="d.id">{{d.name}}</option></select>
+            </div><div class="tq-dependency-results"><button type="button" @click="taskForm.dependsOn=''">Aucune dépendance</button><button type="button" v-for="t in data.tasks.filter(x=>dependencyMatches(x,taskForm.id))" :key="t.id" @click="taskForm.dependsOn=t.id">{{t.title}} <small>{{data.projects.find(p=>p.id===t.projectId)?.name||t.category||'Sans projet'}}</small></button></div>
+          </details>
+        </fieldset>
         <label>Date butoir
           <input type="date" v-model="taskForm.due">
         </label>
@@ -883,7 +897,7 @@
             </button>
           </div>
           <p class="project-desc" v-if="p.description">{{ p.description }}</p>
-          <div class="project-milestones"><strong>Jalons ({{ projectStats(p).milestonesDone }}/{{ projectStats(p).milestonesTotal }})</strong><progress :value="projectStats(p).done + projectStats(p).milestonesDone" :max="Math.max(1, projectStats(p).total + projectStats(p).milestonesTotal)"></progress><label v-for="m in milestones(p)" :key="m.id"><input type="checkbox" :checked="!!m.done" @change="toggleMilestone(m)"> {{ m.title }} <button type="button" @click.stop="removeMilestone(m)">×</button></label><div><input v-model="milestoneDraft[p.id]" placeholder="Nouveau jalon" @click.stop @keyup.enter.stop="addMilestone(p)"><button type="button" @click.stop="addMilestone(p)">Ajouter</button></div></div>
+          <div class="project-milestones"><strong>Jalons ({{ projectStats(p).milestonesDone }}/{{ projectStats(p).milestonesTotal }})</strong><progress :value="projectStats(p).done + projectStats(p).milestonesDone" :max="Math.max(1, projectStats(p).total + projectStats(p).milestonesTotal)"></progress><div class="tq-milestone" v-for="m in milestones(p)" :key="m.id"><input type="checkbox" :checked="milestoneDone(m)" :disabled="milestoneTasks(m).length>0&&!milestoneDone(m)" @change="toggleMilestone(m)"> {{ m.title }} <button type="button" @click.stop="removeMilestone(m)">×</button><div class="tq-milestone-children"><div v-for="t in milestoneTasks(m)" :key="t.id"><button type="button" :disabled="!!blockingTask(t)" @click.stop="changeStatus(t,t.status==='done'?'todo':'done')">{{t.status==='done'?'↶':'☐'}}</button> {{t.title}} <button type="button" @click.stop="openTaskForm(t)">Modifier</button></div><input v-model="milestoneTaskDraft[m.id]" placeholder="Nouvelle sous-tâche" @click.stop @keyup.enter.stop="addMilestoneTask(m)"><button type="button" @click.stop="addMilestoneTask(m)">＋ Sous-tâche</button></div></div><div><input v-model="milestoneDraft[p.id]" placeholder="Nouveau jalon" @click.stop @keyup.enter.stop="addMilestone(p)"><button type="button" @click.stop="addMilestone(p)">Ajouter</button></div></div>
           <div class="project-progress">
             <progress :value="projectStats(p).done" :max="Math.max(1, projectStats(p).total)"></progress>
             <span>{{ projectStats(p).done }} / {{ projectStats(p).total }} tâches · {{ projectStats(p).milestonesDone }} / {{ projectStats(p).milestonesTotal }} jalons · {{ projectStats(p).points }} pts à gagner</span>
@@ -897,8 +911,8 @@
         <div class="task-list" v-if="isProjectOpen(p.id)">
           <p class="empty" v-if="!projectTasks(p).length">Pas encore de tâche dans ce projet.</p>
           <div class="project-task" v-for="t in projectTasks(p)" :key="t.id" :class="'status-' + t.status">
-            <span class="project-task-title">{{ t.title }}</span>
-            <label class="v30-dependency">Après <select :value="t.dependsOn||''" @change="setTaskDependency(t,$event.target.value)"><option value="">Aucune</option><option v-for="other in projectTasks(p).filter(x=>x.id!==t.id)" :key="other.id" :value="other.id">{{other.title}}</option></select></label><small v-if="blockingTask(t)">Bloquée par {{blockingTask(t).title}}</small><span class="project-task-points" :class="{ 'is-malus': t.malus }">{{ t.malus ? '−' : '' }}{{ t.points }} pts</span>
+            <span class="project-task-title">{{ t.title }}</span><small v-if="blockingTask(t)" class="tq-blocked">🔒 Bloquée</small>
+            <button type="button" @click.stop="openTaskForm(t)">Configurer dépendance</button><small v-if="blockingTask(t)">Bloquée par {{blockingTask(t).title}}</small><span class="project-task-points" :class="{ 'is-malus': t.malus }">{{ t.malus ? '−' : '' }}{{ t.points }} pts</span>
             <button type="button" @click="openTaskForm(t)">Modifier</button>
             <button type="button" @click="deleteTask(t)">Supprimer</button>
           </div>
@@ -1178,9 +1192,8 @@
       <label>Journée <input type="date" v-model="plannerDate"></label>
       <p><strong>{{ plannedTasks.length }} tâches proposées</strong> · sans durée ni quota horaire.</p>
       <h3>Proposition de journée</h3><article v-for="(x,i) in plannedTasks" :key="x.task.id" class="v29-line"><strong>{{ i+1 }}. {{ x.task.title }}</strong><span>{{ x.task.due ? 'Échéance '+formatDate(x.task.due) : 'Sans échéance' }}</span><button type="button" @click="changeStatus(x.task,'done')">✓ Terminé</button></article>
-      <h3>Dépendances des tâches</h3><p>Une tâche peut commencer seulement lorsque sa tâche préalable est terminée. Les tâches des projets sont également configurables directement dans le projet.</p><article v-for="t in data.tasks.filter(x=>x.status!=='done')" :key="t.id" class="v29-line"><strong>{{t.title}}</strong><label>Après <select :value="t.dependsOn||''" @change="setTaskDependency(t,$event.target.value)"><option value="">Aucune dépendance</option><option v-for="other in data.tasks.filter(x=>x.id!==t.id)" :key="other.id" :value="other.id">{{other.title}}</option></select></label><small v-if="blockingTask(t)">Bloquée par : {{ blockingTask(t).title }}</small></article>
+      <h3>Dépendances des tâches</h3><p>Une tâche peut commencer seulement lorsque sa tâche préalable est terminée. Les tâches des projets sont également configurables directement dans le projet.</p><article v-for="t in data.tasks.filter(x=>x.status!=='done')" :key="t.id" class="v29-line"><strong>{{t.title}}</strong><button type="button" @click="openTaskForm(t)">Configurer dépendance</button><small v-if="blockingTask(t)">Bloquée par : {{ blockingTask(t).title }}</small></article>
     </section>
-    <section class="view v29-view" v-if="view==='calendar'"><h2>Calendrier global des tâches</h2><div class="v29-toolbar"><button type="button" @click="shiftCalendarMonth(-1)">◀</button><strong>{{calendarMonth}}</strong><button type="button" @click="shiftCalendarMonth(1)">▶</button></div><p>Glisse une tâche vers une autre date pour modifier son échéance.</p><div class="v29-calendar"><div v-for="date in calendarDays" :key="date" class="v29-day" @dragover.prevent @drop.prevent="onCalendarDrop(date)"><strong>{{formatDate(date)}}</strong><div v-for="t in calendarTasks(date)" :key="t.id" class="v29-calendar-task" draggable="true" @dragstart="calendarDrag=t.id;$event.dataTransfer.setData('text/plain',t.id)" @dragend="calendarDrag=''" :class="{'v29-done':t.status==='done'}">⠿ {{t.title}}</div><div v-for="ticket in calendarTickets(date)" :key="ticket.id" class="v29-calendar-task">🎫 {{ticket.name}}</div><div v-for="m in calendarMilestones(date)" :key="m.id" class="v29-calendar-task">◆ {{m.title}}</div><div v-for="meal in calendarMeals(date)" :key="meal.kind" class="v29-calendar-task">🍽 {{meal.name}}</div></div></div></section>
     <section class="view v29-view" v-if="view==='achievements'"><h2>Succès et objectifs</h2><p>Succès obtenus automatiquement d'après les tâches, projets et repas enregistrés. Aucun point supplémentaire n'est attribué pour éviter de modifier le solde existant.</p><div class="v29-achievements"><article v-for="x in successProgress" :key="x.id" class="v29-panel"><strong>{{ x.unlocked?'🏆':'🔒' }} {{x.name}}</strong><p>{{x.detail}}</p><progress :value="Math.min(x.current,x.target)" :max="x.target"></progress><small>{{ x.current }} / {{x.target}} <template v-if="data.achievements.find(a=>a.id===x.id)">· Débloqué le {{formatDate(data.achievements.find(a=>a.id===x.id).unlockedAt)}}</template></small></article></div></section>
 
     <!-- ============ BUDGET ============ -->
@@ -1262,7 +1275,10 @@
       <input v-else ref="titleInput" class="task-title-input" type="text" v-model="draft"
              @keydown.enter.prevent="saveTitle" @keydown.esc.stop.prevent="cancelTitle" @blur="saveTitle">
 
-      <div class="task-tags">
+      <button v-if="!compact" type="button" class="tq-edit-toggle" @click.stop="editingDetails=!editingDetails">{{editingDetails ? "Fermer les modifications" : "✎ Modifier les détails"}}</button>
+      <div class="tq-read-summary" v-if="!compact&&!editingDetails">{{task.category||"Sans catégorie"}} · {{task.points}} pts · {{task.due ? dueLabel : "Sans échéance"}}</div>
+      <button v-if="!compact&&!editingDetails" type="button" class="task-finish-button" :disabled="!!blockedBy" @click.stop="$emit('status',task,'done')">✓ Terminé</button><span v-if="blockedBy&&!compact" class="tq-blocked">🔒 Après : {{blockedBy.title}}</span><button type="button" v-if="!compact&&!editingDetails" class="task-duplicate" @click.stop="$emit('duplicate',task,'tomorrow')">+ Demain</button><button type="button" v-if="!compact&&!editingDetails" class="task-duplicate" @click.stop="$emit('duplicate',task,'followup')">+ Suite</button>
+      <div class="task-tags" :class="{'tq-edit-hidden':!editingDetails&&!compact}">
 
         <!-- Catégorie -->
         <details v-if="task.scope === 'work'" class="tag tag-category work-tag-picker" @click.stop>
@@ -1289,8 +1305,9 @@
         <!-- En mode compact (onglet Terminés) on s'arrête ici -->
         <template v-if="!compact">
 
-          <button type="button" class="task-finish-button" @click.stop="$emit('status',task,'done')">✓ Terminé</button>
+          <button type="button" class="task-finish-button" :disabled="!!blockedBy" :title="blockedBy ? `Bloquée par ${blockedBy.title}` : `Terminer la tâche`" @click.stop="$emit('status',task,'done')">✓ Terminé</button>
 
+          <span class="tq-blocked" v-if="blockedBy">🔒 Après : {{blockedBy.title}}</span>
           <!-- Points : + (bonus) ou − (malus), puis le nombre -->
           <label class="tag tag-points" :class="{ 'tag-malus': task.malus }">
             <select class="tag-sign" :value="task.malus ? 'true' : 'false'" title="Bonus (+) ou malus (−)"
@@ -1375,7 +1392,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261029-v26"></script>
+<script src="app.js?v=20261029-v31"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

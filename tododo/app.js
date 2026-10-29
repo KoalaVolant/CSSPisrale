@@ -36,7 +36,6 @@ const TABS = [
   { id: 'usual-lists', label: 'Listes de tâches habituelles' },
   { id: 'menu', label: 'Menu de la semaine' },
   { id: 'shopping', label: 'Liste de courses' },
-  { id: 'calendar', label: 'Calendrier global' },
   { id: 'planner', label: 'Planificateur' },
   { id: 'achievements', label: 'Succès & objectifs' },
   { id: 'trash', label: 'Corbeille' },
@@ -57,7 +56,7 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','planner','calendar','all','work','habits','usual-lists','evening','done'] },
+  { title: 'Tâches', ids: ['home','planner','all','work','habits','usual-lists','evening','done'] },
   { title: 'Repas', ids: ['menu','shopping'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','challenges','achievements','statistics','budget'] },
@@ -339,9 +338,10 @@ const TaskRow = {
   inject: { appData: 'app-data' },
   emits: ['toggle', 'status', 'points', 'due', 'update'],
   data() {
-    return { editingTitle: false, draft: '' };
+    return { editingTitle: false, editingDetails:false, draft: '' };
   },
   computed: {
+    blockedBy(){const p=this.appData.tasks.find(x=>x.id===this.task.dependsOn);return p&&p.status!=='done'?p:null;},
     isOverdue() {
       return !!this.task.due && this.task.due < this.today && this.task.status !== 'done';
     },
@@ -1232,7 +1232,7 @@ const app = createApp({
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
       open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
-      urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '',
+      urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',
     });
 
     const DRAFT_KEY='todo-quest-form-drafts-v2';
@@ -1246,12 +1246,12 @@ const app = createApp({
         Object.assign(taskForm, {
           id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal',
           status: task.status, projectId: task.projectId || '', due: task.due || '',
-          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '',
+          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '', dependsOn: task.dependsOn || '', milestoneId:task.milestoneId||'',
         });
       } else {
         Object.assign(taskForm, {
           id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId, scope: view.value==='work'?'work':'personal',
-          due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [], ticketName: '',
+          due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',
         });
       }
       if(!task && persistedDrafts.task && persistedDrafts.task.scope===taskForm.scope)Object.assign(taskForm,persistedDrafts.task,{open:false,id:null});
@@ -1273,6 +1273,7 @@ const app = createApp({
 
     // Change le statut d'une tâche en gérant la date de fin (doneAt)
     function setStatus(task, newStatus, doneAt = '') {
+      if(newStatus==='done'&&task.dependsOn){const dep=data.tasks.find(x=>x.id===task.dependsOn);if(dep&&dep.status!=='done'){notify('Tâche bloquée par « '+dep.title+' »');return;}}
       const old = task.status;
       task.status = newStatus;
       if (newStatus === 'done') task.doneAt = doneAt || (old === 'done' && task.doneAt) || today.value;
@@ -1280,6 +1281,8 @@ const app = createApp({
     }
 
     function saveTask() {
+      if(taskForm.dependsOn&&taskForm.dependsOn===taskForm.id){notify('Dépendance sur soi impossible');return;}
+      if(taskForm.id&&taskForm.dependsOn){let cur=taskForm.dependsOn,seen=new Set([taskForm.id]);while(cur){if(seen.has(cur)){notify('Dépendance circulaire impossible');return;}seen.add(cur);cur=data.tasks.find(t=>t.id===cur)?.dependsOn||'';}}
       const title = taskForm.title.trim();
       if (!title) return;
       const fields = {
@@ -1294,6 +1297,8 @@ const app = createApp({
         due: taskForm.due || '',
         urgency: taskForm.urgency || '',
         difficulty: taskForm.difficulty || '',
+        dependsOn: taskForm.dependsOn || '',
+        milestoneId:taskForm.projectId?(taskForm.milestoneId||''):'',
       };
       let becameDone = false;
       let value = 0;
@@ -1302,6 +1307,7 @@ const app = createApp({
         if (t) {
           const was = t.status;
           Object.assign(t, fields);
+          if(taskForm.status==='done'&&blockingTask(t)){notify('Termine la tâche préalable avant celle-ci');return;}
           setStatus(t, taskForm.status, taskForm.doneAt);
           becameDone = was !== 'done' && t.status === 'done';
           value = taskValue(t);
@@ -1517,6 +1523,7 @@ const app = createApp({
     const upcomingPoints = computed(() => sumToEarn(upcomingTasks.value));
 
     function changeStatus(task, newStatus) {
+      if(newStatus==='done'&&blockingTask(task)){notify('Tâche bloquée : termine d’abord « '+blockingTask(task).title+' »');return;}
       const old = task.status;
       if (old === newStatus) return;
       setStatus(task, newStatus);
@@ -1636,7 +1643,7 @@ const app = createApp({
         done: list.filter(t => t.status === 'done').length,
         points: list.reduce((s, t) => s + taskValue(t), 0),
         milestonesTotal:data.projectMilestones.filter(m=>m.projectId===project.id).length,
-        milestonesDone:data.projectMilestones.filter(m=>m.projectId===project.id&&m.done).length,
+        milestonesDone:data.projectMilestones.filter(m=>m.projectId===project.id&&milestoneDone(m)).length,
       };
     }
 
@@ -2360,7 +2367,7 @@ const app = createApp({
     });
     // Priorisation par échéance avant toute pondération : retard > aujourd'hui > futur > sans date.
     // Les tâches à échéance égale sont classées par urgence puis difficulté.
-    const suggestedTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work').map(t=>{
+    const suggestedTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work'&&!blockingTask(t)).map(t=>{
       const urgencyRank=levelRank(data.urgencies,t.urgency);
       const difficultyRank=levelRank(data.difficulties,t.difficulty);
       const hasDue=typeof t.due==='string' && /^\d{4}-\d{2}-\d{2}$/.test(t.due);
@@ -2371,9 +2378,13 @@ const app = createApp({
     function refreshPriorities(){today.value=todayStr();notify('Priorités recalculées');}
     if(typeof document!=='undefined')document.addEventListener('visibilitychange',()=>{if(!document.hidden)today.value=todayStr();});
     const milestoneDraft=reactive({});
+    const milestoneTaskDraft=reactive({});
+    function milestoneTasks(m){return data.tasks.filter(t=>t.projectId===m.projectId&&t.milestoneId===m.id);}
+    function addMilestoneTask(m){const title=String(milestoneTaskDraft[m.id]||'').trim();if(!title)return;data.tasks.push(newTask({title,projectId:m.projectId,milestoneId:m.id,scope:'personal'}));milestoneTaskDraft[m.id]='';}
     function addMilestone(project){const title=(milestoneDraft[project.id]||'').trim();if(!title)return;data.projectMilestones.push({id:uid(),projectId:project.id,title,done:false});milestoneDraft[project.id]='';}
-    function toggleMilestone(m){m.done=!m.done;m.doneAt=m.done?today.value:'';}
-    function removeMilestone(m){data.trash.unshift({id:uid(),type:'milestone',deletedAt:new Date().toISOString(),payload:clone(m)});data.projectMilestones=data.projectMilestones.filter(x=>x.id!==m.id);}
+    function milestoneDone(m){const list=milestoneTasks(m);return list.length?list.every(t=>t.status==='done'):!!m.done;}
+    function toggleMilestone(m){const list=milestoneTasks(m);if(list.length&&!milestoneDone(m)){notify('Termine les sous-tâches du jalon avant de le valider');return;}m.done=!milestoneDone(m);m.doneAt=m.done?today.value:'';}
+    function removeMilestone(m){data.trash.unshift({id:uid(),type:'milestone',deletedAt:new Date().toISOString(),payload:clone(m)});data.tasks.forEach(t=>{if(t.milestoneId===m.id)t.milestoneId='';});data.projectMilestones=data.projectMilestones.filter(x=>x.id!==m.id);}
     function milestones(project){return data.projectMilestones.filter(m=>m.projectId===project.id);}
     const weekSummary=computed(()=>{const start=monday(today.value);const end=new Date(start+'T12:00:00');end.setDate(end.getDate()+6);const toDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const endS=toDate(end);const tasks=data.tasks.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.status==='done');const tickets=data.workTickets.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.done);return {tasks:tasks.length,tickets:tickets.length,points:tasks.reduce((s,t)=>s+taskValue(t),0),meals:Array.from({length:7},(_,i)=>{const d=new Date(start+'T12:00:00');d.setDate(d.getDate()+i);const date=toDate(d);return ['lunch','dinner'].map(k=>mealSlot(date,k));}).flat().filter(m=>m.state==='done').length};});
 
@@ -2385,7 +2396,18 @@ const app = createApp({
     function setWidgetVisible(id,on){data.dashboardWidgets=on?[...new Set([...data.dashboardWidgets,id])]:data.dashboardWidgets.filter(x=>x!==id);}
     function moveDashboardWidget(id,direction){const a=data.dashboardWidgets;const i=a.indexOf(id),j=i+direction;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];}
     const dashboardSorted=computed(()=>data.dashboardWidgets.filter(x=>dashboardCatalogue.some(w=>w.id===x)));
+    const depPicker=reactive({search:'',project:'',category:'',urgency:'',difficulty:''});
+    function dependencyMatches(t,currentId=''){
+      if(t.id===currentId||t.status==='done')return false;
+      if(depPicker.search&&!String(t.title||'').toLocaleLowerCase('fr').includes(depPicker.search.toLocaleLowerCase('fr')))return false;
+      if(depPicker.project&&t.projectId!==depPicker.project)return false;
+      if(depPicker.category&&t.category!==depPicker.category)return false;
+      if(depPicker.urgency&&t.urgency!==depPicker.urgency)return false;
+      if(depPicker.difficulty&&t.difficulty!==depPicker.difficulty)return false;
+      return true;
+    }
     const dependencyChoices=computed(()=>data.tasks.filter(t=>t.status!=='done'));
+
     function setTaskDependency(t,id){if(!id){t.dependsOn='';return;}if(id===t.id){notify('Une tâche ne peut dépendre d’elle-même');return;}const seen=new Set([t.id]);let cur=id;while(cur){if(seen.has(cur)){notify('Dépendance circulaire refusée');return;}seen.add(cur);cur=data.tasks.find(x=>x.id===cur)?.dependsOn||'';}t.dependsOn=id;}
     function blockingTask(t){const parent=data.tasks.find(x=>x.id===t.dependsOn);return parent&&parent.status!=='done'?parent:null;}
     const plannerDate=ref(today.value);
@@ -2395,15 +2417,6 @@ const app = createApp({
     }).sort((a,b)=>(a.days<0?0:a.days===0?1:Number.isFinite(a.days)?2:3)-(b.days<0?0:b.days===0?1:Number.isFinite(b.days)?2:3)||(Number.isFinite(a.days)&&Number.isFinite(b.days)?a.days-b.days:0)||b.rank-a.rank||b.difficulty-a.difficulty));
     const plannedTasks=computed(()=>plannerCandidates.value);
     const plannedMinutes=computed(()=>0); // ancien nom conservé pour compatibilité d'interface
-    const calendarMonth=ref(today.value.slice(0,7));
-    const calendarDays=computed(()=>{const [y,m]=calendarMonth.value.split('-').map(Number);const count=new Date(y,m,0).getDate();return Array.from({length:count},(_,i)=>`${y}-${String(m).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`);});
-    function shiftCalendarMonth(n){const [y,m]=calendarMonth.value.split('-').map(Number),d=new Date(y,m-1+n,1);calendarMonth.value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
-    function calendarTasks(date){return data.tasks.filter(t=>t.due===date);}
-    function calendarTickets(date){return data.workTickets.filter(t=>t.due===date||t.startDate===date);}
-    function calendarMilestones(date){return data.projectMilestones.filter(m=>m.due===date);}
-    function calendarMeals(date){return ['lunch','dinner'].map(k=>({kind:k,name:mealSlot(date,k).name})).filter(x=>x.name);}
-    const calendarDrag=ref('');
-    function onCalendarDrop(date){const t=data.tasks.find(t=>t.id===calendarDrag.value);if(t)t.due=date;calendarDrag.value='';}
     const availableDishes=computed(()=>data.dishes.map(d=>{const ingredients=(d.ingredientIds||[]).map(id=>data.ingredients.find(i=>i.id===id)).filter(Boolean);const missing=ingredients.filter(i=>!i.owned);return {dish:d,missing,total:ingredients.length};}).sort((a,b)=>a.missing.length-b.missing.length||a.dish.name.localeCompare(b.dish.name,'fr')));
     const suggestedMealDraft=reactive({open:false,dishId:'',name:'',date:today.value,kind:'dinner'});
     function openSuggestedMeal(d){suggestedMealDraft.open=true;suggestedMealDraft.dishId=d.id;suggestedMealDraft.name=d.name;suggestedMealDraft.date=today.value;suggestedMealDraft.kind='dinner';}
@@ -2430,8 +2443,8 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,calendarMonth,calendarDays,shiftCalendarMonth,calendarTasks,calendarTickets,calendarMilestones,calendarMeals,calendarDrag,onCalendarDrop,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
-      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,addMilestone,toggleMilestone,removeMilestone,milestones,weekSummary,
+      ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
+      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTasks,milestoneDone,addMilestone,addMilestoneTask,toggleMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
       // état
       budgetMonth,budgetSection,budgetCategories,budgetCategoryName,reorderDrag,startReorder,dropReorder,cashForm,cashBalance,cashIncome,cashExpenses,addCashEntry,removeCashEntry,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
