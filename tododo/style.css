@@ -343,3 +343,6 @@
 .shopping-add-form .shopping-ingredient-picker {display:flex;flex:1 1 280px;flex-wrap:wrap;gap:6px;}
 .shopping-add-form .shopping-ingredient-picker input {min-width:130px; flex:1;}
 .shopping-add-form .shopping-ingredient-picker select {min-width:180px; flex:1;}
+
+/* V27 : magasins et emplacements (stylekoala.css inchangé) */
+.shopping-filters{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:12px 0}.shopping-filters>input{flex:1;min-width:220px;padding:8px}.shopping-filters label{display:flex;gap:8px;align-items:center}.shopping-store{max-width:150px;padding:6px}.shopping-add-form>select{min-width:140px}
