@@ -1149,6 +1149,7 @@ const app = createApp({
     function ticketPoints(ticket){return (ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0);}
 
     const mealModes = reactive({});
+    const mealDishSearch = reactive({});
     function mealMode(date, kind) { const key=date+'-'+kind; return mealModes[key] || (mealSlot(date,kind).dishId ? 'saved' : 'manual'); }
     function setMealMode(date,kind,mode) { mealModes[date+'-'+kind]=mode; }
     const eveningPreview = ref(true);
@@ -2388,6 +2389,7 @@ const app = createApp({
     const milestoneDraft=reactive({});
     const milestoneTaskDraft=reactive({});
     function milestoneTasks(m){return data.tasks.filter(t=>t.projectId===m.projectId&&t.milestoneId===m.id);}
+    function linkMilestoneTask(m,id){const t=data.tasks.find(t=>t.id===id && t.projectId===m.projectId);if(t)t.milestoneId=m.id;}
     function addMilestoneTask(m){const title=String(milestoneTaskDraft[m.id]||'').trim();if(!title)return;data.tasks.push(newTask({title,projectId:m.projectId,milestoneId:m.id,scope:'personal'}));milestoneTaskDraft[m.id]='';}
     function addMilestone(project){const title=(milestoneDraft[project.id]||'').trim();if(!title)return;data.projectMilestones.push({id:uid(),projectId:project.id,title,done:false});milestoneDraft[project.id]='';}
     function milestoneDone(m){const list=milestoneTasks(m);return list.length?list.every(t=>t.status==='done'):!!m.done;}
@@ -2458,7 +2460,7 @@ const app = createApp({
     const badHabitsHomeOpen = ref(true);
     return {
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
-      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTasks,milestoneDone,addMilestone,addMilestoneTask,toggleMilestone,removeMilestone,milestones,weekSummary,
+      menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
       // état
       budgetMonth,budgetSection,budgetCategories,budgetCategoryName,reorderDrag,startReorder,dropReorder,cashForm,cashBalance,cashIncome,cashExpenses,addCashEntry,removeCashEntry,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
@@ -2497,7 +2499,7 @@ const app = createApp({
       habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
       activityForm, randomActivity, pickRandomActivity, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
-      formatDate, mealMode, setMealMode, eveningPreview, renderEveningMarkdown, addTextarea, removeTextarea, openWorkQuickPaste,
+      formatDate, mealMode, setMealMode, mealDishSearch, eveningPreview, renderEveningMarkdown, addTextarea, removeTextarea, openWorkQuickPaste,
     };
   },
 });

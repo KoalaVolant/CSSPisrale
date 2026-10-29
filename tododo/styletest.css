@@ -109,74 +109,71 @@ body{width:100%;max-width:none;overflow-x:hidden}
 }
 @media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
 
-/* Koala V3 : harmonisation des commandes et navigation, sans modifier
-   la taille standard de la typographie ou l'identité graphique. */
+/* Koala V4 : correctifs ciblés sans re-theme */
+/* Sticky a besoin que les ancêtres ne créent PAS de conteneur de scrolling via overflow:hidden */
+html,body{overflow-x:clip!important;overflow-y:visible!important}
+.layout{overflow:visible!important;align-items:stretch}
 @media(min-width:801px){
-  .sidebar{position:sticky;top:0;max-height:100dvh;overflow-y:auto;align-self:flex-start;scrollbar-width:thin}
+ .sidebar{position:sticky!important;top:0!important;align-self:flex-start!important;height:100dvh!important;max-height:100dvh!important;overflow-y:auto!important;overscroll-behavior:contain;z-index:25}
 }
-/* L'en-tête de marque et les points restent dans le flux normal. */
 .app-header,.app-brand,.app-title,.points-box,.points-badge{position:static!important}
-/* Barres d'actions dans les vues, sans rendre sticky le titre de l'application. */
-.page-header{position:sticky!important;top:0!important;z-index:40!important;background:var(--fnd,#f0f0f0)!important;padding:7px 8px!important;border-radius:0 0 8px 8px}
-.view-work .work-mode-actions{position:sticky;top:56px;z-index:35;background:var(--fnd,#f0f0f0);padding:7px 8px;margin:0 0 9px;border:1px solid var(--main-color);border-radius:8px}
-.view-home .task-toolbar,.view-all .task-toolbar,.view-done .task-toolbar{position:sticky!important;top:62px!important;z-index:30!important;background:var(--fnd,#f0f0f0)!important;padding:6px 8px!important;border:1px solid var(--main-color);border-radius:8px}
-#work-ticket-create{scroll-margin-top:130px}
-/* Champs et listes natifs : jamais du blanc sur blanc */
-select,select option,select optgroup,.tag select,.meal-dish-select{color:#27332f!important;background-color:#fff!important}
-select option:checked{color:#172a24!important;background-color:#accac4!important}
-input:not([type=checkbox]):not([type=radio]),textarea{color:#27332f}
-/* Boutons : palette Koala, dimensions régulières et états lisibles. */
-button:not(.app-nav button):not(.drag-handle),.page-actions button,.task-toolbar button,.work-mode-actions a,.subtabs button{font-family:var(--fnt);border:1px solid var(--fnd3,#88a7a1);border-radius:8px;padding:6px 10px;line-height:1.45;background:var(--fnd2,#accac4);color:#1d3730;font-weight:600;box-shadow:none;transition:background-color .14s,border-color .14s,filter .14s}
-button:not(.app-nav button):hover,.work-mode-actions a:hover{filter:brightness(.95)}
-button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--tit,#688d85);outline-offset:2px}
-button:disabled{opacity:.5;cursor:not-allowed}
-button.active,.subtabs button.active,.page-actions .btn-add{background:var(--fnd3,#88a7a1);color:#fff;border-color:var(--tit,#688d85)}
-.task button,.tag button,.project-task button,.ticket-card button{padding:4px 8px}
-/* Pas de padding géant : grille sur échelle 4/6/8/10/12. */
-.project,.ticket-card,.ticket-create,.done-summary,.reward,.inventory-item,.textarea-card,.menu-day,.habit-entry{padding:10px;max-width:100%;min-width:0}
-.project-task{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 6px;margin:3px 0;border-bottom:1px solid var(--main-color);line-height:1.5;min-width:0}
-.project-task-title{flex:1 1 210px;min-width:0;overflow-wrap:anywhere}
-.project-task input,.project-task select{min-width:0;max-width:100%}
-.project-task button{flex:0 0 auto}
-.project-task.status-done{opacity:.72}
-.project-milestones{margin-top:10px;padding:8px;border:1px solid var(--main-color);background:var(--fnd);border-radius:8px}
-.tq-milestone{padding:7px 5px;border-top:1px solid var(--main-color)}
-.tq-milestone-children{margin:5px 0 0 12px;padding-left:8px;border-left:2px solid var(--fnd3)}
-.tq-milestone-children>div{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:4px 0}
-.milestone-progress{display:flex;align-items:center;gap:7px;color:var(--tit)}
-.milestone-progress progress{width:110px;max-width:35%;height:7px}
-/* Menu repas : choix exclusif, champs unifiés. */
-.meal-entry-mode{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:5px 0}
-.meal-entry-mode label{display:inline-flex;gap:4px;align-items:center;white-space:nowrap;cursor:pointer}
-.menu-meal>.meal-dish-select,.menu-meal>input{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
-.menu-heading h2{display:none} /* titre déjà présent dans l'entête de page */
-/* Notes et sommaire automatique. */
-.textarea-toc{display:flex;align-items:center;flex-wrap:wrap;gap:5px 10px;padding:8px;margin:8px 0;background:var(--fnd);border:1px solid var(--main-color);border-radius:8px}
-.textarea-toc strong{margin-right:6px}
-.textarea-toc a{display:inline-flex;padding:3px 7px;text-decoration:none;color:#2d5c50;background:#fff;border:1px solid var(--fnd3);border-radius:6px}
-.textarea-toc a:hover{text-decoration:underline}
-.textarea-card{scroll-margin-top:125px;margin:9px 0}
-.textarea-card-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
-.textarea-card-head input{flex:1 1 180px;min-width:0}
-.evening-markdown{overflow-wrap:anywhere}
-/* Vue terminée : lisible et moins compacte horizontalement. */
-.view-done .task-group{display:block}
-.view-done .task-group article{width:100%;margin:5px 0}
-.view-done .task-group-title{padding:6px 7px;border-bottom:1px solid var(--fnd3);background:var(--fnd)}
-.view-done .task-list-box [class*="status"]{width:100%}
-.view-done .done-summary{padding:8px 10px;margin:8px 0}
-.view-done .ticket-closed{padding:8px 10px}
-.random-activity{display:inline-flex;flex-wrap:wrap;gap:7px;align-items:center;margin:6px;padding:7px 10px;background:var(--fnd);border:1px solid var(--fnd3);border-radius:8px}
-@media(max-width:800px){
- .sidebar{position:fixed!important}
- .page-header{top:0!important}
- .view-work .work-mode-actions{top:56px}
- .page-actions{gap:5px}
- .project-task-title{flex-basis:100%}
-}
-@media(max-width:560px){
- .view-work .work-mode-actions{top:55px}
- .view-home .task-toolbar,.view-all .task-toolbar,.view-done .task-toolbar{top:64px!important}
- .project,.ticket-card,.textarea-card{padding:8px}
- .meal-entry-mode{gap:6px}
-}
+.page-header{position:sticky!important;top:0!important;z-index:50!important;background:var(--fnd)!important;padding:6px 8px!important;border-bottom:1px solid var(--fnd3);box-shadow:0 2px 4px #0000000a}
+.view-work .work-mode-actions{position:sticky!important;top:52px!important;z-index:45!important;background:var(--fnd);padding:6px 8px}
+.view-home .task-toolbar,.view-all .task-toolbar,.view-done .task-toolbar{position:sticky!important;top:58px!important;z-index:40!important;background:var(--fnd);padding:5px 7px}
+/* Boutons neutres hérités de Koala, pas de remplissage vert général */
+button:not(.app-nav button){font-family:var(--fnt);cursor:pointer}
+.page-actions button,.task-toolbar button,.form-actions button,.subtabs button,.work-mode-actions button,.work-mode-actions a,.ticket-card button,.project-task button,.evening-actions button{background:var(--fnd)!important;color:#33453e!important;border:1px solid var(--main-color)!important;border-radius:8px;padding:5px 9px;box-shadow:none}
+.page-actions button:hover,.task-toolbar button:hover,.form-actions button:hover,.subtabs button:hover,.project-task button:hover,.work-mode-actions button:hover{background:#e6eeeb!important;border-color:var(--fnd3)!important}
+.page-actions .btn-add,.form-actions button[type=submit],.subtabs button.active{background:var(--fnd2)!important;border-color:var(--fnd3)!important;color:#223b33!important}
+button:focus-visible,a:focus-visible{outline:2px solid var(--tit);outline-offset:2px}
+button:disabled{opacity:.55;cursor:not-allowed}
+/* Tags existants : toujours laisser les couleurs configurées via --tag-bg */
+.tag-colored{background:var(--tag-bg)!important;color:var(--tag-fg)!important;border-color:var(--tag-bg)!important}
+.tag-colored select,.tag-colored input{color:var(--tag-fg)!important;background:transparent!important}
+select:not(.tag select),select option,select optgroup{color:#263b34;background-color:white}
+/* Cartes tâches de projet nettement séparées des autres */
+.project .task-list{display:grid;gap:5px}
+.project-task{display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;margin:0;padding:8px 10px;border:1px solid #d6e2df;border-left:4px solid var(--fnd3);border-radius:8px;background:#f2f7f5;min-width:0}
+.project-task:nth-child(even){background:#e8f1ed}
+.project-task.status-done{background:#edf1ed;border-left-color:#93a79c;opacity:.75}
+.project-task.status-doing{border-left-color:#d9b983}
+.project-task-title{flex:1 1 220px;min-width:0;overflow-wrap:anywhere;font-weight:600}
+.project-task-points{white-space:nowrap;padding:2px 6px;border-radius:5px;background:#fff}
+/* Menu semaine : contrôle discret, résultat prioritaire */
+.meal-entry-mode{display:flex;align-items:center;flex-wrap:wrap;gap:3px;margin:4px 0}
+.meal-entry-mode label{display:inline-flex;align-items:center;gap:3px;margin:0;padding:2px 5px;background:#f6f6f6;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer}
+.meal-entry-mode input{margin:0;accent-color:var(--tit)}
+.meal-dish-picker{position:relative;background:#fff;border:1px solid #ceded8;border-radius:7px;min-width:0}
+.meal-dish-picker summary{padding:6px 8px;color:#263b34;font-weight:600;cursor:pointer;overflow-wrap:anywhere}
+.meal-dish-choices{position:relative;z-index:3;padding:7px;border-top:1px solid #ddd;background:#fff}
+.meal-dish-choices input{width:100%;padding:7px}
+.meal-dish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:5px;max-height:230px;overflow-y:auto;margin:6px 0}
+.meal-dish-grid button{background:#f0f5f2;color:#263b34;text-align:left;padding:6px;border:1px solid #d5e0db;border-radius:6px;overflow-wrap:anywhere}
+/* Table des notes et navigation permanente */
+.view-evening .textarea-toc{position:sticky;top:52px;z-index:45;display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:7px;background:#edf3f0;border:1px solid #cadad4;border-radius:8px}
+.textarea-toc a{display:inline-flex;padding:3px 7px;background:#fff;border:1px solid #d2ded9;border-radius:6px;text-decoration:none;color:#325c50}
+.textarea-card{scroll-margin-top:118px;padding:8px;margin:8px 0}
+/* Jalons : sous-tâches, échéance et statut visibles */
+.project-milestones{margin:9px 0;padding:8px;background:#eef4f1;border:1px solid #cbded5;border-radius:8px}
+.tq-milestone{padding:8px;margin:6px 0;background:#fff;border:1px solid #d6e1da;border-left:3px solid var(--fnd3);border-radius:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tq-milestone.milestone-finished{border-left-color:#639c79;background:#f3f8f4}
+.tq-milestone.milestone-overdue{border-left-color:#bf6d56}
+.milestone-label{flex:1 1 150px}
+.milestone-state{background:#e9f0ed;border-radius:5px;padding:2px 5px}
+.milestone-date,.milestone-link{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap}
+.milestone-link{flex:1 1 100%;margin:5px 0}
+.milestone-link select{max-width:100%}
+.tq-milestone-children{width:100%;border-left:2px solid var(--fnd3);padding:4px 7px;margin:4px 0 0 8px}
+.tq-milestone-children>div{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:3px}
+/* Terminés : une seule colonne, regroupements clairs */
+.view-done .task-group{display:block;width:100%}
+.view-done .task-group article,.view-done .task-list-box [class*="status"]{width:100%;max-width:100%;margin:4px 0}
+.view-done .task-group-title,.done-section-heading{margin:9px 0 5px;background:#e5efea;color:#31584d;padding:7px 9px;border-left:3px solid var(--fnd3);border-radius:5px}
+.view-done .task{padding:7px 9px;background:#f5f7f6;border:1px solid #dce4e0;border-radius:7px}
+.view-done .task:nth-child(even){background:#ecf2ef}
+.view-done .done-summary{padding:8px 10px;margin:7px 0;background:#f2f6f4;border:1px solid #dce5df;border-radius:7px}
+.quick-paste-content{display:block!important;min-height:120px}
+.quick-paste-content .paste-text{display:block;width:100%;min-height:155px;color:#263b34!important;background:#fff!important}
+.back-to-top{position:fixed;bottom:14px;right:14px;z-index:70;background:#e4eeea;color:#264b3f;border:1px solid #9cbab0;border-radius:8px;padding:7px 11px;box-shadow:0 2px 8px #0002}
+@media(max-width:800px){.sidebar{position:fixed!important;top:0!important;height:100dvh!important}.view-evening .textarea-toc{top:55px}.page-header{top:0!important}.project-task-title{flex-basis:100%}}
+@media(max-width:560px){.view-work .work-mode-actions{top:62px!important}.view-home .task-toolbar,.view-all .task-toolbar,.view-done .task-toolbar{top:70px!important}.meal-dish-grid{grid-template-columns:1fr 1fr}}
