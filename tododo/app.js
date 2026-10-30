@@ -266,6 +266,7 @@ function loadData() {
     if (!Array.isArray(d.habits)) d.habits = [];
     if (!Array.isArray(d.activities)) d.activities = [];
     if (!Array.isArray(d.workTickets)) d.workTickets = [];
+    d.workTickets=d.workTickets.filter(t=>t&&typeof t==='object').map(t=>({...t,items:Array.isArray(t.items)?t.items:[]}));
     if (!Array.isArray(d.workTicketTypes)) d.workTicketTypes = [];
     if (!Array.isArray(d.usualLists)) d.usualLists = [];
     d.eveningNotes = typeof d.eveningNotes === 'string' ? d.eveningNotes : '';
@@ -503,6 +504,7 @@ const app = createApp({
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
       for (const k of ['ingredients','dishes','shoppingItems','trash','projectMilestones','ingredientCategories','ingredientLocations']) data[k]=Array.isArray(src[k])?src[k]:[];
+      data.dishes=data.dishes.filter(x=>x&&typeof x==='object').map(x=>({...x,ingredientIds:Array.isArray(x.ingredientIds)?x.ingredientIds:[]}));
       data.ingredients=data.ingredients.filter(x=>x&&typeof x==='object').map(x=>({...x,name:String(x.name||''),category:typeof x.category==='string'&&x.category.trim()?x.category:'Sans catégorie',owned:!!x.owned,location:typeof x.location==='string'?x.location:''}));
       data.ingredientCategories=[...new Set(['Sans catégorie',...data.ingredientCategories.filter(x=>typeof x==='string'&&x.trim()),...data.ingredients.map(i=>i.category)])];
       data.ingredientLocations=[...new Set([...(data.ingredientLocations||['Congélo','Frigo','Garde-manger','Placard']).filter(x=>typeof x==='string'&&x.trim()),...data.ingredients.map(i=>i.location).filter(Boolean)])];
@@ -1083,7 +1085,7 @@ const app = createApp({
     data.workTickets.forEach(t=>{ticketInputs[t.id]={name:'',points:10};});
     const ticketSort = ref('manual');
     const ticketNow = ref(Date.now());
-    const ticketActivityDate = t => new Date(t.lastActivityAt || (t.createdAt ? t.createdAt+'T00:00:00' : new Date().toISOString())).getTime();
+    const ticketActivityDate = t => { const raw=t.lastActivityAt || t.startDate || t.createdAt; if(!raw)return NaN; const ms=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw).getTime();return ms; };
     const ticketStale = t => Number.isFinite(ticketActivityDate(t)) && ticketNow.value-ticketActivityDate(t)>=86400000;
     const ticketNeedsAction = t => (t.items||[]).some(i=>!i.done);
     const ticketColorState = t => ticketStale(t)?'stale':ticketNeedsAction(t)?'pending':'clear';
@@ -1098,7 +1100,7 @@ const app = createApp({
       const difficulty=t=>levelRank(data.workDifficulties,t.difficulty);
       switch(ticketSort.value){
         case 'action': return [...list].sort((a,b)=>ticketStateRank(a)-ticketStateRank(b));
-        case 'inactive': return [...list].sort((a,b)=>ticketActivityDate(a)-ticketActivityDate(b));
+        case 'inactive': return [...list].sort((a,b)=>(Number.isFinite(ticketActivityDate(a))?ticketActivityDate(a):-Infinity)-(Number.isFinite(ticketActivityDate(b))?ticketActivityDate(b):-Infinity));
         case 'urgency-desc': return [...list].sort((a,b)=>urgency(b)-urgency(a));
         case 'urgency-asc': return [...list].sort((a,b)=>urgency(a)-urgency(b));
         case 'difficulty-desc': return [...list].sort((a,b)=>difficulty(b)-difficulty(a));
@@ -2559,5 +2561,17 @@ const app = createApp({
   },
 });
 
+app.config.errorHandler = (error, instance, info) => {
+  console.error('[Todo Quest] Erreur Vue :', info, error);
+  let panel = document.getElementById('todo-error-banner');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'todo-error-banner';
+    panel.setAttribute('role', 'alert');
+    panel.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;max-height:35vh;overflow:auto;z-index:99999;padding:12px 16px;background:#fff0f0;border:2px solid #b91c1c;color:#7f1d1d;font:14px Arial,sans-serif;box-shadow:0 4px 14px #0003';
+    document.body.appendChild(panel);
+  }
+  panel.textContent = 'Todo Quest : erreur sur la page. ' + (error?.message || String(error)) + ' (section : ' + info + '). Copie ce message pour le diagnostic. Tes données ne sont pas supprimées.';
+};
 app.component('task-list', TaskList);
 app.mount('#app');

@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261030-v32">
-  <link rel="stylesheet" href="stylekoala.css?v=20261030-v32">
-  <link rel="stylesheet" href="styletest.css?v=20261030-v32">
+  <link rel="stylesheet" href="style.css?v=20261030-v34">
+  <link rel="stylesheet" href="stylekoala.css?v=20261030-v34">
+  <link rel="stylesheet" href="styletest.css?v=20261030-v34">
 </head>
 <body>
 
@@ -507,8 +507,8 @@
           <button type="button" class="ticket-toggle" :aria-expanded="!isTicketCollapsed(ticket.id)" @click="toggleTicketCollapse(ticket.id)" :title="isTicketCollapsed(ticket.id) ? 'Déplier' : 'Replier'">
             <span aria-hidden="true">{{ isTicketCollapsed(ticket.id) ? '▸' : '▾' }}</span>
             <strong>🎫 {{ ticket.name }}</strong><small class="ticket-state-label">{{ticketStale(ticket)?'⏳ Sans activité depuis 24 h':ticketNeedsAction(ticket)?'● Actions à faire':'✓ Aucune action en attente'}}</small>
-            <span v-if="ticket.items.some(i => !i.done)" class="ticket-pending">● {{ ticket.items.filter(i=>!i.done).length }} tâche(s) à faire</span>
-            <span v-else-if="!ticket.items.length" class="ticket-empty">Aucune tâche</span>
+            <span v-if="(ticket.items||[]).some(i => !i.done)" class="ticket-pending">● {{ (ticket.items||[]).filter(i=>!i.done).length }} tâche(s) à faire</span>
+            <span v-else-if="!(ticket.items||[]).length" class="ticket-empty">Aucune tâche</span>
             <span v-else class="ticket-complete">✓ Tout est fait</span>
           </button>
           <input class="ticket-custom-status" v-model="ticket.customStatus" maxlength="100" placeholder="Statut personnalisé" aria-label="Statut du ticket" title="Statut libre du ticket"><button type="button" @click="renameTicket(ticket)">Renommer</button><button type="button" @click="removeTicket(ticket)">Supprimer</button>
@@ -521,14 +521,14 @@
         <div v-if="!isTicketCollapsed(ticket.id)" class="ticket-body">
           <div class="ticket-edit-levels"><label>Début <input type="date" v-model="ticket.startDate" :max="ticket.due || undefined" title="Date de départ"></label><label>Type <select v-model="ticket.typeId"><option value="">Sans type</option><option v-for="type in data.workTicketTypes" :key="type.id" :value="type.id">{{ type.name }}</option></select></label><label>Urgence <select v-model="ticket.urgency"><option value="">Sans urgence</option><option v-for="u in data.workUrgencies" :key="u.id" :value="u.id">{{ u.name }}</option></select></label><label>Difficulté <select v-model="ticket.difficulty"><option value="">Sans difficulté</option><option v-for="d in data.workDifficulties" :key="d.id" :value="d.id">{{ d.name }}</option></select></label><small>{{ (ticket.items||[]).filter(i=>i.done).length }}/{{ (ticket.items||[]).length }} tâches · {{ ticketPoints(ticket) }} pts acquis</small></div>
           <div class="ticket-items">
-            <div class="ticket-item" v-for="item in ticket.items.filter(x=>!x.done)" :key="item.id">
-              <label><input type="checkbox" :checked="item.done" :disabled="!!ticketItemBlocker(ticket,item)" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label><label class="v30-dependency">Après <select v-model="item.dependsOn" @change="validateTicketDependency(ticket,item)"><option value="">Aucune</option><option v-for="other in ticket.items.filter(x=>x.id!==item.id)" :key="other.id" :value="other.id">{{other.name}}</option></select></label><small v-if="ticketItemBlocker(ticket,item)">Bloquée par {{ticketItemBlocker(ticket,item).name}}</small>
+            <div class="ticket-item" v-for="item in (ticket.items||[]).filter(x=>!x.done)" :key="item.id">
+              <label><input type="checkbox" :checked="item.done" :disabled="!!ticketItemBlocker(ticket,item)" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label><label class="v30-dependency">Après <select v-model="item.dependsOn" @change="validateTicketDependency(ticket,item)"><option value="">Aucune</option><option v-for="other in (ticket.items||[]).filter(x=>x.id!==item.id)" :key="other.id" :value="other.id">{{other.name}}</option></select></label><small v-if="ticketItemBlocker(ticket,item)">Bloquée par {{ticketItemBlocker(ticket,item).name}}</small>
               <label class="ticket-point-label">Points <input class="ticket-point-input" type="number" min="0" step="1" :value="item.points" @change="updateTicketItemPoints(ticket,item,$event)" aria-label="Modifier les points de la tâche"></label>
               <button type="button" @click="removeTicketItem(ticket,item)" title="Supprimer la tâche">×</button>
             </div>
-            <details v-if="ticket.items.some(i=>i.done)">
-              <summary>✓ Tâches terminées ({{ ticket.items.filter(i=>i.done).length }})</summary>
-              <div class="ticket-item" v-for="item in ticket.items.filter(x=>x.done)" :key="item.id">
+            <details v-if="(ticket.items||[]).some(i=>i.done)">
+              <summary>✓ Tâches terminées ({{ (ticket.items||[]).filter(i=>i.done).length }})</summary>
+              <div class="ticket-item" v-for="item in (ticket.items||[]).filter(x=>x.done)" :key="item.id">
                 <label class="ticket-checked"><input type="checkbox" :checked="item.done" @change="toggleTicketItem(ticket,item)"> {{ item.name }}</label>
                 <label class="ticket-point-label">Points <input class="ticket-point-input" type="number" min="0" step="1" :value="item.points" @change="updateTicketItemPoints(ticket,item,$event)" aria-label="Modifier les points de la tâche terminée"></label>
                 <button type="button" @click="removeTicketItem(ticket,item)" title="Supprimer la tâche">×</button>
@@ -536,7 +536,7 @@
             </details>
           </div>
           <form class="ticket-inline ticket-add" @submit.prevent="addTicketItem(ticket)"><input v-model="ticketInputs[ticket.id].name" required placeholder="Nouvelle tâche : intitulé"><input v-model.number="ticketInputs[ticket.id].points" type="number" min="0" placeholder="Points" aria-label="Points" class="ticket-point-input"><button type="submit">＋ Ajouter</button></form>
-          <button type="button" class="ticket-finish" :disabled="!ticket.items.length || ticket.items.some(i=>!i.done)" @click="finishTicket(ticket)">Terminer le ticket</button>
+          <button type="button" class="ticket-finish" :disabled="!(ticket.items||[]).length || (ticket.items||[]).some(i=>!i.done)" @click="finishTicket(ticket)">Terminer le ticket</button>
         </div>
       </article>
       <div class="work-independent-head"><h3>📋 Tâches travail indépendantes ({{ workTasks.length }})</h3><button type="button" class="btn-add" @click="openTaskForm()">＋ Nouvelle tâche indépendante</button></div>
@@ -730,7 +730,7 @@
         <template v-if="doneScope==='work' && closedTickets.length">
           <details class="done-archive done-ticket-section"><summary>Tickets de travail terminés <strong>{{closedTickets.length}}</strong></summary>
             <article class="ticket-card ticket-closed" v-for="ticket in closedTickets" :key="ticket.id">
-              <div class="ticket-heading"><div><strong>🎫 {{ ticket.name }}</strong><small>Terminé le {{ formatDate(ticket.doneAt) }} · {{ ticketPoints(ticket) }} pts · {{ ticket.items.length }} tâches</small></div><button type="button" @click="reopenTicket(ticket)">Rouvrir</button></div>
+              <div class="ticket-heading"><div><strong>🎫 {{ ticket.name }}</strong><small>Terminé le {{ formatDate(ticket.doneAt) }} · {{ ticketPoints(ticket) }} pts · {{ (ticket.items||[]).length }} tâches</small></div><button type="button" @click="reopenTicket(ticket)">Rouvrir</button></div>
               <details><summary>Voir les tâches</summary><div class="ticket-item" v-for="item in ticket.items" :key="item.id"><span>✓ {{ item.name }}</span><strong>{{ ticketItemValue(ticket,item) }} pts</strong></div></details>
             </article>
           </details>
@@ -789,7 +789,7 @@
               <div class="ingredient-choices"><label v-for="i in group.items" :key="i.id"><input type="checkbox" :value="i.id" v-model="dishDraft.ingredientIds"> {{ i.name }} <small>{{ i.owned?'(en stock)':'(manquant)' }}</small></label></div>
             </details>
           </details><button type="button" @click="addDish">Ajouter le plat</button></div>
-        <div class="catalogue-form"><input v-model="dishCategoryNew" placeholder="Nouvelle catégorie de plats" @keyup.enter="addDishCategory"><button type="button" @click="addDishCategory">Créer</button></div><input v-model="dishQuery" type="search" placeholder="Rechercher un plat…"><div v-for="category in dishCategoryList" :key="category" class="dish-category" @dragover.prevent @drop.prevent="dropDishCategory(category)"><div class="category-title"><h3>{{category}}</h3><button v-if="category!=='Sans catégorie'" type="button" @click="renameDishCategory(category)">Renommer</button><button v-if="category!=='Sans catégorie'" type="button" @click="deleteDishCategory(category)">Supprimer</button></div><article v-for="d in filteredDishes.filter(x=>(x.category||'Sans catégorie')===category)" :key="d.id" class="catalogue-row" draggable="true" @dragstart="dishDragged=d.id" @dragend="dishDragged=''">⠿ <template v-if="dishEditing===d.id"><input v-model="d.name"><select v-model="d.category"><option v-for="c in dishCategoryList">{{c}}</option></select><div class="dish-edit-ingredients"><strong>Ingrédients sélectionnés</strong><div class="ingredient-chip-row"><button type="button" v-for="i in dishIngredients(d)" :key="i.id" @click="toggleDishIngredient(d,i.id)" title="Retirer cet ingrédient">{{i.name}} ×</button><small v-if="!dishIngredients(d).length">Aucun ingrédient sélectionné</small></div><input type="search" v-model="dishEditSearch" placeholder="Rechercher des ingrédients à ajouter…"><div class="ingredient-choices"><button type="button" v-for="i in data.ingredients.filter(i=>!d.ingredientIds.includes(i.id)&&i.name.toLocaleLowerCase().includes(dishEditSearch.toLocaleLowerCase()))" :key="i.id" @click="toggleDishIngredient(d,i.id)">＋ {{i.name}}</button></div></div><button type="button" @click="saveDishEdit(d)">Enregistrer</button></template><template v-else><strong>{{d.name}}</strong><small>{{dishIngredients(d).map(i=>i.name).join(', ')||'Aucun ingrédient'}}</small><button type="button" @click="dishEditing=d.id">Modifier</button></template><button type="button" @click="removeDish(d)">Supprimer</button></article></div></section>
+        <div class="catalogue-form"><input v-model="dishCategoryNew" placeholder="Nouvelle catégorie de plats" @keyup.enter="addDishCategory"><button type="button" @click="addDishCategory">Créer</button></div><input v-model="dishQuery" type="search" placeholder="Rechercher un plat…"><div v-for="category in dishCategoryList" :key="category" class="dish-category" @dragover.prevent @drop.prevent="dropDishCategory(category)"><div class="category-title"><h3>{{category}}</h3><button v-if="category!=='Sans catégorie'" type="button" @click="renameDishCategory(category)">Renommer</button><button v-if="category!=='Sans catégorie'" type="button" @click="deleteDishCategory(category)">Supprimer</button></div><article v-for="d in filteredDishes.filter(x=>(x.category||'Sans catégorie')===category)" :key="d.id" class="catalogue-row" draggable="true" @dragstart="dishDragged=d.id" @dragend="dishDragged=''">⠿ <template v-if="dishEditing===d.id"><input v-model="d.name"><select v-model="d.category"><option v-for="c in dishCategoryList">{{c}}</option></select><div class="dish-edit-ingredients"><strong>Ingrédients sélectionnés</strong><div class="ingredient-chip-row"><button type="button" v-for="i in dishIngredients(d)" :key="i.id" @click="toggleDishIngredient(d,i.id)" title="Retirer cet ingrédient">{{i.name}} ×</button><small v-if="!dishIngredients(d).length">Aucun ingrédient sélectionné</small></div><input type="search" v-model="dishEditSearch" placeholder="Rechercher des ingrédients à ajouter…"><div class="ingredient-choices"><button type="button" v-for="i in data.ingredients.filter(i=>!(d.ingredientIds||[]).includes(i.id)&&i.name.toLocaleLowerCase().includes(dishEditSearch.toLocaleLowerCase()))" :key="i.id" @click="toggleDishIngredient(d,i.id)">＋ {{i.name}}</button></div></div><button type="button" @click="saveDishEdit(d)">Enregistrer</button></template><template v-else><strong>{{d.name}}</strong><small>{{dishIngredients(d).map(i=>i.name).join(', ')||'Aucun ingrédient'}}</small><button type="button" @click="dishEditing=d.id">Modifier</button></template><button type="button" @click="removeDish(d)">Supprimer</button></article></div></section>
       <section v-if="menuTab==='ingredients'" class="catalogue"><h2>Ingrédients et disponibilité</h2>
         <div class="catalogue-form"><input v-model="newIngredientCategory" placeholder="Nouvelle catégorie…" @keyup.enter="addIngredientCategory"><button type="button" @click="addIngredientCategory">Créer la catégorie</button></div>
         <div class="catalogue-form"><input v-model="newIngredientLocation" placeholder="Nouvel emplacement…" @keyup.enter="addIngredientLocation"><button type="button" @click="addIngredientLocation">Créer emplacement</button></div>
@@ -1380,7 +1380,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261030-v32"></script>
+<script src="app.js?v=20261030-v34"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
