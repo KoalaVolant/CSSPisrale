@@ -621,7 +621,7 @@ const app = createApp({
     const cashIncome = computed(() => data.cashEntries.reduce((sum,x)=>sum+Math.max(0,Number(x.amount)||0),0));
     const cashExpenses = computed(() => data.cashEntries.reduce((sum,x)=>sum+Math.min(0,Number(x.amount)||0),0));
     function addCashEntry(){
-      const amount=Number(cashForm.amount);
+      const amount=Number(String(cashForm.amount).replace(',','.'));
       if(!cashForm.label.trim()||cashForm.amount===null||cashForm.amount===''||!Number.isFinite(amount)||!cashForm.date)return;
       data.cashEntries.push({id:uid(),date:cashForm.date,label:cashForm.label.trim(),amount,category:cashForm.category});
       cashForm.label='';cashForm.amount=null;
@@ -639,19 +639,19 @@ const app = createApp({
     function overrideRecurring(rec,evt){const n=Number(evt.target.value);if(!evt.target.value.trim()||!Number.isFinite(n))return;data.budgetOverrides[rec.monthlyKey]=n;}
     function resetRecurringOverride(rec){delete data.budgetOverrides[rec.monthlyKey];}
     function addBudgetEntry(){
-      const n=Number(budgetEntryForm.amount);
+      const n=Number(String(budgetEntryForm.amount).replace(',','.'));
       if(!budgetEntryForm.label.trim()||budgetEntryForm.amount===null||budgetEntryForm.amount===''||!Number.isFinite(n))return;
       data.budgetEntries.push({id:uid(),date:budgetEntryForm.date||budgetMonth.value+'-01',label:budgetEntryForm.label.trim(),amount:n,category:budgetEntryForm.category});
       budgetEntryForm.label='';budgetEntryForm.amount=null;
     }
     function addBudgetRecurring(){
-      const n=Number(budgetRecurringForm.amount);
+      const n=Number(String(budgetRecurringForm.amount).replace(',','.'));
       if(!budgetRecurringForm.label.trim()||budgetRecurringForm.amount===null||budgetRecurringForm.amount===''||!Number.isFinite(n)||!budgetRecurringForm.start||(budgetRecurringForm.end&&budgetRecurringForm.end<budgetRecurringForm.start))return;
       data.budgetRecurring.push({id:uid(),label:budgetRecurringForm.label.trim(),amount:n,category:budgetRecurringForm.category,start:budgetRecurringForm.start,end:budgetRecurringForm.end,active:true});
       budgetRecurringForm.label='';budgetRecurringForm.amount=null;
     }
     function addBudgetSwile(){
-      const n=Number(budgetSwileForm.amount);
+      const n=Number(String(budgetSwileForm.amount).replace(',','.'));
       if(!budgetSwileForm.label.trim()||budgetSwileForm.amount===null||budgetSwileForm.amount===''||!Number.isFinite(n)||n>=0)return;
       data.budgetSwile.push({id:uid(),date:budgetSwileForm.date||todayStr(),label:budgetSwileForm.label.trim(),amount:n,category:budgetSwileForm.category});
       budgetSwileForm.label='';budgetSwileForm.amount=null;
@@ -1085,11 +1085,13 @@ const app = createApp({
     data.workTickets.forEach(t=>{ticketInputs[t.id]={name:'',points:10};});
     const ticketSort = ref('manual');
     const ticketNow = ref(Date.now());
-    const ticketActivityDate = t => { const raw=t.lastActivityAt || t.startDate || t.createdAt; if(!raw)return NaN; const ms=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw).getTime();return ms; };
+    const ticketActivityDate = t => { const raw=t.lastActivityAt || t.createdAtTime || t.createdAt || t.startDate; if(!raw)return NaN; const ms=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw).getTime();return ms; };
     const ticketStale = t => Number.isFinite(ticketActivityDate(t)) && ticketNow.value-ticketActivityDate(t)>=86400000;
     const ticketNeedsAction = t => (t.items||[]).some(i=>!i.done);
-    const ticketColorState = t => ticketStale(t)?'stale':ticketNeedsAction(t)?'pending':'clear';
-    const ticketStateRank = t => ticketColorState(t)==='stale'?0:ticketColorState(t)==='pending'?1:2;
+    const ticketWaiting = t => !!t.waiting;
+    const ticketColorState = t => ticketNeedsAction(t)?'pending':ticketWaiting(t)?'waiting':ticketStale(t)?'stale':'clear';
+    const ticketStateRank = t => ({pending:0,stale:1,waiting:2,clear:3})[ticketColorState(t)];
+    const ticketCreatedLabel = t => {const raw=t.createdAtTime||t.createdAt; if(!raw)return 'Date inconnue'; const dt=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw);return Number.isNaN(dt.getTime())?String(raw):dt.toLocaleString('fr-FR',{dateStyle:'short',timeStyle: /^\d{4}-\d{2}-\d{2}$/.test(raw)?undefined:'short'});};
     function touchTicket(t){t.lastActivityAt=new Date().toISOString();ticketNow.value=Date.now();}
     // Rafraîchissement lorsqu'une interaction sur la page intervient, sans boucle de synchronisation.
 
@@ -1132,7 +1134,7 @@ const app = createApp({
     function createTicket() {
       const name=ticketDraft.name.trim(); if(!name)return;
       const id=uid();ticketInputs[id]={name:'',points:10};
-      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,typeId:ticketDraft.typeId,url:ticketDraft.url.trim(),due:ticketDraft.due,startDate:ticketDraft.startDate||today.value,category:ticketDraft.category,createdAt:today.value,customStatus:'',done:false,doneAt:'',items:[]});
+      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,typeId:ticketDraft.typeId,url:ticketDraft.url.trim(),due:ticketDraft.due,startDate:ticketDraft.startDate||today.value,category:ticketDraft.category,createdAt:today.value,createdAtTime:new Date().toISOString(),waiting:false,customStatus:'',done:false,doneAt:'',items:[]});
       ticketDraft.name='';ticketDraft.startDate=today.value;ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';
     }
     function addTicketItem(ticket) {
@@ -2306,7 +2308,11 @@ const app = createApp({
     const menuTab=ref('planning');
     const dishQuery=ref(''), ingredientQuery=ref(''), dishIngredientQuery=ref(''), shoppingQuery=ref('');
     const dishDraft=reactive({name:'',ingredientIds:[],category:'Sans catégorie'});
-    const dishEditing=ref(''),dishCategoryNew=ref(''),dishDragged=ref(''),ingredientDragged=ref(''),menuRulesEditing=ref(false);
+    const dishEditing=ref(''),dishCategoryNew=ref(''),dishDragged=ref(''),dishCategoryDragged=ref(''),ingredientDragged=ref(''),menuRulesEditing=ref(false);
+    const dishCategoryOpen=reactive({});
+    function dishCategoryIsOpen(c){return dishCategoryOpen[c]!==false || !!dishQuery.value.trim();}
+    function toggleDishCategory(c){dishCategoryOpen[c]=!dishCategoryIsOpen(c);}
+    function reorderDishCategory(to){const from=dishCategoryDragged.value;dishCategoryDragged.value='';if(!from||from===to||from==='Sans catégorie'||to==='Sans catégorie')return;const list=data.dishCategories;const i=list.indexOf(from),k=list.indexOf(to);if(i<0||k<0)return;list.splice(i,1);list.splice(k,0,from);}
     const dishCategoryList=computed(()=>[...new Set(['Sans catégorie',...(data.dishCategories||[]),...data.dishes.map(d=>d.category||'Sans catégorie')])]);
     function addDishCategory(){const n=dishCategoryNew.value.trim();if(n&&!dishCategoryList.value.some(c=>c.toLowerCase()===n.toLowerCase()))data.dishCategories.push(n);dishCategoryNew.value='';}
     function renameDishCategory(c){if(c==='Sans catégorie')return;const n=prompt('Nouveau nom de la catégorie',c)?.trim();if(!n||n===c||dishCategoryList.value.includes(n))return;data.dishCategories.splice(data.dishCategories.indexOf(c),1,n);data.dishes.filter(d=>d.category===c).forEach(d=>d.category=n);}
@@ -2516,7 +2522,7 @@ const app = createApp({
     const badHabitsHomeOpen = ref(true);
     return {
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
-      dishEditSearch,toggleDishIngredient,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
+      dishEditSearch,toggleDishIngredient,dishCategoryOpen,dishCategoryDragged,dishCategoryIsOpen,toggleDishCategory,reorderDishCategory,ticketWaiting,ticketCreatedLabel,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
       menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
       // état
