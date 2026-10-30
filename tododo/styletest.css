@@ -276,3 +276,14 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 .random-type-entry{display:flex;gap:8px;align-items:center;padding:7px;background:white;border:1px solid var(--main-color);border-radius:7px}
 .random-type-entry strong{flex:1}.random-type-entry .drag-grip{cursor:grab}
 .random-note-filter{display:flex;align-items:center;gap:8px;margin:12px 0}
+
+/* v38 : suggestions en surimpression, sans ascenseur induit par le conteneur */
+.filters-row{overflow:visible!important;max-height:none!important;align-items:flex-start!important}
+.filters{overflow:visible!important;max-height:none!important}
+.suggest-box{position:relative!important;isolation:auto!important;z-index:80!important}
+.suggest-options{position:absolute!important;left:0!important;top:calc(100% + 2px)!important;z-index:999!important;max-height:190px!important;overflow-y:auto!important;box-shadow:0 8px 18px #0003!important}
+.dish-multi-category{display:flex;flex-wrap:wrap;gap:6px;border:1px solid var(--main-color);border-radius:8px;padding:8px;max-width:100%}
+.dish-multi-category label{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;background:#eef4ee;border-radius:6px}
+.dish-filters{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;align-items:center}.dish-filters label{display:flex;gap:6px;align-items:center}
+.dish-pages{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0}
+@media(max-width:800px){.filters{top:94px!important}.filters-row{max-height:none!important;overflow:visible!important}}
