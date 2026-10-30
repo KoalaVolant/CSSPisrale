@@ -905,12 +905,15 @@ const app = createApp({
     // Notes au pif : création rapide sur le dashboard et organisation dans un onglet dédié.
     const randomNoteDraft=ref('');
     const randomNoteTypeDraft=ref('');
+    const randomNoteNewType=ref('');
+    const randomNoteEditing=ref('');
+    const randomNoteTypeDragged=ref('');
     const randomNoteDragged=ref('');
     const randomNoteTypeFilter=ref('');
     function addRandomNote(fromDashboard=false){
       const content=randomNoteDraft.value.trim();
-      if(!content){if(!fromDashboard) data.randomNotes.push({id:uid(),title:'Nouvelle note',content:'',type:''});return;}
-      data.randomNotes.push({id:uid(),title:content.split('\n')[0].slice(0,60)||'Note au pif',content,type:''});
+      if(!content){if(!fromDashboard) data.randomNotes.push({id:uid(),title:'Nouvelle note',content:'',type:randomNoteNewType.value||''});return;}
+      data.randomNotes.push({id:uid(),title:content.split('\n')[0].slice(0,60)||'Note au pif',content,type:randomNoteNewType.value||''});
       randomNoteDraft.value='';notify('Note ajoutée');
     }
     function addRandomNoteType(){const n=randomNoteTypeDraft.value.trim();if(n&&!data.randomNoteTypes.includes(n))data.randomNoteTypes.push(n);randomNoteTypeDraft.value='';}
@@ -918,8 +921,21 @@ const app = createApp({
     function deleteRandomNoteType(name){if(!confirm('Supprimer le type « '+name+' » ? Les notes seront conservées.'))return;data.randomNoteTypes=data.randomNoteTypes.filter(x=>x!==name);data.randomNotes.forEach(n=>{if(n.type===name)n.type=''});if(randomNoteTypeFilter.value===name)randomNoteTypeFilter.value='';}
     function deleteRandomNote(note){if(confirm('Supprimer cette note ?'))data.randomNotes=data.randomNotes.filter(n=>n.id!==note.id);}
     function dropRandomNote(target){const from=data.randomNotes.findIndex(n=>n.id===randomNoteDragged.value),to=data.randomNotes.findIndex(n=>n.id===target.id);if(from>=0&&to>=0&&from!==to){const [n]=data.randomNotes.splice(from,1);data.randomNotes.splice(to,0,n);}randomNoteDragged.value='';}
+    function reorderRandomNoteType(target){
+      const from=data.randomNoteTypes.indexOf(randomNoteTypeDragged.value),to=data.randomNoteTypes.indexOf(target);
+      if(from>=0&&to>=0&&from!==to){const [type]=data.randomNoteTypes.splice(from,1);data.randomNoteTypes.splice(to,0,type);}
+      randomNoteTypeDragged.value='';
+    }
+    const randomNoteGroups=computed(()=>{
+      const types=[...data.randomNoteTypes,''];
+      for(const note of data.randomNotes) if(note.type&&!types.includes(note.type))types.splice(types.length-1,0,note.type);
+      return types.filter(type=>!randomNoteTypeFilter.value||type===randomNoteTypeFilter.value)
+        .map(type=>({type,title:type||'Sans type',notes:data.randomNotes.filter(note=>(note.type||'')===type)}))
+        .filter(group=>group.notes.length);
+    });
     const visibleRandomNotes=computed(()=>data.randomNotes.filter(n=>!randomNoteTypeFilter.value||n.type===randomNoteTypeFilter.value));
     // Les listes de suggestions ne sont jamais affichées avant une saisie.
+    const taskSuggestFocused=ref(false),ingredientSuggestFocused=ref(false);
     const taskSuggestions=computed(()=>{const q=filters.search.trim().toLocaleLowerCase();return q?data.tasks.filter(x=>String(x.title||'').toLocaleLowerCase().includes(q)).slice(0,5):[];});
     const ingredientSuggestions=computed(()=>{const q=ingredientQuery.value.trim().toLocaleLowerCase();return q?data.ingredients.filter(x=>String(x.name||'').toLocaleLowerCase().includes(q)).slice(0,5):[];});
     const shoppingSuggestions=computed(()=>{const q=shoppingIngredientSearch.value.trim().toLocaleLowerCase();return q?shoppingIngredientChoices.value.slice(0,5):[];});
@@ -2551,7 +2567,7 @@ const app = createApp({
     const badHabitsHomeOpen = ref(true);
     return {
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
-      randomNoteDraft,randomNoteTypeDraft,randomNoteDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,deleteRandomNote,dropRandomNote,visibleRandomNotes,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
+      randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
       dishEditSearch,toggleDishIngredient,dishCategoryOpen,dishCategoryDragged,dishCategoryIsOpen,toggleDishCategory,reorderDishCategory,ticketWaiting,ticketCreatedLabel,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
       menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
