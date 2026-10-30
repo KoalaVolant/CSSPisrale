@@ -1021,7 +1021,7 @@ const app = createApp({
     const allTasks      = computed(() => applyFilters(activeTasks.value));
     const workTasks = computed(() => [...data.tasks.filter(t => t.scope === 'work' && t.status !== 'done')].sort((a,b)=>Number(a.status==='done')-Number(b.status==='done') || (a.due||'9999').localeCompare(b.due||'9999')));
     const copyForm = reactive({open:false});
-    const copyText = computed(() => allTasks.value.map(t => t.title).join('\n'));
+    const copyText = computed(() => [...allTasks.value.map(t => t.title), ...data.habits.filter(h=>!h.malus&&!habitIsFinished(h)&&(habitDue(h)||habitLateDays(h)>0)&&!habitDoneToday(h)).map(h=>'[Habitude] '+h.title)].join('\n'));
     function copyTaskTitles() { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(copyText.value).then(() => notify('Liste copiée')).catch(() => notify('Sélectionne le texte pour le copier')); }
     // Terminées : triées par date de fin (la plus récente d'abord) ; les filtres s'appliquent aussi
     const doneTasks = computed(() => applyFilters(data.tasks.filter(t => t.scope !== 'work' && t.status === 'done'), false)
@@ -1066,7 +1066,7 @@ const app = createApp({
       if (value === null) return;
       const name = value.trim();
       if (!name) { notify("Le ticket doit avoir un nom"); return; }
-      ticket.name = name;
+      ticket.name = name;touchTicket(ticket);
     }
     function updateTicketItemPoints(ticket, item, event) {
       const raw = String(event.target.value).trim();
@@ -1082,12 +1082,23 @@ const app = createApp({
     const ticketInputs = reactive({});
     data.workTickets.forEach(t=>{ticketInputs[t.id]={name:'',points:10};});
     const ticketSort = ref('manual');
+    const ticketNow = ref(Date.now());
+    const ticketActivityDate = t => new Date(t.lastActivityAt || (t.createdAt ? t.createdAt+'T00:00:00' : new Date().toISOString())).getTime();
+    const ticketStale = t => Number.isFinite(ticketActivityDate(t)) && ticketNow.value-ticketActivityDate(t)>=86400000;
+    const ticketNeedsAction = t => (t.items||[]).some(i=>!i.done);
+    const ticketColorState = t => ticketStale(t)?'stale':ticketNeedsAction(t)?'pending':'clear';
+    const ticketStateRank = t => ticketColorState(t)==='stale'?0:ticketColorState(t)==='pending'?1:2;
+    function touchTicket(t){t.lastActivityAt=new Date().toISOString();ticketNow.value=Date.now();}
+    // Rafraîchissement lorsqu'une interaction sur la page intervient, sans boucle de synchronisation.
+
     const ticketDragged = ref(null);
     const openTickets = computed(()=>{
       const list=data.workTickets.filter(t=>!t.done);
       const urgency=t=>levelRank(data.workUrgencies,t.urgency);
       const difficulty=t=>levelRank(data.workDifficulties,t.difficulty);
       switch(ticketSort.value){
+        case 'action': return [...list].sort((a,b)=>ticketStateRank(a)-ticketStateRank(b));
+        case 'inactive': return [...list].sort((a,b)=>ticketActivityDate(a)-ticketActivityDate(b));
         case 'urgency-desc': return [...list].sort((a,b)=>urgency(b)-urgency(a));
         case 'urgency-asc': return [...list].sort((a,b)=>urgency(a)-urgency(b));
         case 'difficulty-desc': return [...list].sort((a,b)=>difficulty(b)-difficulty(a));
@@ -1124,22 +1135,22 @@ const app = createApp({
     }
     function addTicketItem(ticket) {
       const draft=ticketInputs[ticket.id]||(ticketInputs[ticket.id]={name:'',points:10});const name=String(draft.name||'').trim();if(!name)return;
-      ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});
+      ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});touchTicket(ticket);
       ticketInputs[ticket.id]={name:'',points:10};
     }
     function ticketItemBlocker(ticket,item){const prev=(ticket.items||[]).find(x=>x.id===item.dependsOn);return prev&&!prev.done?prev:null;}
     function validateTicketDependency(ticket,item){let id=item.dependsOn;const seen=new Set([item.id]);while(id){if(seen.has(id)){item.dependsOn='';notify('Dépendance circulaire interdite');return;}seen.add(id);id=ticket.items.find(x=>x.id===id)?.dependsOn||'';}}
     function toggleTicketItem(ticket,item) {
       if(!item.done&&ticketItemBlocker(ticket,item)){notify('Termine la tâche précédente avant celle-ci');return;}
-      item.done=!item.done;item.doneAt=item.done?today.value:'';
+      item.done=!item.done;item.doneAt=item.done?today.value:'';touchTicket(ticket);
       if(!item.done&&ticket.done){ticket.done=false;ticket.doneAt='';}
     }
     function finishTicket(ticket) {
       if(!ticket.items.length){notify('Ajoute au moins une tâche avant de terminer le ticket');return;}
       if(ticket.items.some(x=>!x.done)){notify('Termine toutes les tâches avant de clôturer le ticket');return;}
-      ticket.done=true;ticket.doneAt=today.value;
+      ticket.done=true;ticket.doneAt=today.value;touchTicket(ticket);
     }
-    function reopenTicket(ticket){ticket.done=false;ticket.doneAt='';}
+    function reopenTicket(ticket){ticket.done=false;ticket.doneAt='';touchTicket(ticket);}
     function removeTicket(ticket){
       if(!confirm(`Supprimer le ticket « ${ticket.name} » et toutes ses tâches ? Les points validés seront conservés.`))return;
       data.trash.unshift({id:uid(),type:'ticket',deletedAt:new Date().toISOString(),payload:clone(ticket)});
@@ -2300,7 +2311,15 @@ const app = createApp({
     function deleteDishCategory(c){if(c==='Sans catégorie'||!confirm('Supprimer la catégorie et déplacer ses plats dans Sans catégorie ?'))return;data.dishCategories=data.dishCategories.filter(x=>x!==c);data.dishes.filter(d=>d.category===c).forEach(d=>d.category='Sans catégorie');}
     function dropDishCategory(c){const d=data.dishes.find(x=>x.id===dishDragged.value);if(d)d.category=c;dishDragged.value='';}
     function dropIngredientCategory(c){const i=data.ingredients.find(x=>x.id===ingredientDragged.value);if(i){i.category=c;data.shoppingItems.filter(x=>x.ingredientId===i.id).forEach(x=>x.category=c);}ingredientDragged.value='';}
+    const ingredientCategoryOpen=reactive({});
+    const ingredientCategoryDragged=ref('');
+    function ingredientIsOpen(c){return ingredientCategoryOpen[c]!==false || !!ingredientQuery.value.trim();}
+    function toggleIngredientCategory(c){ingredientCategoryOpen[c]=!ingredientIsOpen(c);}
+    function reorderIngredientCategory(to){const from=ingredientCategoryDragged.value;ingredientCategoryDragged.value='';if(!from||from===to||from==='Sans catégorie'||to==='Sans catégorie')return;const list=data.ingredientCategories;const i=list.indexOf(from),j=list.indexOf(to);if(i<0||j<0)return;list.splice(i,1);list.splice(j,0,from);}
+    function deleteIngredientCategory(c){if(c==='Sans catégorie')return;if(!confirm('Supprimer cette catégorie ? Ses ingrédients seront conservés dans Sans catégorie.'))return;data.ingredients.filter(i=>(i.category||'Sans catégorie')===c).forEach(i=>i.category='Sans catégorie');data.shoppingItems.filter(i=>i.category===c).forEach(i=>i.category='Sans catégorie');data.ingredientCategories=data.ingredientCategories.filter(x=>x!==c);if(ingredientCategoryDraft.value===c)ingredientCategoryDraft.value='Sans catégorie';delete ingredientCategoryOpen[c];}
     function renameIngredientCategory(c){if(c==='Sans catégorie')return;const n=prompt('Renommer la catégorie',c)?.trim();if(!n||n===c||ingredientCategoryList.value.includes(n))return;const idx=data.ingredientCategories.indexOf(c);if(idx>=0)data.ingredientCategories.splice(idx,1,n);data.ingredients.filter(i=>i.category===c).forEach(i=>i.category=n);data.shoppingItems.filter(i=>i.category===c).forEach(i=>i.category=n);if(ingredientCategoryDraft.value===c)ingredientCategoryDraft.value=n;}
+    const dishEditSearch=ref('');
+    function toggleDishIngredient(d,id){if(!Array.isArray(d.ingredientIds))d.ingredientIds=[];const k=d.ingredientIds.indexOf(id);if(k>=0)d.ingredientIds.splice(k,1);else d.ingredientIds.push(id);}
     function saveDishEdit(d){d.name=String(d.name||'').trim();if(!d.name){notify('Nom de plat obligatoire');return;}d.ingredientIds=[...new Set(d.ingredientIds||[])];dishEditing.value='';}
     const ingredientDraft=ref(''), ingredientCategoryDraft=ref('Sans catégorie'), newIngredientCategory=ref('');
     const ingredientLocationDraft=ref(''), newIngredientLocation=ref('');
@@ -2421,6 +2440,7 @@ const app = createApp({
     function milestoneTasks(m){return data.tasks.filter(t=>t.projectId===m.projectId&&t.milestoneId===m.id);}
     function linkMilestoneTask(m,id){const t=data.tasks.find(t=>t.id===id && t.projectId===m.projectId);if(t)t.milestoneId=m.id;}
     function addMilestoneTask(m){const title=String(milestoneTaskDraft[m.id]||'').trim();if(!title)return;data.tasks.push(newTask({title,projectId:m.projectId,milestoneId:m.id,scope:'personal'}));milestoneTaskDraft[m.id]='';}
+    function renameMilestone(m){const title=prompt('Nouveau nom du jalon',m.title);if(title===null)return;const clean=title.trim();if(clean)m.title=clean;else notify('Nom du jalon obligatoire');}
     function addMilestone(project){const title=(milestoneDraft[project.id]||'').trim();if(!title)return;data.projectMilestones.push({id:uid(),projectId:project.id,title,done:false});milestoneDraft[project.id]='';}
     function milestoneDone(m){const list=milestoneTasks(m);return list.length?list.every(t=>t.status==='done'):!!m.done;}
     function toggleMilestone(m){const list=milestoneTasks(m);if(list.length&&!milestoneDone(m)){notify('Termine les sous-tâches du jalon avant de le valider');return;}m.done=!milestoneDone(m);m.doneAt=m.done?today.value:'';}
@@ -2494,7 +2514,7 @@ const app = createApp({
     const badHabitsHomeOpen = ref(true);
     return {
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
-      noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
+      dishEditSearch,toggleDishIngredient,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
       menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
       // état
