@@ -287,3 +287,6 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 .dish-filters{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;align-items:center}.dish-filters label{display:flex;gap:6px;align-items:center}
 .dish-pages{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0}
 @media(max-width:800px){.filters{top:94px!important}.filters-row{max-height:none!important;overflow:visible!important}}
+
+/* v39 : notes en simple lecture et niveaux personnalisables des plats */
+.random-note-head{justify-content:flex-end}.random-note-head .drag-grip{margin-right:auto;cursor:grab}.random-note-head input{flex:1 1 180px}.random-note-body{margin:5px 4px 8px}.dish-level-selects{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}.dish-level-selects label{display:flex;flex-direction:column;gap:4px}.dish-level-selects select{min-width:140px;max-width:100%}.dish-level-manager{margin:10px 0}.dish-level-entry{display:flex;align-items:center;gap:8px;padding:6px;border-bottom:1px solid var(--main-color)}.dish-level-entry strong{flex:1}.dish-level-entry .drag-grip{cursor:grab}

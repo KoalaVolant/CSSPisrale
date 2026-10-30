@@ -211,6 +211,8 @@ function defaultData() {
     ingredients: [], // {id,name,owned}
     dishes: [], // {id,name,ingredientIds}
     dishCategories: ['Sans catégorie'],
+    dishDifficulties: [], // niveaux ordonnés personnalisables
+    dishTimes: [], // durées ordonnées personnalisables
     shoppingSessions: [],
     shoppingItems: [], // {id,name,ingredientId,manual,checked,sourceKeys,quantity}
     ingredientCategories: ['Sans catégorie'],
@@ -297,6 +299,7 @@ function loadData() {
     if (!Array.isArray(d.randomNotes)) d.randomNotes=[];
     if (!Array.isArray(d.randomNoteTypes)) d.randomNoteTypes=[];
     if (!Array.isArray(d.dishCategories)) d.dishCategories=['Sans catégorie'];
+    for(const key of ['dishDifficulties','dishTimes']) if(!Array.isArray(d[key])) d[key]=[];
     if (!Array.isArray(d.shoppingSessions)) d.shoppingSessions=[];
     if (d.eveningNotes.trim()) { if (!d.textareas.length) d.textareas.push({id:uid(),title:'To do du soir',content:d.eveningNotes}); d.eveningNotes=''; }
      d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
@@ -530,6 +533,8 @@ const app = createApp({
       data.randomNotes=Array.isArray(src.randomNotes)?src.randomNotes:[];
       data.randomNoteTypes=Array.isArray(src.randomNoteTypes)?src.randomNoteTypes:[];
       data.dishCategories=Array.isArray(src.dishCategories)?src.dishCategories:['Sans catégorie'];
+      data.dishDifficulties=Array.isArray(src.dishDifficulties)?src.dishDifficulties:[];
+      data.dishTimes=Array.isArray(src.dishTimes)?src.dishTimes:[];
       data.shoppingSessions=Array.isArray(src.shoppingSessions)?src.shoppingSessions:[];
       if (data.eveningNotes.trim()) { if (!data.textareas.length) data.textareas.push({id:uid(),title:'To do du soir',content:data.eveningNotes}); data.eveningNotes=''; }
       data.usualLists = Array.isArray(src.usualLists) ? src.usualLists : [];
@@ -855,7 +860,10 @@ const app = createApp({
     const rewardsByCost = computed(() => [...data.rewards].sort((a, b) => a.cost - b.cost));
     const nextReward = computed(() => rewardsByCost.value.find(r => r.cost > balance.value) || null);
     const favoriteReward = computed(() => data.rewards.find(r => r.favorite) || null);
-    const rewardRemaining = r => Math.max(0, (Number(r.cost)||0) - (Number(r.saved)||0));
+    // Calculs en centièmes de point pour éviter 6.349999999999994.
+    const pointsCents = value => Math.round((Number(value) || 0) * 100);
+    const formatPoints = value => (Math.round((Number(value) || 0) * 100) / 100).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+    const rewardRemaining = r => Math.max(0, pointsCents(r.cost) - pointsCents(r.saved)) / 100;
     function toggleRewardFavorite(reward) {
       const wasFavorite=!!reward.favorite;
       data.rewards.forEach(r => {r.favorite=false;});
@@ -868,23 +876,28 @@ const app = createApp({
       depositReward(reward, true);
     }
     function depositReward(reward, random=false) {
-      const max = Math.min(balance.value, rewardRemaining(reward));
-      if (max <= 0) { notify('Aucun point disponible à épargner'); return; }
-      const response = prompt(random ? ('Combien de points épargner sur une récompense surprise ? (max '+max+')') : ('Points à épargner pour « '+reward.name+' » (max '+max+') :'), String(Math.min(5,max)));
+      const maxCents = Math.min(pointsCents(balance.value), pointsCents(rewardRemaining(reward)));
+      if (maxCents <= 0) { notify('Aucun point disponible à épargner'); return; }
+      const max = maxCents / 100;
+      const response = prompt(random ? ('Combien de points épargner sur une récompense surprise ? (max '+formatPoints(max)+')') : ('Points à épargner pour « '+reward.name+' » (max '+formatPoints(max)+') :'), formatPoints(Math.min(5,max)));
       if (response === null) return;
-      const amount = Number(response.replace(',','.'));
-      if (!Number.isFinite(amount) || amount <= 0 || amount > max || Math.round(amount*100)!==amount*100) { alert('Montant invalide ou supérieur au solde disponible.'); return; }
-      reward.saved = Math.round(((Number(reward.saved)||0)+amount)*100)/100;
-      notify(amount+' pts réservés pour '+reward.name);
+      const raw = Number(String(response).trim().replace(',','.'));
+      const amountCents = Math.round(raw * 100);
+      if (!Number.isFinite(raw) || amountCents <= 0 || amountCents > maxCents || Math.abs(raw * 100 - amountCents) > 0.000001) {
+        alert('Montant invalide ou supérieur au solde disponible (2 décimales maximum).'); return;
+      }
+      reward.saved = (pointsCents(reward.saved) + amountCents) / 100;
+      notify(formatPoints(amountCents / 100)+' pts réservés pour '+reward.name);
     }
     function withdrawReward(reward) {
-      const saved=Number(reward.saved)||0;
-      if (saved<=0) return;
-      const response=prompt('Points à retirer de cette épargne (max '+saved+') :',String(saved));
+      const savedCents = pointsCents(reward.saved);
+      if (savedCents <= 0) return;
+      const response = prompt('Points à retirer de cette épargne (max '+formatPoints(savedCents / 100)+') :',formatPoints(savedCents / 100));
       if(response===null)return;
-      const amount=Number(response.replace(',','.'));
-      if(!Number.isFinite(amount)||amount<=0||amount>saved || Math.round(amount*100)!==amount*100) {alert('Montant invalide.');return;}
-      reward.saved=Math.round((saved-amount)*100)/100;
+      const raw=Number(String(response).trim().replace(',','.'));
+      const amountCents=Math.round(raw * 100);
+      if(!Number.isFinite(raw)||amountCents<=0||amountCents>savedCents || Math.abs(raw*100-amountCents)>0.000001) {alert('Montant invalide (2 décimales maximum).');return;}
+      reward.saved=(savedCents-amountCents)/100;
     }
     const gratitudeDraft = ref('');
     const gratitudeMoment = ref('');
@@ -2352,9 +2365,18 @@ const app = createApp({
     // Catalogue repas, ingrédients et courses
     const menuTab=ref('planning');
     const dishQuery=ref(''), ingredientQuery=ref(''), dishIngredientQuery=ref(''), shoppingQuery=ref('');
-    const dishDraft=reactive({name:'',ingredientIds:[],category:'Sans catégorie',categories:['Sans catégorie']});
-    const dishCategoryFilter=ref(''),dishFoodTypeFilter=ref(''),suggestDishCategory=ref(''),suggestFoodType=ref(''),suggestPage=ref(1),suggestPageSize=ref(10);
+    const dishDraft=reactive({name:'',ingredientIds:[],category:'Sans catégorie',categories:['Sans catégorie'],difficulty:'',time:''});
+    const dishCategoryFilter=ref(''),dishFoodTypeFilter=ref(''),dishDifficultyFilter=ref(''),dishTimeFilter=ref(''),dishSort=ref('name'),suggestDishCategory=ref(''),suggestFoodType=ref(''),suggestPage=ref(1),suggestPageSize=ref(10);
     const dishEditing=ref(''),dishCategoryNew=ref(''),dishDragged=ref(''),dishCategoryDragged=ref(''),ingredientDragged=ref(''),menuRulesEditing=ref(false);
+    // Difficulté et temps sont des listes de niveaux configurables dont l'ordre sert aux tris.
+    const dishLevelDraft=reactive({difficulty:'',time:''});
+    function dishLevels(kind){return kind==='difficulty'?data.dishDifficulties:data.dishTimes;}
+    function addDishLevel(kind){const list=dishLevels(kind),name=String(dishLevelDraft[kind]||'').trim();if(name&&!list.some(x=>x.toLocaleLowerCase()===name.toLocaleLowerCase()))list.push(name);dishLevelDraft[kind]='';}
+    function renameDishLevel(kind,name){const list=dishLevels(kind),next=prompt('Renommer :',name)?.trim();if(!next||next===name||list.includes(next))return;const index=list.indexOf(name);if(index<0)return;list.splice(index,1,next);data.dishes.forEach(d=>{if(d[kind]===name)d[kind]=next;});if(dishDraft[kind]===name)dishDraft[kind]=next;if(kind==='difficulty'&&dishDifficultyFilter.value===name)dishDifficultyFilter.value=next;if(kind==='time'&&dishTimeFilter.value===name)dishTimeFilter.value=next;}
+    function deleteDishLevel(kind,name){if(!confirm('Supprimer « '+name+' » ? Les plats seront conservés, mais sans cette valeur.'))return;const list=dishLevels(kind),index=list.indexOf(name);if(index>=0)list.splice(index,1);data.dishes.forEach(d=>{if(d[kind]===name)d[kind]='';});if(dishDraft[kind]===name)dishDraft[kind]='';if(kind==='difficulty'&&dishDifficultyFilter.value===name)dishDifficultyFilter.value='';if(kind==='time'&&dishTimeFilter.value===name)dishTimeFilter.value='';}
+    const dishLevelDragged=reactive({kind:'',name:''});
+    function reorderDishLevel(kind,target){if(dishLevelDragged.kind!==kind)return;const list=dishLevels(kind),a=list.indexOf(dishLevelDragged.name),b=list.indexOf(target);if(a>=0&&b>=0&&a!==b){const [item]=list.splice(a,1);list.splice(b,0,item);}dishLevelDragged.kind='';dishLevelDragged.name='';}
+    function dishLevelRank(kind,value){const rank=dishLevels(kind).indexOf(value);return rank<0?Number.MAX_SAFE_INTEGER:rank;}
     const dishCategoryOpen=reactive({});
     function dishCats(d){return [...new Set((Array.isArray(d.categories)?d.categories:(d.category?[d.category]:['Sans catégorie'])).filter(Boolean))];}
     function setDishCats(d,cats){d.categories=[...new Set(cats.filter(Boolean))];d.category=d.categories[0]||'Sans catégorie';}
@@ -2400,14 +2422,14 @@ const app = createApp({
     const groupedIngredients=computed(()=>ingredientCategoryList.value.map(name=>({name,items:filteredIngredients.value.filter(i=>normalizeIngredientCategory(i)===name)})).filter(g=>g.items.length));
     const groupedShopping=computed(()=>ingredientCategoryList.value.map(name=>({name,items:shoppingVisible.value.filter(x=>{const i=data.ingredients.find(i=>i.id===x.ingredientId);return (i?normalizeIngredientCategory(i):(x.category||'Sans catégorie'))===name})})).filter(g=>g.items.length));
     const shoppingVisible=computed(()=>data.shoppingItems.filter(x=>String(x.name||'').toLocaleLowerCase().includes(shoppingQuery.value.toLocaleLowerCase()) && (!shoppingStoreFilter.value || (shoppingStoreFilter.value==='__none'?!x.store:x.store===shoppingStoreFilter.value))));
-    const filteredDishes=computed(()=>data.dishes.filter(x=>x.name.toLocaleLowerCase().includes(dishQuery.value.toLocaleLowerCase())&&(!dishCategoryFilter.value||dishCats(x).includes(dishCategoryFilter.value))&&dishMatchesFood(x,dishFoodTypeFilter.value)).sort((a,b)=>a.name.localeCompare(b.name,'fr')));
+    const filteredDishes=computed(()=>data.dishes.filter(x=>String(x.name||'').toLocaleLowerCase().includes(dishQuery.value.toLocaleLowerCase())&&(!dishCategoryFilter.value||dishCats(x).includes(dishCategoryFilter.value))&&dishMatchesFood(x,dishFoodTypeFilter.value)&&(!dishDifficultyFilter.value||x.difficulty===dishDifficultyFilter.value)&&(!dishTimeFilter.value||x.time===dishTimeFilter.value)).sort((a,b)=>{const order=dishSort.value;if(order==='difficulty-asc'||order==='difficulty-desc'||order==='time-asc'||order==='time-desc'){const kind=order.startsWith('difficulty')?'difficulty':'time',sign=order.endsWith('desc')?-1:1;const av=dishLevelRank(kind,a[kind]),bv=dishLevelRank(kind,b[kind]);if(av!==bv)return sign*(av-bv);}return String(a.name||'').localeCompare(String(b.name||''),'fr');}));
     const dishIngredientChoices=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&String(x.name||'').toLocaleLowerCase().includes(dishIngredientQuery.value.toLocaleLowerCase())));
     const filteredIngredients=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&String(x.name||'').toLocaleLowerCase().includes(ingredientQuery.value.toLocaleLowerCase())).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'fr')));
     function addIngredientCategory(){const name=newIngredientCategory.value.trim();if(!name)return;if(!data.ingredientCategories.some(x=>x.toLocaleLowerCase()===name.toLocaleLowerCase()))data.ingredientCategories.push(name);ingredientCategoryDraft.value=name;newIngredientCategory.value='';}
     function addIngredient(){const name=ingredientDraft.value.trim();if(!name)return; if(data.ingredients.some(i=>i.name.toLocaleLowerCase()===name.toLocaleLowerCase())){notify('Ingrédient déjà présent');return;}data.ingredients.push({id:uid(),name,category:ingredientCategoryDraft.value||'Sans catégorie',owned:false,location:ingredientLocationDraft.value});ingredientDraft.value='';}
     function setIngredientOwned(i,owned){i.owned=owned;if(owned)data.shoppingItems=data.shoppingItems.filter(x=>x.ingredientId!==i.id);}
     function moveShoppingCategory(target){const from=shoppingCategoryDragged.value;shoppingCategoryDragged.value='';if(!from||from===target)return;const order=data.ingredientCategories;const src=order.indexOf(from),dest=order.indexOf(target);if(src<0||dest<0)return;order.splice(src,1);order.splice(dest,0,from);}
-    function addDish(){const name=dishDraft.name.trim();if(!name)return;data.dishes.push({id:uid(),name,category:dishDraft.categories[0]||'Sans catégorie',categories:[...dishDraft.categories],ingredientIds:[...new Set(dishDraft.ingredientIds)]});dishDraft.name='';dishDraft.ingredientIds=[];dishDraft.categories=['Sans catégorie'];}
+    function addDish(){const name=dishDraft.name.trim();if(!name)return;data.dishes.push({id:uid(),name,category:dishDraft.categories[0]||'Sans catégorie',categories:[...dishDraft.categories],ingredientIds:[...new Set(dishDraft.ingredientIds)],difficulty:dishDraft.difficulty,time:dishDraft.time});dishDraft.difficulty='';dishDraft.time='';dishDraft.name='';dishDraft.ingredientIds=[];dishDraft.categories=['Sans catégorie'];}
     function dishName(id){return data.dishes.find(d=>d.id===id)?.name||'';}
     function dishIngredients(dish){return (dish?.ingredientIds||[]).map(id=>data.ingredients.find(i=>i.id===id)).filter(Boolean);}
     function assignDish(date,kind,dishId){
@@ -2575,6 +2597,7 @@ const app = createApp({
     const badHabitsHomeOpen = ref(true);
     return {
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
+      dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
       randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
       dishEditSearch,toggleDishIngredient,dishCategoryOpen,dishCategoryDragged,dishCategoryIsOpen,toggleDishCategory,reorderDishCategory,ticketWaiting,ticketCreatedLabel,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
       dishCats,setDishCats,dishFoodTypes,dishCategoryFilter,dishFoodTypeFilter,suggestDishCategory,suggestFoodType,suggestPage,suggestPageSize,suggestedDishPages,paginatedDishes,menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,removeMilestone,milestones,weekSummary,
@@ -2592,7 +2615,7 @@ const app = createApp({
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
-      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, depositRandomReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, gratitudeMoment, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, moveTicketType, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, formatPoints, toggleRewardFavorite, depositReward, depositRandomReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, gratitudeMoment, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, moveTicketType, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, groupedRewards, visibleInventory, unusedInventory, usedInventory, rewardClaimCount, setInventoryUsed,
       // filtres
       filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
