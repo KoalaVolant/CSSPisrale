@@ -248,3 +248,17 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 
 /* v35 */
 .dish-category-collapse{background:transparent;border:0;font-size:1rem;font-weight:700;cursor:pointer;text-align:left;color:inherit}.dish-category .category-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ticket-state-waiting{border-left:5px solid #7293b1!important;background:#f0f5fb!important}.ticket-waiting{display:inline-flex;align-items:center;gap:5px}.ticket-created{font-size:.79rem;color:#54635e;padding:2px 8px}.signed-amount{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}.signed-amount input{width:110px;max-width:55vw}.signed-amount button{min-width:30px;padding:4px 7px;border:1px solid #adbfb4;border-radius:6px;background:#fff}@media(max-width:800px){.mobile-nav-bar{position:sticky!important;top:0;z-index:90;background:#fafbfa}.page-header{top:45px!important}.filters{position:sticky;top:103px;z-index:38;max-height:55vh;overflow:auto;box-shadow:0 3px 8px #0002}.task-toolbar,.view-home .task-toolbar,.view-all .task-toolbar,.view-done .task-toolbar{top:98px!important}}@media(min-width:801px){.filters{position:sticky;top:60px;z-index:39;max-height:55vh;overflow:auto;box-shadow:0 3px 8px #0002}}
+
+/* v36 : panneau de filtres complet et suggestions contextuelles */
+.filters{overflow:visible!important;max-height:none!important;position:sticky!important;z-index:57!important;background:var(--fnd)!important}
+.filters-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-height:min(48dvh,420px);overflow-y:auto;overscroll-behavior:contain;padding:5px}
+.suggest-box{position:relative;flex:1 1 175px;min-width:140px}.suggest-box input{width:100%}
+.suggest-options{position:absolute;top:100%;left:0;right:0;z-index:99;max-height:210px;overflow:auto;background:white;border:1px solid #bacdc4;border-radius:7px;box-shadow:0 6px 16px #0002}
+.suggest-options button{display:block;width:100%;text-align:left;padding:7px;background:white;border:0;border-bottom:1px solid #eee;color:#263b34}
+.suggest-options button:hover{background:#e8f2ec}
+.shopping-ingredient-results{max-height:180px;overflow:auto}
+.random-note-home,.random-note-create,.random-note-card{padding:10px;border:1px solid var(--main-color);border-radius:10px;margin:10px 0;background:#fff}
+.random-note-home textarea,.random-note-create textarea,.random-note-card textarea{display:block;width:100%;min-height:82px;resize:vertical}
+.random-note-card{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.random-note-card textarea{flex:1 1 100%}
+.random-note-types,.random-type-manager{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}.random-type-manager span{display:inline-flex;gap:5px;align-items:center;border:1px solid #ddd;padding:5px;border-radius:7px}
+@media(max-width:800px){.filters{top:94px!important}.filters-row{max-height:calc(100dvh - 160px)}.random-note-card input{max-width:45%}}

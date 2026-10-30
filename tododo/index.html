@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261030-v35">
-  <link rel="stylesheet" href="stylekoala.css?v=20261030-v35">
-  <link rel="stylesheet" href="styletest.css?v=20261030-v35">
+  <link rel="stylesheet" href="style.css?v=20261030-v36">
+  <link rel="stylesheet" href="stylekoala.css?v=20261030-v36">
+  <link rel="stylesheet" href="styletest.css?v=20261030-v36">
 </head>
 <body>
 
@@ -106,7 +106,7 @@
       <!-- Tri / filtre des tâches (Accueil, Toutes les tâches, Terminés) -->
       <section class="filters" v-if="ui.filtersOpen && (view === 'home' || view === 'all' || view === 'done' || view === 'work')">
         <div class="filters-row">
-          <input type="search" v-model="filters.search" list="task-autocomplete" placeholder="Rechercher…"><datalist id="task-autocomplete"><option v-for="task in data.tasks.filter(t=>t.title).slice(0,250)" :key="task.id" :value="task.title"></option></datalist>
+          <div class="suggest-box"><input type="search" v-model="filters.search" placeholder="Rechercher…" autocomplete="off"><div class="suggest-options" v-if="taskSuggestions.length"><button type="button" v-for="task in taskSuggestions" :key="task.id" @click="filters.search=task.title">{{task.title}}</button></div></div>
 
           <select v-model="filters.category">
             <option value="">Toutes catégories</option>
@@ -379,6 +379,7 @@
       <details class="config-fold"><summary>Personnaliser le dashboard</summary><p>Afficher ou masquer les blocs. Leur ordre sera utilisé dans une prochaine évolution de la grille.</p><div v-for="w in dashboardCatalogue" :key="w.id" class="v29-widget-choice"><label><input type="checkbox" :checked="widgetVisible(w.id)" @change="setWidgetVisible(w.id,$event.target.checked)"> {{ w.name }}</label><button type="button" @click="moveDashboardWidget(w.id,-1)" :disabled="data.dashboardWidgets.indexOf(w.id)<1">↑</button><button type="button" @click="moveDashboardWidget(w.id,1)" :disabled="data.dashboardWidgets.indexOf(w.id)===data.dashboardWidgets.length-1">↓</button></div></details>
 
 
+      <section class="random-note-home"><h3>Note au pif</h3><textarea rows="2" v-model="randomNoteDraft" placeholder="Noter une idée rapide…"></textarea><button type="button" @click="addRandomNote(true)">＋ Ajouter la note</button></section>
       <section class="challenge-dashboard" v-if="currentChallenges.some(c=>c.enabled!==false && !c.hiddenHome)">
         <h2>Défis en cours</h2>
         <div v-for="c in currentChallenges.filter(x=>x.enabled!==false && !x.hiddenHome)" :key="c.id" class="challenge-summary"><strong>{{ c.name }}</strong> · {{ c.current }}/{{ c.target }} · +{{ c.points }} pts <span v-if="c.awarded">✓ Terminé</span><button v-if="c.awarded" type="button" @click="hideChallengeHome(c)">Retirer de l’accueil</button></div>
@@ -442,6 +443,16 @@
       </div>
     </section>
 
+    <section class="view view-random-notes" v-if="view === 'random-notes'">
+      <h3>Notes au pif</h3>
+      <div class="random-note-create"><textarea v-model="randomNoteDraft" rows="2" placeholder="Une idée, un truc à noter…"></textarea><button type="button" @click="addRandomNote()">＋ Ajouter</button></div>
+      <div class="random-note-types"><input v-model="randomNoteTypeDraft" placeholder="Créer un type" @keyup.enter="addRandomNoteType"><button type="button" @click="addRandomNoteType">Créer un type</button><select v-model="randomNoteTypeFilter"><option value="">Tous les types</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select></div>
+      <div class="random-type-manager"><span v-for="type in data.randomNoteTypes" :key="type"><strong>{{type}}</strong><button type="button" @click="renameRandomNoteType(type)">Renommer</button><button type="button" @click="deleteRandomNoteType(type)">×</button></span></div>
+      <article class="random-note-card" v-for="note in visibleRandomNotes" :key="note.id" draggable="true" @dragstart="randomNoteDragged=note.id" @dragover.prevent @drop.prevent="dropRandomNote(note)" @dragend="randomNoteDragged=''">
+        <span class="drag-grip">⠿</span><input v-model="note.title" placeholder="Titre de la note" aria-label="Titre"><select v-model="note.type"><option value="">Sans type</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select><button type="button" @click="deleteRandomNote(note)">Supprimer</button><textarea v-model="note.content" rows="2" placeholder="Ta note…"></textarea>
+      </article>
+      <p v-if="!visibleRandomNotes.length">Aucune note dans cette sélection.</p>
+    </section>
     <section class="view view-evening" v-if="view === 'evening'">
       <p>Crée plusieurs notes Markdown indépendantes, avec un titre et une sauvegarde automatique.</p>
       <div class="textarea-layout"><nav class="textarea-toc" v-if="visibleNotes.length" aria-label="Sommaire des notes"><strong>Table des matières</strong><a v-for="(note,i) in visibleNotes" :key="note.id" :href="'#note-'+note.id">{{note.title || 'Sans titre'}}</a></nav><div class="textarea-content">
@@ -593,13 +604,14 @@
       <p>Premier jour : +1 pt ; deuxième jour consécutif : +1,25 pt ; puis +0,25 pt par jour supplémentaire. La série reprend à zéro après un jour manqué.</p>
       <p>Total gagné : <strong>{{ gratitudeTotal }} pts</strong></p>
       <form v-if="!todayGratitude" @submit.prevent="saveGratitude">
+        <label>Moment (libre, facultatif) <input type="text" v-model="gratitudeMoment" placeholder="Ex. ce matin, pendant ma pause, 18 h 30…"></label>
         <label>Ta gratitude du jour <textarea v-model="gratitudeDraft" required maxlength="3000" rows="4" placeholder="Aujourd'hui, je suis reconnaissant(e) pour..."></textarea></label>
         <button type="submit">Enregistrer la gratitude du jour</button>
       </form>
       <p v-else>✓ Gratitude d'aujourd'hui enregistrée : {{ todayGratitude.text }} (+{{ todayGratitude.points }} pt)</p>
       <h3>Historique</h3>
       <article v-for="g in sortedGratitude" :key="g.date" class="gratitude-entry">
-        <div><strong>{{ formatDate(g.date) }}</strong> · +{{ g.points }} pt <p>{{ g.text }}</p></div>
+        <div><strong>{{ formatDate(g.date) }}</strong><span v-if="g.moment"> · {{g.moment}}</span> · +{{ g.points }} pt <p>{{ g.text }}</p></div>
         <button type="button" @click="deleteGratitude(g)">Supprimer</button>
       </article>
     </section>
@@ -794,7 +806,7 @@
         <div class="catalogue-form"><input v-model="newIngredientCategory" placeholder="Nouvelle catégorie…" @keyup.enter="addIngredientCategory"><button type="button" @click="addIngredientCategory">Créer la catégorie</button></div>
         <div class="catalogue-form"><input v-model="newIngredientLocation" placeholder="Nouvel emplacement…" @keyup.enter="addIngredientLocation"><button type="button" @click="addIngredientLocation">Créer emplacement</button></div>
         <div class="catalogue-form"><input v-model="ingredientDraft" placeholder="Nouvel ingrédient" @keyup.enter="addIngredient"><select v-model="ingredientCategoryDraft"><option v-for="c in ingredientCategoryList" :key="c">{{ c }}</option></select><select v-model="ingredientLocationDraft"><option value="">Emplacement non défini</option><option v-for="loc in ingredientLocationList" :key="loc" :value="loc">{{ loc }}</option></select><button type="button" @click="addIngredient">Ajouter</button></div>
-        <input v-model="ingredientQuery" type="search" list="ingredient-autocomplete" placeholder="Rechercher un ingrédient…"><datalist id="ingredient-autocomplete"><option v-for="i in data.ingredients" :key="i.id" :value="i.name"></option></datalist>
+        <div class="suggest-box"><input v-model="ingredientQuery" type="search" placeholder="Rechercher un ingrédient…" autocomplete="off"><div class="suggest-options" v-if="ingredientSuggestions.length"><button type="button" v-for="i in ingredientSuggestions" :key="i.id" @click="ingredientQuery=i.name">{{i.name}}</button></div></div>
         <details v-for="group in groupedIngredients" :key="group.name" class="ingredient-group" :open="ingredientIsOpen(group.name)" @dragover.prevent @drop.prevent="ingredientCategoryDragged ? reorderIngredientCategory(group.name) : dropIngredientCategory(group.name)"><summary @click.prevent="toggleIngredientCategory(group.name)"><span v-if="group.name!=='Sans catégorie'" class="category-drag" draggable="true" @click.stop @dragstart.stop="ingredientCategoryDragged=group.name" @dragend.stop="ingredientCategoryDragged=''" title="Réordonner cette catégorie">⠿</span> {{ ingredientIsOpen(group.name)?'▾':'▸' }} {{ group.name }} ({{ group.items.length }}) <button v-if="group.name!=='Sans catégorie'" type="button" @click.stop.prevent="renameIngredientCategory(group.name)">✎ Renommer</button><button v-if="group.name!=='Sans catégorie'" type="button" @click.stop.prevent="deleteIngredientCategory(group.name)">Supprimer</button></summary>
           <article v-for="i in group.items" :key="i.id" class="catalogue-row" draggable="true" @dragstart="ingredientDragged=i.id" @dragend="ingredientDragged=''">⠿ <template v-if="ingredientEditId===i.id"><input v-model="ingredientEditName" @keyup.enter="saveIngredientEdit(i)" @keyup.esc="ingredientEditId=''" aria-label="Nom de l'ingrédient"><select v-model="i.category"><option v-for="c in ingredientCategoryList" :key="c">{{c}}</option></select><select v-model="i.location"><option value="">Sans emplacement</option><option v-for="loc in ingredientLocationList" :key="loc" :value="loc">{{loc}}</option></select><button type="button" @click="saveIngredientEdit(i)">Enregistrer</button><button type="button" @click="ingredientEditId=''">Annuler</button></template><template v-else><strong>{{i.name}}</strong><small>{{i.category||'Sans catégorie'}} · {{i.location||'Sans emplacement'}}</small><button type="button" @click="startIngredientEdit(i)">Renommer / Modifier</button></template><label><input type="checkbox" :checked="!!i.owned" @change="setIngredientOwned(i,$event.target.checked)"> En ma possession</label><button type="button" @click="addIngredientToShopping(i)">+ Courses</button><button type="button" @click="removeIngredient(i)">Supprimer</button></article>
         </details></section>
@@ -806,7 +818,7 @@
       <div class="catalogue-form shopping-add-form">
         <label>Type d'ajout <select v-model="shoppingAddMode"><option value="free">Article libre</option><option value="ingredient">Ingrédients</option></select></label>
         <input v-if="shoppingAddMode==='free'" v-model="shoppingDraft" placeholder="Nom de l'article libre…" @keyup.enter="addShoppingItem">
-        <div v-else class="shopping-ingredient-picker"><input v-model="shoppingIngredientSearch" type="search" list="ingredient-autocomplete" placeholder="🔎 Rechercher un ingrédient…"><div class="shopping-ingredient-results"><button type="button" v-for="i in shoppingIngredientChoices.slice(0,60)" :key="i.id" :class="{active:shoppingIngredientId===i.id}" @click="shoppingIngredientId=i.id">{{i.name}} <small>{{i.category}}</small></button></div><small v-if="shoppingIngredientChoices.length>60">Affinez votre recherche pour voir plus de résultats.</small></div>
+        <div v-else class="shopping-ingredient-picker"><input v-model="shoppingIngredientSearch" type="search" autocomplete="off" placeholder="🔎 Rechercher un ingrédient…"><div class="shopping-ingredient-results"><button type="button" v-for="i in shoppingSuggestions" :key="i.id" :class="{active:shoppingIngredientId===i.id}" @click="shoppingIngredientId=i.id">{{i.name}} <small>{{i.category}}</small></button></div></div>
         <select v-if="shoppingAddMode==='free'" v-model="shoppingCategoryDraft" aria-label="Catégorie de l’article libre"><option v-for="c in ingredientCategoryList" :key="c" :value="c">{{ c }}</option></select>
         <input v-model="shoppingStoreDraft" list="shopping-stores" placeholder="Magasin (facultatif)"><datalist id="shopping-stores"><option v-for="store in shoppingStores" :key="store" :value="store"></option></datalist>
         <label>Prix pensé (€) <input type="number" min="0" step="0.01" v-model.number="shoppingEstimatedDraft"></label><input v-model="shoppingQuantityDraft" placeholder="Quantité (ex : 2 kg, 3, 1 paquet)" @keyup.enter="addShoppingItem"><button type="button" @click="addShoppingItem">Ajouter</button>
@@ -1380,7 +1392,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261030-v35"></script>
+<script src="app.js?v=20261030-v36"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

@@ -39,6 +39,7 @@ const TABS = [
   { id: 'achievements', label: 'Succès & objectifs' },
   { id: 'trash', label: 'Corbeille' },
   { id: 'gratitude',  label: 'Gratitude' },
+  { id: 'random-notes', label: 'Notes au pif' },
   { id: 'evening', label: 'Textareas' },
   { id: 'habits',     label: 'Habitudes & routines' },
   { id: 'challenges', label: 'Défis' },
@@ -58,7 +59,7 @@ const NAV_GROUPS = [
   { title: 'Tâches', ids: ['home','all','work','habits','usual-lists','done'] },
   { title: 'Repas', ids: ['menu','shopping'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
-  { title: 'Autres', ids: ['gratitude','evening','challenges','achievements','statistics','budget'] },
+  { title: 'Autres', ids: ['gratitude','evening','random-notes','challenges','achievements','statistics','budget'] },
   { title: 'Configuration', ids: ['projects','categories','levels','trash','data'] },
 ].map(group => ({ ...group, tabs: group.ids.map(id => TABS.find(t => t.id === id)).filter(Boolean) }));
 
@@ -224,6 +225,8 @@ function defaultData() {
     budgetSwile: [], // dépenses Swile décalées au mois suivant à 50 %
     cashEntries: [], // espèces indépendantes du budget mensuel
     textareas: [], // blocs Markdown nommés
+    randomNotes: [], // petites notes indépendantes
+    randomNoteTypes: [],
     usualLists: [], // listes de suivi sans points
     workTicketTypes: [], // types avec bonus de points
     workTickets: [],  // tickets avec sous-tâches et historique
@@ -291,6 +294,8 @@ function loadData() {
     if (!Array.isArray(d.cashEntries)) d.cashEntries = [];
     d.budgetSwile = d.budgetSwile.map(x => ({...x, amount: -Math.abs(Number(x.amount) || 0)}));
     if (!Array.isArray(d.textareas)) d.textareas = [];
+    if (!Array.isArray(d.randomNotes)) d.randomNotes=[];
+    if (!Array.isArray(d.randomNoteTypes)) d.randomNoteTypes=[];
     if (!Array.isArray(d.dishCategories)) d.dishCategories=['Sans catégorie'];
     if (!Array.isArray(d.shoppingSessions)) d.shoppingSessions=[];
     if (d.eveningNotes.trim()) { if (!d.textareas.length) d.textareas.push({id:uid(),title:'To do du soir',content:d.eveningNotes}); d.eveningNotes=''; }
@@ -522,6 +527,8 @@ const app = createApp({
       data.budgetSwile = Array.isArray(src.budgetSwile) ? src.budgetSwile.map(x => ({...x, amount: -Math.abs(Number(x.amount) || 0)})) : [];
       data.cashEntries = Array.isArray(src.cashEntries) ? src.cashEntries : [];
       data.textareas = Array.isArray(src.textareas) ? src.textareas : [];
+      data.randomNotes=Array.isArray(src.randomNotes)?src.randomNotes:[];
+      data.randomNoteTypes=Array.isArray(src.randomNoteTypes)?src.randomNoteTypes:[];
       data.dishCategories=Array.isArray(src.dishCategories)?src.dishCategories:['Sans catégorie'];
       data.shoppingSessions=Array.isArray(src.shoppingSessions)?src.shoppingSessions:[];
       if (data.eveningNotes.trim()) { if (!data.textareas.length) data.textareas.push({id:uid(),title:'To do du soir',content:data.eveningNotes}); data.eveningNotes=''; }
@@ -880,6 +887,7 @@ const app = createApp({
       reward.saved=Math.round((saved-amount)*100)/100;
     }
     const gratitudeDraft = ref('');
+    const gratitudeMoment = ref('');
     const todayGratitude = computed(() => data.gratitude.find(g=>g.date===today.value));
     const sortedGratitude = computed(() => [...data.gratitude].sort((a,b)=>b.date.localeCompare(a.date)));
     function saveGratitude() {
@@ -890,10 +898,31 @@ const app = createApp({
       const dates=new Set(data.gratitude.map(g=>g.date));
       while(cursor.slice(0,7)===today.value.slice(0,7) && dates.has(cursor)) {run++; const d=new Date(cursor+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-1);cursor=d.toISOString().slice(0,10);}
       const points=1 + run * 0.25;
-      data.gratitude.push({date:today.value,text:value,points});
-      gratitudeDraft.value='';notify('Gratitude enregistrée : +'+points+' pt');
+      data.gratitude.push({date:today.value,text:value,moment:gratitudeMoment.value.trim(),points});
+      gratitudeDraft.value='';gratitudeMoment.value='';notify('Gratitude enregistrée : +'+points+' pt');
     }
     function deleteGratitude(g) {if(confirm('Supprimer cette gratitude et les points associés ?'))data.gratitude=data.gratitude.filter(x=>x.date!==g.date);}
+    // Notes au pif : création rapide sur le dashboard et organisation dans un onglet dédié.
+    const randomNoteDraft=ref('');
+    const randomNoteTypeDraft=ref('');
+    const randomNoteDragged=ref('');
+    const randomNoteTypeFilter=ref('');
+    function addRandomNote(fromDashboard=false){
+      const content=randomNoteDraft.value.trim();
+      if(!content){if(!fromDashboard) data.randomNotes.push({id:uid(),title:'Nouvelle note',content:'',type:''});return;}
+      data.randomNotes.push({id:uid(),title:content.split('\n')[0].slice(0,60)||'Note au pif',content,type:''});
+      randomNoteDraft.value='';notify('Note ajoutée');
+    }
+    function addRandomNoteType(){const n=randomNoteTypeDraft.value.trim();if(n&&!data.randomNoteTypes.includes(n))data.randomNoteTypes.push(n);randomNoteTypeDraft.value='';}
+    function renameRandomNoteType(name){const v=prompt('Renommer ce type :',name);if(v===null||!v.trim()||v.trim()===name)return;if(data.randomNoteTypes.includes(v.trim()))return alert('Type déjà existant');data.randomNoteTypes.splice(data.randomNoteTypes.indexOf(name),1,v.trim());data.randomNotes.forEach(n=>{if(n.type===name)n.type=v.trim()});}
+    function deleteRandomNoteType(name){if(!confirm('Supprimer le type « '+name+' » ? Les notes seront conservées.'))return;data.randomNoteTypes=data.randomNoteTypes.filter(x=>x!==name);data.randomNotes.forEach(n=>{if(n.type===name)n.type=''});if(randomNoteTypeFilter.value===name)randomNoteTypeFilter.value='';}
+    function deleteRandomNote(note){if(confirm('Supprimer cette note ?'))data.randomNotes=data.randomNotes.filter(n=>n.id!==note.id);}
+    function dropRandomNote(target){const from=data.randomNotes.findIndex(n=>n.id===randomNoteDragged.value),to=data.randomNotes.findIndex(n=>n.id===target.id);if(from>=0&&to>=0&&from!==to){const [n]=data.randomNotes.splice(from,1);data.randomNotes.splice(to,0,n);}randomNoteDragged.value='';}
+    const visibleRandomNotes=computed(()=>data.randomNotes.filter(n=>!randomNoteTypeFilter.value||n.type===randomNoteTypeFilter.value));
+    // Les listes de suggestions ne sont jamais affichées avant une saisie.
+    const taskSuggestions=computed(()=>{const q=filters.search.trim().toLocaleLowerCase();return q?data.tasks.filter(x=>String(x.title||'').toLocaleLowerCase().includes(q)).slice(0,5):[];});
+    const ingredientSuggestions=computed(()=>{const q=ingredientQuery.value.trim().toLocaleLowerCase();return q?data.ingredients.filter(x=>String(x.name||'').toLocaleLowerCase().includes(q)).slice(0,5):[];});
+    const shoppingSuggestions=computed(()=>{const q=shoppingIngredientSearch.value.trim().toLocaleLowerCase();return q?shoppingIngredientChoices.value.slice(0,5):[];});
     const workCategories = computed(()=>data.workCategories.map(c=>c.name));
     const newWorkCategory=ref('');
     function addWorkCategory(){const name=newWorkCategory.value.trim();if(name&&!workCategories.value.some(c=>c.toLowerCase()===name.toLowerCase()))data.workCategories.push({name,color:''});newWorkCategory.value='';}
@@ -2522,6 +2551,7 @@ const app = createApp({
     const badHabitsHomeOpen = ref(true);
     return {
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
+      randomNoteDraft,randomNoteTypeDraft,randomNoteDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,deleteRandomNote,dropRandomNote,visibleRandomNotes,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
       dishEditSearch,toggleDishIngredient,dishCategoryOpen,dishCategoryDragged,dishCategoryIsOpen,toggleDishCategory,reorderDishCategory,ticketWaiting,ticketCreatedLabel,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
       menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
@@ -2538,7 +2568,7 @@ const app = createApp({
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
-      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, depositRandomReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, moveTicketType, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, toggleRewardFavorite, depositReward, depositRandomReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, gratitudeMoment, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, moveTicketType, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, groupedRewards, visibleInventory, unusedInventory, usedInventory, rewardClaimCount, setInventoryUsed,
       // filtres
       filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
