@@ -304,3 +304,18 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 .appointment-line{border-left:5px solid #999;padding:10px;background:white;margin:6px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 @media(max-width:650px){.calendar-day{min-height:85px;padding:2px}.calendar-event{font-size:10px;padding:2px}.calendar-weekday{font-size:11px}}
+
+/* V42 : petits correctifs interface */
+.appointment-category-label{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;padding:4px 8px;border-radius:999px;background:#f4f7f5;color:#253e36;border:1px solid var(--appt-category-color,#999);overflow-wrap:anywhere}
+.appointment-category-label::before{content:"";display:inline-block;width:9px;height:9px;flex:0 0 9px;border-radius:50%;background:var(--appt-category-color,#999)}
+.toast{position:fixed;bottom:18px;right:18px;z-index:200;max-width:min(410px,calc(100vw - 32px));margin:0;padding:13px 18px;border-radius:10px;border:1px solid #819d92;background:#25473d;color:#fff;font-weight:600;line-height:1.4;box-shadow:0 7px 24px #0004;overflow-wrap:anywhere}
+.view.view-habits > h3{flex:0 0 100%;width:100%;margin:14px 0 4px;padding:8px 10px;background:var(--fnd);border-bottom:2px solid var(--fnd3);box-sizing:border-box}
+
+/* v43 : liens rendez-vous / échéances */
+.appointment-link-box{margin:12px 0;padding:12px;border:1px solid var(--main-color,#dedede);border-radius:10px}
+.appointment-link-box h3{margin:0 0 10px}
+.calendar-quick-create{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.calendar-quick-create input{flex:1 1 170px;min-width:0}
+.calendar-reminders{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:6px;margin-top:12px;border:1px solid var(--main-color,#dedede);border-radius:8px}
+.calendar-reminders label{display:flex;gap:5px;align-items:center}
+.calendar-reminders small{grid-column:1/-1}

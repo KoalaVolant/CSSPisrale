@@ -2601,7 +2601,7 @@ const app = createApp({
     // Rendez-vous indépendants des tâches et des points.
     const calMode=ref('month');
     const calAnchor=ref(todayStr().slice(0,7)+'-01');
-    const apptForm=reactive({open:false,id:'',title:'',start:todayStr(),end:todayStr(),categoryId:'',details:''});
+    const apptForm=reactive({open:false,id:'',title:'',start:todayStr(),end:todayStr(),categoryId:'',details:'',linkedType:'',linkedId:'',newTask:'',newProject:'',reminders:[]});
     const apptCategoryName=ref(''); const apptCategoryColor=ref('#7c9bb8'); const draggedCategory=ref(''); const draggedAppointment=ref('');
     const dateAdd=(value,days)=>{const d=new Date(value+'T12:00:00');d.setDate(d.getDate()+days);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
     const dateMonday=value=>{const d=new Date(value+'T12:00:00');return dateAdd(value,-((d.getDay()+6)%7));};
@@ -2613,18 +2613,35 @@ const app = createApp({
     const appointmentToday=computed(()=>appointmentsOn(today.value));
     const appointmentNext3=computed(()=>appointmentUpcoming.value.filter(a=>a.start>today.value).slice(0,3));
     function moveCalendar(delta){if(calMode.value==='week')calAnchor.value=dateAdd(calAnchor.value,7*delta);else{let d=new Date(calAnchor.value+'T12:00:00');d.setDate(1);d.setMonth(d.getMonth()+delta);calAnchor.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';}}
-    function openAppointment(a=null,date=null){Object.assign(apptForm,{open:true,id:a?.id||'',title:a?.title||'',start:a?.start||date||today.value,end:a?.end||date||today.value,categoryId:a?.categoryId||'',details:a?.details||''});}
-    function saveAppointment(){if(!apptForm.title.trim()||!apptForm.start||apptForm.end<apptForm.start)return;const item={id:apptForm.id||uid(),title:apptForm.title.trim(),start:apptForm.start,end:apptForm.end,categoryId:apptForm.categoryId,details:apptForm.details,status:'pending'};const pos=data.appointments.findIndex(a=>a.id===item.id);if(pos<0)data.appointments.push(item);else Object.assign(data.appointments[pos],{...item,status:'pending'});apptForm.open=false;}
+    const weekDate=value=>new Date(value+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const reminderChoices=[{days:30,label:'30 jours avant'},{days:14,label:'14 jours avant'},{days:7,label:'7 jours avant'},{days:3,label:'3 jours avant'},{days:2,label:'2 jours avant'},{days:1,label:'La veille'},{days:0,label:'Le jour de fin'}];
+    const linkedLabel=a=>a?.linkedType==='task'?(data.tasks.find(t=>t.id===a.linkedId)?.title||'Tâche supprimée'):a?.linkedType==='project'?(data.projects.find(p=>p.id===a.linkedId)?.name||'Projet supprimé'):'';
+    function openAppointment(a=null,date=null){Object.assign(apptForm,{open:true,id:a?.id||'',title:a?.title||'',start:a?.start||date||today.value,end:a?.end||date||today.value,categoryId:a?.categoryId||'',details:a?.details||'',linkedType:a?.linkedType||'',linkedId:a?.linkedId||'',newTask:'',newProject:'',reminders:Array.isArray(a?.reminders)?[...a.reminders]:[]});}
+    function toggleReminder(days,checked){const arr=apptForm.reminders.filter(x=>x!==days);if(checked)arr.push(days);apptForm.reminders=arr.sort((a,b)=>b-a);}
+    function createLinkedTask(){const title=apptForm.newTask.trim();if(!title)return;const t=newTask({title,due:apptForm.end,scope:'personal'});data.tasks.push(t);apptForm.linkedType='task';apptForm.linkedId=t.id;apptForm.newTask='';notify('Tâche créée et liée. Enregistre le rendez-vous pour conserver le lien.');}
+    function createLinkedProject(){const name=apptForm.newProject.trim();if(!name)return;const p={id:uid(),name,description:'',color:nextColor(data.projects.length)};data.projects.push(p);apptForm.linkedType='project';apptForm.linkedId=p.id;apptForm.newProject='';notify('Projet créé et lié. Enregistre le rendez-vous pour conserver le lien.');}
+    const deadlineAlerts=computed(()=>data.appointments.flatMap(a=>{if(!a.linkedType||!a.linkedId||!a.end||!Array.isArray(a.reminders))return [];const exists=a.linkedType==='task'?data.tasks.some(t=>t.id===a.linkedId&&t.status!=='done'):a.linkedType==='project'?data.projects.some(p=>p.id===a.linkedId):false;if(!exists)return [];return a.reminders.filter(n=>Number.isInteger(n)&&n>=0).map(days=>({a,days,date:dateAdd(a.end,-days),key:a.end+':'+days})).filter(x=>x.date<=today.value&&!(a.reminderAcknowledged||[]).includes(x.key));}).sort((x,y)=>x.date.localeCompare(y.date)));
+    const pendingDeadlineAlert=computed(()=>deadlineAlerts.value[0]||null);
+    function acknowledgeDeadlineAlert(item){if(!item)return;if(!Array.isArray(item.a.reminderAcknowledged))item.a.reminderAcknowledged=[];item.a.reminderAcknowledged.push(item.key);}
+
+    function saveAppointment(){if(!apptForm.title.trim()||!apptForm.start||apptForm.end<apptForm.start)return;
+      const old=data.appointments.find(a=>a.id===apptForm.id);
+      const type=apptForm.linkedType;
+      const id=(type==='task'&&data.tasks.some(t=>t.id===apptForm.linkedId))||(type==='project'&&data.projects.some(p=>p.id===apptForm.linkedId))?apptForm.linkedId:'';
+      const reminders=id?[...apptForm.reminders]:[];
+      const item={id:apptForm.id||uid(),title:apptForm.title.trim(),start:apptForm.start,end:apptForm.end,categoryId:apptForm.categoryId,details:apptForm.details,linkedType:id?type:'',linkedId:id,reminders,reminderAcknowledged:old&&old.end===apptForm.end&&old.linkedId===id?(old.reminderAcknowledged||[]):[],status:old?.status==='done'?'done':'pending'};
+      const pos=data.appointments.findIndex(a=>a.id===item.id);if(pos<0)data.appointments.push(item);else Object.assign(data.appointments[pos],item);apptForm.open=false;}
+
     function deleteAppointment(a){if(confirm('Supprimer ce rendez-vous ?'))data.appointments=data.appointments.filter(x=>x.id!==a.id);}
     function addAppointmentCategory(){const name=apptCategoryName.value.trim();if(!name)return;data.appointmentCategories.push({id:uid(),name,color:apptCategoryColor.value});apptCategoryName.value='';}
     function renameAppointmentCategory(c){const name=prompt('Nom de la catégorie',c.name);if(name?.trim())c.name=name.trim();}
     function deleteAppointmentCategory(c){if(!confirm('Supprimer cette catégorie ? Les rendez-vous restent sans catégorie.'))return;data.appointmentCategories=data.appointmentCategories.filter(x=>x.id!==c.id);data.appointments.forEach(a=>{if(a.categoryId===c.id)a.categoryId='';});}
     function dropAppointmentCategory(target){const from=data.appointmentCategories.findIndex(x=>x.id===draggedCategory.value),to=data.appointmentCategories.findIndex(x=>x.id===target.id);draggedCategory.value='';if(from<0||to<0||from===to)return;data.appointmentCategories.splice(to,0,...data.appointmentCategories.splice(from,1));}
-    function dropAppointment(date){const a=data.appointments.find(x=>x.id===draggedAppointment.value);draggedAppointment.value='';if(!a)return;const duration=Math.round((new Date(a.end+'T12:00:00')-new Date(a.start+'T12:00:00'))/86400000);a.start=date;a.end=dateAdd(date,duration);a.status='pending';}
+    function dropAppointment(date){const a=data.appointments.find(x=>x.id===draggedAppointment.value);draggedAppointment.value='';if(!a)return;const duration=Math.round((new Date(a.end+'T12:00:00')-new Date(a.start+'T12:00:00'))/86400000);a.start=date;a.end=dateAdd(date,duration);a.status='pending';a.reminderAcknowledged=[];}
     const pendingAppointment=computed(()=>data.appointments.find(a=>a.end<today.value&&(a.status==='pending'||a.status==='postpone')));
     const postponeDate=ref(todayStr());
     function confirmAppointment(a,done){if(done)a.status='done';else {a.status='postpone';postponeDate.value=dateAdd(today.value,1);}}
-    function rescheduleAppointment(a){if(!postponeDate.value)return;const duration=Math.round((new Date(a.end+'T12:00:00')-new Date(a.start+'T12:00:00'))/86400000);a.start=postponeDate.value;a.end=dateAdd(a.start,duration);a.status='pending';}
+    function rescheduleAppointment(a){if(!postponeDate.value)return;const duration=Math.round((new Date(a.end+'T12:00:00')-new Date(a.start+'T12:00:00'))/86400000);a.start=postponeDate.value;a.end=dateAdd(a.start,duration);a.status='pending';a.reminderAcknowledged=[];}
     const achievementForm=reactive({open:false,id:'',name:'',description:'',target:1,current:0});
     function openAchievement(a=null){Object.assign(achievementForm,{open:true,id:a?.id||'',name:a?.name||'',description:a?.description||'',target:a?.target||1,current:a?.current||0});}
     function saveAchievement(){if(!achievementForm.name.trim())return;const a={id:achievementForm.id||uid(),name:achievementForm.name.trim(),description:achievementForm.description,target:Math.max(1,Number(achievementForm.target)||1),current:Math.max(0,Number(achievementForm.current)||0)};const old=data.customAchievements.find(x=>x.id===a.id);if(old)Object.assign(old,a);else data.customAchievements.push(a);achievementForm.open=false;}
@@ -2638,7 +2655,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
+      ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
       randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
