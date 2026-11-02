@@ -290,3 +290,17 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 
 /* v39 : notes en simple lecture et niveaux personnalisables des plats */
 .random-note-head{justify-content:flex-end}.random-note-head .drag-grip{margin-right:auto;cursor:grab}.random-note-head input{flex:1 1 180px}.random-note-body{margin:5px 4px 8px}.dish-level-selects{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}.dish-level-selects label{display:flex;flex-direction:column;gap:4px}.dish-level-selects select{min-width:140px;max-width:100%}.dish-level-manager{margin:10px 0}.dish-level-entry{display:flex;align-items:center;gap:8px;padding:6px;border-bottom:1px solid var(--main-color)}.dish-level-entry strong{flex:1}.dish-level-entry .drag-grip{cursor:grab}
+
+/* Calendrier et rendez-vous */
+.calendar-toolbar,.appointments-home-header,.calendar-category-form,.calendar-category{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid #cbd5d1;border-radius:8px;overflow:hidden}
+.calendar-weekday{text-align:center;padding:8px;background:var(--fnd2);font-weight:600}
+.calendar-day{min-height:110px;border:1px solid #e5e7eb;padding:5px;min-width:0}
+.calendar-day.calendar-today{outline:2px solid var(--tit);outline-offset:-2px}.calendar-outside{background:#f5f6f6;opacity:.7}
+.calendar-date{display:block;background:transparent;border:0;font-weight:600;margin-bottom:5px}
+.calendar-event{display:block;width:100%;font-size:12px;text-align:left;padding:4px;border:0;border-radius:4px;margin:3px 0;overflow-wrap:anywhere;cursor:grab;color:#172b2b}
+.calendar-category{border:1px solid #ddd;padding:6px;border-radius:6px}.calendar-category input[type=color]{width:34px;height:30px}
+.appointments-home{order:-100!important;background:var(--fnd);padding:16px;border-radius:12px;margin:8px 0 16px}.appointments-home h3{margin:12px 0 5px}
+.appointment-line{border-left:5px solid #999;padding:10px;background:white;margin:6px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+@media(max-width:650px){.calendar-day{min-height:85px;padding:2px}.calendar-event{font-size:10px;padding:2px}.calendar-weekday{font-size:11px}}

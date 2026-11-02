@@ -31,6 +31,7 @@ const nextColor = i => PALETTE[Math.abs(i) % PALETTE.length];
 
 const TABS = [
   { id: 'home',       label: 'Accueil' },
+  { id: 'calendar', label: 'Calendrier' },
   { id: 'all',        label: 'Toutes les tâches' },
   { id: 'work',       label: 'Travail' },
   { id: 'usual-lists', label: 'Listes de tâches habituelles' },
@@ -56,7 +57,7 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','all','work','habits','usual-lists','done'] },
+  { title: 'Tâches', ids: ['home','calendar','all','work','habits','usual-lists','done'] },
   { title: 'Repas', ids: ['menu','shopping'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','evening','random-notes','challenges','achievements','statistics','budget'] },
@@ -204,6 +205,9 @@ function migrateGratitudePoints(records) {
 function defaultData() {
   return {
     achievements: [], // succès attribués, une seule fois
+    customAchievements: [],
+    appointments: [],
+    appointmentCategories: [],
     dashboardWidgets: ['randomNotes','habits','meals','priorities','tasks'],
     groceryBudget: 0, // budget facultatif de courses
     eveningNotes: '', // ancien champ conservé pour migration
@@ -520,6 +524,9 @@ const app = createApp({
       data.weeklyMenus = src.weeklyMenus && typeof src.weeklyMenus === 'object' && !Array.isArray(src.weeklyMenus) ? src.weeklyMenus : {};
       data.menuRules = typeof src.menuRules === 'string' ? src.menuRules : '';
       data.achievements=Array.isArray(src.achievements)?src.achievements:[];
+      data.customAchievements=Array.isArray(src.customAchievements)?src.customAchievements:[];
+      data.appointments=Array.isArray(src.appointments)?src.appointments:[];
+      data.appointmentCategories=Array.isArray(src.appointmentCategories)?src.appointmentCategories:[];
       data.dashboardWidgets=Array.isArray(src.dashboardWidgets)?src.dashboardWidgets:['randomNotes','habits','meals','priorities','tasks'];
       data.groceryBudget=Number.isFinite(Number(src.groceryBudget))?Number(src.groceryBudget):0;
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
@@ -1241,7 +1248,7 @@ const app = createApp({
     const eveningPreview = ref(true);
     const noteEditing=ref(''), showArchivedNotes=ref(false), noteDragged=ref('');
     const visibleNotes=computed(()=>data.textareas.filter(n=>showArchivedNotes.value ? !!n.archived : !n.archived));
-    function addTextarea(){const note={id:uid(),title:'Nouvelle note',content:'',archived:false};data.textareas.push(note);noteEditing.value=note.id;showArchivedNotes.value=false;}
+    function addTextarea(){const note={id:uid(),title:'Nouvelle note',content:'',archived:false};data.textareas.push(note);noteEditing.value=note.id;showArchivedNotes.value=false;nextTick(()=>{const el=document.getElementById('note-'+note.id);el?.scrollIntoView({behavior:'smooth',block:'center'});el?.querySelector('textarea')?.focus({preventScroll:true});});}
     function toggleNoteArchive(note){note.archived=!note.archived;if(noteEditing.value===note.id)noteEditing.value='';}
     function dropNote(target){const from=data.textareas.findIndex(n=>n.id===noteDragged.value), to=data.textareas.findIndex(n=>n.id===target.id);noteDragged.value='';if(from<0||to<0||from===to)return;data.textareas.splice(to,0,...data.textareas.splice(from,1));}
     function removeTextarea(note){if(confirm('Supprimer « '+(note.title||'Sans titre')+' » ?')){data.trash.unshift({id:uid(),type:'textarea',deletedAt:new Date().toISOString(),payload:clone(note)});data.textareas=data.textareas.filter(x=>x.id!==note.id);}}
@@ -2424,7 +2431,8 @@ const app = createApp({
     const shoppingVisible=computed(()=>data.shoppingItems.filter(x=>String(x.name||'').toLocaleLowerCase().includes(shoppingQuery.value.toLocaleLowerCase()) && (!shoppingStoreFilter.value || (shoppingStoreFilter.value==='__none'?!x.store:x.store===shoppingStoreFilter.value))));
     const filteredDishes=computed(()=>data.dishes.filter(x=>String(x.name||'').toLocaleLowerCase().includes(dishQuery.value.toLocaleLowerCase())&&(!dishCategoryFilter.value||dishCats(x).includes(dishCategoryFilter.value))&&dishMatchesFood(x,dishFoodTypeFilter.value)&&(!dishDifficultyFilter.value||x.difficulty===dishDifficultyFilter.value)&&(!dishTimeFilter.value||x.time===dishTimeFilter.value)).sort((a,b)=>{const order=dishSort.value;if(order==='difficulty-asc'||order==='difficulty-desc'||order==='time-asc'||order==='time-desc'){const kind=order.startsWith('difficulty')?'difficulty':'time',sign=order.endsWith('desc')?-1:1;const av=dishLevelRank(kind,a[kind]),bv=dishLevelRank(kind,b[kind]);if(av!==bv)return sign*(av-bv);}return String(a.name||'').localeCompare(String(b.name||''),'fr');}));
     const dishIngredientChoices=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&String(x.name||'').toLocaleLowerCase().includes(dishIngredientQuery.value.toLocaleLowerCase())));
-    const filteredIngredients=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&String(x.name||'').toLocaleLowerCase().includes(ingredientQuery.value.toLocaleLowerCase())).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'fr')));
+    const ingredientOwnedFilter=ref('all');
+    const filteredIngredients=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&(ingredientOwnedFilter.value==='all'||!!x.owned===(ingredientOwnedFilter.value==='owned'))&&String(x.name||'').toLocaleLowerCase().includes(ingredientQuery.value.toLocaleLowerCase())).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'fr')));
     function addIngredientCategory(){const name=newIngredientCategory.value.trim();if(!name)return;if(!data.ingredientCategories.some(x=>x.toLocaleLowerCase()===name.toLocaleLowerCase()))data.ingredientCategories.push(name);ingredientCategoryDraft.value=name;newIngredientCategory.value='';}
     function addIngredient(){const name=ingredientDraft.value.trim();if(!name)return; if(data.ingredients.some(i=>i.name.toLocaleLowerCase()===name.toLocaleLowerCase())){notify('Ingrédient déjà présent');return;}data.ingredients.push({id:uid(),name,category:ingredientCategoryDraft.value||'Sans catégorie',owned:false,location:ingredientLocationDraft.value});ingredientDraft.value='';}
     function setIngredientOwned(i,owned){i.owned=owned;if(owned)data.shoppingItems=data.shoppingItems.filter(x=>x.ingredientId!==i.id);}
@@ -2589,6 +2597,40 @@ const app = createApp({
     const successProgress=computed(()=>successDefinitions.map(def=>({...def,current:successCounts.value[def.kind],unlocked:successCounts.value[def.kind]>=def.target})));
     watch(successProgress,items=>{for(const def of items){if(def.unlocked&&!data.achievements.some(a=>a.id===def.id)){data.achievements.push({id:def.id,unlockedAt:today.value});}}},{immediate:true,flush:'post'});
 
+
+    // Rendez-vous indépendants des tâches et des points.
+    const calMode=ref('month');
+    const calAnchor=ref(todayStr().slice(0,7)+'-01');
+    const apptForm=reactive({open:false,id:'',title:'',start:todayStr(),end:todayStr(),categoryId:'',details:''});
+    const apptCategoryName=ref(''); const apptCategoryColor=ref('#7c9bb8'); const draggedCategory=ref(''); const draggedAppointment=ref('');
+    const dateAdd=(value,days)=>{const d=new Date(value+'T12:00:00');d.setDate(d.getDate()+days);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+    const dateMonday=value=>{const d=new Date(value+'T12:00:00');return dateAdd(value,-((d.getDay()+6)%7));};
+    const calendarTitle=computed(()=>calMode.value==='month'?new Date(calAnchor.value+'T12:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'}):'Semaine du '+formatDate(dateMonday(calAnchor.value)));
+    const calendarDays=computed(()=>{const start=calMode.value==='month'?dateMonday(calAnchor.value.slice(0,7)+'-01'):dateMonday(calAnchor.value);const n=calMode.value==='month'?42:7;return Array.from({length:n},(_,i)=>dateAdd(start,i));});
+    const appointmentsOn=date=>data.appointments.filter(a=>a.start<=date&&a.end>=date).sort((a,b)=>a.start.localeCompare(b.start)||a.title.localeCompare(b.title,'fr'));
+    const categoryFor=id=>data.appointmentCategories.find(c=>c.id===id);
+    const appointmentUpcoming=computed(()=>data.appointments.filter(a=>a.end>=today.value && a.status!=='missed').sort((a,b)=>a.start.localeCompare(b.start)||a.title.localeCompare(b.title,'fr')));
+    const appointmentToday=computed(()=>appointmentsOn(today.value));
+    const appointmentNext3=computed(()=>appointmentUpcoming.value.filter(a=>a.start>today.value).slice(0,3));
+    function moveCalendar(delta){if(calMode.value==='week')calAnchor.value=dateAdd(calAnchor.value,7*delta);else{let d=new Date(calAnchor.value+'T12:00:00');d.setDate(1);d.setMonth(d.getMonth()+delta);calAnchor.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';}}
+    function openAppointment(a=null,date=null){Object.assign(apptForm,{open:true,id:a?.id||'',title:a?.title||'',start:a?.start||date||today.value,end:a?.end||date||today.value,categoryId:a?.categoryId||'',details:a?.details||''});}
+    function saveAppointment(){if(!apptForm.title.trim()||!apptForm.start||apptForm.end<apptForm.start)return;const item={id:apptForm.id||uid(),title:apptForm.title.trim(),start:apptForm.start,end:apptForm.end,categoryId:apptForm.categoryId,details:apptForm.details,status:'pending'};const pos=data.appointments.findIndex(a=>a.id===item.id);if(pos<0)data.appointments.push(item);else Object.assign(data.appointments[pos],{...item,status:'pending'});apptForm.open=false;}
+    function deleteAppointment(a){if(confirm('Supprimer ce rendez-vous ?'))data.appointments=data.appointments.filter(x=>x.id!==a.id);}
+    function addAppointmentCategory(){const name=apptCategoryName.value.trim();if(!name)return;data.appointmentCategories.push({id:uid(),name,color:apptCategoryColor.value});apptCategoryName.value='';}
+    function renameAppointmentCategory(c){const name=prompt('Nom de la catégorie',c.name);if(name?.trim())c.name=name.trim();}
+    function deleteAppointmentCategory(c){if(!confirm('Supprimer cette catégorie ? Les rendez-vous restent sans catégorie.'))return;data.appointmentCategories=data.appointmentCategories.filter(x=>x.id!==c.id);data.appointments.forEach(a=>{if(a.categoryId===c.id)a.categoryId='';});}
+    function dropAppointmentCategory(target){const from=data.appointmentCategories.findIndex(x=>x.id===draggedCategory.value),to=data.appointmentCategories.findIndex(x=>x.id===target.id);draggedCategory.value='';if(from<0||to<0||from===to)return;data.appointmentCategories.splice(to,0,...data.appointmentCategories.splice(from,1));}
+    function dropAppointment(date){const a=data.appointments.find(x=>x.id===draggedAppointment.value);draggedAppointment.value='';if(!a)return;const duration=Math.round((new Date(a.end+'T12:00:00')-new Date(a.start+'T12:00:00'))/86400000);a.start=date;a.end=dateAdd(date,duration);a.status='pending';}
+    const pendingAppointment=computed(()=>data.appointments.find(a=>a.end<today.value&&(a.status==='pending'||a.status==='postpone')));
+    const postponeDate=ref(todayStr());
+    function confirmAppointment(a,done){if(done)a.status='done';else {a.status='postpone';postponeDate.value=dateAdd(today.value,1);}}
+    function rescheduleAppointment(a){if(!postponeDate.value)return;const duration=Math.round((new Date(a.end+'T12:00:00')-new Date(a.start+'T12:00:00'))/86400000);a.start=postponeDate.value;a.end=dateAdd(a.start,duration);a.status='pending';}
+    const achievementForm=reactive({open:false,id:'',name:'',description:'',target:1,current:0});
+    function openAchievement(a=null){Object.assign(achievementForm,{open:true,id:a?.id||'',name:a?.name||'',description:a?.description||'',target:a?.target||1,current:a?.current||0});}
+    function saveAchievement(){if(!achievementForm.name.trim())return;const a={id:achievementForm.id||uid(),name:achievementForm.name.trim(),description:achievementForm.description,target:Math.max(1,Number(achievementForm.target)||1),current:Math.max(0,Number(achievementForm.current)||0)};const old=data.customAchievements.find(x=>x.id===a.id);if(old)Object.assign(old,a);else data.customAchievements.push(a);achievementForm.open=false;}
+    function removeAchievement(a){if(confirm('Supprimer ce succès ou objectif ?'))data.customAchievements=data.customAchievements.filter(x=>x.id!==a.id);}
+    const sortedHabits=computed(()=>[...data.habits].sort((a,b)=>Number(!!a.malus)-Number(!!b.malus)||a.title.localeCompare(b.title,'fr')));
+
     const doneScope = ref('personal');
     const doneCutoff = computed(() => { const d = new Date(today.value + 'T12:00:00'); d.setDate(d.getDate()-30); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; });
     const doneRecent = scope => (scope === 'work' ? doneWorkTasks.value : doneTasks.value).filter(t => (t.doneAt || '') >= doneCutoff.value);
@@ -2596,6 +2638,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
+      ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
       randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
