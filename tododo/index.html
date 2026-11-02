@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261102-v45">
-  <link rel="stylesheet" href="stylekoala.css?v=20261102-v45">
-  <link rel="stylesheet" href="styletest.css?v=20261102-v45">
+  <link rel="stylesheet" href="style.css?v=20261102-v46">
+  <link rel="stylesheet" href="stylekoala.css?v=20261102-v46">
+  <link rel="stylesheet" href="styletest.css?v=20261102-v46">
 </head>
 <body>
 
@@ -86,9 +86,9 @@
           </template>
           <template v-else-if="view === 'projects'">
             <button type="button" class="btn-add" @click="openProjectForm()">＋ Nouveau projet</button>
-            <select class="project-sort" v-model="ui.projectSort" title="Ordre des projets">
+            <select v-model="projectAlterFilter" title="Filtrer les projets par alter"><option value="">Tous les alters</option><option value="__none">Sans alter</option><option v-for="a in data.alters" :value="a.id" :key="a.id">{{a.name}}</option></select><select class="project-sort" v-model="ui.projectSort" title="Ordre des projets">
               <option value="manual">Ordre manuel</option>
-              <option value="urgency">Trier : urgence ↓</option>
+              <option value="urgency">Trier : urgence ↓</option><option value="alter">Trier : Alter A→Z</option>
             </select>
             <button type="button" @click="setAllProjectsOpen(false)">Tout replier</button>
             <button type="button" @click="setAllProjectsOpen(true)">Tout déplier</button>
@@ -119,7 +119,7 @@
             <option v-for="s in statuses.filter(x => x.value !== 'done')" :key="s.value" :value="s.value">{{ s.label }}</option>
           </select>
 
-          <select v-model="filters.project">
+          <select v-model="filters.alter"><option value="">Tous les alters</option><option value="__none">Sans alter</option><option v-for="a in data.alters" :value="a.id" :key="a.id">{{a.name}}</option></select><select v-model="filters.project">
             <option value="">Tous projets</option>
             <option value="__none">Sans projet</option>
             <option v-for="p in data.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
@@ -153,7 +153,7 @@
             <option value="urgency-asc">Trier : urgence ↑</option>
             <option value="difficulty-desc">Trier : difficulté ↓</option>
             <option value="difficulty-asc">Trier : difficulté ↑</option>
-            <option value="title">Trier : titre A→Z</option>
+            <option value="title">Trier : titre A→Z</option><option value="alter">Trier : Alter A→Z</option>
           </select>
 
           <button type="button" @click="resetFilters">Réinitialiser</button>
@@ -377,21 +377,22 @@
 
 
     <section class="view alters-view" v-if="view==='alters'">
-      <h2>Alters</h2><div class="subtabs"><button :class="{active:alterTab==='planning'}" @click="alterTab='planning'">Liste et calendrier</button><button :class="{active:alterTab==='history'}" @click="alterTab='history'">Bilans des journées</button></div>
+      <h2>Alters</h2><div class="subtabs"><button :class="{active:alterTab==='planning'}" @click="alterTab='planning'">Liste et calendrier</button><button :class="{active:alterTab==='history'}" @click="alterTab='history'">Bilans des journées</button><button :class="{active:alterTab==='activities'}" @click="alterTab='activities'">Idées d’activités</button></div>
       <template v-if="alterTab==='planning'"><form class="tq-panel" @submit.prevent="saveAlter"><h3>{{alterForm.id?'Modifier':'Ajouter'}} un alter</h3><label>Nom <input v-model="alterForm.name" required></label><label>Couleur <input type="color" v-model="alterForm.color"></label><button type="submit">Enregistrer</button><button v-if="alterForm.id" type="button" @click="alterForm.id='';alterForm.name=''">Annuler</button></form>
         <div v-for="a in data.alters" :key="a.id" class="tq-entry"><span class="alter-dot" :style="{background:a.color}"></span><strong>{{a.name}}</strong><button @click="editAlter(a)">Modifier</button><button @click="removeAlter(a)">Supprimer</button></div>
-        <form class="tq-panel" @submit.prevent="assignAlterDay"><h3>Attribuer une journée</h3><label>Date <input type="date" v-model="alterAssignment.date" required></label><label>Alter <select v-model="alterAssignment.alterId"><option value="">Aucun (effacer l'attribution)</option><option v-for="a in data.alters" :value="a.id" :key="a.id">{{a.name}}</option></select></label><button type="submit">Enregistrer l'attribution</button></form>
-        <h3>Cette semaine</h3><div v-for="d in alterWeekDays" :key="d.date" class="tq-entry"><span>{{weekDate(d.date)}}</span><strong v-if="d.alter" :style="{color:d.alter.color}">{{d.alter.name}}</strong><span v-else>Non attribué</span><button @click="alterAssignment.date=d.date;alterAssignment.alterId=d.alter?.id||''">Modifier</button></div>
+        <form class="tq-panel" @submit.prevent="assignAlterDay"><h3>Attribuer une journée</h3><label>Jour de la semaine <select v-model.number="alterAssignment.day"><option v-for="(d,i) in ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']" :value="i">{{d}}</option></select></label><label>Alter <select v-model="alterAssignment.alterId"><option value="">Aucun (effacer l'attribution)</option><option v-for="a in data.alters" :value="a.id" :key="a.id">{{a.name}}</option></select></label><button type="submit">Enregistrer l'attribution</button></form>
+        <h3>Cette semaine</h3><div v-for="d in alterWeekDays" :key="d.date" class="tq-entry"><span>{{weekDate(d.date)}}</span><strong v-if="d.alter" :style="{color:d.alter.color}">{{d.alter.name}}</strong><span v-else>Non attribué</span><button @click="alterAssignment.day=d.day;alterAssignment.alterId=d.alter?.id||''">Modifier</button></div>
       </template>
+      <template v-else-if="alterTab==='activities'"><form class="tq-panel" @submit.prevent="addAlterActivity"><h3>Nouvelle idée d’activité</h3><select v-model="alterActivityDraft.alterId"><option value="">Tous les alters</option><option v-for="a in data.alters" :key="a.id" :value="a.id">{{a.name}}</option></select><input v-model="alterActivityDraft.title" placeholder="Activité" required><textarea v-model="alterActivityDraft.description" placeholder="Description facultative"></textarea><button>Ajouter</button></form><article v-for="a in data.alterActivities" :key="a.id" class="tq-entry"><strong>{{a.title}}</strong><span>{{data.alters.find(z=>z.id===a.alterId)?.name||'Tous les alters'}}</span><span>{{a.description}}</span><button @click="removeAlterActivity(a)">Supprimer</button></article></template>
       <template v-else><p v-if="!data.alterReviews.length">Aucun bilan enregistré.</p><article class="tq-panel" v-for="r in [...data.alterReviews].sort((a,b)=>b.date.localeCompare(a.date))" :key="r.id"><h3>{{weekDate(r.date)}} · {{r.name}}</h3><p v-for="q in alterReviewQuestions" :key="q[0]">{{q[1]}} : <strong>{{r[q[0]]===true?'Oui':r[q[0]]===false?'Non':'Non renseigné'}}</strong></p><p v-if="r.notes">{{r.notes}}</p></article></template>
     </section>
     <div class="modal-backdrop" v-if="alterReviewForm.open"><section class="modal form-panel" role="dialog" aria-modal="true"><h2>Bilan de la journée de {{alterReviewForm.name}}</h2><p>{{weekDate(alterReviewForm.date)}}</p><div v-for="q in alterReviewQuestions" :key="q[0]" class="alter-review-question"><strong>{{q[1]}}</strong><select v-model="alterReviewForm[q[0]]"><option :value="null">Non renseigné</option><option :value="true">Oui</option><option :value="false">Non</option></select></div><label>Note facultative <textarea v-model="alterReviewForm.notes"></textarea></label><button @click="saveAlterReview">Enregistrer le bilan</button></section></div>
-    <section class="view mood-view" v-if="view==='mood'"><h2>Humeur & Psychologie</h2><div class="tq-panel"><h3>Humeurs personnalisées</h3><form @submit.prevent="saveMoodType"><input v-model="newMoodType.name" placeholder="Nom d'une humeur" required><input type="color" v-model="newMoodType.color"><button>Ajouter</button></form><div v-for="t in data.moodTypes" :key="t.id" class="tq-entry"><input type="color" v-model="t.color"><input v-model="t.name"><button @click="removeMoodType(t)">Supprimer</button></div></div>
-      <form class="tq-panel" @submit.prevent="saveMood"><h3>Journal du jour</h3><label>Date <input type="date" v-model="moodForm.date" required></label><label>Humeur <select v-model="moodForm.moodId"><option value="">Non définie</option><option v-for="t in data.moodTypes" :key="t.id" :value="t.id">{{t.name}}</option></select></label><label>Note personnelle <textarea v-model="moodForm.note" rows="4"></textarea></label><label>Évaluation de -5 à +5 <input type="number" min="-5" max="5" step="1" v-model.number="moodForm.score" required></label><button>Enregistrer / mettre à jour</button></form>
-      <div class="tq-panel"><h3>Évolution chronologique</h3><label>Période <select v-model.number="moodChartDays"><option :value="7">7 jours</option><option :value="30">30 jours</option><option :value="90">90 jours</option><option :value="365">365 jours</option></select></label><div class="mood-graph"><div class="mood-graph-zero"></div><div v-for="e in moodChart" :key="e.id" class="mood-graph-item" :title="weekDate(e.date)+' : '+e.score+' / 5 · '+e.moodName"><div class="mood-graph-track"><div class="mood-graph-bar" :style="{height:Math.max(3,Math.abs(e.score)*10)+'%',bottom:e.score>=0?'50%':(50-Math.abs(e.score)*10)+'%',background:e.moodColor||'#688d85'}"></div></div><small>{{e.date.slice(5)}}</small><strong>{{e.score}}</strong></div></div><p v-if="!moodChart.length">Aucune donnée sur cette période.</p><p class="tq-hint">Chaque barre représente la note de -5 à +5 d'une journée. Le nom et la couleur de l'humeur sont visibles au survol.</p></div>
-      <div class="tq-panel"><h3>Historique</h3><article v-for="e in [...data.moodEntries].sort((a,b)=>b.date.localeCompare(a.date))" :key="e.id" class="tq-entry"><strong>{{weekDate(e.date)}}</strong><span :style="{color:e.moodColor}">{{e.moodName||'Sans humeur'}}</span><strong>{{e.score}} / 5</strong><span>{{e.note}}</span><button @click="editMoodEntry(e)">Modifier</button><button @click="removeMoodEntry(e)">Supprimer</button></article></div>
+    <section class="view mood-view" v-if="view==='mood'"><h2>Humeur & Psychologie</h2><div class="tq-panel"><h3>Humeurs personnalisées</h3><label>Heure du rappel quotidien <input type="time" :value="String(data.moodReminderHour).padStart(2,'0')+':00'" @change="data.moodReminderHour=Number($event.target.value.split(':')[0])"></label><form @submit.prevent="saveMoodType"><input v-model="newMoodType.name" placeholder="Nom d'une humeur" required><input type="color" v-model="newMoodType.color"><button>Ajouter</button></form><div v-for="t in data.moodTypes" :key="t.id" class="tq-entry mood-sort-row" draggable="true" @dragstart="draggedMood=t.id" @dragend="draggedMood=''" @dragover.prevent @drop.prevent="dropMoodType(t)"><span title="Déplacer">⠿</span><input type="color" v-model="t.color"><input v-model="t.name"><button @click="removeMoodType(t)">Supprimer</button></div><small>Du haut (humeur positive) vers le bas (humeur négative). Cet ordre définit le score d’humeur du graphique.</small></div>
+      <form class="tq-panel" @submit.prevent="saveMood"><h3>Journal du jour</h3><label>Date <input type="date" v-model="moodForm.date" required></label><fieldset><legend>Humeurs (plusieurs possibles)</legend><label v-for="t in data.moodTypes" :key="t.id" class="mood-choice"><input type="checkbox" :value="t.id" v-model="moodForm.moodIds"> {{t.name}}</label></fieldset><label>Note personnelle <textarea v-model="moodForm.note" rows="4"></textarea></label><label>Évaluation de -5 à +5 <input type="number" min="-5" max="5" step="1" v-model.number="moodForm.score" required></label><button>{{moodForm.id?'Mettre à jour':'Ajouter une entrée'}}</button><button type="button" @click="moodForm.id='';moodForm.note='';moodForm.moodIds=[];moodForm.score=0">Nouvelle note</button></form>
+      <div class="tq-panel"><h3>Évolution chronologique</h3><label>Période <select v-model.number="moodChartDays"><option :value="7">7 jours</option><option :value="30">30 jours</option><option :value="90">90 jours</option><option :value="365">365 jours</option></select></label><div class="mood-graph"><div class="mood-graph-zero"></div><div v-for="e in moodChart" :key="e.id" class="mood-graph-item" :title="weekDate(e.date)+' : '+e.score+' / 5 · '+e.moodName"><div class="mood-graph-track"><div class="mood-graph-bar" :style="{height:Math.max(3,Math.abs(e.score)*10)+'%',bottom:e.score>=0?'50%':(50-Math.abs(e.score)*10)+'%',background:moodTone(e)>0?'#4b9673':moodTone(e)<0?'#c87676':'#82949c'}"></div></div><small>{{e.date.slice(5)}}</small><strong>{{e.score}}</strong><small>Humeur {{moodTone(e).toFixed(1)}}</small></div></div><p v-if="!moodChart.length">Aucune donnée sur cette période.</p><p class="tq-hint">Chaque barre représente une entrée de -5 à +5 (plusieurs entrées possibles par jour). La position des humeurs dans la liste détermine leur tonalité (visible dans le tableau). Le nom et la couleur de l'humeur sont visibles au survol.</p></div>
+      <div class="tq-panel"><h3>Historique</h3><article v-for="e in [...data.moodEntries].sort((a,b)=>b.date.localeCompare(a.date))" :key="e.id" class="tq-entry"><strong>{{weekDate(e.date)}}</strong><span :style="{color:e.moodColor}">{{e.moodName||'Sans humeur'}}</span><strong>{{e.score}} / 5 · Tonalité {{moodTone(e).toFixed(1)}}</strong><span>{{e.note}}</span><button @click="editMoodEntry(e)">Modifier</button><button @click="removeMoodEntry(e)">Supprimer</button></article></div>
     </section>
-    <div class="modal-backdrop" v-if="moodPromptOpen && !alterReviewForm.open && !pendingAppointment && !apptForm.open"><section class="modal form-panel" role="dialog" aria-modal="true"><h2>19 h · Humeur du jour</h2><p>Tu peux renseigner ton humeur et une note aujourd'hui.</p><button @click="setTab('mood');dismissMoodPrompt()">Ouvrir le journal</button><button @click="dismissMoodPrompt">Plus tard</button></section></div>
+    <div class="modal-backdrop" v-if="moodPromptOpen && !alterReviewForm.open && !pendingAppointment && !apptForm.open"><section class="modal form-panel" role="dialog" aria-modal="true"><h2>{{String(data.moodReminderHour).padStart(2,'0')}} h · Humeur du jour</h2><p>Tu peux renseigner ton humeur et une note aujourd'hui.</p><button @click="setTab('mood');dismissMoodPrompt()">Ouvrir le journal</button><button @click="dismissMoodPrompt">Plus tard</button></section></div>
     <section class="view calendar-view" v-if="view==='calendar'">
       <header class="calendar-toolbar"><h2>Calendrier</h2><button @click="moveCalendar(-1)">←</button><strong>{{calendarTitle}}</strong><button @click="moveCalendar(1)">→</button><button @click="calAnchor=today">Aujourd'hui</button><select v-model="calMode"><option value="month">Mois</option><option value="week">Semaine</option></select><button @click="openAppointment()">＋ Rendez-vous</button></header>
       <div class="calendar-grid"><div class="calendar-weekday" v-for="day in ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']" :key="day">{{day}}</div><div class="calendar-day" v-for="date in calendarDays" :key="date" :class="{'calendar-outside':date.slice(0,7)!==calAnchor.slice(0,7)&&calMode==='month','calendar-today':date===today}" @dragover.prevent @drop.prevent="dropAppointment(date)"><button class="calendar-date" @click="openAppointment(null,date)">{{date.slice(-2)}}</button><button v-for="a in appointmentsOn(date)" :key="a.id" class="calendar-event" :style="{background:categoryFor(a.categoryId)?.color||'#bdc9d3'}" draggable="true" @dragstart="draggedAppointment=a.id" @dragend="draggedAppointment=''" @click="openAppointment(a)">{{a.title}}</button></div></div>
@@ -938,7 +939,7 @@
                   @dragstart="onProjectDragStart($event, data.projects.indexOf(p))" @dragend="onProjectDragEnd">⠿</span>
             <input class="project-color" type="color" :value="p.color || '#888888'" title="Couleur du projet"
                    @change="setProjectColor(p, $event.target.value)">
-            <h3 class="project-name">{{ p.name }}</h3>
+            <h3 class="project-name">{{ p.name }}</h3><span v-if="data.alters.find(a=>a.id===p.alterId)" class="alter-tag" :style="{borderColor:data.alters.find(a=>a.id===p.alterId)?.color}">Alter : {{data.alters.find(a=>a.id===p.alterId)?.name}}</span>
             
             
             <button type="button" class="project-toggle" :aria-expanded="isProjectOpen(p.id)" @click="toggleProjectOpen(p.id)">
@@ -960,7 +961,7 @@
         <div class="task-list" v-if="isProjectOpen(p.id)">
           <p class="empty" v-if="!projectTasks(p).length">Pas encore de tâche dans ce projet.</p>
           <div class="project-task" v-for="t in projectTasks(p)" :key="t.id" :class="'status-' + t.status">
-            <span class="project-task-title">{{ t.title }}</span><small v-if="blockingTask(t)" class="tq-blocked">🔒 Bloquée</small>
+            <span class="project-task-title">{{ t.title }}</span><small v-if="data.alters.find(a=>a.id===(t.alterId||p.alterId))" class="alter-tag">{{data.alters.find(a=>a.id===(t.alterId||p.alterId))?.name}}</small><small v-if="blockingTask(t)" class="tq-blocked">🔒 Bloquée</small>
             <button type="button" v-if="blockingTask(t)" @click.stop="openTaskForm(t)">Dépendance</button><small v-if="blockingTask(t)">Bloquée par {{blockingTask(t).title}}</small><span class="project-task-points" :class="{ 'is-malus': t.malus }">{{ t.malus ? '−' : '' }}{{ t.points }} pts</span>
             <button type="button" @click="openTaskForm(t)">Modifier</button>
             <button type="button" @click="deleteTask(t)">Supprimer</button>
@@ -1322,7 +1323,7 @@
       <input v-else ref="titleInput" class="task-title-input" type="text" v-model="draft"
              @keydown.enter.prevent="saveTitle" @keydown.esc.stop.prevent="cancelTitle" @blur="saveTitle">
 
-      <div class="task-tags">
+      <div class="task-tags"><span v-if="taskAlter" class="alter-tag" :style="{borderColor:taskAlter.color,color:taskAlter.color}">Alter : {{taskAlter.name}}</span>
 
         <!-- Catégorie -->
         <details v-if="task.scope === 'work'" class="tag tag-category work-tag-picker" @click.stop>
@@ -1436,7 +1437,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261102-v45"></script>
+<script src="app.js?v=20261102-v46"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

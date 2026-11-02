@@ -214,6 +214,8 @@ function defaultData() {
     alterReviews: [],
     moodTypes: [],
     moodEntries: [],
+    alterActivities: [],
+    moodReminderHour: 19,
     appointmentCategories: [],
     dashboardWidgets: ['randomNotes','habits','meals','priorities','tasks'],
     groceryBudget: 0, // budget facultatif de courses
@@ -275,8 +277,9 @@ function loadData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultData();
     const d = Object.assign(defaultData(), JSON.parse(raw));
-    for(const k of ['alters','alterReviews','moodTypes','moodEntries'])if(!Array.isArray(d[k]))d[k]=[];
+    for(const k of ['alters','alterReviews','moodTypes','moodEntries','alterActivities'])if(!Array.isArray(d[k]))d[k]=[];
     if(!d.alterDays||typeof d.alterDays!=='object'||Array.isArray(d.alterDays))d.alterDays={};
+    if(!Number.isInteger(d.moodReminderHour))d.moodReminderHour=19;
     d.categories = normalizeCategories(d.categories).filter(c => c.name !== 'Travail');
 
     if (!Array.isArray(d.rewardCategories)) d.rewardCategories = [];
@@ -346,7 +349,7 @@ function loadUi() {
     const ui = Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
     if (!TABS.some(t => t.id === ui.tab)) ui.tab = 'home';   // onglet inconnu -> accueil
     if (!Array.isArray(ui.collapsedProjects)) ui.collapsedProjects = [];
-    if (!['manual', 'urgency'].includes(ui.projectSort)) ui.projectSort = 'manual';
+    if (!['manual', 'urgency','alter'].includes(ui.projectSort)) ui.projectSort = 'manual';
     return ui;
   } catch (e) {
     return defaults;
@@ -367,6 +370,7 @@ const TaskRow = {
     return { editingTitle: false, editingDetails:false, draft: '' };
   },
   computed: {
+    taskAlter(){const id=this.task.alterId||this.appData.projects.find(p=>p.id===this.task.projectId)?.alterId;return this.appData.alters.find(a=>a.id===id)||null;},
     blockedBy(){const p=this.appData.tasks.find(x=>x.id===this.task.dependsOn);return p&&p.status!=='done'?p:null;},
     isOverdue() {
       return !!this.task.due && this.task.due < this.today && this.task.status !== 'done';
@@ -536,8 +540,9 @@ const app = createApp({
       data.achievements=Array.isArray(src.achievements)?src.achievements:[];
       data.customAchievements=Array.isArray(src.customAchievements)?src.customAchievements:[];
       data.appointments=Array.isArray(src.appointments)?src.appointments:[];
-      for(const k of ['alters','alterReviews','moodTypes','moodEntries'])data[k]=Array.isArray(src[k])?src[k]:[];
+      for(const k of ['alters','alterReviews','moodTypes','moodEntries','alterActivities'])data[k]=Array.isArray(src[k])?src[k]:[];
       data.alterDays=src.alterDays&&typeof src.alterDays==='object'&&!Array.isArray(src.alterDays)?src.alterDays:{};
+      data.moodReminderHour=Number.isInteger(src.moodReminderHour)?src.moodReminderHour:19;
       data.appointmentCategories=Array.isArray(src.appointmentCategories)?src.appointmentCategories:[];
       data.dashboardWidgets=Array.isArray(src.dashboardWidgets)?[...src.dashboardWidgets]:['randomNotes','habits','meals','priorities','tasks'];
       if(!data.dashboardWidgets.includes('appointments'))data.dashboardWidgets.unshift('appointments');
@@ -1038,7 +1043,7 @@ const app = createApp({
     const rewardClaimCount = r => data.inventory.filter(i=>i.rewardId===r.id || (!i.rewardId && i.name===r.name)).length;
 
     /* ---------- Filtres & tris des tâches ---------- */
-    const FILTER_DEFAULTS = { search: '', category: '', status: '', project: '', urgency: '', difficulty: '', kind: '', dueMode: 'any', dueExact: '', dueFrom: '', dueTo: '', sort: 'due' };
+    const FILTER_DEFAULTS = { alter: '', search: '', category: '', status: '', project: '', urgency: '', difficulty: '', kind: '', dueMode: 'any', dueExact: '', dueFrom: '', dueTo: '', sort: 'due' };
     const filters = reactive({ ...FILTER_DEFAULTS });
 
     function resetFilters() {
@@ -1050,6 +1055,7 @@ const app = createApp({
       let n = 0;
       if (filters.search.trim()) n++;
       if (filters.category) n++;
+      if (filters.alter) n++;
       if (filters.status) n++;
       if (filters.project) n++;
       if (filters.urgency) n++;
@@ -1066,6 +1072,7 @@ const app = createApp({
     function applyFilters(list, withSort = true) {
       const q = filters.search.trim().toLowerCase();
       const res = list.filter(t => {
+        if (filters.alter && (t.alterId||data.projects.find(p=>p.id===t.projectId)?.alterId||'') !== (filters.alter==='__none'?'':filters.alter)) return false;
         if (filters.status && t.status !== filters.status) return false;
         if (filters.dueMode==='none' && t.due) return false;
         if (filters.dueMode==='dated' && !t.due) return false;
@@ -1092,6 +1099,7 @@ const app = createApp({
         case 'difficulty-asc':  res.sort((a, b) => levelRank(data.difficulties, a.difficulty) - levelRank(data.difficulties, b.difficulty) || byDue(a, b)); break;
         case 'urgency-desc':    res.sort((a, b) => levelRank(data.urgencies, effectiveUrgency(b)) - levelRank(data.urgencies, effectiveUrgency(a)) || byDue(a, b)); break;
         case 'difficulty-desc': res.sort((a, b) => levelRank(data.difficulties, b.difficulty) - levelRank(data.difficulties, a.difficulty) || byDue(a, b)); break;
+        case 'alter': res.sort((a,b)=>String(data.alters.find(z=>z.id===(a.alterId||data.projects.find(p=>p.id===a.projectId)?.alterId))?.name||'').localeCompare(String(data.alters.find(z=>z.id===(b.alterId||data.projects.find(p=>p.id===b.projectId)?.alterId))?.name||''),'fr')||byDue(a,b)); break;
         case 'title':           res.sort((a, b) => a.title.localeCompare(b.title)); break;
         default:                res.sort(byDue);
       }
@@ -1778,13 +1786,16 @@ const app = createApp({
     }
 
     // Tri des projets : ordre manuel (glisser-déposer) ou par urgence
+    const projectAlterFilter=ref('');
     const activeProjects = computed(() => sortedProjects.value.filter(p=>!p.completed));
     const finishedProjects = computed(() => sortedProjects.value.filter(p=>p.completed));
     function setProjectCompleted(project,completed){ project.completed=!!completed; project.completedAt=completed?today.value:''; }
     const sortedProjects = computed(() => {
-      if (ui.projectSort !== 'urgency') return data.projects;
+      const filtered=data.projects.filter(p=>!projectAlterFilter.value||(projectAlterFilter.value==='__none'?!p.alterId:p.alterId===projectAlterFilter.value));
+      if(ui.projectSort==='alter')return [...filtered].sort((a,b)=>String(data.alters.find(z=>z.id===a.alterId)?.name||'').localeCompare(String(data.alters.find(z=>z.id===b.alterId)?.name||''),'fr'));
+      if (ui.projectSort !== 'urgency') return filtered;
       const rank = p => { const u = projectTopUrgency(p); return u ? levelRank(data.urgencies, u.id) : 0; };
-      return [...data.projects].sort((a, b) => rank(b) - rank(a));   // tri stable : à égalité, l'ordre manuel est gardé
+      return [...filtered].sort((a, b) => rank(b) - rank(a));   // tri stable : à égalité, l'ordre manuel est gardé
     });
 
     // Replier / déplier les tâches d'un projet (mémorisé sur cet appareil)
@@ -2671,35 +2682,41 @@ const app = createApp({
     const doneCutoff = computed(() => { const d = new Date(today.value + 'T12:00:00'); d.setDate(d.getDate()-30); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; });
     const doneRecent = scope => (scope === 'work' ? doneWorkTasks.value : doneTasks.value).filter(t => (t.doneAt || '') >= doneCutoff.value);
     const doneArchive = scope => (scope === 'work' ? doneWorkTasks.value : doneTasks.value).filter(t => (t.doneAt || '') < doneCutoff.value);
-    // Alters: attribution explicite par date, indépendamment du menu et des tâches.
+    // Attribution hebdomadaire récurrente : 0 dimanche, 1 lundi ... 6 samedi.
     const alterForm=reactive({id:'',name:'',color:'#688d85'});
     const alterTab=ref('planning');
-    const alterAssignment=reactive({date:todayStr(),alterId:''});
-    const alterDayFor=date=>data.alters.find(a=>a.id===data.alterDays[date])||null;
+    const alterAssignment=reactive({day:1,alterId:''});
+    const alterDayFor=date=>{const day=new Date(date+'T12:00:00').getDay();return data.alters.find(a=>a.id===data.alterDays[String(day)])||null;};
     const currentAlter=computed(()=>alterDayFor(today.value));
     function saveAlter(){const name=alterForm.name.trim();if(!name)return;const existing=data.alters.find(a=>a.id===alterForm.id);if(existing)Object.assign(existing,{name,color:alterForm.color});else data.alters.push({id:uid(),name,color:alterForm.color});Object.assign(alterForm,{id:'',name:'',color:'#688d85'});}
     function editAlter(a){Object.assign(alterForm,{id:a.id,name:a.name,color:a.color||'#688d85'});}
     function removeAlter(a){if(!confirm('Supprimer cet alter et ses affectations ? Les bilans existants seront conservés.'))return;data.alters=data.alters.filter(x=>x.id!==a.id);Object.keys(data.alterDays).forEach(d=>{if(data.alterDays[d]===a.id)delete data.alterDays[d]});data.tasks.forEach(t=>{if(t.alterId===a.id)t.alterId=''});data.projects.forEach(p=>{if(p.alterId===a.id)p.alterId=''});}
-    function assignAlterDay(){if(!alterAssignment.date)return;if(alterAssignment.alterId)data.alterDays[alterAssignment.date]=alterAssignment.alterId;else delete data.alterDays[alterAssignment.date];}
-    const alterWeekDays=computed(()=>Array.from({length:7},(_,i)=>{const date=dateAdd(monday(today.value),i);return{date,alter:alterDayFor(date)}}));
+    function assignAlterDay(){const day=String(alterAssignment.day);if(alterAssignment.alterId)data.alterDays[day]=alterAssignment.alterId;else delete data.alterDays[day];}
+    const alterWeekDays=computed(()=>Array.from({length:7},(_,i)=>{const date=dateAdd(monday(today.value),i);return{date,day:(i+1)%7,alter:alterDayFor(date)}}));
+    const alterActivityDraft=reactive({alterId:'',title:'',description:''});
+    function addAlterActivity(){if(!alterActivityDraft.title.trim())return;data.alterActivities.push({id:uid(),alterId:alterActivityDraft.alterId,title:alterActivityDraft.title.trim(),description:alterActivityDraft.description.trim()});alterActivityDraft.title='';alterActivityDraft.description='';}
+    function removeAlterActivity(a){if(confirm('Supprimer cette idée ?'))data.alterActivities=data.alterActivities.filter(x=>x.id!==a.id);}
     const alterReviewQuestions=[['enjoyed','A pu profiter de sa journée'],['clothes','A choisi les habits'],['game','A choisi le jeu'],['meal','A mangé le repas'],['interaction','A interagi avec une personne qui savait que c’était lui']];
     const alterReviewForm=reactive({open:false,date:'',alterId:'',name:'',enjoyed:null,clothes:null,game:null,meal:null,interaction:null,notes:''});
-    const pendingAlterReview=computed(()=>Object.entries(data.alterDays).filter(([date,id])=>date<today.value&&id&&!data.alterReviews.some(r=>r.date===date)).sort((a,b)=>a[0].localeCompare(b[0]))[0]||null);
+    const pendingAlterReview=computed(()=>{const yesterday=dateAdd(today.value,-1);const a=alterDayFor(yesterday);return a&&!data.alterReviews.some(r=>r.date===yesterday)?[yesterday,a.id]:null;});
     function openPendingAlterReview(){if(!pendingAlterReview.value||alterReviewForm.open)return;const [date,id]=pendingAlterReview.value;Object.assign(alterReviewForm,{open:true,date,alterId:id,name:data.alters.find(a=>a.id===id)?.name||'Alter supprimé',enjoyed:null,clothes:null,game:null,meal:null,interaction:null,notes:''});}
-    function saveAlterReview(){data.alterReviews.push({id:uid(),date:alterReviewForm.date,alterId:alterReviewForm.alterId,name:alterReviewForm.name,...Object.fromEntries(alterReviewQuestions.map(([k])=>[k,alterReviewForm[k]])),notes:alterReviewForm.notes});alterReviewForm.open=false;nextTick(openPendingAlterReview);}
-    // Humeur : une entrée par date, avec éventuelle note cotée de -5 à +5.
-    const moodForm=reactive({date:todayStr(),moodId:'',note:'',score:0});
+    function saveAlterReview(){data.alterReviews.push({id:uid(),date:alterReviewForm.date,alterId:alterReviewForm.alterId,name:alterReviewForm.name,...Object.fromEntries(alterReviewQuestions.map(([k])=>[k,alterReviewForm[k]])),notes:alterReviewForm.notes});alterReviewForm.open=false;}
+    const moodForm=reactive({id:'',date:todayStr(),moodIds:[],note:'',score:0});
     const newMoodType=reactive({name:'',color:'#8a9bb9'});
     const moodChartDays=ref(30);
-    const moodChart=computed(()=>[...data.moodEntries].filter(x=>x.date>=dateAdd(today.value,-moodChartDays.value+1)&&x.date<=today.value).sort((a,b)=>a.date.localeCompare(b.date)));
     const moodTypeFor=id=>data.moodTypes.find(m=>m.id===id)||null;
+    const moodEntryTypes=e=>(Array.isArray(e.moodIds)?e.moodIds:e.moodId?[e.moodId]:[]).map(moodTypeFor).filter(Boolean);
+    const moodTone=e=>{const values=moodEntryTypes(e).map(t=>{const rank=data.moodTypes.findIndex(m=>m.id===t.id);return data.moodTypes.length<2?0:5-(10*rank/(data.moodTypes.length-1));});return values.length?values.reduce((a,b)=>a+b,0)/values.length:0;};
+    const moodChart=computed(()=>[...data.moodEntries].filter(x=>x.date>=dateAdd(today.value,-moodChartDays.value+1)&&x.date<=today.value).sort((a,b)=>a.date.localeCompare(b.date)));
     function saveMoodType(){const name=newMoodType.name.trim();if(!name)return;data.moodTypes.push({id:uid(),name,color:newMoodType.color});newMoodType.name='';}
     function removeMoodType(type){if(!confirm('Supprimer cette humeur ? Les entrées historiques seront conservées.'))return;data.moodTypes=data.moodTypes.filter(x=>x.id!==type.id);}
-    function saveMood(){if(!moodForm.date)return;const value=Math.max(-5,Math.min(5,Number(moodForm.score)||0));const old=data.moodEntries.find(x=>x.date===moodForm.date);const entry={id:old?.id||uid(),date:moodForm.date,moodId:moodForm.moodId,moodName:moodTypeFor(moodForm.moodId)?.name||'',moodColor:moodTypeFor(moodForm.moodId)?.color||'#999',note:moodForm.note,score:value};if(old)Object.assign(old,entry);else data.moodEntries.push(entry);moodPromptDismissed.value=today.value;notify('Humeur enregistrée');}
-    function editMoodEntry(e){Object.assign(moodForm,{date:e.date,moodId:e.moodId||'',note:e.note||'',score:e.score});}
+    const draggedMood=ref('');
+    function dropMoodType(target){const i=data.moodTypes.findIndex(t=>t.id===draggedMood.value),j=data.moodTypes.findIndex(t=>t.id===target.id);if(i<0||j<0||i===j)return;data.moodTypes.splice(j,0,...data.moodTypes.splice(i,1));draggedMood.value='';}
+    function saveMood(){if(!moodForm.date)return;const value=Math.max(-5,Math.min(5,Number(moodForm.score)||0));const ids=[...moodForm.moodIds];const entry={id:moodForm.id||uid(),date:moodForm.date,moodIds:ids,moodId:ids[0]||'',moodName:ids.map(id=>moodTypeFor(id)?.name).filter(Boolean).join(', '),moodColor:moodTypeFor(ids[0])?.color||'#999',note:moodForm.note,score:value};const old=data.moodEntries.find(x=>x.id===entry.id);if(old)Object.assign(old,entry);else data.moodEntries.push(entry);Object.assign(moodForm,{id:'',date:todayStr(),moodIds:[],note:'',score:0});moodPromptDismissed.value=today.value;notify('Entrée du journal enregistrée');}
+    function editMoodEntry(e){Object.assign(moodForm,{id:e.id,date:e.date,moodIds:[...(e.moodIds|| (e.moodId?[e.moodId]:[]))],note:e.note||'',score:e.score});}
     function removeMoodEntry(e){if(confirm('Supprimer cette note ?'))data.moodEntries=data.moodEntries.filter(x=>x.id!==e.id);}
     const moodPromptDismissed=ref('');
-    const moodPromptOpen=computed(()=>(nowMinute.value>=0)&&new Date().getHours()>=19&&moodPromptDismissed.value!==today.value&&!data.moodEntries.some(x=>x.date===today.value));
+    const moodPromptOpen=computed(()=>(nowMinute.value>=0)&&(new Date().getHours()*60+new Date().getMinutes()>=Number(data.moodReminderHour||0)*60)&&moodPromptDismissed.value!==today.value&&!data.moodEntries.some(x=>x.date===today.value));
     function dismissMoodPrompt(){moodPromptDismissed.value=today.value;}
     const nowMinute=ref(0);
     setInterval(()=>{nowMinute.value++;if(pendingAlterReview.value&&!alterReviewForm.open&&!pendingAppointment.value&&!apptForm.open)openPendingAlterReview();},60000);
@@ -2709,7 +2726,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      alterForm,alterTab,alterAssignment,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewForm,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
+      projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewForm,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
