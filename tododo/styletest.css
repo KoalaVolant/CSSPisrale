@@ -319,3 +319,16 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 .calendar-reminders{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:6px;margin-top:12px;border:1px solid var(--main-color,#dedede);border-radius:8px}
 .calendar-reminders label{display:flex;gap:5px;align-items:center}
 .calendar-reminders small{grid-column:1/-1}
+
+/* Todo Quest v44 */
+.points-box{flex-wrap:wrap}.alter-day-badge{flex:1 1 100%;font-size:12px;font-weight:700;border-top:2px solid;padding-top:5px;margin-top:5px;white-space:normal}
+.dashboard-mini-nav{display:flex;flex-wrap:wrap;gap:5px;position:sticky;top:56px;z-index:38;background:var(--fnd,#fff);padding:6px;border:1px solid #ddd;border-radius:8px;margin:6px 0}
+.dashboard-mini-nav button{border:1px solid #bccdc4;border-radius:7px;padding:4px 7px;background:white;font-size:11px}
+.view-home{display:flex;flex-direction:column}.view-home>.appointments-home,.view-home>.random-note-home,.view-home>.home-habits,.view-home>.today-meals,.view-home>.priority-box,.view-home>.dashboard{width:100%}
+#dashboard-appointments,#dashboard-randomNotes,#dashboard-habits,#dashboard-meals,#dashboard-priorities,#dashboard-tasks{scroll-margin-top:110px}
+.menu-alter-tag{display:block;font-weight:700;font-size:12px;padding:4px}
+.tq-panel{padding:12px;margin:12px 0;border:1px solid var(--main-color,#ddd);border-radius:10px;background:var(--fnd,#fafafa)}
+.tq-panel form,.tq-panel label{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}.tq-panel label{display:block}.tq-panel input,.tq-panel textarea,.tq-panel select{max-width:100%}
+.tq-entry{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:8px;border-bottom:1px solid #ddd}.alter-dot{display:inline-block;width:15px;height:15px;border-radius:50%}.alter-review-question{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0}
+.mood-graph{display:flex;gap:6px;overflow-x:auto;min-height:200px;align-items:end;position:relative;padding:8px 6px}.mood-graph-item{flex:0 0 34px;text-align:center;font-size:10px}.mood-graph-track{height:130px;position:relative;background:linear-gradient(to bottom,#eaf3ec 0 50%,#f8eae8 50% 100%);border:1px solid #ddd}.mood-graph-zero{display:none}.mood-graph-bar{position:absolute;left:17%;width:66%;border-radius:3px}.mood-graph-item strong{display:block}
+@media(max-width:800px){.dashboard-mini-nav{top:0;position:static}}

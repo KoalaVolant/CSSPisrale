@@ -32,6 +32,8 @@ const nextColor = i => PALETTE[Math.abs(i) % PALETTE.length];
 const TABS = [
   { id: 'home',       label: 'Accueil' },
   { id: 'calendar', label: 'Calendrier' },
+  { id: 'alters', label: 'Alters' },
+  { id: 'mood', label: 'Humeur & Psychologie' },
   { id: 'all',        label: 'Toutes les tâches' },
   { id: 'work',       label: 'Travail' },
   { id: 'usual-lists', label: 'Listes de tâches habituelles' },
@@ -57,7 +59,7 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','calendar','all','work','habits','usual-lists','done'] },
+  { title: 'Tâches', ids: ['home','calendar','all','work','habits','usual-lists','done','alters','mood'] },
   { title: 'Repas', ids: ['menu','shopping'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','evening','random-notes','challenges','achievements','statistics','budget'] },
@@ -207,6 +209,11 @@ function defaultData() {
     achievements: [], // succès attribués, une seule fois
     customAchievements: [],
     appointments: [],
+    alters: [],
+    alterDays: {},
+    alterReviews: [],
+    moodTypes: [],
+    moodEntries: [],
     appointmentCategories: [],
     dashboardWidgets: ['randomNotes','habits','meals','priorities','tasks'],
     groceryBudget: 0, // budget facultatif de courses
@@ -268,6 +275,8 @@ function loadData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultData();
     const d = Object.assign(defaultData(), JSON.parse(raw));
+    for(const k of ['alters','alterReviews','moodTypes','moodEntries'])if(!Array.isArray(d[k]))d[k]=[];
+    if(!d.alterDays||typeof d.alterDays!=='object'||Array.isArray(d.alterDays))d.alterDays={};
     d.categories = normalizeCategories(d.categories).filter(c => c.name !== 'Travail');
 
     if (!Array.isArray(d.rewardCategories)) d.rewardCategories = [];
@@ -292,6 +301,7 @@ function loadData() {
     if (typeof d.menuRules !== 'string') d.menuRules = '';
     if (!Array.isArray(d.achievements)) d.achievements=[];
     if (!Array.isArray(d.dashboardWidgets)) d.dashboardWidgets=['randomNotes','habits','meals','priorities','tasks'];
+    if(!d.dashboardWidgets.includes('appointments'))d.dashboardWidgets.unshift('appointments');
     d.groceryBudget=Number.isFinite(Number(d.groceryBudget))?Number(d.groceryBudget):0;
     if (!Array.isArray(d.budgetEntries)) d.budgetEntries = [];
     if (!Array.isArray(d.budgetRecurring)) d.budgetRecurring = [];
@@ -526,8 +536,11 @@ const app = createApp({
       data.achievements=Array.isArray(src.achievements)?src.achievements:[];
       data.customAchievements=Array.isArray(src.customAchievements)?src.customAchievements:[];
       data.appointments=Array.isArray(src.appointments)?src.appointments:[];
+      for(const k of ['alters','alterReviews','moodTypes','moodEntries'])data[k]=Array.isArray(src[k])?src[k]:[];
+      data.alterDays=src.alterDays&&typeof src.alterDays==='object'&&!Array.isArray(src.alterDays)?src.alterDays:{};
       data.appointmentCategories=Array.isArray(src.appointmentCategories)?src.appointmentCategories:[];
-      data.dashboardWidgets=Array.isArray(src.dashboardWidgets)?src.dashboardWidgets:['randomNotes','habits','meals','priorities','tasks'];
+      data.dashboardWidgets=Array.isArray(src.dashboardWidgets)?[...src.dashboardWidgets]:['randomNotes','habits','meals','priorities','tasks'];
+      if(!data.dashboardWidgets.includes('appointments'))data.dashboardWidgets.unshift('appointments');
       data.groceryBudget=Number.isFinite(Number(src.groceryBudget))?Number(src.groceryBudget):0;
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
       data.budgetCategories = Array.isArray(src.budgetCategories) ? [...new Set([...src.budgetCategories, ...[...(src.budgetEntries||[]),...(src.budgetRecurring||[]),...(src.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))] : [...new Set([...defaultData().budgetCategories, ...[...(src.budgetEntries||[]),...(src.budgetRecurring||[]),...(src.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))];
@@ -930,7 +943,11 @@ const app = createApp({
     const randomNoteTypeDragged=ref('');
     const randomNoteDragged=ref('');
     const randomNoteTypeFilter=ref('');
+    const dashboardNewNoteType=ref('');
     function addRandomNote(fromDashboard=false){
+      const created=fromDashboard?dashboardNewNoteType.value.trim():'';
+      if(created){if(!data.randomNoteTypes.includes(created))data.randomNoteTypes.push(created);randomNoteNewType.value=created;}
+      dashboardNewNoteType.value='';
       const content=randomNoteDraft.value.trim();
       if(!content){if(!fromDashboard) data.randomNotes.push({id:uid(),title:'Nouvelle note',content:'',type:randomNoteNewType.value||''});return;}
       data.randomNotes.push({id:uid(),title:content.split('\n')[0].slice(0,60)||'Note au pif',content,type:randomNoteNewType.value||''});
@@ -1335,7 +1352,7 @@ const app = createApp({
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
       open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
-      urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',
+      urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',alterId:'',
     });
 
     const DRAFT_KEY='todo-quest-form-drafts-v2';
@@ -1349,7 +1366,7 @@ const app = createApp({
         Object.assign(taskForm, {
           id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal',
           status: task.status, projectId: task.projectId || '', due: task.due || '',
-          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '', dependsOn: task.dependsOn || '', milestoneId:task.milestoneId||'',
+          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '', dependsOn: task.dependsOn || '', milestoneId:task.milestoneId||'',alterId:task.alterId||'',
         });
       } else {
         Object.assign(taskForm, {
@@ -1401,6 +1418,7 @@ const app = createApp({
         urgency: taskForm.urgency || '',
         difficulty: taskForm.difficulty || '',
         dependsOn: taskForm.dependsOn || '',
+        alterId:taskForm.alterId||'',
         milestoneId:taskForm.projectId?(taskForm.milestoneId||''):'',
       };
       let becameDone = false;
@@ -1688,12 +1706,12 @@ const app = createApp({
       if (project) {
         Object.assign(projectForm, {
           id: project.id, name: project.name, description: project.description || '',
-          color: project.color || nextColor(data.projects.length), tasks: [],
+          color: project.color || nextColor(data.projects.length), tasks: [],alterId:project.alterId||'',
         });
       } else {
         Object.assign(projectForm, {
           id: null, name: '', description: '', color: nextColor(data.projects.length),
-          tasks: [{ title: '', category: '', points: 10, due: '' }],
+          tasks: [{ title: '', category: '', points: 10, due: '' }],alterId:'',
         });
       }
       projectForm.open = true;
@@ -1708,9 +1726,9 @@ const app = createApp({
       if (!name) return;
       if (projectForm.id) {
         const p = data.projects.find(x => x.id === projectForm.id);
-        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color; }
+        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color;p.alterId=projectForm.alterId||''; }
       } else {
-        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color };
+        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color,alterId:projectForm.alterId||'' };
         data.projects.push(project);
         projectForm.tasks
           .filter(d => d.title.trim())
@@ -2538,7 +2556,7 @@ const app = createApp({
 
     // V29 : dépendances, planification, calendrier, repas, budget courses, succès et widgets.
     const v29Date = (date, offset=0) => {const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+offset);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
-    const dashboardCatalogue=[{id:'randomNotes',name:'Ajouter une note au pif'},{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas du jour'},{id:'priorities',name:'Priorités suggérées'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
+    const dashboardCatalogue=[{id:'appointments',name:'Rendez-vous de la semaine'},{id:'randomNotes',name:'Ajouter une note au pif'},{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas du jour'},{id:'priorities',name:'Priorités suggérées'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
     const dashboardEdit=ref(false);
     function widgetVisible(id){return id!=='planner'&&data.dashboardWidgets.includes(id);}
     function setWidgetVisible(id,on){data.dashboardWidgets=on?[...new Set([...data.dashboardWidgets,id])]:data.dashboardWidgets.filter(x=>x!==id);}
@@ -2611,6 +2629,7 @@ const app = createApp({
     const categoryFor=id=>data.appointmentCategories.find(c=>c.id===id);
     const appointmentUpcoming=computed(()=>data.appointments.filter(a=>a.end>=today.value && a.status!=='missed').sort((a,b)=>a.start.localeCompare(b.start)||a.title.localeCompare(b.title,'fr')));
     const appointmentToday=computed(()=>appointmentsOn(today.value));
+    const appointmentWeek=computed(()=>{const start=monday(today.value),end=dateAdd(start,6);return [...data.appointments].filter(a=>a.status!=='done'&&a.start<=end&&a.end>=start).sort((a,b)=>a.start.localeCompare(b.start));});
     const appointmentNext3=computed(()=>appointmentUpcoming.value.filter(a=>a.start>today.value).slice(0,3));
     function moveCalendar(delta){if(calMode.value==='week')calAnchor.value=dateAdd(calAnchor.value,7*delta);else{let d=new Date(calAnchor.value+'T12:00:00');d.setDate(1);d.setMonth(d.getMonth()+delta);calAnchor.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';}}
     const weekDate=value=>new Date(value+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -2652,9 +2671,45 @@ const app = createApp({
     const doneCutoff = computed(() => { const d = new Date(today.value + 'T12:00:00'); d.setDate(d.getDate()-30); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; });
     const doneRecent = scope => (scope === 'work' ? doneWorkTasks.value : doneTasks.value).filter(t => (t.doneAt || '') >= doneCutoff.value);
     const doneArchive = scope => (scope === 'work' ? doneWorkTasks.value : doneTasks.value).filter(t => (t.doneAt || '') < doneCutoff.value);
+    // Alters: attribution explicite par date, indépendamment du menu et des tâches.
+    const alterForm=reactive({id:'',name:'',color:'#688d85'});
+    const alterTab=ref('planning');
+    const alterAssignment=reactive({date:todayStr(),alterId:''});
+    const alterDayFor=date=>data.alters.find(a=>a.id===data.alterDays[date])||null;
+    const currentAlter=computed(()=>alterDayFor(today.value));
+    function saveAlter(){const name=alterForm.name.trim();if(!name)return;const existing=data.alters.find(a=>a.id===alterForm.id);if(existing)Object.assign(existing,{name,color:alterForm.color});else data.alters.push({id:uid(),name,color:alterForm.color});Object.assign(alterForm,{id:'',name:'',color:'#688d85'});}
+    function editAlter(a){Object.assign(alterForm,{id:a.id,name:a.name,color:a.color||'#688d85'});}
+    function removeAlter(a){if(!confirm('Supprimer cet alter et ses affectations ? Les bilans existants seront conservés.'))return;data.alters=data.alters.filter(x=>x.id!==a.id);Object.keys(data.alterDays).forEach(d=>{if(data.alterDays[d]===a.id)delete data.alterDays[d]});data.tasks.forEach(t=>{if(t.alterId===a.id)t.alterId=''});data.projects.forEach(p=>{if(p.alterId===a.id)p.alterId=''});}
+    function assignAlterDay(){if(!alterAssignment.date)return;if(alterAssignment.alterId)data.alterDays[alterAssignment.date]=alterAssignment.alterId;else delete data.alterDays[alterAssignment.date];}
+    const alterWeekDays=computed(()=>Array.from({length:7},(_,i)=>{const date=dateAdd(monday(today.value),i);return{date,alter:alterDayFor(date)}}));
+    const alterReviewQuestions=[['enjoyed','A pu profiter de sa journée'],['clothes','A choisi les habits'],['game','A choisi le jeu'],['meal','A mangé le repas'],['interaction','A interagi avec une personne qui savait que c’était lui']];
+    const alterReviewForm=reactive({open:false,date:'',alterId:'',name:'',enjoyed:null,clothes:null,game:null,meal:null,interaction:null,notes:''});
+    const pendingAlterReview=computed(()=>Object.entries(data.alterDays).filter(([date,id])=>date<today.value&&id&&!data.alterReviews.some(r=>r.date===date)).sort((a,b)=>a[0].localeCompare(b[0]))[0]||null);
+    function openPendingAlterReview(){if(!pendingAlterReview.value||alterReviewForm.open)return;const [date,id]=pendingAlterReview.value;Object.assign(alterReviewForm,{open:true,date,alterId:id,name:data.alters.find(a=>a.id===id)?.name||'Alter supprimé',enjoyed:null,clothes:null,game:null,meal:null,interaction:null,notes:''});}
+    function saveAlterReview(){data.alterReviews.push({id:uid(),date:alterReviewForm.date,alterId:alterReviewForm.alterId,name:alterReviewForm.name,...Object.fromEntries(alterReviewQuestions.map(([k])=>[k,alterReviewForm[k]])),notes:alterReviewForm.notes});alterReviewForm.open=false;nextTick(openPendingAlterReview);}
+    // Humeur : une entrée par date, avec éventuelle note cotée de -5 à +5.
+    const moodForm=reactive({date:todayStr(),moodId:'',note:'',score:0});
+    const newMoodType=reactive({name:'',color:'#8a9bb9'});
+    const moodChartDays=ref(30);
+    const moodChart=computed(()=>[...data.moodEntries].filter(x=>x.date>=dateAdd(today.value,-moodChartDays.value+1)&&x.date<=today.value).sort((a,b)=>a.date.localeCompare(b.date)));
+    const moodTypeFor=id=>data.moodTypes.find(m=>m.id===id)||null;
+    function saveMoodType(){const name=newMoodType.name.trim();if(!name)return;data.moodTypes.push({id:uid(),name,color:newMoodType.color});newMoodType.name='';}
+    function removeMoodType(type){if(!confirm('Supprimer cette humeur ? Les entrées historiques seront conservées.'))return;data.moodTypes=data.moodTypes.filter(x=>x.id!==type.id);}
+    function saveMood(){if(!moodForm.date)return;const value=Math.max(-5,Math.min(5,Number(moodForm.score)||0));const old=data.moodEntries.find(x=>x.date===moodForm.date);const entry={id:old?.id||uid(),date:moodForm.date,moodId:moodForm.moodId,moodName:moodTypeFor(moodForm.moodId)?.name||'',moodColor:moodTypeFor(moodForm.moodId)?.color||'#999',note:moodForm.note,score:value};if(old)Object.assign(old,entry);else data.moodEntries.push(entry);moodPromptDismissed.value=today.value;notify('Humeur enregistrée');}
+    function editMoodEntry(e){Object.assign(moodForm,{date:e.date,moodId:e.moodId||'',note:e.note||'',score:e.score});}
+    function removeMoodEntry(e){if(confirm('Supprimer cette note ?'))data.moodEntries=data.moodEntries.filter(x=>x.id!==e.id);}
+    const moodPromptDismissed=ref('');
+    const moodPromptOpen=computed(()=>(nowMinute.value>=0)&&new Date().getHours()>=19&&moodPromptDismissed.value!==today.value&&!data.moodEntries.some(x=>x.date===today.value));
+    function dismissMoodPrompt(){moodPromptDismissed.value=today.value;}
+    const nowMinute=ref(0);
+    setInterval(()=>{nowMinute.value++;if(pendingAlterReview.value&&!alterReviewForm.open&&!pendingAppointment.value&&!apptForm.open)openPendingAlterReview();},60000);
+    nextTick(()=>{if(pendingAlterReview.value)openPendingAlterReview();});
+    const dashboardNav=[{id:'appointments',name:'Rendez-vous'},{id:'randomNotes',name:'Note au pif'},{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas'},{id:'priorities',name:'Priorités'},{id:'tasks',name:'Tâches'}];
+    function jumpDashboard(id){nextTick(()=>document.getElementById('dashboard-'+id)?.scrollIntoView({behavior:'smooth',block:'start'}));}
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
+      alterForm,alterTab,alterAssignment,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewForm,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
