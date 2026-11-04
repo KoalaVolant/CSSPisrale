@@ -368,3 +368,11 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 }
 .mood-sort-row select {max-width:125px}
 .mood-value-label {white-space:nowrap;font-size:12px;min-width:45px}
+
+/* V48 : texte de notes sélectionnable même après validation */
+.view-evening .evening-markdown,.view-evening .evening-markdown *{user-select:text!important;-webkit-user-select:text!important;cursor:text}
+.view-evening .textarea-card{cursor:default!important}
+.view-evening .textarea-card .drag-grip{cursor:grab!important;user-select:none!important}
+.ticket-hide-waiting{display:inline-flex;align-items:center;gap:6px;white-space:normal}
+.tq-milestone-points{display:inline-flex;align-items:center;gap:5px}
+.tq-milestone-points input{max-width:75px}
