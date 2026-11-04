@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261104-v48">
-  <link rel="stylesheet" href="stylekoala.css?v=20261104-v48">
-  <link rel="stylesheet" href="styletest.css?v=20261104-v48">
+  <link rel="stylesheet" href="style.css?v=20261104-v50">
+  <link rel="stylesheet" href="stylekoala.css?v=20261104-v50">
+  <link rel="stylesheet" href="styletest.css?v=20261104-v50">
 </head>
 <body>
 
@@ -424,7 +424,7 @@
         </section>
       </section>
       <section id="dashboard-meals" class="today-meals" :style="{order:data.dashboardWidgets.indexOf('meals')+10}" v-if="widgetVisible('meals')"><h2>Repas du jour</h2><div v-for="kind in ['lunch','dinner']" :key="kind" class="daily-meal"><strong>{{kind==='lunch'?'Déjeuner':'Dîner'}} :</strong> {{todayMeals[kind].name||'Non prévu'}} <span class="meal-state">{{todayMeals[kind].state==='done'?'✓ Pris':todayMeals[kind].state==='missed'?'↪ Pas la même chose':'Pas pris'}}</span><button type="button" @click="setMealState(today,kind,'done')">✓ Pris</button><button type="button" @click="setMealState(today,kind,'missed')">↪ Autre chose</button></div><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
-      <section id="dashboard-priorities" class="priority-box" :style="{order:data.dashboardWidgets.indexOf('priorities')+10}" v-if="widgetVisible('priorities')"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ item.task.due ? '· échéance '+formatDate(item.task.due) : '' }}</small></li></ol></section>
+      <section id="dashboard-priorities" class="priority-box" :style="{order:data.dashboardWidgets.indexOf('priorities')+10}" v-if="widgetVisible('priorities')"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ taskDue(item.task) ? '· échéance '+formatDate(taskDue(item.task)) : '' }}</small></li></ol></section>
       <div id="dashboard-tasks" class="dashboard" :style="{order:data.dashboardWidgets.indexOf('tasks')+10}" v-if="widgetVisible('tasks')">
 
         <section class="view view-today">
@@ -443,6 +443,17 @@
           <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
           <div class="task-list">
             <task-list :tasks="upcomingTasks" :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
+                       @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
+                       @edit-selected="editSelected" @delete-selected="deleteSelected"
+                       @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
+          </div>
+        </section>
+
+        <section class="view view-undated" v-if="undatedTasks.length">
+          <h2>Sans échéance <small>({{ undatedTasks.length }})</small></h2>
+          <p class="hint">Tâches sans échéance individuelle ni échéance de jalon.</p>
+          <div class="task-list">
+            <task-list :tasks="undatedTasks" :projects="data.projects" :categories="categories" :statuses="statuses" :today="today" :selected="selection"
                        @toggle="toggleSelect" @select-all="selectMany" @clear="deselectMany"
                        @edit-selected="editSelected" @delete-selected="deleteSelected"
                        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
@@ -1380,10 +1391,10 @@
           </label>
 
           <!-- Date butoir : ouvre le calendrier (rien d'affiché s'il n'y a pas de date) -->
-          <label class="tag tag-due" v-if="task.due">
+          <label class="tag tag-due" v-if="effectiveDue">
             <span class="tag-due-text">{{ dueLabel }}</span>
-            <input class="tag-due-input" type="date" :value="task.due"
-                   title="Cliquer pour changer la date butoir"
+            <input class="tag-due-input" type="date" :value="effectiveDue"
+                   :title="task.due ? 'Date propre à la tâche' : 'Date héritée du jalon ; modifier pour personnaliser'"
                    @click="openPicker" @change="onDue">
           </label>
 
@@ -1437,7 +1448,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261104-v48"></script>
+<script src="app.js?v=20261104-v50"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

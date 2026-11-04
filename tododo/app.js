@@ -373,11 +373,12 @@ const TaskRow = {
     taskAlter(){const id=this.task.alterId||this.appData.projects.find(p=>p.id===this.task.projectId)?.alterId;return this.appData.alters.find(a=>a.id===id)||null;},
     milestoneTaskLabel(){const milestone=this.task.milestoneId && this.appData.projectMilestones.find(m=>m.id===this.task.milestoneId&&m.projectId===this.task.projectId);return milestone ? `${milestone.title} - ${this.task.title}` : this.task.title;},
     blockedBy(){const p=this.appData.tasks.find(x=>x.id===this.task.dependsOn);return p&&p.status!=='done'?p:null;},
+    effectiveDue(){const m=this.task.milestoneId && this.appData.projectMilestones.find(m=>m.id===this.task.milestoneId&&m.projectId===this.task.projectId);return this.task.due || m?.due || '';},
     isOverdue() {
-      return !!this.task.due && this.task.due < this.today && this.task.status !== 'done';
+      return !!this.effectiveDue && this.effectiveDue < this.today && this.task.status !== 'done';
     },
     dueLabel() {
-      return formatLongDate(this.task.due);
+      return formatLongDate(this.effectiveDue);
     },
     calculatedPoints() { return taskValue(this.task); },
     urgencyOptions() {
@@ -1071,16 +1072,23 @@ const app = createApp({
       return n;
     });
 
+    // La date de la tâche prévaut ; à défaut, elle hérite dynamiquement de celle du jalon.
+    function taskDue(t) {
+      if (t.due) return t.due;
+      const milestone = t.milestoneId && data.projectMilestones.find(m => m.id === t.milestoneId && m.projectId === t.projectId);
+      return milestone?.due || '';
+    }
+
     function applyFilters(list, withSort = true) {
       const q = filters.search.trim().toLowerCase();
       const res = list.filter(t => {
         if (filters.alter && (t.alterId||data.projects.find(p=>p.id===t.projectId)?.alterId||'') !== (filters.alter==='__none'?'':filters.alter)) return false;
         if (filters.status && t.status !== filters.status) return false;
-        if (filters.dueMode==='none' && t.due) return false;
-        if (filters.dueMode==='dated' && !t.due) return false;
-        if (filters.dueExact && t.due!==filters.dueExact) return false;
-        if (!filters.dueExact && filters.dueFrom && (!t.due || t.due<filters.dueFrom)) return false;
-        if (!filters.dueExact && filters.dueTo && (!t.due || t.due>filters.dueTo)) return false;
+        if (filters.dueMode==='none' && taskDue(t)) return false;
+        if (filters.dueMode==='dated' && !taskDue(t)) return false;
+        if (filters.dueExact && taskDue(t)!==filters.dueExact) return false;
+        if (!filters.dueExact && filters.dueFrom && (!taskDue(t) || taskDue(t)<filters.dueFrom)) return false;
+        if (!filters.dueExact && filters.dueTo && (!taskDue(t) || taskDue(t)>filters.dueTo)) return false;
         if (filters.category === '__none' && t.category) return false;
         if (filters.category && filters.category !== '__none' && t.category !== filters.category) return false;
         if (filters.project === '__none' && t.projectId) return false;
@@ -1089,11 +1097,11 @@ const app = createApp({
         if (filters.difficulty && (t.difficulty || '') !== (filters.difficulty === '__none' ? '' : filters.difficulty)) return false;
         if (filters.kind === 'malus' && !t.malus) return false;
         if (filters.kind === 'bonus' && t.malus) return false;
-        if (q && !t.title.toLowerCase().includes(q)) return false;
+        if (q && !milestoneTaskLabel(t).toLowerCase().includes(q)) return false;
         return true;
       });
       if (!withSort) return res;
-      const byDue = (a, b) => (a.due || '9999').localeCompare(b.due || '9999');
+      const byDue = (a, b) => (taskDue(a) || '9999').localeCompare(taskDue(b) || '9999');
       switch (filters.sort) {
         case 'points-desc':     res.sort((a, b) => taskValue(b) - taskValue(a) || byDue(a, b)); break;
         case 'points-asc':      res.sort((a, b) => taskValue(a) - taskValue(b) || byDue(a, b)); break;
@@ -1110,8 +1118,10 @@ const app = createApp({
 
     // Les tâches terminées ne sont plus dans ces listes : elles sont dans l'onglet "Terminés"
     const activeTasks   = computed(() => data.tasks.filter(t => t.scope !== 'work' && t.status !== 'done'));
-    const todayTasks    = computed(() => applyFilters(activeTasks.value.filter(t => t.due && t.due <= today.value)));
-    const upcomingTasks = computed(() => applyFilters(activeTasks.value.filter(t => t.due && t.due > today.value)));
+    const todayTasks    = computed(() => applyFilters(activeTasks.value.filter(t => taskDue(t) && taskDue(t) <= today.value)));
+    const upcomingTasks = computed(() => applyFilters(activeTasks.value.filter(t => taskDue(t) && taskDue(t) > today.value)));
+    // Taches sans echeance, notamment celles creees sous un jalon de projet.
+    const undatedTasks = computed(() => applyFilters(activeTasks.value.filter(t => !taskDue(t))));
     const allTasks      = computed(() => applyFilters(activeTasks.value));
     const workTasks = computed(() => [...data.tasks.filter(t => t.scope === 'work' && t.status !== 'done')].sort((a,b)=>Number(a.status==='done')-Number(b.status==='done') || (a.due||'9999').localeCompare(b.due||'9999')));
     const copyForm = reactive({open:false});
@@ -2548,8 +2558,8 @@ const app = createApp({
     const suggestedTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work'&&!blockingTask(t)).map(t=>{
       const urgencyRank=levelRank(data.urgencies,t.urgency);
       const difficultyRank=levelRank(data.difficulties,t.difficulty);
-      const hasDue=typeof t.due==='string' && /^\d{4}-\d{2}-\d{2}$/.test(t.due);
-      const delta=hasDue?Math.round((new Date(t.due+'T12:00:00')-new Date(today.value+'T12:00:00'))/86400000):Infinity;
+      const due=taskDue(t);const hasDue=typeof due==='string' && /^\d{4}-\d{2}-\d{2}$/.test(due);
+      const delta=hasDue?Math.round((new Date(due+'T12:00:00')-new Date(today.value+'T12:00:00'))/86400000):Infinity;
       const category=delta<0?0:delta===0?1:Number.isFinite(delta)?2:3;
       return {task:t,category,delta,urgencyRank,difficultyRank};
     }).sort((a,b)=>a.category-b.category || (Number.isFinite(a.delta)&&Number.isFinite(b.delta)?a.delta-b.delta:0) || b.urgencyRank-a.urgencyRank || b.difficultyRank-a.difficultyRank || String(a.task.title).localeCompare(String(b.task.title),'fr')).slice(0,5));
@@ -2601,7 +2611,7 @@ const app = createApp({
     function blockingTask(t){const parent=data.tasks.find(x=>x.id===t.dependsOn);return parent&&parent.status!=='done'?parent:null;}
     const plannerDate=ref(today.value);
     const plannerCandidates=computed(()=>data.tasks.filter(t=>t.scope!=='work'&&t.status!=='done'&&!blockingTask(t)).map(t=>{
-      const due=t.due||'';const days=due?Math.round((new Date(due+'T12:00:00')-new Date(plannerDate.value+'T12:00:00'))/86400000):Infinity;
+      const due=taskDue(t);const days=due?Math.round((new Date(due+'T12:00:00')-new Date(plannerDate.value+'T12:00:00'))/86400000):Infinity;
       return {task:t,days,rank:levelRank(data.urgencies,t.urgency),difficulty:levelRank(data.difficulties,t.difficulty)};
     }).sort((a,b)=>(a.days<0?0:a.days===0?1:Number.isFinite(a.days)?2:3)-(b.days<0?0:b.days===0?1:Number.isFinite(b.days)?2:3)||(Number.isFinite(a.days)&&Number.isFinite(b.days)?a.days-b.days:0)||b.rank-a.rank||b.difficulty-a.difficulty));
     const plannedTasks=computed(()=>plannerCandidates.value);
@@ -2805,7 +2815,7 @@ const app = createApp({
       earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, formatPoints, toggleRewardFavorite, depositReward, depositRandomReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, gratitudeMoment, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, moveTicketType, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, groupedRewards, visibleInventory, unusedInventory, usedInventory, rewardClaimCount, setInventoryUsed,
       // filtres
-      filters, resetFilters, activeFilterCount, todayTasks, upcomingTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
+      filters, resetFilters, activeFilterCount, taskDue, todayTasks, upcomingTasks, undatedTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
       // tâches
       quickForm, openQuickForm, toggleQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
       taskForm, openTaskForm, toggleTaskForm, saveTask, duplicateTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName,

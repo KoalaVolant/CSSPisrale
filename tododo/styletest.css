@@ -376,3 +376,8 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 .ticket-hide-waiting{display:inline-flex;align-items:center;gap:6px;white-space:normal}
 .tq-milestone-points{display:inline-flex;align-items:center;gap:5px}
 .tq-milestone-points input{max-width:75px}
+
+/* v49 : tâches sans échéance sur le dashboard */
+.dashboard .view-undated { flex: 1 1 100%; width: 100%; min-width: 0; }
+.dashboard .view-undated .task-list-box { display: flex; flex-wrap: wrap; }
+@media (max-width: 800px) { .dashboard .view-undated { width: 100%; } }
