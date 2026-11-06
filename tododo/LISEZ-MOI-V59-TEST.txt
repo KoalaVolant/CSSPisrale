@@ -1,0 +1,29 @@
+Todo Quest V59 TEST - VERSION EXPERIMENTALE
+
+IMPORTANT : cette version est isolée du stockage de la V58 et ne se connecte pas à Firebase. Les données entrées dans cette version ne sont donc pas envoyées dans le cloud.
+
+UTILISATION :
+1. Exporter le JSON de la version habituelle avec l’onglet Sauvegarde.
+2. Installer les fichiers V59 dans un dossier de test séparé et servir via un serveur web local (HTTP).
+3. Si souhaité, importer une COPIE du JSON dans la version V59 via Sauvegarde.
+4. Vérifier les nouvelles fonctionnalités avec des données de test.
+5. Ne pas utiliser les données saisies dans la V59 comme votre source unique : elles ne sont pas synchronisées.
+
+Fonctionnalités de test :
+- Sous-tâches sur les tâches personnelles et Travail : suivies sans points individuels, les points restent ceux de la tâche principale.
+- Dates de début et tâches récurrentes après validation, avec création d'une occurrence suivante.
+- Événements récurrents après validation.
+- Recherche transversale (navigation au module).
+- Dashboard contextuel, aperçu Ma journée et bouton Je ne sais pas quoi faire sans estimation de temps.
+- Mode concentration simple.
+- Centre de rappels in-app pour tâches, événements du jour et relances de tickets.
+- Personne attendue libre et filtre dans Travail, statistiques de volume des tickets.
+- Pause d'habitudes jusqu’à une date.
+- Récapitulatif graphique alimentaire à quatre courbes et séries par mois/semaine.
+- Enveloppes mensuelles par catégorie du budget.
+- Ressenti facultatif après les séances sportives.
+- Plats favoris et création explicite d'un plat à partir d'un remplacement (ingrédients à compléter dans la fiche).
+
+Non inclus ou encore exploratoire : objectif progressif en paliers, routines composées, suggestions anti-gaspillage, gestion des restes, regroupement intelligent des quantités de courses, automatisations avancées/serveur, calendrier d'humeur, sauvegardes versionnées automatiques, protection anti-conflit Firestore.
+
+Tests effectués : vérification syntaxique JavaScript, compilation statique et archive ZIP. Navigation manuelle complète non vérifiée : l'environnement d'exécution interdit l'accès aux pages locales via Chromium.

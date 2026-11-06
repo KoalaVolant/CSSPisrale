@@ -399,3 +399,23 @@
 .v57-legend-item{display:inline-flex;align-items:center;gap:5px;font-size:.79rem;color:#33473e}
 .v57-legend-item i{display:inline-block;width:11px;height:11px;border-radius:3px;flex-shrink:0}
 .v57-plan{padding:8px 10px;background:var(--fnd,#f1f5f1);border-radius:8px;margin:10px 0;line-height:1.5}
+
+/* V58 : périodes alimentaires et tri personnalisable */
+.v58-period-list{display:grid;gap:14px;margin-top:12px}
+.v58-period-card{padding:12px;border:1px solid #ccd9d1;border-radius:10px;background:#fff;min-width:0}
+.v58-period-card h4{margin:0 0 12px;color:var(--tit,#577d6c);text-transform:capitalize}
+.v58-period-card h4 small{font-weight:400;color:#52645e;font-size:.8rem}
+.v58-period-line{display:grid;grid-template-columns:minmax(115px,175px) minmax(0,1fr);gap:8px 15px;align-items:start;margin:12px 0}
+.v58-period-name{font-size:.87rem;font-weight:650;padding-top:2px}
+.v58-period-graphic{min-width:0}.v58-period-graphic .v57-legend{margin-top:5px;gap:5px 11px}.v58-period-graphic .v57-legend-item{font-size:.72rem}
+.v58-draggable{padding:7px 9px;border:1px solid #d2dfd5;border-radius:8px;background:#fff;margin:5px 0;cursor:grab;touch-action:pan-y}
+.v58-draggable.v58-dragging{opacity:.5;outline:2px dashed var(--fnd3,#8da);cursor:grabbing}
+.v58-draggable label{flex:1;min-width:0}.v58-grip{font-size:1.25rem;color:#6d8f80;user-select:none}
+@media(max-width:620px){.v58-period-line{grid-template-columns:1fr;gap:4px}.v58-period-card{padding:9px}}
+
+/* V59 TEST - Extensions non destructives */
+.v59-hub{border:1px solid var(--main-color,#ddd);background:var(--fnd,#fafafa);border-radius:12px;padding:12px;margin:10px 0;order:1}.v59-hub h2,.v59-hub h3{margin:2px 0 8px}.v59-actions,.v59-chooser,.v59-alert,.v59-subline,.v59-ticket-wait,.v59-stats,.v59-envelope{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:7px 0}.v59-alert{border-bottom:1px solid #ccc;padding:5px}.v59-alert span{flex:1;min-width:180px}.v59-subtask{width:100%;border:1px solid #ccc;border-radius:8px}.v59-subline input:not([type=checkbox]){min-width:150px;flex:1}.v59-search{position:relative;min-width:180px;max-width:330px;flex:1}.v59-search>input{width:100%;padding:7px}.v59-search-results{position:absolute;z-index:200;top:100%;left:0;right:0;max-height:240px;overflow:auto;background:white;border:1px solid #bbb;box-shadow:0 5px 15px #0002}.v59-search-results button{display:block;width:100%;text-align:left;background:white;border:0;padding:8px}.v59-search-results button:hover{background:#e8f0eb}.v59-focus{text-align:center}.v59-focus>button{margin:10px}.v59-envelope{border-bottom:1px solid #ddd;padding:5px 0}.v59-stats span{padding:8px;background:white;border-radius:7px}@media(max-width:650px){.v59-search{order:3;max-width:100%;flex-basis:100%}.v59-envelope{flex-direction:column;align-items:flex-start}}
+
+.v59-test-warning{background:#f7ead0;border:2px solid #a47b35;padding:10px 15px;font-size:13px;color:#3d311d}.v59-trend-legend{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}.v59-trend-legend span{display:flex;align-items:center;gap:5px;font-size:12px}.v59-trend-legend i{display:inline-block;width:13px;height:13px;border-radius:3px}.v59-chart-scroll{width:100%;overflow:auto}.v59-chart-scroll svg{display:block;width:100%;min-width:430px;height:240px}
+
+.v59-sport-feedback{background:var(--fnd,#fafafa);padding:12px;border-radius:8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0}.v59-sport-feedback label{display:inline-flex;align-items:center;gap:5px}
