@@ -437,3 +437,10 @@
 .v64-stage-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}.v64-stage-row input[type=number]{width:74px;max-width:100%}.v64-stage-row input[type=month]{min-width:155px}
 .v64-habit-stages{margin-top:8px}.v64-challenge-button{margin:8px 0}.v64-stat-card{padding:10px;margin:10px 0;border:1px solid var(--border,#ddd);border-radius:8px}.v64-bar{height:8px;background:#d9e1dd;border-radius:6px;overflow:hidden}.v64-bar span{display:block;height:100%;background:#74a78d}
 @media(max-width:600px){.v64-stage-row{align-items:flex-start}.v64-stage-row label{width:100%}}
+
+/* V65 TEST : stocks facultatifs et suggestions sans quantités */
+.v65-stock-overview,.v65-suggestions{margin:12px 0;padding:12px;border:1px solid var(--border, #bfc4c4);border-radius:10px;}
+.v65-grocery-item{display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
+.v65-grocery-item label{display:flex;align-items:center;gap:6px;}
+.v65-leftover-planner{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;}
+.v65-suggestions>label{display:inline-flex;gap:8px;align-items:center;margin:7px 0 12px;}

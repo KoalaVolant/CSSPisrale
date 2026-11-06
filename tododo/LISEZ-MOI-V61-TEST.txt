@@ -1,9 +1,0 @@
-Todo Quest V61 TEST — version expérimentale, isolée de Firebase.
-
-Importe une COPIE de ton JSON pour tester. Ne remplace pas la V58 de production.
-
-Changements : retrait de Ce qui compte maintenant ; conservation du bouton de suggestions et de Ma journée ; points éditables sur chaque sous-tâche depuis la carte ; masquage des points principaux pour les tâches ayant des sous-tâches ; boutons Pause/Reprendre des habitudes sur le dashboard ; débuts/fins tâches, projets, jalons dans Ma journée avec échéances prochaines 3/7/14/30 jours ; dates début et fin de projet ; statistiques Travail dépliables avec sélection semaine/mois/année ; achats prévus en bas du budget ; navigation directe de la suggestion.
-
-Limites : événements récurrents et automatisations avancées non refondus ; graphique et autres modules de V60 conservés ; stats Travail stock actif actuel et dates de création/clôture, ancienneté d attente approximative. Validation JS et HTML, pas de navigateur complet testé.
-
-Ne pas publier sur ton GitHub de production sans sauvegarde et essai préalable.

@@ -3,7 +3,7 @@ const { createApp, reactive, ref, computed, watch, nextTick, provide } = Vue;
 /* ============================================================
    Constantes & utilitaires
    ============================================================ */
-const STORAGE_KEY = 'todo-quest-v63-test-isolated';
+const STORAGE_KEY = 'todo-quest-v65-test-isolated';
 const UI_KEY = 'todo-quest-ui-v63-test';   // préférences d'affichage (propres à chaque appareil)
 
 const STATUSES = [
@@ -1382,7 +1382,7 @@ function loadData() {
     if(!Array.isArray(d.ingredientCategories)) d.ingredientCategories=['Sans catégorie'];
     if(!Array.isArray(d.ingredientLocations)) d.ingredientLocations=['Congélo','Frigo','Garde-manger','Placard'];
     d.ingredientLocations=[...new Set([...d.ingredientLocations.filter(x=>typeof x==='string'&&x.trim()),...d.ingredients.map(x=>x?.location).filter(Boolean)])];
-    d.ingredients=d.ingredients.filter(x=>x&&typeof x==='object').map(x=>({...x,name:String(x.name||''),category:typeof x.category==='string'&&x.category.trim()?x.category:'Sans catégorie',owned:!!x.owned,location:typeof x.location==='string'?x.location:''}));
+    d.ingredients=d.ingredients.filter(x=>x&&typeof x==='object').map(x=>({...x,name:String(x.name||''),category:typeof x.category==='string'&&x.category.trim()?x.category:'Sans catégorie',owned:!!x.owned,location:typeof x.location==='string'?x.location:'',expiry:typeof x.expiry==='string'?x.expiry:'',stockNote:typeof x.stockNote==='string'?x.stockNote:''}));
     d.ingredientCategories=[...new Set(['Sans catégorie',...d.ingredientCategories.filter(x=>typeof x==='string'&&x.trim()),...d.ingredients.map(x=>x.category).filter(Boolean)])];
     d.shoppingItems.forEach(x=>{if(typeof x.quantity!=='string') x.quantity=String(x.quantity??'');x.store=String(x.store||'');x.category=String(x.category||'Sans catégorie');});
     if (typeof d.menuRules !== 'string') d.menuRules = '';
@@ -3440,7 +3440,7 @@ const app = createApp({
           if (!ok) throw new Error('format');
           if (!confirm('Remplacer toutes les données actuelles par celles du fichier ?')) return;
           applyData(json);
-          notify('Import réussi');
+          notify(user.value ? 'Import réussi : synchronisation Firebase en cours' : 'Import réussi');
         } catch (e) {
           alert("Fichier invalide : ce n'est pas une sauvegarde Todo Quest.");
         } finally {
@@ -3460,12 +3460,12 @@ const app = createApp({
     /* ---------- Synchro cloud (Firebase) ---------- */
     // Actif seulement si firebase-config.js est rempli et que le SDK est chargé.
     const cfg = window.FIREBASE_CONFIG || {};
-    const firebaseReady = false; // V59 TEST isolée : ne lit/n'écrit JAMAIS le cloud de production
+    const firebaseReady = Boolean(cfg.apiKey && cfg.projectId && window.firebase && firebase.apps); // synchronisation Firebase réactivée
 
     const user = ref(null);
     const syncState = ref(firebaseReady ? 'signedout' : 'local');
     const syncLabel = computed(() => ({
-      local:     'VERSION TEST ISOLÉE : Firebase désactivé',
+      local:     'Firebase indisponible : données locales',
       signedout: 'Non connecté : données sur cet appareil uniquement',
       syncing:   'Synchronisation…',
       synced:    'Synchronisé',
@@ -3475,9 +3475,10 @@ const app = createApp({
     const clientId = uid();           // identifie cet onglet / appareil
     let auth = null, db = null, docRef = null;
     let unsubscribe = null, saveTimer = null, lastSyncedJson = '', firstSnapshot = true;
+    let cloudInitialized = false; // aucune écriture avant lecture du premier état serveur
 
     function pushToCloud() {
-      if (!docRef) return Promise.resolve();
+      if (!docRef || !cloudInitialized) return Promise.resolve();
       syncState.value = 'syncing';
       const payload = JSON.parse(JSON.stringify(data));
       payload._by = clientId;
@@ -3500,6 +3501,7 @@ const app = createApp({
     function startSync(u) {
       docRef = db.collection('users').doc(u.uid);
       firstSnapshot = true;
+      cloudInitialized = false;
       syncState.value = 'syncing';
 
       unsubscribe = docRef.onSnapshot(snap => {
@@ -3509,26 +3511,29 @@ const app = createApp({
 
         if (firstSnapshot) {
           firstSnapshot = false;
-          if (!remote) {                                    // 1re connexion : on envoie les données locales
+          if (!remote) {
+            // Jamais de création du document cloud sans accord explicite.
+            if (!confirm('Aucune sauvegarde Firebase trouvée pour ce compte. Envoyer les données locales dans le cloud ?\n\nOK = créer la sauvegarde cloud\nAnnuler = rester en lecture seule (aucune écriture Firebase).')) {
+              syncState.value = 'error';
+              notify('Envoi cloud annulé : déconnecte-toi pour continuer en local');
+              return;
+            }
             lastSyncedJson = JSON.stringify(data);
+            cloudInitialized = true;
             pushToCloud();
-            notify('Données envoyées dans le cloud');
             return;
           }
-          const localHasData = data.tasks.length || data.projects.length || data.inventory.length;
-          if (localHasData && !confirm('Des données existent déjà dans ton cloud. Remplacer celles de cet appareil par celles du cloud ?\n\nOK = utiliser le cloud\nAnnuler = envoyer les données de cet appareil vers le cloud')) {
-            lastSyncedJson = JSON.stringify(data);
-            pushToCloud();
-            return;
-          }
+          // Toujours charger le document distant existant : aucun écrasement du cloud par
+          // des données de test importées ou conservées localement, sans action explicite.
           applyRemote(remote);
+          cloudInitialized = true;
           syncState.value = 'synced';
-          notify('Données synchronisées');
+          notify('Données Firebase chargées. Pense à exporter un JSON avant les tests.');
           return;
         }
 
         // Mises à jour venant d'un autre appareil
-        if (remote && remote._by !== clientId && !saveTimer) {
+        if (cloudInitialized && remote && remote._by !== clientId && !saveTimer) {
           applyRemote(remote);
           syncState.value = 'synced';
         }
@@ -3542,6 +3547,8 @@ const app = createApp({
 
       auth.onAuthStateChanged(u => {
         if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+        cloudInitialized = false;
+        if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
         docRef = null;
         user.value = u ? { name: u.displayName, email: u.email } : null;
         if (u) startSync(u); else syncState.value = 'signedout';
@@ -3549,7 +3556,7 @@ const app = createApp({
 
       // Envoi vers le cloud dès que les données changent (avec un petit délai)
       watch(data, () => {
-        if (!docRef) return;
+        if (!docRef || !cloudInitialized) return;
         const json = JSON.stringify(data);
         if (json === lastSyncedJson) return;
         lastSyncedJson = json;
@@ -3684,9 +3691,12 @@ const app = createApp({
     const filteredDishes=computed(()=>data.dishes.filter(x=>String(x.name||'').toLocaleLowerCase().includes(dishQuery.value.toLocaleLowerCase())&&(!dishCategoryFilter.value||dishCats(x).includes(dishCategoryFilter.value))&&dishMatchesFood(x,dishFoodTypeFilter.value)&&(!dishDifficultyFilter.value||x.difficulty===dishDifficultyFilter.value)&&(!dishTimeFilter.value||x.time===dishTimeFilter.value)).sort((a,b)=>{const order=dishSort.value;if(order==='difficulty-asc'||order==='difficulty-desc'||order==='time-asc'||order==='time-desc'){const kind=order.startsWith('difficulty')?'difficulty':'time',sign=order.endsWith('desc')?-1:1;const av=dishLevelRank(kind,a[kind]),bv=dishLevelRank(kind,b[kind]);if(av!==bv)return sign*(av-bv);}return Number(!!b.favorite)-Number(!!a.favorite)||String(a.name||'').localeCompare(String(b.name||''),'fr');}));
     const dishIngredientChoices=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&String(x.name||'').toLocaleLowerCase().includes(dishIngredientQuery.value.toLocaleLowerCase())));
     const ingredientOwnedFilter=ref('all');
+    const shiftISODate=(date,days)=>{const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+days);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+    const pantryExpiring=computed(()=>data.ingredients.filter(i=>i.owned&&i.expiry&&i.expiry>=today.value&&i.expiry<=shiftISODate(today.value,7)).sort((a,b)=>a.expiry.localeCompare(b.expiry)));
+    const pantryOverdue=computed(()=>data.ingredients.filter(i=>i.owned&&i.expiry&&i.expiry<today.value).sort((a,b)=>a.expiry.localeCompare(b.expiry)));
     const filteredIngredients=computed(()=>(Array.isArray(data.ingredients)?data.ingredients:[]).filter(x=>x&&(ingredientOwnedFilter.value==='all'||!!x.owned===(ingredientOwnedFilter.value==='owned'))&&String(x.name||'').toLocaleLowerCase().includes(ingredientQuery.value.toLocaleLowerCase())).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'fr')));
     function addIngredientCategory(){const name=newIngredientCategory.value.trim();if(!name)return;if(!data.ingredientCategories.some(x=>x.toLocaleLowerCase()===name.toLocaleLowerCase()))data.ingredientCategories.push(name);ingredientCategoryDraft.value=name;newIngredientCategory.value='';}
-    function addIngredient(){const name=ingredientDraft.value.trim();if(!name)return; if(data.ingredients.some(i=>i.name.toLocaleLowerCase()===name.toLocaleLowerCase())){notify('Ingrédient déjà présent');return;}data.ingredients.push({id:uid(),name,category:ingredientCategoryDraft.value||'Sans catégorie',owned:false,location:ingredientLocationDraft.value});ingredientDraft.value='';}
+    function addIngredient(){const name=ingredientDraft.value.trim();if(!name)return; if(data.ingredients.some(i=>i.name.toLocaleLowerCase()===name.toLocaleLowerCase())){notify('Ingrédient déjà présent');return;}data.ingredients.push({id:uid(),name,category:ingredientCategoryDraft.value||'Sans catégorie',owned:false,location:ingredientLocationDraft.value,expiry:'',stockNote:''});ingredientDraft.value='';}
     function setIngredientOwned(i,owned){i.owned=owned;if(owned)data.shoppingItems=data.shoppingItems.filter(x=>x.ingredientId!==i.id);}
     function moveShoppingCategory(target){const from=shoppingCategoryDragged.value;shoppingCategoryDragged.value='';if(!from||from===target)return;const order=data.ingredientCategories;const src=order.indexOf(from),dest=order.indexOf(target);if(src<0||dest<0)return;order.splice(src,1);order.splice(dest,0,from);}
     function favoriteDish(d){d.favorite=!d.favorite;}
@@ -3958,6 +3968,8 @@ const app = createApp({
     function consumeLeftover(x){if(x.portions<1)return;x.portions--;if(x.portions===0)notify('Toutes les portions sont consommées');}
     function planLeftover(x,kind='lunch'){if(!x||x.portions<1)return;setMeal(today.value,kind,'name',x.name);setMeal(today.value,kind,'dishId',x.dishId||'');notify('Reste placé au menu du jour ; la portion sera décomptée après confirmation manuelle');}
     function removeLeftover(x){if(confirm('Supprimer ce reste ?'))data.mealLeftovers=data.mealLeftovers.filter(z=>z.id!==x.id);}
+    const leftoverPlanDate=ref(today.value),leftoverPlanKind=ref('dinner');
+    function planLeftoverSelected(x){if(!x||x.portions<1)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(leftoverPlanDate.value)){notify('Choisis une date valide');return;}setMeal(leftoverPlanDate.value,leftoverPlanKind.value,'name',x.name);setMeal(leftoverPlanDate.value,leftoverPlanKind.value,'dishId',x.dishId||'');notify('Reste planifié sans décompte automatique des portions');}
     // V63 : sélection explicite et indépendante de la semaine de courses.
     // Le sélecteur accepte n'importe quel jour, ramené au lundi correspondant.
     const groceryMonday = date => {
@@ -3978,6 +3990,9 @@ const app = createApp({
     });
     function selectIngredientWeek(which){ingredientWeekDate.value=which==='current'?groceryMonday(today.value):groceryWeekShift(today.value,1);}
     function shiftIngredientWeek(n){ingredientWeekDate.value=groceryWeekShift(ingredientWeekStart.value,n);}
+    const groceryExcludedIds=ref([]);
+    watch(ingredientWeekStart,()=>{groceryExcludedIds.value=[];});
+    const groceryShoppingExists=id=>data.shoppingItems.some(i=>i.ingredientId===id&&!i.checked);
     const ingredientWeekMeals=computed(()=>{
       const results=[];const start=ingredientWeekStart.value,end=ingredientWeekEnd.value;
       for(const date of Object.keys(data.weeklyMenus||{}).sort()){
@@ -4007,7 +4022,7 @@ const app = createApp({
     });
     function addNeededIngredients(){
       let added=0;
-      for(const x of menuIngredientNeeds.value.filter(x=>!x.owned)){
+      for(const x of menuIngredientNeeds.value.filter(x=>!x.owned&&!groceryExcludedIds.value.includes(x.id))){
         const ing=data.ingredients.find(i=>i.id===x.id);
         if(!ing||data.shoppingItems.some(i=>i.ingredientId===x.id&&!i.checked))continue;
         addIngredientToShopping(ing);added++;
@@ -4086,10 +4101,32 @@ const app = createApp({
     }).sort((a,b)=>(a.days<0?0:a.days===0?1:Number.isFinite(a.days)?2:3)-(b.days<0?0:b.days===0?1:Number.isFinite(b.days)?2:3)||(Number.isFinite(a.days)&&Number.isFinite(b.days)?a.days-b.days:0)||b.rank-a.rank||b.difficulty-a.difficulty));
     const plannedTasks=computed(()=>plannerCandidates.value);
     const plannedMinutes=computed(()=>0); // ancien nom conservé pour compatibilité d'interface
+    const suggestionMode=ref('available');
+    const suggestionWeek=ref('');
+    const dishRecentUse=computed(()=>{const dates=new Map();for(const [date,slots] of Object.entries(data.weeklyMenus||{})){for(const key of ['lunch','dinner']){const id=slots?.[key]?.dishId;if(id && (!dates.has(id)||date>dates.get(id)))dates.set(id,date);}}return dates;});
+    const recentDishCutoff=computed(()=>shiftISODate(today.value,-14));
+    const pantryAtRisk=computed(()=>new Set([...pantryExpiring.value,...pantryOverdue.value].map(i=>i.id)));
+    const suggestionLeftovers=computed(()=>data.mealLeftovers.filter(x=>x.portions>0).sort((a,b)=>(a.expiry||'9999').localeCompare(b.expiry||'9999')));
     const suggestedDishPages=computed(()=>Math.max(1,Math.ceil(availableDishes.value.length/Number(suggestPageSize.value||10))));
     const paginatedDishes=computed(()=>availableDishes.value.slice((Math.min(suggestPage.value,suggestedDishPages.value)-1)*Number(suggestPageSize.value),Math.min(suggestPage.value,suggestedDishPages.value)*Number(suggestPageSize.value)));
-    watch([suggestDishCategory,suggestFoodType,suggestPageSize],()=>{suggestPage.value=1;});
-    const availableDishes=computed(()=>data.dishes.filter(d=>(!suggestDishCategory.value||dishCats(d).includes(suggestDishCategory.value))&&dishMatchesFood(d,suggestFoodType.value)).map(d=>{const ingredients=(d.ingredientIds||[]).map(id=>data.ingredients.find(i=>i.id===id)).filter(Boolean);const missing=ingredients.filter(i=>!i.owned);return {dish:d,missing,total:ingredients.length};}).sort((a,b)=>a.missing.length-b.missing.length||a.dish.name.localeCompare(b.dish.name,'fr')));
+    watch([suggestDishCategory,suggestFoodType,suggestPageSize,suggestionMode],()=>{suggestPage.value=1;});
+    const availableDishes=computed(()=>data.dishes.filter(d=>(!suggestDishCategory.value||dishCats(d).includes(suggestDishCategory.value))&&dishMatchesFood(d,suggestFoodType.value)).map(d=>{
+      const ingredients=(d.ingredientIds||[]).map(id=>data.ingredients.find(i=>i.id===id)).filter(Boolean);
+      const missing=ingredients.filter(i=>!i.owned);
+      const atRisk=ingredients.filter(i=>i.owned&&pantryAtRisk.value.has(i.id));
+      const lastUsed=dishRecentUse.value.get(d.id)||'';
+      return {dish:d,missing,total:ingredients.length,atRisk,lastUsed};
+    }).filter(x=>{
+      if(suggestionMode.value==='favorites')return !!x.dish.favorite;
+      if(suggestionMode.value==='available')return x.total>0&&x.missing.length===0;
+      if(suggestionMode.value==='variety')return !x.lastUsed||x.lastUsed<recentDishCutoff.value;
+      if(suggestionMode.value==='antiwaste')return x.atRisk.length>0;
+      return true;
+    }).sort((a,b)=>{
+      if(suggestionMode.value==='antiwaste')return b.atRisk.length-a.atRisk.length||a.missing.length-b.missing.length;
+      if(suggestionMode.value==='variety')return a.lastUsed.localeCompare(b.lastUsed)||a.missing.length-b.missing.length;
+      return a.missing.length-b.missing.length||a.dish.name.localeCompare(b.dish.name,'fr');
+    }));
     const suggestedMealDraft=reactive({open:false,dishId:'',name:'',date:today.value,kind:'dinner'});
     function openSuggestedMeal(d){suggestedMealDraft.open=true;suggestedMealDraft.dishId=d.id;suggestedMealDraft.name=d.name;suggestedMealDraft.date=today.value;suggestedMealDraft.kind='dinner';}
     function confirmSuggestedMeal(){if(!/^\d{4}-\d{2}-\d{2}$/.test(suggestedMealDraft.date)){notify('Sélectionne une date');return;}assignDish(suggestedMealDraft.date,suggestedMealDraft.kind,suggestedMealDraft.dishId);suggestedMealDraft.open=false;setTab('menu');}
@@ -4638,12 +4675,12 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
+      routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,groceryExcludedIds,groceryShoppingExists,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,leftoverPlanDate,leftoverPlanKind,planLeftoverSelected,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
       wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
       sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
-      ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
-      ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,dashboardDragged,dropDashboardWidget,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
+      ingredientOwnedFilter,pantryExpiring,pantryOverdue,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
+      ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,dashboardDragged,dropDashboardWidget,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestionMode,suggestionLeftovers,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
       randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
       dishEditSearch,toggleDishIngredient,dishCategoryOpen,dishCategoryDragged,dishCategoryIsOpen,toggleDishCategory,reorderDishCategory,ticketWaiting,ticketCreatedLabel,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,

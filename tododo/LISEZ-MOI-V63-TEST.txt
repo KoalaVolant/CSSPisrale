@@ -1,9 +1,0 @@
-TODO QUEST V63 TEST - Corrections ciblées à partir de V62
-
-1. Routines composées visibles sur le dashboard comme widget personnalisable (affiché par défaut même après import JSON V62). Le bouton Terminer agit sur l’habitude existante, sans double attribution de points.
-2. Courses regroupées : sélection de la semaine courante, prochaine ou d’une date libre ; le lundi/dimanche est calculé et seuls les plats de cette semaine sont retenus. La liste des plats est consultable pour vérifier les sources des ingrédients.
-3. Pas de calcul arbitraire des quantités et pas de doublon des ingrédients non cochés dans les courses.
-
-Installation : décompresser les 6 fichiers applicatifs à l’emplacement publié par GitHub Pages et confirmer la version app.js?v=20261106-v63test dans la page.
-Sauvegardes : cette version TEST utilise une clé locale distincte et ne synchronise pas avec Firebase. Exporter le JSON de la version précédente, puis importer la copie dans la V63.
-Vérifications : syntaxe JS et intégrité ZIP ; parcours complets navigateur non vérifiés.
