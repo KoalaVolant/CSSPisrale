@@ -419,3 +419,21 @@
 .v59-test-warning{background:#f7ead0;border:2px solid #a47b35;padding:10px 15px;font-size:13px;color:#3d311d}.v59-trend-legend{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}.v59-trend-legend span{display:flex;align-items:center;gap:5px;font-size:12px}.v59-trend-legend i{display:inline-block;width:13px;height:13px;border-radius:3px}.v59-chart-scroll{width:100%;overflow:auto}.v59-chart-scroll svg{display:block;width:100%;min-width:430px;height:240px}
 
 .v59-sport-feedback{background:var(--fnd,#fafafa);padding:12px;border-radius:8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0}.v59-sport-feedback label{display:inline-flex;align-items:center;gap:5px}
+
+/* V63 TEST : routines sur dashboard et choix explicite de la semaine de courses */
+.v63-routine-dashboard{padding:1rem;margin:.65rem 0}
+.v63-routine-item{border:1px solid var(--border,#bbb5);border-radius:10px;padding:.65rem;margin:.55rem 0}
+.v63-routine-item summary{cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.6rem}
+.v63-routine-count{font-size:.88rem;opacity:.8}
+.v63-routine-step{display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.4rem .15rem;border-top:1px solid #9993}
+.v63-routine-done{text-decoration:line-through;opacity:.65}
+.v63-week-picker{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.7rem 0}
+.v63-week-picker label{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.v63-week-meals{padding:.6rem;margin:.6rem 0;border:1px solid #9994;border-radius:8px}
+@media(max-width:640px){.v63-week-picker{align-items:stretch}.v63-week-picker label{width:100%}.v63-week-picker input{max-width:100%}.v63-routine-step{flex-wrap:wrap}}
+
+/* V64 : progression et routines */
+.v64-stages,.v64-routine-stats,.v64-habit-stages{padding:12px;border:1px solid var(--border,#bbb);border-radius:10px;margin:12px 0;}
+.v64-stage-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}.v64-stage-row input[type=number]{width:74px;max-width:100%}.v64-stage-row input[type=month]{min-width:155px}
+.v64-habit-stages{margin-top:8px}.v64-challenge-button{margin:8px 0}.v64-stat-card{padding:10px;margin:10px 0;border:1px solid var(--border,#ddd);border-radius:8px}.v64-bar{height:8px;background:#d9e1dd;border-radius:6px;overflow:hidden}.v64-bar span{display:block;height:100%;background:#74a78d}
+@media(max-width:600px){.v64-stage-row{align-items:flex-start}.v64-stage-row label{width:100%}}

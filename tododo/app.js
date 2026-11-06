@@ -3,8 +3,8 @@ const { createApp, reactive, ref, computed, watch, nextTick, provide } = Vue;
 /* ============================================================
    Constantes & utilitaires
    ============================================================ */
-const STORAGE_KEY = 'todo-quest-v60-test-isolated';
-const UI_KEY = 'todo-quest-ui-v60-test';   // préférences d'affichage (propres à chaque appareil)
+const STORAGE_KEY = 'todo-quest-v63-test-isolated';
+const UI_KEY = 'todo-quest-ui-v63-test';   // préférences d'affichage (propres à chaque appareil)
 
 const STATUSES = [
   { value: 'todo',   label: 'Pas commencé' },
@@ -1269,6 +1269,9 @@ function defaultData() {
     testNotifications: [],
     budgetEnvelopes: {},
     plannedPurchases: [],
+    customRoutines: [],
+    mealLeftovers: [],
+    moodQuestions: [],
     testSettings: {contextualDashboard:true,automationEnabled:true},
     alters: [],
     alterDays: {},
@@ -1279,7 +1282,7 @@ function defaultData() {
     alterActivities: [],
     moodReminderHour: 19,
     appointmentCategories: [],
-    dashboardWidgets: ['sport','foodReview','weight','wellnessReport','randomNotes','habits','meals','priorities','tasks'],
+    dashboardWidgets: ['sport','foodReview','weight','wellnessReport','randomNotes','habits','routines','meals','priorities','tasks'],
     sportExercises: clone(SPORT_DEFAULT_EXERCISES),
     sportSessions: [],
     sportLocations: [{id:'tremelin',name:'Lac de Trémelin',active:true},{id:'bedee',name:'Parc de Bédée',active:true}],
@@ -1361,6 +1364,9 @@ function loadData() {
     if (!Array.isArray(d.testNotifications)) d.testNotifications=[];
     if (!d.budgetEnvelopes || typeof d.budgetEnvelopes!=='object') d.budgetEnvelopes={};
     if (!Array.isArray(d.plannedPurchases)) d.plannedPurchases=[];
+    if(!Array.isArray(d.customRoutines))d.customRoutines=[];
+    if(!Array.isArray(d.mealLeftovers))d.mealLeftovers=[];
+    if(!Array.isArray(d.moodQuestions))d.moodQuestions=[];
     if (!d.testSettings || typeof d.testSettings!=='object') d.testSettings={contextualDashboard:true,automationEnabled:true};
     if (!Array.isArray(d.habits)) d.habits = [];
     if (!Array.isArray(d.activities)) d.activities = [];
@@ -1383,6 +1389,7 @@ function loadData() {
     if (!Array.isArray(d.achievements)) d.achievements=[];
     if (!Array.isArray(d.dashboardWidgets)) d.dashboardWidgets=['randomNotes','habits','meals','priorities','tasks'];
     if(!d.dashboardWidgets.includes('appointments'))d.dashboardWidgets.unshift('appointments');
+    if(!d.dashboardRoutinesV63){if(!d.dashboardWidgets.includes('routines'))d.dashboardWidgets.splice(Math.max(0,d.dashboardWidgets.indexOf('habits')+1),0,'routines');d.dashboardRoutinesV63=true;}
     d.groceryBudget=Number.isFinite(Number(d.groceryBudget))?Number(d.groceryBudget):0;
     if (!Array.isArray(d.budgetEntries)) d.budgetEntries = [];
     if (!Array.isArray(d.budgetRecurring)) d.budgetRecurring = [];
@@ -1648,6 +1655,9 @@ const app = createApp({
       data.budgetEnvelopes=src.budgetEnvelopes&&typeof src.budgetEnvelopes==='object'?src.budgetEnvelopes:{};
       data.plannedPurchases=Array.isArray(src.plannedPurchases)?clone(src.plannedPurchases):[];
       data.plannedPurchases=data.plannedPurchases.filter(p=>p&&typeof p==='object'&&String(p.name||'').trim()).map(p=>({...p,amount:Math.max(0,Number(p.amount)||0),status:p.status||'planned'}));
+      data.customRoutines=Array.isArray(src.customRoutines)?clone(src.customRoutines):[];
+      data.mealLeftovers=Array.isArray(src.mealLeftovers)?clone(src.mealLeftovers):[];
+      data.moodQuestions=Array.isArray(src.moodQuestions)?clone(src.moodQuestions):[];
       data.testSettings=src.testSettings&&typeof src.testSettings==='object'?src.testSettings:{contextualDashboard:true,automationEnabled:true};
       for(const k of ['alters','alterReviews','moodTypes','moodEntries','alterActivities'])data[k]=Array.isArray(src[k])?src[k]:[];
       data.alterReviewQuestions=normalizeAlterReviewQuestions(src.alterReviewQuestions);
@@ -1656,6 +1666,7 @@ const app = createApp({
       data.appointmentCategories=Array.isArray(src.appointmentCategories)?src.appointmentCategories:[];
       data.dashboardWidgets=Array.isArray(src.dashboardWidgets)?[...src.dashboardWidgets]:['randomNotes','habits','meals','priorities','tasks'];
       if(!data.dashboardWidgets.includes('appointments'))data.dashboardWidgets.unshift('appointments');
+      if(!src.dashboardRoutinesV63){if(!data.dashboardWidgets.includes('routines'))data.dashboardWidgets.splice(Math.max(0,data.dashboardWidgets.indexOf('habits')+1),0,'routines');}data.dashboardRoutinesV63=true;
       data.groceryBudget=Number.isFinite(Number(src.groceryBudget))?Number(src.groceryBudget):0;
       data.eveningNotes = typeof src.eveningNotes === 'string' ? src.eveningNotes : '';
       data.budgetCategories = Array.isArray(src.budgetCategories) ? [...new Set([...src.budgetCategories, ...[...(src.budgetEntries||[]),...(src.budgetRecurring||[]),...(src.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))] : [...new Set([...defaultData().budgetCategories, ...[...(src.budgetEntries||[]),...(src.budgetRecurring||[]),...(src.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))];
@@ -2494,7 +2505,7 @@ const app = createApp({
       urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',alterId:'',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',
     });
 
-    const DRAFT_KEY='todo-quest-form-drafts-v2';
+    const DRAFT_KEY='todo-quest-form-drafts-v62-test';
     let persistedDrafts={};
     try{persistedDrafts=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}')||{};}catch(e){}
     function saveDrafts(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify({task:persistedDrafts.task,quick:persistedDrafts.quick,ticket:clone(ticketDraft)}));}catch(e){}}
@@ -2543,6 +2554,8 @@ const app = createApp({
     function addFormSubtask(){const title=String(taskForm.subtaskDraft||'').trim();if(!title)return;taskForm.subtasks.push({id:uid(),title,done:false,points:5});taskForm.subtaskDraft='';}
     function removeFormSubtask(id){taskForm.subtasks=taskForm.subtasks.filter(x=>x.id!==id);}
     function toggleTaskSubtask(task,sub){sub.done=!sub.done;if(!sub.done && task.status==='done'){task.status='doing';task.doneAt='';}}
+    function setSubtaskPoints(task,sub,value){const amount=Number(value);if(!Number.isFinite(amount)||amount<0){notify('Le nombre de points doit être positif ou nul');return;}sub.points=Math.round(amount*100)/100;}
+
     // Les sous-tâches servent au suivi : seuls les points de la tâche principale sont attribués.
     function recurrenceNext(task){
       const freq=task.recurrence||'';if(!freq)return;
@@ -2844,6 +2857,7 @@ const app = createApp({
     // Modification directe depuis les tags : catégorie, projet, urgence, difficulté, bonus/malus, titre
     function updateTask(task, field, value) {
       if(field==='subtaskToggle'){const s=(task.subtasks||[]).find(x=>x.id===value);if(s)toggleTaskSubtask(task,s);return;}
+      if(field==='subtaskPoints'){const s=(task.subtasks||[]).find(x=>x.id===value?.id);if(s)setSubtaskPoints(task,s,value.points);return;}
       if (field === 'title') {
         const v = String(value).trim();
         if (v) task.title = v;
@@ -2867,18 +2881,18 @@ const app = createApp({
     }
 
     /* ---------- Projets ---------- */
-    const projectForm = reactive({ open: false, id: null, name: '', description: '', color: '#6366f1', tasks: [] });
+    const projectForm = reactive({ open: false, id: null, name: '', description: '', color: '#6366f1', tasks: [],startDate:'',endDate:'' });
 
     function openProjectForm(project = null) {
       if (project) {
         Object.assign(projectForm, {
           id: project.id, name: project.name, description: project.description || '',
-          color: project.color || nextColor(data.projects.length), tasks: [],alterId:project.alterId||'',
+          color: project.color || nextColor(data.projects.length), tasks: [],alterId:project.alterId||'',startDate:project.startDate||'',endDate:project.endDate||'',
         });
       } else {
         Object.assign(projectForm, {
           id: null, name: '', description: '', color: nextColor(data.projects.length),
-          tasks: [{ title: '', category: '', points: 10, due: '' }],alterId:'',
+          tasks: [{ title: '', category: '', points: 10, due: '' }],alterId:'',startDate:'',endDate:'',
         });
       }
       projectForm.open = true;
@@ -2891,11 +2905,12 @@ const app = createApp({
     function saveProject() {
       const name = projectForm.name.trim();
       if (!name) return;
+      if(projectForm.startDate && projectForm.endDate && projectForm.endDate<projectForm.startDate){notify('La fin du projet précède son début');return;}
       if (projectForm.id) {
         const p = data.projects.find(x => x.id === projectForm.id);
-        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color;p.alterId=projectForm.alterId||''; }
+        if (p) { p.name = name; p.description = projectForm.description.trim(); p.color = projectForm.color;p.alterId=projectForm.alterId||'';p.startDate=projectForm.startDate||'';p.endDate=projectForm.endDate||''; }
       } else {
-        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color,alterId:projectForm.alterId||'' };
+        const project = { id: uid(), name, description: projectForm.description.trim(), color: projectForm.color,alterId:projectForm.alterId||'',startDate:projectForm.startDate||'',endDate:projectForm.endDate||'' };
         data.projects.push(project);
         projectForm.tasks
           .filter(d => d.title.trim())
@@ -3116,15 +3131,42 @@ const app = createApp({
     }
 
     /* ---------- Habitudes et routines ---------- */
-    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,malus:false,quantityEnabled:false,quantityMax:3,quantityBonus:0.10,pausedUntil:''});
+    // V64 : paliers manuels. Le plan est conservé dans chaque habitude et ne modifie
+    // jamais les points des réalisations passées. Activation explicite uniquement.
+    function addHabitProgressionStep(){
+      const target=Math.floor(Number(habitForm.progressionNewTarget));
+      if(!Number.isFinite(target)||target<1||target>7){notify('Objectif hebdomadaire de 1 à 7 nécessaire');return;}
+      habitForm.progressionSteps.push({id:uid(),weeklyTarget:target});
+      habitForm.progressionNewTarget=target;
+    }
+    function removeHabitProgressionStep(index){habitForm.progressionSteps.splice(index,1);}
+    function activateHabitProgression(h,index){
+      const steps=Array.isArray(h.progressionSteps)?h.progressionSteps:[];
+      const step=steps[index];if(!step)return;
+      const target=Math.floor(Number(step.weeklyTarget));if(!(target>=1&&target<=7))return;
+      const msg=h.frequency==='weekly'
+        ? 'Activer le palier '+target+' fois/semaine pour « '+h.title+' » ?'
+        : 'Ce palier utilisera une fréquence hebdomadaire de '+target+' fois/semaine pour « '+h.title+' ». Confirmer ?';
+      if(!confirm(msg))return;
+      // Les validations et les points déjà enregistrés sont préservés.
+      h.frequency='weekly';h.weeklyTarget=target;h.activeProgressionStep=index;
+      h.progressionHistory=Array.isArray(h.progressionHistory)?h.progressionHistory:[];
+      h.progressionHistory.push({date:today.value,index,target});
+      notify('Palier activé : '+target+' fois/semaine');
+    }
+    function habitProgressionCompleted(h){
+      const k=monday(today.value);return (h.history||[]).filter(d=>d>=k&&d<=today.value).length;
+    }
+    const habitForm = reactive({open:false,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:'',endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,malus:false,quantityEnabled:false,quantityMax:3,quantityBonus:0.10,pausedUntil:'',progressionSteps:[],progressionNewTarget:3});
     const habitWeekdays = [{id:1,label:'Lun'},{id:2,label:'Mar'},{id:3,label:'Mer'},{id:4,label:'Jeu'},{id:5,label:'Ven'},{id:6,label:'Sam'},{id:0,label:'Dim'}];
     function openHabitForm(habit = null) {
-      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),endDate:habit.endDate||'',completed:!!habit.completed,basePoints:habit.basePoints??0,malus:!!habit.malus,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??'',quantityEnabled:!!habit.quantityEnabled,quantityMax:habit.quantityMax||3,quantityBonus:habit.quantityBonus??0.10,pausedUntil:habit.pausedUntil||''} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,malus:false,quantityEnabled:false,quantityMax:3,quantityBonus:0.10,pausedUntil:''});
+      Object.assign(habitForm, habit ? {open:true,id:habit.id,title:habit.title,frequency:habit.frequency,weekdays:[...(habit.weekdays||[])],every:habit.every||2,weeklyTarget:habit.weeklyTarget||3,startDate:habit.startDate||habit.createdAt||todayStr(),endDate:habit.endDate||'',completed:!!habit.completed,basePoints:habit.basePoints??0,malus:!!habit.malus,comboPoints:habit.comboPoints??0,maxPoints:habit.maxPoints??'',quantityEnabled:!!habit.quantityEnabled,quantityMax:habit.quantityMax||3,quantityBonus:habit.quantityBonus??0.10,pausedUntil:habit.pausedUntil||'',progressionSteps:clone(habit.progressionSteps||[]),progressionNewTarget:3} : {open:true,id:null,title:'',frequency:'daily',weekdays:[],every:2,weeklyTarget:3,startDate:todayStr(),endDate:'',completed:false,basePoints:1,comboPoints:0.25,maxPoints:10,malus:false,quantityEnabled:false,quantityMax:3,quantityBonus:0.10,pausedUntil:'',progressionSteps:[],progressionNewTarget:3});
     }
     function saveHabit() {
       const title = habitForm.title.trim(); if (!title) return;
       if(habitForm.endDate && habitForm.endDate < habitForm.startDate) { notify("La date de fin doit être après la date de début"); return; }
-      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),endDate:habitForm.endDate||'',completed:!!habitForm.completed,malus:!!habitForm.malus,basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0),quantityEnabled:!!habitForm.quantityEnabled,quantityMax:Math.max(1,Number(habitForm.quantityMax)||1),quantityBonus:Math.max(0,Number(habitForm.quantityBonus)||0),pausedUntil:habitForm.pausedUntil||''};
+      if((habitForm.progressionSteps||[]).some(step=>!Number.isInteger(Number(step.weeklyTarget))||Number(step.weeklyTarget)<1||Number(step.weeklyTarget)>7)){notify('Chaque palier doit être compris entre 1 et 7 fois/semaine');return;}
+      const fields = {title,frequency:habitForm.frequency,weekdays:[...habitForm.weekdays],every:Math.max(1,Number(habitForm.every)||2),weeklyTarget:Math.max(1,Math.min(7,Number(habitForm.weeklyTarget)||3)),startDate:habitForm.startDate||todayStr(),endDate:habitForm.endDate||'',completed:!!habitForm.completed,malus:!!habitForm.malus,basePoints:Math.max(0,Number(habitForm.basePoints)||0),comboPoints:Math.max(0,Number(habitForm.comboPoints)||0),maxPoints:habitForm.maxPoints === '' || habitForm.maxPoints === null ? null : Math.max(0,Number(habitForm.maxPoints)||0),quantityEnabled:!!habitForm.quantityEnabled,quantityMax:Math.max(1,Number(habitForm.quantityMax)||1),quantityBonus:Math.max(0,Number(habitForm.quantityBonus)||0),pausedUntil:habitForm.pausedUntil||'',progressionSteps:clone(habitForm.progressionSteps||[])};
       if (habitForm.id) {const h=data.habits.find(x=>x.id===habitForm.id);if(h) { if (!h.pointAwards) h.pointAwards = Object.fromEntries(habitAwards(h).map(a=>[a.date,a.points])); Object.assign(h,fields); }}
       else data.habits.push({id:uid(),...fields,createdAt:todayStr(),history:[],postponed:[]});
       habitForm.open=false;
@@ -3246,18 +3288,19 @@ const app = createApp({
       {id:'task-count',label:'Terminer X tâches'},
       {id:'all-tasks',label:'Terminer toutes les tâches prévues'},
       {id:'habit-count',label:'Effectuer X habitudes'},
+      {id:'single-habit',label:'Réaliser X fois une habitude précise'},
       {id:'all-habits',label:'Effectuer toutes les habitudes prévues'},
       {id:'project-count',label:'Terminer X tâches d’un projet'},
       {id:'selected-tasks',label:'Terminer les tâches sélectionnées'},
       {id:'level-deadline',label:'Terminer les tâches d’une urgence / difficulté avant une date'}
     ];
-    const challengeForm = reactive({open:false,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true,selectedTaskIds:[],urgency:'',difficulty:'',deadline:''});
+    const challengeForm = reactive({open:false,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true,selectedTaskIds:[],urgency:'',difficulty:'',deadline:'',habitId:''});
     function openChallengeForm(ch = null) {
       Object.assign(challengeForm, ch ? {
         open:true,id:ch.id,name:ch.name,kind:ch.kind,scope:ch.scope||'personal',
         projectId:ch.projectId||'',target:ch.target||1,period:ch.period||'daily',
-        points:ch.points||0,enabled:ch.enabled!==false,selectedTaskIds:[...(ch.selectedTaskIds||[])],urgency:ch.urgency||'',difficulty:ch.difficulty||'',deadline:ch.deadline||''
-      } : {open:true,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true,selectedTaskIds:[],urgency:'',difficulty:'',deadline:''});
+        points:ch.points||0,enabled:ch.enabled!==false,selectedTaskIds:[...(ch.selectedTaskIds||[])],urgency:ch.urgency||'',difficulty:ch.difficulty||'',deadline:ch.deadline||'',habitId:ch.habitId||''
+      } : {open:true,id:null,name:'',kind:'task-count',scope:'personal',projectId:'',target:5,period:'daily',points:10,enabled:true,selectedTaskIds:[],urgency:'',difficulty:'',deadline:'',habitId:''});
     }
     function saveChallenge() {
       const name=String(challengeForm.name||'').trim();
@@ -3266,14 +3309,26 @@ const app = createApp({
       if (!name || !Number.isFinite(points) || points<0 || !Number.isFinite(target) || target<1 || target>100000) {notify('Nom, objectif et points invalides');return;}
       if (challengeForm.kind==='selected-tasks' && !challengeForm.selectedTaskIds.length) {notify('Sélectionne au moins une tâche');return;}
       if (challengeForm.kind==='level-deadline' && (!challengeForm.deadline || (!challengeForm.urgency && !challengeForm.difficulty))) {notify('Indique une date et au moins un niveau');return;}
+      if (challengeForm.kind==='single-habit' && !data.habits.some(h=>h.id===challengeForm.habitId&&!h.malus)) {notify('Choisis une habitude active');return;}
       if (challengeForm.kind==='project-count' && !data.projects.some(p=>p.id===challengeForm.projectId)) {notify('Sélectionne un projet');return;}
-      const fields={name,kind:challengeForm.kind,scope:challengeForm.scope,projectId:challengeForm.kind==='project-count'?challengeForm.projectId:'',target,period:['selected-tasks','level-deadline'].includes(challengeForm.kind)?'once':challengeForm.period,points:Math.round(points*100)/100,enabled:challengeForm.enabled,selectedTaskIds:[...challengeForm.selectedTaskIds],urgency:challengeForm.urgency,difficulty:challengeForm.difficulty,deadline:challengeForm.deadline,deadlineTaskIds:challengeForm.kind==='level-deadline'?data.tasks.filter(t=>(!challengeForm.urgency||t.urgency===challengeForm.urgency)&&(!challengeForm.difficulty||t.difficulty===challengeForm.difficulty)).map(t=>t.id):[]};
+      const targetHabit=data.habits.find(h=>h.id===challengeForm.habitId);
+      const baselineFrom=today.value;
+      const baseline=(challengeForm.kind==='single-habit'&&targetHabit)
+        ?(targetHabit.history||[]).filter(d=>d>=baselineFrom&&d<=today.value).length:0;
+      const fields={activationBaseline:baseline,baselinePeriodKey:challengeForm.period==='once'?'once':challengeForm.period==='weekly'?weekStart(today.value):today.value,name,kind:challengeForm.kind,habitId:challengeForm.kind==='single-habit'?challengeForm.habitId:'',scope:challengeForm.scope,projectId:challengeForm.kind==='project-count'?challengeForm.projectId:'',target,period:['selected-tasks','level-deadline'].includes(challengeForm.kind)?'once':challengeForm.period,points:Math.round(points*100)/100,enabled:challengeForm.enabled,selectedTaskIds:[...challengeForm.selectedTaskIds],urgency:challengeForm.urgency,difficulty:challengeForm.difficulty,deadline:challengeForm.deadline,deadlineTaskIds:challengeForm.kind==='level-deadline'?data.tasks.filter(t=>(!challengeForm.urgency||t.urgency===challengeForm.urgency)&&(!challengeForm.difficulty||t.difficulty===challengeForm.difficulty)).map(t=>t.id):[]};
       if (challengeForm.id) {
         const item=data.challenges.find(c=>c.id===challengeForm.id);
         if(item) Object.assign(item,fields,{activationDate:today.value,hiddenHome:false});
       } else data.challenges.push({id:uid(),...fields,activationDate:today.value});
       challengeForm.open=false;
       evaluateChallenges();
+    }
+    function newChallengeFromHabit(h){
+      if(!h||h.malus){notify('Choisis une bonne habitude');return;}
+      openChallengeForm();
+      Object.assign(challengeForm,{name:'Défi : '+h.title,kind:'single-habit',habitId:h.id,
+        target:Math.max(1,Math.min(7,Number(h.weeklyTarget)||3)),period:'weekly',points:5});
+      view.value='challenges';
     }
     function deleteChallenge(c) {
       if(!confirm('Supprimer ce défi ? Les points déjà gagnés seront conservés.'))return;
@@ -3302,6 +3357,15 @@ const app = createApp({
           (!c.urgency||t.urgency===c.urgency)&&(!c.difficulty||t.difficulty===c.difficulty));
         const done=tasks.filter(t=>t.status==='done'&&t.doneAt && t.doneAt<=c.deadline).length;
         return {current:done,target:tasks.length,complete:tasks.length>0&&done===tasks.length && today.value<=c.deadline};
+      }
+      if(c.kind==='single-habit'){
+        const habit=data.habits.find(h=>h.id===c.habitId);
+        const base=c.period==='once'?(c.activationDate||today.value):start;
+        const from=base>(c.activationDate||base)?base:(c.activationDate||base);
+        const raw=habit?(habit.history||[]).filter(d=>d>=from&&d<=end).length:0;
+        const current=Math.max(0,raw-(challengePeriodKey(c,date)===(c.baselinePeriodKey||'')?(Number(c.activationBaseline)||0):0));
+        const goal=Math.max(1,Number(c.target)||1);
+        return {current,target:goal,complete:!!habit&&current>=goal};
       }
       if(c.kind==='all-habits'||c.kind==='habit-count') {
         // Une habitude prévue aujourd'hui compte dans le dénominateur.
@@ -3774,15 +3838,36 @@ const app = createApp({
       const choices=[];
       const low=chooserEnergy.value==='low';
       for(const t of data.tasks.filter(t=>t.status!=='done' && (!t.startDate||t.startDate<=today.value) && !blockingTask(t))){
-        if(chooserKind.value==='pleasure'||(low&&t.difficulty&&levelRank(data.difficulties,t.difficulty)>1))continue;
+        if(chooserKind.value==='pleasure')continue;
         choices.push({id:t.id,title:t.title,source:'Tâche',tab:t.scope==='work'?'work':'all'});
       }
       for(const h of data.habits.filter(h=>!h.malus&&!habitIsFinished(h)&&(habitDue(h)||habitLateDays(h)>0)&&!habitDoneToday(h)))if(chooserKind.value!=='pleasure')choices.push({id:h.id,title:h.title,source:'Habitude',tab:'habits'});
       for(const a of data.activities)if(chooserKind.value!=='useful')choices.push({id:a.id,title:a.name||a.title||'Activité',source:'Activité',tab:'activities'});
       if(chooserKind.value!=='useful')choices.push({id:'sport',title:low?'Mini-flemme sportive':'Séance de sport surprise',source:'Sport',tab:'sport'});
+      if(chooserKind.value!=='pleasure')for(const p of data.projects.filter(p=>!p.completed).slice(0,25))choices.push({id:p.id,title:'Avancer sur : '+p.name,source:'Projet',tab:'projects'});
+      if(chooserKind.value!=='useful'){
+        for(const kind of ['lunch','dinner']){const slot=mealSlot(today.value,kind);const dish=data.dishes.find(d=>d.id===slot.dishId);const name=dish?.name||slot.name;if(name)choices.push({id:'meal-'+kind,title:'Préparer '+(kind==='lunch'?'le déjeuner':'le dîner')+' : '+name,source:'Repas',tab:'menu'});}
+      }
+      if(chooserKind.value!=='pleasure'&&!data.moodEntries.some(x=>x.date===today.value))choices.push({id:'mood',title:'Compléter le bilan humeur du jour',source:'Bilan',tab:'mood'});
       return choices;
     });
-    function chooseAction(){const a=chooserPool.value;if(!a.length){chooserChoice.value=null;notify('Aucune proposition disponible');return;}const others=a.filter(x=>x.id!==chooserChoice.value?.id);chooserChoice.value=(others.length?others:a)[Math.floor(Math.random()*(others.length||a.length))];}
+    function openChooserChoice(){const choice=chooserChoice.value;if(!choice)return;if(choice.source==='Tâche'){const t=data.tasks.find(x=>x.id===choice.id);if(t){openTaskForm(t);return;}}if(choice.source==='Habitude'){const h=data.habits.find(x=>x.id===choice.id);if(h){openHabitForm(h);return;}}if(choice.source==='Projet'){setTab('projects');nextTick(()=>document.querySelector('[data-project-id=\"'+choice.id+'\"]')?.scrollIntoView({block:'center'}));return;}if(choice.source==='Repas'){menuTab.value='planning';}setTab(choice.tab);}
+    // La difficulté influe sur la sélection des tâches, pas sur leur présence dans le pool.
+    const chooserLastSources=ref([]);
+    function chooseAction(){
+      const pool=chooserPool.value;
+      if(!pool.length){chooserChoice.value=null;notify('Aucune proposition disponible');return;}
+      const sources=[...new Set(pool.map(x=>x.source))];
+      // Équilibrer les sources : 40 tâches ne doivent pas étouffer 3 habitudes.
+      const recent=new Set(chooserLastSources.value.slice(-Math.max(1,sources.length-1)));
+      const candidates=sources.filter(s=>!recent.has(s));
+      const choices=candidates.length?candidates:sources;
+      const source=choices[Math.floor(Math.random()*choices.length)];
+      const same=pool.filter(x=>x.source===source&&x.id!==chooserChoice.value?.id);
+      const eligible=same.length?same:pool.filter(x=>x.source===source);
+      chooserChoice.value=eligible[Math.floor(Math.random()*eligible.length)];
+      chooserLastSources.value=[...chooserLastSources.value.slice(-5),source];
+    }
     const dayTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&(!t.startDate||t.startDate<=today.value)&&(t.due===today.value||(!t.due&&t.scope!=='work'))).slice(0,12));
     const dayHabits=computed(()=>data.habits.filter(h=>!h.malus&&!habitIsFinished(h)&&habitDue(h)&&!habitDoneToday(h)).slice(0,12));
     const contextPeriod=computed(()=>{let h=new Date().getHours();return h<12?'Matin':h<18?'Après-midi':'Soir';});
@@ -3809,23 +3894,161 @@ const app = createApp({
     function markPurchaseBought(p){if(p.status==='bought')return;if(!confirm('Enregistrer cet achat comme dépense réelle dans le budget ?'))return;data.budgetEntries.push({id:uid(),date:today.value,label:p.name,amount:-Math.abs(Number(p.amount)||0),category:p.category||data.budgetCategories[0]||'Autre'});p.status='bought';notify('Achat enregistré dans les dépenses');}
     function removePlannedPurchase(p){if(confirm('Supprimer cet achat prévu ?'))data.plannedPurchases=data.plannedPurchases.filter(x=>x.id!==p.id);}
     // V60 : statistiques de charge, descriptives sans temps de travail inféré.
+    const workStatPeriod=ref('week');
+    const workStatMonth=ref(today.value.slice(0,7));
+    const workStatRange=computed(()=>{
+      const end=today.value,d=new Date(end+'T12:00:00Z'),p=workStatPeriod.value;
+      if(p==='customMonth'&&/^\d{4}-\d{2}$/.test(workStatMonth.value)){const first=workStatMonth.value+'-01';const last=new Date(Date.UTC(Number(workStatMonth.value.slice(0,4)),Number(workStatMonth.value.slice(5)),0)).toISOString().slice(0,10);return {start:first,end:last};}
+      if(p==='lastWeek'||p==='week'){const dow=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-dow-(p==='lastWeek'?7:0));return {start:d.toISOString().slice(0,10),end:p==='lastWeek'?dateAdd(d.toISOString().slice(0,10),6):end};}
+      if(p==='lastMonth'||p==='month'){d.setUTCDate(1);if(p==='lastMonth'){d.setUTCMonth(d.getUTCMonth()-1);return {start:d.toISOString().slice(0,10),end:dateAdd(end.slice(0,7)+'-01',-1)};}return {start:d.toISOString().slice(0,10),end};}
+      if(p==='year'){d.setUTCMonth(0,1);return {start:d.toISOString().slice(0,10),end};}
+      return {start:'0000-01-01',end};
+    });
     const workDetailed=computed(()=>{
-      const active=data.workTickets.filter(t=>!t.done),closed=data.workTickets.filter(t=>t.done);
+      const {start,end}=workStatRange.value;
+      const all=data.workTickets||[];
+      const active=all.filter(t=>!t.done&&(t.startDate||t.createdAt||'0000-01-01')<=end);
+      const closed=all.filter(t=>t.done && String(t.doneAt||'').slice(0,10)>=start && String(t.doneAt||'').slice(0,10)<=end);
       const late=active.filter(t=>t.due&&t.due<today.value).length;
       const relaunch=active.filter(t=>t.followUpDate&&t.followUpDate<=today.value).length;
-      const byType=Object.entries(active.reduce((a,t)=>{const k=data.workTicketTypes.find(x=>x.id===t.typeId)?.name||t.category||'Sans catégorie';a[k]=(a[k]||0)+1;return a;},{})).sort((a,b)=>b[1]-a[1]).slice(0,8);
-      return {active:active.length,closed:closed.length,late,relaunch,byType};
+      const byType=Object.entries(active.reduce((a,t)=>{const k=data.workTicketTypes.find(x=>x.id===t.typeId)?.name||t.category||'Sans catégorie';a[k]=(a[k]||0)+1;return a;},{})).sort((a,b)=>b[1]-a[1]).slice(0,12);
+      const waiting=active.filter(t=>t.waiting||String(t.customStatus||'').toLowerCase().includes('attente'));
+      const byPerson=Object.entries(waiting.reduce((a,t)=>{const key=String(t.waitingPerson||'Non renseignée').trim()||'Non renseignée';a[key]=(a[key]||0)+1;return a;},{})).sort((a,b)=>b[1]-a[1]);
+      const newTickets=all.filter(t=>{const date=String(t.createdAt||t.startDate||'').slice(0,10);return date>=start&&date<=end;}).length;
+      const actions=active.reduce((n,t)=>n+(t.items||[]).filter(x=>!x.done).length,0);
+      const age=waiting.map(t=>{const d=String(t.startDate||t.createdAt||'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)?Math.max(0,Math.round((new Date(today.value+'T12:00:00Z')-new Date(d+'T12:00:00Z'))/86400000)):null;}).filter(v=>v!==null);
+      return {active:active.length,closed:closed.length,late,relaunch,byType,byPerson,waiting:waiting.length,actions,newTickets,avgWaitingAge:age.length?Math.round(age.reduce((a,b)=>a+b,0)/age.length):null,rangeStart:start,rangeEnd:end};
     });
+    // V62 : routines qui référencent les habitudes existantes : aucun double gain de points.
+    const routineDraft=reactive({name:'',habitIds:[]});
+    function saveRoutine(){const name=String(routineDraft.name||'').trim();if(!name||!routineDraft.habitIds.length){notify('Nom et au moins une habitude nécessaires');return;}data.customRoutines.push({id:uid(),name,habitIds:[...new Set(routineDraft.habitIds)],createdAt:today.value});routineDraft.name='';routineDraft.habitIds=[];notify('Routine ajoutée');}
+    function removeRoutine(r){if(confirm('Supprimer cette routine ? Les habitudes restent intactes.'))data.customRoutines=data.customRoutines.filter(x=>x.id!==r.id);}
+    function routineProgress(r){const ids=r.habitIds||[];return {total:ids.length,done:ids.filter(id=>{const h=data.habits.find(x=>x.id===id);return h&&habitDoneToday(h);}).length};}
+    // V64 : historique des routines : aucune attribution de points additionnels.
+    const routineStatsPeriod=ref('week');
+    const routineStatsAnchor=ref(todayStr().slice(0,7));
+    function monthStart(date){return date.slice(0,7)+'-01';}
+    function monthEnd(date){const [y,m]=date.slice(0,7).split('-').map(Number);return new Date(Date.UTC(y,m,0,12)).toISOString().slice(0,10);}
+    const routineStatsRange=computed(()=>{
+      if(routineStatsPeriod.value==='month'){
+        const start=routineStatsAnchor.value+'-01';return {start,end:[monthEnd(start),today.value].sort()[0],label:'Mois '+routineStatsAnchor.value};
+      }
+      const start=monday(today.value);const d=new Date(start+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+6);
+      return {start,end:today.value,label:'Semaine en cours'};
+    });
+    function routineStats(r){
+      const ids=(r.habitIds||[]).filter(id=>data.habits.some(h=>h.id===id));
+      const range=routineStatsRange.value;
+      const start=[range.start,r.createdAt||today.value].sort().pop();const end=range.end;
+      if(!ids.length||start>end)return {days:0,fullDays:0,rate:null,habitResults:[]};
+      let days=0,fullDays=0;
+      const counts=Object.fromEntries(ids.map(id=>[id,0]));
+      for(let dt=start;dt<=end;){
+        const done=ids.filter(id=>{const h=data.habits.find(x=>x.id===id);return h&&(h.history||[]).includes(dt);});
+        done.forEach(id=>counts[id]++);days++;if(done.length===ids.length)fullDays++;
+        const next=new Date(dt+'T12:00:00Z');next.setUTCDate(next.getUTCDate()+1);dt=next.toISOString().slice(0,10);
+      }
+      return {days,fullDays,rate:days?Math.round(fullDays/days*100):null,
+        habitResults:ids.map(id=>({id,title:data.habits.find(h=>h.id===id)?.title||'Habitude',done:counts[id]}))};
+    }
+    const routineHabits=r=>(r.habitIds||[]).map(id=>data.habits.find(h=>h.id===id)).filter(Boolean);
+    // V62 : restes facultatifs, par portions ; aucune date de consommation inventée.
+    const leftoverDraft=reactive({name:'',dishId:'',portions:1,storage:'fridge',expiry:''});
+    function addLeftover(){const dish=data.dishes.find(x=>x.id===leftoverDraft.dishId);const name=String(leftoverDraft.name||dish?.name||'').trim();const portions=Math.trunc(Number(leftoverDraft.portions));if(!name||!Number.isInteger(portions)||portions<1){notify('Nom et nombre de portions valides requis');return;}data.mealLeftovers.push({id:uid(),name,dishId:dish?.id||'',portions,storage:leftoverDraft.storage,expiry:leftoverDraft.expiry||'',createdAt:today.value});leftoverDraft.name='';leftoverDraft.dishId='';leftoverDraft.portions=1;leftoverDraft.expiry='';notify('Reste ajouté');}
+    function consumeLeftover(x){if(x.portions<1)return;x.portions--;if(x.portions===0)notify('Toutes les portions sont consommées');}
+    function planLeftover(x,kind='lunch'){if(!x||x.portions<1)return;setMeal(today.value,kind,'name',x.name);setMeal(today.value,kind,'dishId',x.dishId||'');notify('Reste placé au menu du jour ; la portion sera décomptée après confirmation manuelle');}
+    function removeLeftover(x){if(confirm('Supprimer ce reste ?'))data.mealLeftovers=data.mealLeftovers.filter(z=>z.id!==x.id);}
+    // V63 : sélection explicite et indépendante de la semaine de courses.
+    // Le sélecteur accepte n'importe quel jour, ramené au lundi correspondant.
+    const groceryMonday = date => {
+      const d=new Date(String(date||today.value).slice(0,10)+'T12:00:00');
+      if(Number.isNaN(d.getTime()))return today.value;
+      d.setDate(d.getDate()-(d.getDay()+6)%7);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    };
+    const groceryWeekShift=(date,delta)=>{
+      const d=new Date(groceryMonday(date)+'T12:00:00');d.setDate(d.getDate()+delta*7);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    };
+    const ingredientWeekDate=ref(groceryWeekShift(today.value,1));
+    const ingredientWeekStart=computed(()=>groceryMonday(ingredientWeekDate.value));
+    const ingredientWeekEnd=computed(()=>{
+      const d=new Date(ingredientWeekStart.value+'T12:00:00');d.setDate(d.getDate()+6);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    });
+    function selectIngredientWeek(which){ingredientWeekDate.value=which==='current'?groceryMonday(today.value):groceryWeekShift(today.value,1);}
+    function shiftIngredientWeek(n){ingredientWeekDate.value=groceryWeekShift(ingredientWeekStart.value,n);}
+    const ingredientWeekMeals=computed(()=>{
+      const results=[];const start=ingredientWeekStart.value,end=ingredientWeekEnd.value;
+      for(const date of Object.keys(data.weeklyMenus||{}).sort()){
+        if(date<start||date>end)continue;
+        for(const kind of ['lunch','dinner']){
+          const slot=data.weeklyMenus[date]?.[kind];
+          if(!slot?.name&&!slot?.dishId)continue;
+          const dish=data.dishes.find(x=>x.id===slot.dishId);
+          results.push({date,kind,name:slot.name||dish?.name||'Repas non identifié',dishId:dish?.id||'',dishFound:!!dish});
+        }
+      }
+      return results;
+    });
+    const menuIngredientNeeds=computed(()=>{
+      const counts=new Map();
+      for(const meal of ingredientWeekMeals.value){
+        if(!meal.dishFound)continue;
+        const dish=data.dishes.find(x=>x.id===meal.dishId);
+        for(const ingredientId of new Set(dish?.ingredientIds||[])){
+          const ingredient=data.ingredients.find(x=>x.id===ingredientId);
+          if(!ingredient)continue;
+          const item=counts.get(ingredientId)||{id:ingredientId,name:ingredient.name,count:0,owned:!!ingredient.owned};
+          item.count++;counts.set(ingredientId,item);
+        }
+      }
+      return [...counts.values()].sort((x,y)=>x.name.localeCompare(y.name,'fr'));
+    });
+    function addNeededIngredients(){
+      let added=0;
+      for(const x of menuIngredientNeeds.value.filter(x=>!x.owned)){
+        const ing=data.ingredients.find(i=>i.id===x.id);
+        if(!ing||data.shoppingItems.some(i=>i.ingredientId===x.id&&!i.checked))continue;
+        addIngredientToShopping(ing);added++;
+      }
+      notify(added+' ingrédient(s) ajouté(s) pour la semaine du '+ingredientWeekStart.value+', sans quantité inventée');
+    }
+    // V62 : questions personnalisables et calendrier des bilans d'humeur.
+    const moodQuestionDraft=reactive({title:'',kind:'text'});
+    function addMoodQuestion(){const title=String(moodQuestionDraft.title||'').trim();if(!title)return;data.moodQuestions.push({id:uid(),title,kind:moodQuestionDraft.kind});moodQuestionDraft.title='';}
+    function removeMoodQuestion(q){if(confirm('Supprimer la question ? Les anciennes réponses restent stockées.'))data.moodQuestions=data.moodQuestions.filter(x=>x.id!==q.id);}
+    const moodCalendarMonth=ref(today.value.slice(0,7));
+    const moodCalendarDays=computed(()=>{const [y,m]=moodCalendarMonth.value.split('-').map(Number);const first=new Date(Date.UTC(y,m-1,1));const pad=(first.getUTCDay()+6)%7;const max=new Date(Date.UTC(y,m,0)).getUTCDate();return [...Array(pad).fill(''),...Array.from({length:max},(_,i)=>moodCalendarMonth.value+'-'+String(i+1).padStart(2,'0'))];});
+    const moodEntriesForDate=date=>data.moodEntries.filter(e=>e.date===date);
+    const moodQuestionsAnswers=reactive({});
+    function openMoodDay(date){if(!date)return;const entry=moodEntriesForDate(date)[0];if(entry){editMoodEntry(entry);}else{Object.assign(moodForm,{id:'',date,moodIds:[],note:'',score:0});for(const key of Object.keys(moodQuestionsAnswers))delete moodQuestionsAnswers[key];}document.querySelector('.mood-view form')?.scrollIntoView({behavior:'smooth',block:'center'});}
     // V60 : détail du jour, sans attribuer d'heure fictive aux tâches.
     const dayView=ref('day');
     const dayOverview=computed(()=>({tasks:data.tasks.filter(t=>t.status!=='done'&&(!t.startDate||t.startDate<=today.value)&&(t.due===today.value||!t.due)),habits:dayHabits.value,appointments:appointmentToday.value,alerts:notificationItems.value}));
+    const dayMilestones=computed(()=>{
+      const result=[];const now=today.value;
+      for(const t of data.tasks){if(t.startDate===now)result.push({id:'task-start-'+t.id,label:'▶ Tâche commence aujourd’hui',title:t.title,kind:'task',item:t});if(t.due===now)result.push({id:'task-due-'+t.id,label:t.status==='done'?'✓ Tâche terminée aujourd’hui':'⚑ Tâche à terminer aujourd’hui',title:t.title,kind:'task',item:t});}
+      for(const p of data.projects){if(p.startDate===now)result.push({id:'project-start-'+p.id,label:'▶ Projet commence aujourd’hui',title:p.name,kind:'project',item:p});if(p.endDate===now)result.push({id:'project-end-'+p.id,label:'⚑ Projet se termine aujourd’hui',title:p.name,kind:'project',item:p});}
+      for(const m of data.projectMilestones||[]){if(m.due===now){const p=data.projects.find(p=>p.id===m.projectId);result.push({id:'milestone-'+m.id,label:'◆ Jalon prévu aujourd’hui',title:(p?.name? p.name+' : ':'')+m.title,kind:'project',item:p});}}
+      return result;
+    });
+    const nextDeadlineDays=ref(7);
+    const upcomingMilestones=computed(()=>{
+      const until=new Date(today.value+'T12:00:00Z');until.setUTCDate(until.getUTCDate()+Number(nextDeadlineDays.value)||7);const end=until.toISOString().slice(0,10);
+      const a=[];
+      for(const t of data.tasks)if(t.status!=='done'&&t.due&&t.due>today.value&&t.due<=end)a.push({id:'t'+t.id,date:t.due,title:t.title,kind:'task',item:t});
+      for(const p of data.projects)if(p.endDate&&p.endDate>today.value&&p.endDate<=end)a.push({id:'p'+p.id,date:p.endDate,title:p.name,kind:'project',item:p});
+      return a.sort((x,y)=>x.date.localeCompare(y.date)).slice(0,30);
+    });
+    function openMilestoneItem(x){if(x.kind==='project'){if(x.item)openProjectForm(x.item);}else openTaskForm(x.item);}
     const openDayItem=(task)=>openTaskForm(task);
     function toggleHabitPause(h){if(h.pausedUntil&&h.pausedUntil>=today.value){h.pausedUntil='';notify('Habitude reprise');return;}const end=prompt('Pause jusqu’au (AAAA-MM-JJ) :',today.value);if(end&&/^\d{4}-\d{2}-\d{2}$/.test(end))h.pausedUntil=end;}
     const envelopeMonth=computed(()=>budgetMonth.value);
     function envelopeKey(category){return envelopeMonth.value+'|'+category;}
     const envelopeRows=computed(()=>data.budgetCategories.map(category=>({category,planned:Number(data.budgetEnvelopes[envelopeKey(category)]||0),actual:data.budgetEntries.filter(x=>String(x.date||'').slice(0,7)===envelopeMonth.value&&x.category===category&&Number(x.amount)<0).reduce((v,x)=>v+Math.abs(Number(x.amount)||0),0)})));
     const dashboardLive=computed(()=>({tasks:dayTasks.value.length,habits:dayHabits.value.length,alerts:notificationItems.value.length}));
-    const dashboardCatalogue=[{id:'appointments',name:'Rendez-vous de la semaine'},{id:'randomNotes',name:'Ajouter une note au pif'},{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas du jour'},{id:'sport',name:'Sport & objectifs'},{id:'weight',name:'Poids'},{id:'foodReview',name:'Bilans alimentaires'},{id:'wellnessReport',name:'Bilan global TCA et poids'},{id:'priorities',name:'Priorités suggérées'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
+    const dashboardCatalogue=[{id:'appointments',name:'Rendez-vous de la semaine'},{id:'randomNotes',name:'Ajouter une note au pif'},{id:'habits',name:'Habitudes'},{id:'routines',name:'Routines du jour'},{id:'meals',name:'Repas du jour'},{id:'sport',name:'Sport & objectifs'},{id:'weight',name:'Poids'},{id:'foodReview',name:'Bilans alimentaires'},{id:'wellnessReport',name:'Bilan global TCA et poids'},{id:'priorities',name:'Priorités suggérées'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
     const dashboardEdit=ref(false);
     function widgetVisible(id){return id!=='planner'&&data.dashboardWidgets.includes(id);}
     function setWidgetVisible(id,on){data.dashboardWidgets=on?[...new Set([...data.dashboardWidgets,id])]:data.dashboardWidgets.filter(x=>x!==id);}
@@ -4055,8 +4278,8 @@ const app = createApp({
     function removeMoodType(type){if(!confirm('Supprimer cette humeur ? Les entrées historiques seront conservées.'))return;data.moodTypes=data.moodTypes.filter(x=>x.id!==type.id);}
     const draggedMood=ref('');
     function dropMoodType(target){const i=data.moodTypes.findIndex(t=>t.id===draggedMood.value),j=data.moodTypes.findIndex(t=>t.id===target.id);if(i<0||j<0||i===j)return;data.moodTypes.splice(j,0,...data.moodTypes.splice(i,1));const moved=data.moodTypes.find(t=>t.id===draggedMood.value);if(moved)moved.polarity=moodTypePolarity(target);normalizeMoodOrder();draggedMood.value='';}
-    function saveMood(){if(!moodForm.date)return;const value=Math.max(-5,Math.min(5,Number(moodForm.score)||0));const ids=[...moodForm.moodIds];const entry={id:moodForm.id||uid(),date:moodForm.date,moodIds:ids,moodId:ids[0]||'',moodName:ids.map(id=>moodTypeFor(id)?.name).filter(Boolean).join(', '),moodColor:moodTypeFor(ids[0])?.color||'#999',note:moodForm.note,score:value};const old=data.moodEntries.find(x=>x.id===entry.id);if(old)Object.assign(old,entry);else data.moodEntries.push(entry);Object.assign(moodForm,{id:'',date:todayStr(),moodIds:[],note:'',score:0});moodPromptDismissed.value=entry.date;notify('Entrée du journal enregistrée');}
-    function editMoodEntry(e){Object.assign(moodForm,{id:e.id,date:e.date,moodIds:[...(e.moodIds|| (e.moodId?[e.moodId]:[]))],note:e.note||'',score:e.score});}
+    function saveMood(){if(!moodForm.date)return;const value=Math.max(-5,Math.min(5,Number(moodForm.score)||0));const ids=[...moodForm.moodIds];const entry={id:moodForm.id||uid(),date:moodForm.date,moodIds:ids,moodId:ids[0]||'',moodName:ids.map(id=>moodTypeFor(id)?.name).filter(Boolean).join(', '),moodColor:moodTypeFor(ids[0])?.color||'#999',note:moodForm.note,score:value,answers:{...moodQuestionsAnswers}};const old=data.moodEntries.find(x=>x.id===entry.id);if(old)Object.assign(old,entry);else data.moodEntries.push(entry);Object.assign(moodForm,{id:'',date:todayStr(),moodIds:[],note:'',score:0});for(const k of Object.keys(moodQuestionsAnswers))delete moodQuestionsAnswers[k];moodPromptDismissed.value=entry.date;notify('Entrée du journal enregistrée');}
+    function editMoodEntry(e){Object.assign(moodForm,{id:e.id,date:e.date,moodIds:[...(e.moodIds|| (e.moodId?[e.moodId]:[]))],note:e.note||'',score:e.score});for(const k of Object.keys(moodQuestionsAnswers))delete moodQuestionsAnswers[k];Object.assign(moodQuestionsAnswers,e.answers||{});}
     function removeMoodEntry(e){if(confirm('Supprimer cette note ?'))data.moodEntries=data.moodEntries.filter(x=>x.id!==e.id);}
     const moodPromptDismissed=ref('');
     const moodPromptDate=computed(()=>{
@@ -4141,7 +4364,8 @@ const app = createApp({
         const options=items.filter(x=>x.id!==sportPick.value?.id);
         sportPick.value=sportRandom(options.length?options:items)||null;sportWalkSteps.value='';sportDraft.value=[];return;
       }
-      const all=sportPool.value.filter(x=>sportMode.value==='surprise'||sportMode.value==='mini'||x.category===sportMode.value);
+      const themeCategories=sportMode.value==='corps'?['genoux','renfo','cardio','mobilite','equilibre','fitness']:sportMode.value==='detente'?['etirement','mobilite','equilibre']:null;
+      const all=sportPool.value.filter(x=>sportMode.value==='surprise'||sportMode.value==='mini'||(themeCategories?themeCategories.includes(x.category):x.category===sportMode.value));
       const availableByDuration = kind==='short' || kind==='mini'
         ? all.filter(x => (Number(x.seconds)||60) <= 90)
         : all;
@@ -4414,7 +4638,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,dayView,dayOverview,openDayItem,toggleHabitPause,
+      routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
       wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
       sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
@@ -4458,8 +4682,8 @@ const app = createApp({
       invForm, startEditInv, saveInv, deleteInv, refundInv,
       // données
       exportData, importData, resetAll,
-      CHALLENGE_KINDS, challengeForm, openChallengeForm, saveChallenge, deleteChallenge, toggleChallenge, hideChallengeHome, currentChallenges, challengeHistory, challengeProgress,
-      habitForm, habitWeekdays, openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
+      CHALLENGE_KINDS, challengeForm, openChallengeForm,newChallengeFromHabit, saveChallenge, deleteChallenge, toggleChallenge, hideChallengeHome, currentChallenges, challengeHistory, challengeProgress,
+      habitForm, habitWeekdays,addHabitProgressionStep,removeHabitProgressionStep,activateHabitProgression,habitProgressionCompleted,openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
       activityForm, randomActivity, pickRandomActivity, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
       formatDate, mealMode, setMealMode, mealDishSearch, isMealEditing, toggleMealEditing, closeMealEditing, chooseMealDish, clearMealChoice, eveningPreview, renderEveningMarkdown, addTextarea, removeTextarea, openWorkQuickPaste,

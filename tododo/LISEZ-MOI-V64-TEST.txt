@@ -1,0 +1,21 @@
+TODO QUEST V64 TEST — EXPÉRIMENTAL
+
+Basé sur la V63 TEST, stockage navigateur isolé et aucune synchronisation Firebase.
+
+NOUVEAUTÉS
+- Paliers progressifs facultatifs : définir des objectifs hebdomadaires sur une habitude, activer un palier manuellement sans recalculer les points passés.
+- Statistiques des routines composées : jours entièrement réalisés sur la semaine ou sur un mois sélectionné et compteurs par habitude. Les routines ne rapportent pas elles-mêmes de points.
+- Défis ciblés : créer depuis une habitude, choisir nombre de réalisations, fréquence, points bonus ; comptage séparé des points de l'habitude.
+
+TESTER
+1. Exporter une sauvegarde JSON depuis la version habituelle.
+2. Installer les six fichiers dans un répertoire GitHub Pages de TEST ; ne pas remplacer la production.
+3. Importer une COPIE du JSON depuis Configuration > Sauvegarde.
+4. Créer une habitude à paliers, activer un palier, puis tester l'historique.
+5. Créer une routine et ouvrir les statistiques par mois.
+6. Créer un défi depuis une habitude, réaliser l'habitude, contrôler les points et l'unicité de la récompense.
+
+LIMITES
+- Les statistiques des routines mesurent des jours où toutes les habitudes sont accomplies, pas le respect du planning individuel.
+- L'activation d'un palier applique la fréquence hebdomadaire correspondante à l'habitude après confirmation.
+- Le test intégral en navigateur connecté n'a pas été effectué.
