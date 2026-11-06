@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261106-v52">
-  <link rel="stylesheet" href="stylekoala.css?v=20261106-v52">
-  <link rel="stylesheet" href="styletest.css?v=20261106-v52">
+  <link rel="stylesheet" href="style.css?v=20261106-v53">
+  <link rel="stylesheet" href="stylekoala.css?v=20261106-v53">
+  <link rel="stylesheet" href="styletest.css?v=20261106-v53">
 </head>
 <body>
 
@@ -430,7 +430,7 @@
         </section>
       </section>
       <section v-if="widgetVisible('sport')" id="dashboard-sport" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('sport')+10}">
-        <div class="v52-heading"><h2>🌱 Objectifs Sport</h2><button type="button" @click="setTab('sport')">Ouvrir Sport</button></div>
+        <div class="v52-heading"><h2>🌱 Objectifs Sport</h2><div class="v53-actions"><button type="button" @click="setTab('sport')">Ouvrir Sport</button><button type="button" @click="setTab('wellness-report')">Bilan global</button></div></div>
         <div class="v52-goals"><label>🦵 Mini-séances / semaine <input type="number" min="0" max="30" v-model.number="data.sportGoals.mini"></label><strong>{{sportProgress.mini}} / {{data.sportGoals.mini}}</strong>
         <label>🎮 Jeux / semaine <input type="number" min="0" max="30" v-model.number="data.sportGoals.game"></label><strong>{{sportProgress.game}} / {{data.sportGoals.game}}</strong>
         <label>🚶 Balades / période <input type="number" min="0" max="30" v-model.number="data.sportGoals.walk"></label><strong>{{sportProgress.walk}} / {{data.sportGoals.walk}}</strong></div>
@@ -438,14 +438,14 @@
         <p v-if="sportReminder && (sportProgress.mini<data.sportGoals.mini || sportProgress.game<data.sportGoals.game)" class="v52-reminder">⏰ Fin de semaine : il reste des activités à faire, si tu en as envie.</p>
       </section>
       <section v-if="widgetVisible('weight') && data.weightSettings.enabled" id="dashboard-weight" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('weight')+10}">
-        <div class="v52-heading"><h2>⚖️ Suivi du poids</h2><button @click="setTab('sport')">Historique</button></div>
+        <div class="v52-heading"><h2>⚖️ Suivi du poids</h2><button @click="setTab('wellness-report')">Bilan global</button></div>
         <p>Dernière mesure : <strong>{{weightLatest===null?'Non renseignée':weightLatest+' kg'}}</strong> · Objectif : {{data.weightSettings.target||'Non défini'}} kg</p>
         <p>Pesées prévues : mardi et vendredi matin (modifiables dans Sport).</p>
         <form class="v52-inline" @submit.prevent="saveWeight"><input type="date" v-model="weightForm.date" required><input type="number" min="1" max="500" step="0.1" v-model.number="weightForm.weight" placeholder="Poids (kg)" required><button>Enregistrer</button></form>
       </section>
       <section v-if="widgetVisible('foodReview')" id="dashboard-foodReview" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('foodReview')+10}">
         <h2>🍽️ Bilan alimentaire</h2><p>{{foodSummary.total}} repas évalués cette semaine · {{foodSummary.respected}} menus respectés · {{foodSummary.changed}} remplacés · {{foodSummary.quantityOk}} quantités ressenties adaptées.</p>
-        <button type="button" @click="setTab('menu')">Voir le menu et les bilans</button>
+        <button type="button" @click="setTab('wellness-report')">Voir les graphiques et le bilan</button>
       </section>
       <section id="dashboard-meals" class="today-meals" :style="{order:data.dashboardWidgets.indexOf('meals')+10}" v-if="widgetVisible('meals')"><h2>Repas du jour</h2><div v-for="kind in ['lunch','dinner']" :key="kind" class="daily-meal"><strong>{{kind==='lunch'?'Déjeuner':'Dîner'}} :</strong> {{todayMeals[kind].name||'Non prévu'}} <span class="meal-state">{{todayMeals[kind].state==='done'?'✓ Pris':todayMeals[kind].state==='missed'?'↪ Pas la même chose':'Pas pris'}}</span><button type="button" @click="openFoodReview(today,kind,'taken')">✓ Pris</button><button type="button" @click="openFoodReview(today,kind,'changed')">↪ Autre chose</button></div><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
       <section id="dashboard-priorities" class="priority-box" :style="{order:data.dashboardWidgets.indexOf('priorities')+10}" v-if="widgetVisible('priorities')"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ taskDue(item.task) ? '· échéance '+formatDate(taskDue(item.task)) : '' }}</small></li></ol></section>
@@ -820,10 +820,11 @@
         <div class="v52-stats"><div>🦵 Renforcement <b>{{sportProgress.mini}} / {{data.sportGoals.mini}}</b></div><div>🎮 Jeu <b>{{sportProgress.game}} / {{data.sportGoals.game}}</b></div><div>🚶 Balade <b>{{sportProgress.walk}} / {{data.sportGoals.walk}}</b></div></div>
         <label>Type de mini-séance <select v-model="sportMode"><option value="surprise">Surprise totale</option><option value="genoux">Genoux</option><option value="renfo">Renforcement</option><option value="cardio">Cardio doux</option><option value="mobilite">Mobilité</option><option value="ludique">Ludique</option></select></label>
         <label>Niveau autorisé <select v-model="sportLevel"><option value="doux">Doux uniquement</option><option value="moyen">Doux et moyen</option></select></label>
-        <div class="v52-actions"><button @click="generateSport('mini')">🎲 Mini-séance (3 à 5 min)</button><button @click="generateSport('short')">🦥 Mini-flemme (1 exercice)</button><button @click="generateSport('game')">🎮 Jeu actif</button><button @click="generateSport('walk')">🚶 Balade</button></div>
+        <div class="v52-actions"><button @click="generateSport('mini')">🎲 Mini-séance (3 à 5 min)</button><button @click="generateSport('long')">⏱️ Séance longue (10 à 15 min)</button><button @click="generateSport('short')">🦥 Mini-flemme (1 exercice)</button><button @click="generateSport('game')">🎮 Jeu actif</button><button @click="generateSport('walk')">🚶 Balade</button></div>
         <div class="v52-card v52-generated" v-if="sportDraft.length || sportPick">
           <h3>Ta proposition aléatoire</h3>
           <template v-if="sportDraft.length"><div class="v52-ex" v-for="(ex,i) in sportDraft" :key="ex.id"><label><input type="checkbox" v-model="ex.completed"> <strong>{{ex.name}}</strong> · {{ex.reps}} <small>{{ex.description}}</small></label><button @click="replaceSportExercise(i)">↻ Remplacer</button></div></template>
+          <label v-if="sportDraftKind==='long' && sportDraft.length">Durée totale réalisée (10 à 15 min) <input type="number" min="10" max="15" v-model.number="sportMinutes"></label>
           <template v-if="sportPick"><h3>{{sportPick.name}}</h3><label>Durée réalisée (minutes) <input type="number" min="1" max="600" v-model.number="sportPick.minutes"></label></template>
           <div class="v52-actions"><button @click="generateSport(sportDraftKind)">🎲 Autre tirage</button><button @click="completeSport">✓ Enregistrer l'activité</button></div>
         </div>
@@ -840,6 +841,53 @@
         <details><summary>Historique détaillé</summary><div class="v52-history" v-for="w in weightRecent" :key="w.id">{{formatDate(w.date)}} : {{w.weight}} kg <button @click="deleteWeight(w)">Supprimer</button></div></details>
       </section>
       <section class="v52-card"><h2>📜 Activités effectuées</h2><p v-if="!sportHistory.length">Aucune activité enregistrée.</p><div class="v52-history" v-for="s in sportHistory.slice(0,60)" :key="s.id">{{formatDate(s.date)}} · {{s.name}} · {{s.minutes}} min · +{{s.points}} pts <button @click="deleteSportSession(s)">Supprimer</button></div></section>
+    </section>
+
+    <section class="view view-wellness-report" v-if="view==='wellness-report'">
+      <section class="v53-report-intro v52-card"><h2>📊 Bilan TCA et poids</h2>
+        <p>Vue descriptive des repas renseignés, de l'activité physique et de l'évolution du poids. Les associations observées ne démontrent pas qu'une activité ou un aliment explique un changement de poids.</p>
+        <label>Période <select v-model.number="wellnessRange"><option :value="4">4 semaines</option><option :value="8">8 semaines</option><option :value="12">12 semaines</option><option :value="26">26 semaines</option></select></label>
+        <div class="v53-metrics">
+          <div><strong>{{wellnessTotals.meals}}</strong><span>Repas évalués</span></div>
+          <div><strong>{{wellnessPct(wellnessTotals.respected,wellnessTotals.meals)}} %</strong><span>Menus prévus respectés</span></div>
+          <div><strong>{{wellnessPct(wellnessTotals.quantityOk,wellnessTotals.meals)}} %</strong><span>Quantités ressenties adaptées</span></div>
+          <div><strong>{{wellnessTotals.minutes}} min</strong><span>Activité enregistrée</span></div>
+          <div><strong>{{wellnessTrend===null?'—':(wellnessTrend>0?'+':'')+wellnessTrend+' kg'}}</strong><span>Écart entre premières et dernières moyennes disponibles</span></div>
+        </div>
+        <p class="v53-caution">Une semaine sans saisie est une semaine sans données, pas une semaine où aucun repas n'a été pris. Les pourcentages utilisent uniquement les bilans enregistrés.</p>
+      </section>
+      <section class="v52-card"><h3>🍽️ Répartition des ressentis alimentaires</h3>
+        <p v-if="!wellnessTotals.meals">Aucun bilan de repas sur la période sélectionnée.</p>
+        <div v-else class="v53-bars">
+          <div v-for="b in [{title:'Menu respecté',value:wellnessTotals.respected},{title:'Menu changé',value:wellnessTotals.changed},{title:'Quantité adaptée',value:wellnessTotals.quantityOk},{title:'Quantité ressentie insuffisante',value:wellnessTotals.quantityLess},{title:'Quantité ressentie excessive',value:wellnessTotals.quantityMore},{title:'Plat jugé plutôt équilibré',value:wellnessTotals.balanced},{title:'Plat jugé à améliorer',value:wellnessTotals.average},{title:'Plat jugé peu équilibré',value:wellnessTotals.unbalanced},{title:'Récipient jugé adapté',value:wellnessTotals.containersGood}]" :key="b.title" class="v53-bar-row">
+            <div class="v53-bar-head"><span>{{b.title}}</span><strong>{{b.value}} / {{wellnessTotals.meals}} ({{wellnessPct(b.value,wellnessTotals.meals)}} %)</strong></div>
+            <div class="v53-bar-track"><div class="v53-bar-fill" :style="{width:wellnessPct(b.value,wellnessTotals.meals)+'%'}"></div></div>
+          </div>
+        </div>
+        <p class="v53-caution">Les catégories nutritionnelles sont des appréciations saisies manuellement, pas une estimation scientifique de la qualité des repas.</p>
+      </section>
+      <section class="v52-card"><h3>🧾 Détails des plats, récipients et activités</h3>
+        <div class="v53-detail-grid">
+          <div><h4>Catégories des plats réellement consommés</h4><p v-if="!wellnessFoodCategories.length">Aucune catégorie enregistrée.</p><div v-for="item in wellnessFoodCategories" :key="item.name" class="v53-detail-line"><span>{{item.name}}</span><strong>{{item.count}} repas</strong></div></div>
+          <div><h4>Récipients et évaluations au moment du repas</h4><p v-if="!wellnessContainers.length">Aucun récipient enregistré.</p><div v-for="item in wellnessContainers" :key="item.name" class="v53-detail-line"><span>{{item.name}}</span><span>{{item.count}} repas · {{item.good}} adapté(s), {{item.neutral}} moyen(s), {{item.bad}} non adapté(s)</span></div></div>
+          <div><h4>Types d'activités enregistrées</h4><p v-if="!wellnessSportTypes.length">Aucune activité enregistrée.</p><div v-for="item in wellnessSportTypes" :key="item.name" class="v53-detail-line"><span>{{item.name}}</span><strong>{{item.count}}</strong></div></div>
+        </div>
+      </section>
+      <section class="v52-card"><h3>🏃 Activité sportive par semaine</h3>
+        <div class="v53-week-chart"><div class="v53-week-col" v-for="w in wellnessWeeks" :key="w.week"><div class="v53-col-value">{{w.minutes}} min</div><div class="v53-column-track"><div class="v53-column-fill" :style="{height:(100*w.minutes/wellnessMaxMinutes)+'%'}"></div></div><small>{{w.week.slice(5)}}</small></div></div>
+        <p class="v53-caution">Minutes déclarées ou estimées dans les activités enregistrées.</p>
+      </section>
+      <section class="v52-card"><h3>📉 Poids : moyennes hebdomadaires</h3>
+        <p v-if="!wellnessWeightChart.segments.length">Ajoute des pesées pour afficher la tendance. Les semaines sans mesure ne sont pas interpolées.</p>
+        <template v-else><div class="v53-plot"><div class="v53-plot-label">{{wellnessWeightChart.max}} kg</div><svg viewBox="0 0 400 135" role="img" aria-label="Évolution des moyennes hebdomadaires du poids" preserveAspectRatio="none"><line x1="10" y1="120" x2="390" y2="120" stroke="#b3c7bc"/><line x1="10" y1="15" x2="390" y2="15" stroke="#dde8e0"/><polyline v-for="(points,i) in wellnessWeightChart.segments" :key="i" :points="points" fill="none" stroke="#4d8977" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle v-for="(point,i) in wellnessWeightChart.points.filter(Boolean)" :key="i" :cx="point.x" :cy="point.y" r="4" fill="#386957"><title>{{formatDate(point.week)}} : {{point.weight}} kg</title></circle></svg><div class="v53-plot-label">{{wellnessWeightChart.min}} kg</div></div></template>
+        <p class="v53-caution">Deux pesées hebdomadaires prévues (mardi et vendredi), sans obligation. Un point représente la moyenne des mesures effectivement saisies cette semaine.</p>
+      </section>
+      <section class="v52-card"><h3>🔎 Repas, activité et balance : vue croisée</h3>
+        <p>Chaque ligne regroupe les données de la même semaine. Compare les tendances avec prudence : ces relevés ne permettent pas de déduire une relation de cause à effet ou de calculer des calories.</p>
+        <div class="v53-table-wrap"><table class="v53-report-table"><thead><tr><th>Semaine</th><th>Repas notés</th><th>Menu respecté</th><th>Quantité adaptée</th><th>Sport</th><th>Poids moyen</th></tr></thead><tbody><tr v-for="w in wellnessWeeks" :key="w.week"><td>{{formatDate(w.week)}}</td><td>{{w.meals}}</td><td>{{w.meals?wellnessPct(w.respected,w.meals)+' %':'—'}}</td><td>{{w.meals?wellnessPct(w.quantityOk,w.meals)+' %':'—'}}</td><td>{{w.activityCount}} séance(s) · {{w.minutes}} min</td><td>{{w.weight===null?'—':w.weight+' kg ('+w.weightCount+' mesure(s))'}}</td></tr></tbody></table></div>
+        <p v-if="wellnessPaired.length<3" class="v53-caution">Il y a moins de trois semaines avec des données de repas et de poids : une comparaison de tendance reste très limitée.</p>
+        <div class="v53-actions"><button type="button" @click="setTab('menu')">Voir le menu</button><button type="button" @click="setTab('sport')">Voir Sport et les pesées</button></div>
+      </section>
     </section>
     <section class="view view-menu" v-if="view==='menu'">
       <div class="subtabs"><button v-for="t in [{id:'planning',name:'Planning'},{id:'dishes',name:'Plats'},{id:'ingredients',name:'Ingrédients'}]" :key="t.id" type="button" :class="{active:menuTab===t.id}" @click="menuTab=t.id">{{ t.name }}</button></div>
@@ -1372,10 +1420,10 @@
         <label>Dans quel récipient ? <select v-model="foodForm.container" required><option value="">Choisir</option><option v-for="x in data.foodContainers" :key="x" :value="x">{{x}}</option></select></label>
         <div class="v52-inline"><input v-model="foodContainerNew" placeholder="Nom d'un nouveau récipient"><button type="button" @click="addFoodContainer">+ Ajouter</button></div>
         <label>Ce récipient était-il adapté à ce repas ? <select v-model="foodForm.containerRating"><option value="good">Bien adapté</option><option value="neutral">Moyen</option><option value="bad">Pas adapté</option></select></label>
-        <div class="v52-actions"><button type="submit">Enregistrer le bilan (+2 pts)</button><button type="button" @click="foodForm.open=false">Annuler</button></div>
+        <div class="v52-actions"><button type="submit">Enregistrer le bilan (+2 pts)</button><button type="button" @click="cancelFoodReview">Annuler</button></div>
       </form>
     </section></div>
-    <div class="modal-backdrop" v-if="foodReminder.open"><section class="modal v52-modal" role="dialog" aria-modal="true"><h2>🍽️ Repas d'hier à compléter</h2><p>Il manque le bilan de {{foodReminder.items.length}} repas du {{formatDate(foodReminder.date)}}. Ce rappel n'apparaîtra qu'une fois.</p><div class="v52-actions"><button v-for="kind in foodReminder.items" :key="kind" @click="reviewReminderMeal(kind)">Compléter {{kind==='lunch'?'le déjeuner':'le dîner'}}</button><button @click="closeFoodReminder">Ignorer</button></div></section></div>
+    <div class="modal-backdrop" v-if="foodReminder.open"><section class="modal v52-modal" role="dialog" aria-modal="true"><h2>🍽️ Repas d'hier à compléter</h2><p>Il reste {{foodReminder.items.length}} bilan(s) à compléter pour le {{formatDate(foodReminder.date)}}. Après avoir enregistré le déjeuner, tu pourras compléter le dîner dans la même série de rappels. Cette popup ne revient pas après fermeture volontaire.</p><div class="v52-actions"><button v-for="kind in foodReminder.items" :key="kind" @click="reviewReminderMeal(kind)">Compléter {{kind==='lunch'?'le déjeuner':'le dîner'}}</button><button @click="closeFoodReminder">Ignorer les bilans restants</button></div></section></div>
 </div>
 
 <!-- ============ TEMPLATE : LIGNE DE TÂCHE ============ -->
@@ -1505,7 +1553,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261106-v52"></script>
+<script src="app.js?v=20261106-v53"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

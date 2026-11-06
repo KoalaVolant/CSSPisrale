@@ -54,6 +54,7 @@ const TABS = [
   { id: 'usual-lists', label: 'Listes de tâches habituelles' },
   { id: 'menu', label: 'Menu de la semaine' },
   { id: 'sport', label: 'Sport & bien-être' },
+  { id: 'wellness-report', label: 'Bilan global' },
   { id: 'shopping', label: 'Liste de courses' },
   { id: 'achievements', label: 'Succès & objectifs' },
   { id: 'trash', label: 'Corbeille' },
@@ -75,8 +76,8 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','sport','calendar','all','work','habits','usual-lists','done','alters','mood'] },
-  { title: 'Repas', ids: ['menu','shopping'] },
+  { title: 'Tâches', ids: ['home','calendar','all','work','habits','usual-lists','done','alters','mood'] },
+  { title: 'TCA et poids', ids: ['menu','shopping','sport','wellness-report'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','evening','random-notes','challenges','achievements','statistics','budget'] },
   { title: 'Configuration', ids: ['projects','categories','levels','trash','data'] },
@@ -722,7 +723,7 @@ function defaultData() {
     sportSessions: [],
     sportLocations: [{id:'tremelin',name:'Lac de Trémelin',active:true},{id:'bedee',name:'Parc de Bédée',active:true}],
     sportGoals: {mini:2,game:1,walk:1,walkDays:14},
-    sportPoints: {short:3,mini:10,game:25,walk:30},
+    sportPoints: {short:3,mini:10,long:20,game:25,walk:30},
     weightSettings: {start:null,target:null,days:[2,5],enabled:true},
     weightEntries: [],
     foodReviews: {},
@@ -855,6 +856,7 @@ function loadData() {
     }
     if (!d.sportGoals || typeof d.sportGoals !== 'object') d.sportGoals=clone(defaultData().sportGoals);
     if (!d.sportPoints || typeof d.sportPoints !== 'object') d.sportPoints=clone(defaultData().sportPoints);
+    if (d.sportPoints.long === undefined) d.sportPoints.long=20;
     if (!d.weightSettings || typeof d.weightSettings !== 'object') d.weightSettings=clone(defaultData().weightSettings);
     for (const k of ['foodReviews','foodCategoriesHealth','foodReminderShown'])
       if (!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k]={};
@@ -1122,6 +1124,7 @@ const app = createApp({
         data[k]=Array.isArray(src[k])?clone(src[k]):clone(fresh[k]);
       for (const k of ['sportGoals','sportPoints','weightSettings','foodReviews','foodCategoriesHealth','foodReminderShown'])
         data[k]=src[k] && typeof src[k]==='object' && !Array.isArray(src[k])?clone(src[k]):clone(fresh[k]);
+      if(data.sportPoints.long===undefined)data.sportPoints.long=20;
       for (const id of ['sport','foodReview','weight'])if(!data.dashboardWidgets.includes(id))data.dashboardWidgets.push(id);
       data.urgencies    = Array.isArray(src.urgencies) ? src.urgencies : clone(DEFAULT_URGENCIES);
       data.difficulties = Array.isArray(src.difficulties) ? src.difficulties : clone(DEFAULT_DIFFICULTIES);
@@ -3349,6 +3352,7 @@ const app = createApp({
     const sportLevel = ref('doux');
     const sportDraft = ref([]);
     const sportDraftKind = ref('mini');
+    const sportMinutes = ref(12);
     const sportPick = ref(null);
     const sportExerciseForm = reactive({name:'',category:'cardio',description:'',level:'doux',reps:'30 secondes',seconds:60});
     const sportLocationName = ref('');
@@ -3357,7 +3361,7 @@ const app = createApp({
     // Cycle de 14 jours ancré à un lundi fixe (05/01/2026), configurable en durée.
     const walkCycleStart=computed(()=>{const base=new Date('2026-01-05T12:00:00');const now=new Date(sportStart.value+'T12:00:00');const days=Math.round((now-base)/86400000);const size=Math.max(7,Number(data.sportGoals.walkDays)||14);return sportDateAdd('2026-01-05',Math.floor(days/size)*size);});
     const sportProgress=computed(()=>({
-      mini:data.sportSessions.filter(x=>x.kind==='mini'&&x.date>=sportStart.value&&x.date<=today.value).length,
+      mini:data.sportSessions.filter(x=>['mini','long'].includes(x.kind)&&x.date>=sportStart.value&&x.date<=today.value).length,
       game:data.sportSessions.filter(x=>x.kind==='game'&&x.date>=sportStart.value&&x.date<=today.value).length,
       walk:data.sportSessions.filter(x=>x.kind==='walk'&&x.date>=walkCycleStart.value&&x.date<=today.value).length,
     }));
@@ -3367,6 +3371,7 @@ const app = createApp({
     const sportRandom=(items)=>items[Math.floor(Math.random()*items.length)];
     function generateSport(kind='mini'){
       sportDraftKind.value=kind;
+      if(kind==='long')sportMinutes.value=12;
       if(kind==='game'){
         const options=['Ring Fit Adventure','Just Dance'];
         const previous=sportPick.value?.name;
@@ -3385,7 +3390,7 @@ const app = createApp({
       const available=[...fallback];
       // Dans le mode Surprise, garder le renforcement des genoux présent,
       // sans empêcher les autres mouvements courts.
-      if(kind==='mini' && sportMode.value==='surprise'){
+      if((kind==='mini'||kind==='long') && sportMode.value==='surprise'){
         const knee=available.filter(x=>x.category==='genoux');
         while(picked.length<2 && knee.length){
           const chosen=knee.splice(Math.floor(Math.random()*knee.length),1)[0];
@@ -3399,13 +3404,13 @@ const app = createApp({
     function completeSport(){
       const plannedKind=sportDraftKind.value;
       const exercises=sportDraft.value.filter(x=>x.completed);
-      const kind=plannedKind==='mini' && exercises.length<sportDraft.value.length?'short':plannedKind;
-      if((kind==='mini'||kind==='short')&&!exercises.length){notify('Coche au moins un exercice réalisé');return;}
+      const kind=(['mini','long'].includes(plannedKind) && exercises.length<sportDraft.value.length)?'short':plannedKind;
+      if((kind==='mini'||kind==='long'||kind==='short')&&!exercises.length){notify('Coche au moins un exercice réalisé');return;}
       if((kind==='game'||kind==='walk')&&!sportPick.value){notify('Choisis une activité');return;}
       const points=Number(data.sportPoints[kind])||0;
       data.sportSessions.push({id:uid(),date:today.value,createdAt:new Date().toISOString(),kind,
-        name:kind==='mini'||kind==='short'?exercises.map(x=>x.name).join(', '):sportPick.value.name,
-        exerciseIds:exercises.map(x=>x.id),minutes:kind==='game'?Math.max(1,Number(sportPick.value.minutes)||15):kind==='walk'?Math.max(1,Number(sportPick.value.minutes)||20):kind==='short'?1:Math.max(3,Math.min(5,exercises.length)),points});
+        name:['mini','long','short'].includes(kind)?exercises.map(x=>x.name).join(', '):sportPick.value.name,
+        exerciseIds:exercises.map(x=>x.id),minutes:kind==='game'?Math.max(1,Number(sportPick.value.minutes)||15):kind==='walk'?Math.max(1,Number(sportPick.value.minutes)||20):kind==='short'?1:kind==='long'?Math.max(10,Math.min(15,Number(sportMinutes.value)||12)):Math.max(3,Math.min(5,exercises.length)),points});
       sportDraft.value=[];sportPick.value=null;notify('Activité enregistrée : +'+points+' points');
     }
     function deleteSportSession(x){if(confirm('Supprimer cette activité et ses points ?'))data.sportSessions=data.sportSessions.filter(y=>y.id!==x.id);}
@@ -3434,23 +3439,119 @@ const app = createApp({
       if(!foodForm.container){notify('Choisis un récipient');return;}
       const key=foodReviewKey(foodForm.date,foodForm.kind);
       data.foodReviews[key]={completed:true,date:foodForm.date,kind:foodForm.kind,status:foodForm.status,actual:foodForm.status==='changed'?foodForm.actual.trim():'',category:foodForm.category,quantity:foodForm.quantity,container:foodForm.container,containerRating:foodForm.containerRating,health:foodForm.health};
-      setMeal(foodForm.date,foodForm.kind,'state',foodForm.status==='changed'?'missed':'done');foodForm.open=false;notify('Bilan du repas enregistré');
+      setMeal(foodForm.date,foodForm.kind,'state',foodForm.status==='changed'?'missed':'done');foodForm.open=false;finishReminderMeal(foodForm.date,foodForm.kind);notify('Bilan du repas enregistré');
     }
     const foodWeekReviews=computed(()=>Object.values(data.foodReviews).filter(x=>x?.completed&&x.date>=monday(today.value)&&x.date<=today.value));
     const foodSummary=computed(()=>{const arr=foodWeekReviews.value;return {total:arr.length,respected:arr.filter(x=>x.status==='taken').length,changed:arr.filter(x=>x.status==='changed').length,quantityOk:arr.filter(x=>x.quantity==='ok').length,balanced:arr.filter(x=>x.health==='balanced').length};});
-    const foodReminder=reactive({open:false,date:'',items:[]});
+    const foodReminder=reactive({open:false,date:'',items:[],activeKind:''});
     function checkFoodReminder(){
       const yesterday=sportDateAdd(today.value,-1);
       if(data.foodReminderShown[yesterday])return;
       const items=['lunch','dinner'].filter(kind=>{const slot=mealSlot(yesterday,kind);return (slot.name||slot.dishId)&&!foodReview(yesterday,kind);});
       if(!items.length)return;
       data.foodReminderShown[yesterday]=today.value;
-      Object.assign(foodReminder,{open:true,date:yesterday,items});
+      Object.assign(foodReminder,{open:true,date:yesterday,items,activeKind:''});
     }
-    function closeFoodReminder(){foodReminder.open=false;}
-    function reviewReminderMeal(kind){const date=foodReminder.date;foodReminder.open=false;openFoodReview(date,kind);}
+    function closeFoodReminder(){foodReminder.open=false;foodReminder.activeKind='';}
+    function reviewReminderMeal(kind){
+      if(!foodReminder.items.includes(kind))return;
+      const date=foodReminder.date;
+      foodReminder.activeKind=kind;
+      foodReminder.open=false;
+      openFoodReview(date,kind);
+    }
+    function finishReminderMeal(date,kind){
+      if(date!==foodReminder.date || kind!==foodReminder.activeKind)return;
+      foodReminder.items=foodReminder.items.filter(x=>x!==kind && !foodReview(date,x));
+      foodReminder.activeKind='';
+      if(foodReminder.items.length)nextTick(()=>{foodReminder.open=true;});
+    }
+    function cancelFoodReview(){
+      foodForm.open=false;
+      if(foodReminder.activeKind){foodReminder.activeKind='';foodReminder.open=true;}
+    }
     nextTick(()=>checkFoodReminder());
     watch(today,()=>checkFoodReminder());
+    // =============== V53 : statistiques descriptives Sport / menu / poids ===============
+    const wellnessRange=ref(8);
+    const wellnessWeeks=computed(()=>{
+      const end=monday(today.value);
+      const rows=[];
+      for(let i=Math.max(1,Math.min(52,Number(wellnessRange.value)||8))-1;i>=0;i--){
+        const week=sportDateAdd(end,-7*i), until=sportDateAdd(week,6);
+        const meals=Object.values(data.foodReviews).filter(x=>x?.completed&&x.date>=week&&x.date<=until);
+        const acts=data.sportSessions.filter(x=>x.date>=week&&x.date<=until);
+        const weights=data.weightEntries.filter(x=>x.date>=week&&x.date<=until&&Number(x.weight)>0);
+        const count=meals.length;
+        const mean=weights.length ? weights.reduce((n,x)=>n+Number(x.weight),0)/weights.length : null;
+        rows.push({week, until, meals:count, respected:meals.filter(x=>x.status==='taken').length,
+          changed:meals.filter(x=>x.status==='changed').length,
+          quantityOk:meals.filter(x=>x.quantity==='ok').length,
+          quantityLess:meals.filter(x=>x.quantity==='less').length,
+          quantityMore:meals.filter(x=>x.quantity==='more').length,
+          balanced:meals.filter(x=>x.health==='balanced').length,
+          average:meals.filter(x=>x.health==='average').length,
+          unbalanced:meals.filter(x=>x.health==='unbalanced').length,
+          containersGood:meals.filter(x=>x.containerRating==='good').length,
+          activityCount:acts.length,
+          minutes:acts.reduce((n,x)=>n+(Number(x.minutes)||0),0),
+          weight:mean===null?null:Math.round(mean*100)/100, weightCount:weights.length});
+      }
+      return rows;
+    });
+    const wellnessTotals=computed(()=>wellnessWeeks.value.reduce((a,r)=>{
+      for(const key of ['meals','respected','changed','quantityOk','quantityLess','quantityMore','balanced','average','unbalanced','containersGood','activityCount','minutes'])a[key]+=r[key];
+      return a;
+    },{meals:0,respected:0,changed:0,quantityOk:0,quantityLess:0,quantityMore:0,balanced:0,average:0,unbalanced:0,containersGood:0,activityCount:0,minutes:0}));
+    function wellnessPct(num,den){return den?Math.round(100*num/den):0;}
+    const wellnessMaxMinutes=computed(()=>Math.max(1,...wellnessWeeks.value.map(x=>x.minutes)));
+    const wellnessMaxMeals=computed(()=>Math.max(1,...wellnessWeeks.value.map(x=>x.meals)));
+    const wellnessWeightChart=computed(()=>{
+      const valid=wellnessWeeks.value.filter(x=>x.weight!==null);
+      if(!valid.length)return {points:'',labels:[],min:0,max:0};
+      const min=Math.floor((Math.min(...valid.map(x=>x.weight))-.5)*10)/10;
+      const max=Math.ceil((Math.max(...valid.map(x=>x.weight))+.5)*10)/10;
+      const spread=Math.max(0.5,max-min);
+      return {min,max,labels:wellnessWeeks.value.map(x=>x.week),
+        points:wellnessWeeks.value.map((r,i)=>r.weight===null?null:{x:10+(i/Math.max(1,wellnessWeeks.value.length-1))*380,y:120-((r.weight-min)/spread)*105,week:r.week,weight:r.weight}),
+        segments:(()=>{const result=[];let line=[];for(const r of wellnessWeeks.value.map((row,i)=>row.weight===null?null:{x:10+(i/Math.max(1,wellnessWeeks.value.length-1))*380,y:120-((row.weight-min)/spread)*105})){if(r){line.push(`${r.x},${r.y}`);}else if(line.length){result.push(line.join(' '));line=[];}}if(line.length)result.push(line.join(' '));return result;})()};
+    });
+    const wellnessPaired=computed(()=>wellnessWeeks.value.filter(x=>x.weight!==null && x.meals>0));
+    const wellnessStart=computed(()=>wellnessWeeks.value[0]?.week||monday(today.value));
+    const wellnessEnd=computed(()=>wellnessWeeks.value[wellnessWeeks.value.length-1]?.until||today.value);
+    const wellnessFoodCategories=computed(()=>{
+      const counter=new Map();
+      for(const x of Object.values(data.foodReviews)){
+        if(!x?.completed || x.date<wellnessStart.value || x.date>wellnessEnd.value)continue;
+        const key=String(x.category||'Non précisé');counter.set(key,(counter.get(key)||0)+1);
+      }
+      return [...counter].map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
+    });
+    const wellnessContainers=computed(()=>{
+      const counter=new Map();
+      for(const x of Object.values(data.foodReviews)){
+        if(!x?.completed || x.date<wellnessStart.value || x.date>wellnessEnd.value)continue;
+        const key=String(x.container||'Non précisé');
+        if(!counter.has(key))counter.set(key,{name:key,count:0,good:0,neutral:0,bad:0});
+        const r=counter.get(key);r.count++;if(['good','neutral','bad'].includes(x.containerRating))r[x.containerRating]++;
+      }
+      return [...counter.values()].sort((a,b)=>b.count-a.count);
+    });
+    const wellnessSportTypes=computed(()=>{
+      const labels={short:'Mini-flemme',mini:'Mini-séance',long:'Séance longue',game:'Jeu actif',walk:'Balade'};
+      const counts=new Map();
+      for(const x of data.sportSessions){
+        if(x.date<wellnessStart.value||x.date>wellnessEnd.value)continue;
+        const name=labels[x.kind]||x.kind||'Autre';counts.set(name,(counts.get(name)||0)+1);
+      }
+      return [...counts].map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
+    });
+    const wellnessTrend=computed(()=>{
+      const rows=wellnessWeeks.value.filter(x=>x.weight!==null);
+      if(rows.length<2)return null;
+      return Math.round((rows[rows.length-1].weight-rows[0].weight)*100)/100;
+    });
+    // Les rapprochements sont descriptifs. Aucune causalité, compensation ou score nutritionnel n'est déduit.
     // =============== fin V52 ===============
 
     const dashboardNav=[{id:'appointments',name:'Rendez-vous'},{id:'randomNotes',name:'Note au pif'},{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas'},{id:'priorities',name:'Priorités'},{id:'tasks',name:'Tâches'}];
@@ -3458,7 +3559,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      sportMode,sportLevel,sportDraft,sportDraftKind,sportPick,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,
+      sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportPick,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessWeeks,wellnessTotals,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
