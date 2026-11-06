@@ -53,6 +53,7 @@ const TABS = [
   { id: 'work',       label: 'Travail' },
   { id: 'usual-lists', label: 'Listes de tâches habituelles' },
   { id: 'menu', label: 'Menu de la semaine' },
+  { id: 'sport', label: 'Sport & bien-être' },
   { id: 'shopping', label: 'Liste de courses' },
   { id: 'achievements', label: 'Succès & objectifs' },
   { id: 'trash', label: 'Corbeille' },
@@ -74,7 +75,7 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','calendar','all','work','habits','usual-lists','done','alters','mood'] },
+  { title: 'Tâches', ids: ['home','sport','calendar','all','work','habits','usual-lists','done','alters','mood'] },
   { title: 'Repas', ids: ['menu','shopping'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
   { title: 'Autres', ids: ['gratitude','evening','random-notes','challenges','achievements','statistics','budget'] },
@@ -219,6 +220,489 @@ function migrateGratitudePoints(records) {
   return records;
 }
 
+const SPORT_DEFAULT_EXERCISES = [
+  {
+    "id": "sport-default-1",
+    "name": "Extension de genou assise",
+    "category": "genoux",
+    "description": "Tendre doucement la jambe depuis une chaise.",
+    "level": "doux",
+    "reps": "6 par jambe",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-2",
+    "name": "Contraction du quadriceps",
+    "category": "genoux",
+    "description": "Contracter la cuisse sans bloquer la respiration.",
+    "level": "doux",
+    "reps": "6 fois 3 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-3",
+    "name": "Lever de jambe tendue",
+    "category": "genoux",
+    "description": "Allongé, lever doucement une jambe.",
+    "level": "doux",
+    "reps": "5 par jambe",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-4",
+    "name": "Glissement du talon",
+    "category": "genoux",
+    "description": "Allongé, ramener le talon vers soi.",
+    "level": "doux",
+    "reps": "8 par jambe",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-5",
+    "name": "Montées sur les pointes",
+    "category": "genoux",
+    "description": "Monter les talons en tenant une chaise.",
+    "level": "doux",
+    "reps": "10 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-6",
+    "name": "Lever des orteils",
+    "category": "genoux",
+    "description": "Relever les pointes en gardant les talons au sol.",
+    "level": "doux",
+    "reps": "10 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-7",
+    "name": "Assis-debout",
+    "category": "genoux",
+    "description": "Se lever et se rasseoir sur une chaise stable.",
+    "level": "moyen",
+    "reps": "5 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-8",
+    "name": "Mini-squat avec appui",
+    "category": "genoux",
+    "description": "Fléchir très légèrement les genoux avec appui.",
+    "level": "moyen",
+    "reps": "5 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-9",
+    "name": "Flexion du genou debout",
+    "category": "genoux",
+    "description": "Ramener doucement le talon vers la fesse.",
+    "level": "doux",
+    "reps": "6 par jambe",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-10",
+    "name": "Pas sur marche basse",
+    "category": "genoux",
+    "description": "Monter puis descendre une marche stable.",
+    "level": "moyen",
+    "reps": "5 par jambe",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-11",
+    "name": "Lever de jambe latéral",
+    "category": "genoux",
+    "description": "Lever une jambe sur le côté avec appui.",
+    "level": "doux",
+    "reps": "6 par jambe",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-12",
+    "name": "Pont fessier",
+    "category": "genoux",
+    "description": "Allongé, soulever doucement le bassin.",
+    "level": "moyen",
+    "reps": "6 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-13",
+    "name": "Marche sur place",
+    "category": "mobilite",
+    "description": "Marcher à allure tranquille sans avancer.",
+    "level": "doux",
+    "reps": "45 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-14",
+    "name": "Cercles de chevilles",
+    "category": "mobilite",
+    "description": "Faire de petits cercles avec les pieds.",
+    "level": "doux",
+    "reps": "6 par sens",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-15",
+    "name": "Flexions de cheville",
+    "category": "mobilite",
+    "description": "Ramener les pointes des pieds vers soi.",
+    "level": "doux",
+    "reps": "10 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-16",
+    "name": "Transfert du poids",
+    "category": "mobilite",
+    "description": "Déplacer doucement le poids de gauche à droite.",
+    "level": "doux",
+    "reps": "30 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-17",
+    "name": "Étirement des mollets",
+    "category": "mobilite",
+    "description": "Étirement léger contre un mur, sans douleur.",
+    "level": "doux",
+    "reps": "15 secondes par côté",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-18",
+    "name": "Étirement arrière de cuisse",
+    "category": "mobilite",
+    "description": "Tendre une jambe et incliner doucement le buste.",
+    "level": "doux",
+    "reps": "15 secondes par côté",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-19",
+    "name": "Bascule du bassin",
+    "category": "mobilite",
+    "description": "Allongé, basculer légèrement le bassin.",
+    "level": "doux",
+    "reps": "8 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-20",
+    "name": "Ouverture des hanches assise",
+    "category": "mobilite",
+    "description": "Ouvrir légèrement un genou puis revenir.",
+    "level": "doux",
+    "reps": "6 par côté",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-21",
+    "name": "Rotations des épaules",
+    "category": "mobilite",
+    "description": "Faire des cercles avec les épaules.",
+    "level": "doux",
+    "reps": "10 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-22",
+    "name": "Rotation du buste assise",
+    "category": "mobilite",
+    "description": "Tourner légèrement le buste sans forcer.",
+    "level": "doux",
+    "reps": "5 par côté",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-23",
+    "name": "Chat-vache",
+    "category": "mobilite",
+    "description": "À quatre pattes, arrondir et relâcher le dos.",
+    "level": "moyen",
+    "reps": "6 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-24",
+    "name": "Étirement des bras",
+    "category": "mobilite",
+    "description": "Tendre les bras en hauteur tranquillement.",
+    "level": "doux",
+    "reps": "20 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-25",
+    "name": "Pompes au mur",
+    "category": "renfo",
+    "description": "Fléchir les bras contre un mur stable.",
+    "level": "doux",
+    "reps": "8 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-26",
+    "name": "Gainage debout au mur",
+    "category": "renfo",
+    "description": "Maintenir le corps aligné contre un mur.",
+    "level": "doux",
+    "reps": "20 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-27",
+    "name": "Serrage des omoplates",
+    "category": "renfo",
+    "description": "Rapprocher doucement les omoplates.",
+    "level": "doux",
+    "reps": "10 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-28",
+    "name": "Lever de bras alterné",
+    "category": "renfo",
+    "description": "Lever un bras puis l'autre.",
+    "level": "doux",
+    "reps": "10 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-29",
+    "name": "Contraction des fessiers",
+    "category": "renfo",
+    "description": "Contracter les fessiers puis relâcher.",
+    "level": "doux",
+    "reps": "8 fois 3 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-30",
+    "name": "Équilibre avec appui",
+    "category": "renfo",
+    "description": "Tenir sur un pied près d'une chaise.",
+    "level": "moyen",
+    "reps": "10 secondes par pied",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-31",
+    "name": "Pas latéraux",
+    "category": "renfo",
+    "description": "Faire de petits pas de côté.",
+    "level": "doux",
+    "reps": "6 par côté",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-32",
+    "name": "Boxe assise",
+    "category": "renfo",
+    "description": "Petits coups de poing dans le vide.",
+    "level": "doux",
+    "reps": "30 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-33",
+    "name": "Bras en croix",
+    "category": "renfo",
+    "description": "Lever puis baisser les bras sur les côtés.",
+    "level": "doux",
+    "reps": "8 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-34",
+    "name": "Pompes inclinées",
+    "category": "renfo",
+    "description": "Pompes contre un plan de travail stable.",
+    "level": "moyen",
+    "reps": "6 fois",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-35",
+    "name": "Bird-dog simplifié",
+    "category": "renfo",
+    "description": "À quatre pattes, allonger bras ou jambe.",
+    "level": "moyen",
+    "reps": "5 par côté",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-36",
+    "name": "Contraction abdominale assise",
+    "category": "renfo",
+    "description": "Contracter le ventre en respirant normalement.",
+    "level": "doux",
+    "reps": "6 fois 4 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-37",
+    "name": "Danse libre douce",
+    "category": "cardio",
+    "description": "Danser sur une chanson, sans saut.",
+    "level": "doux",
+    "reps": "60 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-38",
+    "name": "Marche rythmée",
+    "category": "cardio",
+    "description": "Marcher sur place en bougeant les bras.",
+    "level": "doux",
+    "reps": "60 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-39",
+    "name": "Boxe debout légère",
+    "category": "cardio",
+    "description": "Enchaîner des mouvements de bras sans forcer.",
+    "level": "doux",
+    "reps": "45 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-40",
+    "name": "Pas latéraux en musique",
+    "category": "cardio",
+    "description": "Petits pas à droite puis à gauche.",
+    "level": "doux",
+    "reps": "45 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-41",
+    "name": "Talons-fesses doux",
+    "category": "cardio",
+    "description": "Alterner les talons vers l'arrière sans rebond.",
+    "level": "moyen",
+    "reps": "30 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-42",
+    "name": "Montées de genoux basses",
+    "category": "cardio",
+    "description": "Lever alternativement les genoux très bas.",
+    "level": "moyen",
+    "reps": "30 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-43",
+    "name": "Marche rapide sur place",
+    "category": "cardio",
+    "description": "Accélérer brièvement la marche sur place.",
+    "level": "moyen",
+    "reps": "45 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-44",
+    "name": "Mouvements de bras rythmés",
+    "category": "cardio",
+    "description": "Bouger les bras au rythme d'une musique.",
+    "level": "doux",
+    "reps": "60 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-45",
+    "name": "Danse d'une minute",
+    "category": "ludique",
+    "description": "Choisir une musique et bouger librement.",
+    "level": "doux",
+    "reps": "60 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-46",
+    "name": "Jeu des statues",
+    "category": "ludique",
+    "description": "Bouger puis s'immobiliser quelques secondes.",
+    "level": "doux",
+    "reps": "60 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-47",
+    "name": "Dessiner des cercles dans l'air",
+    "category": "ludique",
+    "description": "Dessiner de grands cercles avec les bras.",
+    "level": "doux",
+    "reps": "45 secondes",
+    "seconds": 60,
+    "active": true
+  },
+  {
+    "id": "sport-default-48",
+    "name": "Pas de danse au choix",
+    "category": "ludique",
+    "description": "Essayer un pas de danse sans saut.",
+    "level": "doux",
+    "reps": "60 secondes",
+    "seconds": 60,
+    "active": true
+  }
+];
+
 function defaultData() {
   return {
     achievements: [], // succès attribués, une seule fois
@@ -233,7 +717,18 @@ function defaultData() {
     alterActivities: [],
     moodReminderHour: 19,
     appointmentCategories: [],
-    dashboardWidgets: ['randomNotes','habits','meals','priorities','tasks'],
+    dashboardWidgets: ['sport','foodReview','weight','randomNotes','habits','meals','priorities','tasks'],
+    sportExercises: clone(SPORT_DEFAULT_EXERCISES),
+    sportSessions: [],
+    sportLocations: [{id:'tremelin',name:'Lac de Trémelin',active:true},{id:'bedee',name:'Parc de Bédée',active:true}],
+    sportGoals: {mini:2,game:1,walk:1,walkDays:14},
+    sportPoints: {short:3,mini:10,game:25,walk:30},
+    weightSettings: {start:null,target:null,days:[2,5],enabled:true},
+    weightEntries: [],
+    foodReviews: {},
+    foodContainers: ['Assiette','Petite assiette','Grande assiette','Bol','Assiette creuse'],
+    foodCategoriesHealth: {},
+    foodReminderShown: {},
     groceryBudget: 0, // budget facultatif de courses
     eveningNotes: '', // ancien champ conservé pour migration
     budgetCategories: ['Alimentation','Essence','Loisirs','Logement','Abonnements','Impôts','Santé','Transport','Salaire','Autres'],
@@ -354,6 +849,16 @@ function loadData() {
     migrateProjectUrgencies(d);
     if (!Array.isArray(d.urgencies)) d.urgencies = clone(DEFAULT_URGENCIES);
     if (!Array.isArray(d.difficulties)) d.difficulties = clone(DEFAULT_DIFFICULTIES);
+    // V52 : données Sport / alimentation, compatibilité anciennes sauvegardes.
+    for (const k of ['sportExercises','sportSessions','sportLocations','weightEntries','foodContainers']) {
+      if (!Array.isArray(d[k])) d[k]=clone(defaultData()[k]);
+    }
+    if (!d.sportGoals || typeof d.sportGoals !== 'object') d.sportGoals=clone(defaultData().sportGoals);
+    if (!d.sportPoints || typeof d.sportPoints !== 'object') d.sportPoints=clone(defaultData().sportPoints);
+    if (!d.weightSettings || typeof d.weightSettings !== 'object') d.weightSettings=clone(defaultData().weightSettings);
+    for (const k of ['foodReviews','foodCategoriesHealth','foodReminderShown'])
+      if (!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k]={};
+    for (const id of ['sport','foodReview','weight']) if (!d.dashboardWidgets.includes(id)) d.dashboardWidgets.push(id);
     return d;
   } catch (e) {
     return defaultData();
@@ -611,6 +1116,13 @@ const app = createApp({
       data.workCategories = normalizeCategories(src.workCategories);
       data.workDifficulties = Array.isArray(src.workDifficulties) ? src.workDifficulties : clone(DEFAULT_DIFFICULTIES);
       data.workUrgencies = Array.isArray(src.workUrgencies) ? src.workUrgencies : clone(Array.isArray(src.urgencies) ? src.urgencies : DEFAULT_URGENCIES);
+      // V52 : appliquer aussi les données Sport / bien-être reçues via Firebase/import.
+      const fresh=defaultData();
+      for (const k of ['sportExercises','sportSessions','sportLocations','weightEntries','foodContainers'])
+        data[k]=Array.isArray(src[k])?clone(src[k]):clone(fresh[k]);
+      for (const k of ['sportGoals','sportPoints','weightSettings','foodReviews','foodCategoriesHealth','foodReminderShown'])
+        data[k]=src[k] && typeof src[k]==='object' && !Array.isArray(src[k])?clone(src[k]):clone(fresh[k]);
+      for (const id of ['sport','foodReview','weight'])if(!data.dashboardWidgets.includes(id))data.dashboardWidgets.push(id);
       data.urgencies    = Array.isArray(src.urgencies) ? src.urgencies : clone(DEFAULT_URGENCIES);
       data.difficulties = Array.isArray(src.difficulties) ? src.difficulties : clone(DEFAULT_DIFFICULTIES);
       data.spent        = Number(src.spent) || 0;
@@ -881,7 +1393,7 @@ const app = createApp({
     const savedTotal = computed(() => data.rewards.reduce((sum,r)=>sum+Math.max(0,Number(r.saved)||0),0));
     const habitTotal = computed(() => Math.round(data.habits.reduce((sum,h)=>sum+habitAwards(h).reduce((s,a)=>s+a.points,0) - (h.penalties||[]).reduce((s,a)=>s+Math.max(0,Number(a.points)||0),0),0)*100)/100);
     const challengeTotal = computed(() => Math.round(data.challengeAwards.reduce((sum,a) => sum + (Number(a.points)||0), 0)*100)/100);
-    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
+    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value + data.sportSessions.reduce((s,x)=>s+(Number(x.points)||0),0) + Object.values(data.foodReviews).reduce((s,x)=>s+(x&&x.completed?2:0),0) - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
 
     // Modification manuelle du solde : on règle "adjust" pour tomber pile sur la valeur voulue
     const balanceForm = reactive({ open: false, value: 0 });
@@ -2429,7 +2941,7 @@ const app = createApp({
       data.weeklyMenus[from.date][from.kind]=b;
       data.weeklyMenus[date][kind]=a;
     }
-    function setMealState(date,kind,state){setMeal(date,kind,'state',mealSlot(date,kind).state===state?'':state);}
+    function setMealState(date,kind,state){openFoodReview(date,kind,state==='missed'?'changed':'taken');}
     // Catalogue repas, ingrédients et courses
     const menuTab=ref('planning');
     const dishQuery=ref(''), ingredientQuery=ref(''), dishIngredientQuery=ref(''), shoppingQuery=ref('');
@@ -2608,7 +3120,7 @@ const app = createApp({
 
     // V29 : dépendances, planification, calendrier, repas, budget courses, succès et widgets.
     const v29Date = (date, offset=0) => {const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+offset);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
-    const dashboardCatalogue=[{id:'appointments',name:'Rendez-vous de la semaine'},{id:'randomNotes',name:'Ajouter une note au pif'},{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas du jour'},{id:'priorities',name:'Priorités suggérées'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
+    const dashboardCatalogue=[{id:'appointments',name:'Rendez-vous de la semaine'},{id:'randomNotes',name:'Ajouter une note au pif'},{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas du jour'},{id:'sport',name:'Sport & objectifs'},{id:'weight',name:'Poids'},{id:'foodReview',name:'Bilans alimentaires'},{id:'priorities',name:'Priorités suggérées'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
     const dashboardEdit=ref(false);
     function widgetVisible(id){return id!=='planner'&&data.dashboardWidgets.includes(id);}
     function setWidgetVisible(id,on){data.dashboardWidgets=on?[...new Set([...data.dashboardWidgets,id])]:data.dashboardWidgets.filter(x=>x!==id);}
@@ -2832,11 +3344,121 @@ const app = createApp({
     const nowMinute=ref(0);
     setInterval(()=>{nowMinute.value++;today.value=todayStr();if(pendingAlterReview.value&&!alterReviewForm.open&&!pendingAppointment.value&&!apptForm.open)openPendingAlterReview();},60000);
     nextTick(()=>{if(pendingAlterReview.value)openPendingAlterReview();});
+    // =============== V52 : Sport, poids et bilans de repas ===============
+    const sportMode = ref('surprise');
+    const sportLevel = ref('doux');
+    const sportDraft = ref([]);
+    const sportDraftKind = ref('mini');
+    const sportPick = ref(null);
+    const sportExerciseForm = reactive({name:'',category:'cardio',description:'',level:'doux',reps:'30 secondes',seconds:60});
+    const sportLocationName = ref('');
+    const sportStart = computed(()=>monday(today.value));
+    const sportDateAdd=(date,n)=>{const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+n);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+    // Cycle de 14 jours ancré à un lundi fixe (05/01/2026), configurable en durée.
+    const walkCycleStart=computed(()=>{const base=new Date('2026-01-05T12:00:00');const now=new Date(sportStart.value+'T12:00:00');const days=Math.round((now-base)/86400000);const size=Math.max(7,Number(data.sportGoals.walkDays)||14);return sportDateAdd('2026-01-05',Math.floor(days/size)*size);});
+    const sportProgress=computed(()=>({
+      mini:data.sportSessions.filter(x=>x.kind==='mini'&&x.date>=sportStart.value&&x.date<=today.value).length,
+      game:data.sportSessions.filter(x=>x.kind==='game'&&x.date>=sportStart.value&&x.date<=today.value).length,
+      walk:data.sportSessions.filter(x=>x.kind==='walk'&&x.date>=walkCycleStart.value&&x.date<=today.value).length,
+    }));
+    const sportHistory=computed(()=>[...data.sportSessions].sort((a,b)=>String(b.createdAt||b.date).localeCompare(String(a.createdAt||a.date))));
+    const sportReminder=computed(()=>{const dow=new Date(today.value+'T12:00:00').getDay();return dow>=4||dow===0;});
+    const sportPool=computed(()=>data.sportExercises.filter(x=>x.active!==false && (sportLevel.value==='moyen'||x.level!=='moyen')));
+    const sportRandom=(items)=>items[Math.floor(Math.random()*items.length)];
+    function generateSport(kind='mini'){
+      sportDraftKind.value=kind;
+      if(kind==='game'){
+        const options=['Ring Fit Adventure','Just Dance'];
+        const previous=sportPick.value?.name;
+        const list=options.filter(x=>x!==previous);
+        sportPick.value={name:sportRandom(list.length?list:options),minutes:15};sportDraft.value=[];return;
+      }
+      if(kind==='walk'){
+        const items=data.sportLocations.filter(x=>x.active!==false);
+        const options=items.filter(x=>x.id!==sportPick.value?.id);
+        sportPick.value=sportRandom(options.length?options:items)||null;sportDraft.value=[];return;
+      }
+      const all=sportPool.value.filter(x=>sportMode.value==='surprise'||sportMode.value==='mini'||x.category===sportMode.value);
+      const fallback=all.length?all:sportPool.value;
+      const n=kind==='short'?1:Math.min(3,fallback.length);
+      const picked=[];
+      const available=[...fallback];
+      // Dans le mode Surprise, garder le renforcement des genoux présent,
+      // sans empêcher les autres mouvements courts.
+      if(kind==='mini' && sportMode.value==='surprise'){
+        const knee=available.filter(x=>x.category==='genoux');
+        while(picked.length<2 && knee.length){
+          const chosen=knee.splice(Math.floor(Math.random()*knee.length),1)[0];
+          picked.push(chosen);available.splice(available.findIndex(x=>x.id===chosen.id),1);
+        }
+      }
+      while(picked.length<n && available.length){const ix=Math.floor(Math.random()*available.length);picked.push(available.splice(ix,1)[0]);}
+      sportDraft.value=picked.map(x=>({...x,completed:false}));sportPick.value=null;
+    }
+    function replaceSportExercise(index){const used=new Set(sportDraft.value.map(x=>x.id));const choices=sportPool.value.filter(x=>!used.has(x.id));if(!choices.length)return; sportDraft.value.splice(index,1,{...sportRandom(choices),completed:false});}
+    function completeSport(){
+      const plannedKind=sportDraftKind.value;
+      const exercises=sportDraft.value.filter(x=>x.completed);
+      const kind=plannedKind==='mini' && exercises.length<sportDraft.value.length?'short':plannedKind;
+      if((kind==='mini'||kind==='short')&&!exercises.length){notify('Coche au moins un exercice réalisé');return;}
+      if((kind==='game'||kind==='walk')&&!sportPick.value){notify('Choisis une activité');return;}
+      const points=Number(data.sportPoints[kind])||0;
+      data.sportSessions.push({id:uid(),date:today.value,createdAt:new Date().toISOString(),kind,
+        name:kind==='mini'||kind==='short'?exercises.map(x=>x.name).join(', '):sportPick.value.name,
+        exerciseIds:exercises.map(x=>x.id),minutes:kind==='game'?Math.max(1,Number(sportPick.value.minutes)||15):kind==='walk'?Math.max(1,Number(sportPick.value.minutes)||20):kind==='short'?1:Math.max(3,Math.min(5,exercises.length)),points});
+      sportDraft.value=[];sportPick.value=null;notify('Activité enregistrée : +'+points+' points');
+    }
+    function deleteSportSession(x){if(confirm('Supprimer cette activité et ses points ?'))data.sportSessions=data.sportSessions.filter(y=>y.id!==x.id);}
+    function addSportExercise(){const name=sportExerciseForm.name.trim();if(!name)return;data.sportExercises.push({...clone(sportExerciseForm),id:uid(),name,active:true});sportExerciseForm.name='';}
+    function removeSportExercise(x){if(confirm('Supprimer cet exercice du catalogue ?'))data.sportExercises=data.sportExercises.filter(y=>y.id!==x.id);}
+    function addSportLocation(){const name=sportLocationName.value.trim();if(!name)return;data.sportLocations.push({id:uid(),name,active:true});sportLocationName.value='';}
+    function removeSportLocation(x){data.sportLocations=data.sportLocations.filter(y=>y.id!==x.id);}
+    const weightForm=reactive({date:today.value,weight:null});
+    const weightRecent=computed(()=>[...data.weightEntries].sort((a,b)=>b.date.localeCompare(a.date)));
+    const weightLatest=computed(()=>weightRecent.value[0]?.weight??null);
+    const weightWeekly=computed(()=>{const map=new Map();for(const x of data.weightEntries){const key=monday(x.date);if(!map.has(key))map.set(key,[]);map.get(key).push(Number(x.weight));}return [...map].sort((a,b)=>a[0].localeCompare(b[0])).map(([week,values])=>({week,average:Math.round(values.reduce((a,b)=>a+b,0)/values.length*10)/10,count:values.length}));});
+    function saveWeight(){const v=Number(weightForm.weight);if(!weightForm.date||!Number.isFinite(v)||v<=0||v>500){notify('Poids invalide');return;}const existing=data.weightEntries.find(x=>x.date===weightForm.date);if(existing)existing.weight=v;else data.weightEntries.push({id:uid(),date:weightForm.date,weight:v});weightForm.weight=null;}
+    function deleteWeight(x){if(confirm('Supprimer cette mesure ?'))data.weightEntries=data.weightEntries.filter(y=>y.id!==x.id);}
+    const foodForm=reactive({open:false,date:'',kind:'lunch',status:'taken',actual:'',category:'',quantity:'ok',container:'',containerRating:'good',health:'unknown'});
+    const foodContainerNew=ref('');
+    function foodReviewKey(date,kind){return date+'|'+kind;}
+    function foodReview(date,kind){return data.foodReviews[foodReviewKey(date,kind)]||null;}
+    function openFoodReview(date,kind,status='taken'){
+      const prior=foodReview(date,kind);
+      Object.assign(foodForm,{open:true,date,kind,status:prior?.status||status,actual:prior?.actual||'',category:prior?.category||'',quantity:prior?.quantity||'ok',container:prior?.container||data.foodContainers[0]||'',containerRating:prior?.containerRating||'good',health:prior?.health||'unknown'});
+      if(status==='changed'&&!prior)foodForm.status='changed';
+    }
+    function addFoodContainer(){const n=foodContainerNew.value.trim();if(n&&!data.foodContainers.includes(n))data.foodContainers.push(n);if(n)foodForm.container=n;foodContainerNew.value='';}
+    function saveFoodReview(){
+      if(foodForm.status==='changed'&&!foodForm.actual.trim()){notify('Indique le repas de remplacement');return;}
+      if(!foodForm.container){notify('Choisis un récipient');return;}
+      const key=foodReviewKey(foodForm.date,foodForm.kind);
+      data.foodReviews[key]={completed:true,date:foodForm.date,kind:foodForm.kind,status:foodForm.status,actual:foodForm.status==='changed'?foodForm.actual.trim():'',category:foodForm.category,quantity:foodForm.quantity,container:foodForm.container,containerRating:foodForm.containerRating,health:foodForm.health};
+      setMeal(foodForm.date,foodForm.kind,'state',foodForm.status==='changed'?'missed':'done');foodForm.open=false;notify('Bilan du repas enregistré');
+    }
+    const foodWeekReviews=computed(()=>Object.values(data.foodReviews).filter(x=>x?.completed&&x.date>=monday(today.value)&&x.date<=today.value));
+    const foodSummary=computed(()=>{const arr=foodWeekReviews.value;return {total:arr.length,respected:arr.filter(x=>x.status==='taken').length,changed:arr.filter(x=>x.status==='changed').length,quantityOk:arr.filter(x=>x.quantity==='ok').length,balanced:arr.filter(x=>x.health==='balanced').length};});
+    const foodReminder=reactive({open:false,date:'',items:[]});
+    function checkFoodReminder(){
+      const yesterday=sportDateAdd(today.value,-1);
+      if(data.foodReminderShown[yesterday])return;
+      const items=['lunch','dinner'].filter(kind=>{const slot=mealSlot(yesterday,kind);return (slot.name||slot.dishId)&&!foodReview(yesterday,kind);});
+      if(!items.length)return;
+      data.foodReminderShown[yesterday]=today.value;
+      Object.assign(foodReminder,{open:true,date:yesterday,items});
+    }
+    function closeFoodReminder(){foodReminder.open=false;}
+    function reviewReminderMeal(kind){const date=foodReminder.date;foodReminder.open=false;openFoodReview(date,kind);}
+    nextTick(()=>checkFoodReminder());
+    watch(today,()=>checkFoodReminder());
+    // =============== fin V52 ===============
+
     const dashboardNav=[{id:'appointments',name:'Rendez-vous'},{id:'randomNotes',name:'Note au pif'},{id:'habits',name:'Habitudes'},{id:'meals',name:'Repas'},{id:'priorities',name:'Priorités'},{id:'tasks',name:'Tâches'}];
     function jumpDashboard(id){nextTick(()=>document.getElementById('dashboard-'+id)?.scrollIntoView({behavior:'smooth',block:'start'}));}
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
+      sportMode,sportLevel,sportDraft,sportDraftKind,sportPick,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,

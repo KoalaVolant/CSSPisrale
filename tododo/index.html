@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261106-v51">
-  <link rel="stylesheet" href="stylekoala.css?v=20261106-v51">
-  <link rel="stylesheet" href="styletest.css?v=20261106-v51">
+  <link rel="stylesheet" href="style.css?v=20261106-v52">
+  <link rel="stylesheet" href="stylekoala.css?v=20261106-v52">
+  <link rel="stylesheet" href="styletest.css?v=20261106-v52">
 </head>
 <body>
 
@@ -429,7 +429,25 @@
           </div>
         </section>
       </section>
-      <section id="dashboard-meals" class="today-meals" :style="{order:data.dashboardWidgets.indexOf('meals')+10}" v-if="widgetVisible('meals')"><h2>Repas du jour</h2><div v-for="kind in ['lunch','dinner']" :key="kind" class="daily-meal"><strong>{{kind==='lunch'?'Déjeuner':'Dîner'}} :</strong> {{todayMeals[kind].name||'Non prévu'}} <span class="meal-state">{{todayMeals[kind].state==='done'?'✓ Pris':todayMeals[kind].state==='missed'?'↪ Pas la même chose':'Pas pris'}}</span><button type="button" @click="setMealState(today,kind,'done')">✓ Pris</button><button type="button" @click="setMealState(today,kind,'missed')">↪ Autre chose</button></div><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
+      <section v-if="widgetVisible('sport')" id="dashboard-sport" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('sport')+10}">
+        <div class="v52-heading"><h2>🌱 Objectifs Sport</h2><button type="button" @click="setTab('sport')">Ouvrir Sport</button></div>
+        <div class="v52-goals"><label>🦵 Mini-séances / semaine <input type="number" min="0" max="30" v-model.number="data.sportGoals.mini"></label><strong>{{sportProgress.mini}} / {{data.sportGoals.mini}}</strong>
+        <label>🎮 Jeux / semaine <input type="number" min="0" max="30" v-model.number="data.sportGoals.game"></label><strong>{{sportProgress.game}} / {{data.sportGoals.game}}</strong>
+        <label>🚶 Balades / période <input type="number" min="0" max="30" v-model.number="data.sportGoals.walk"></label><strong>{{sportProgress.walk}} / {{data.sportGoals.walk}}</strong></div>
+        <label>Fréquence des balades <select v-model.number="data.sportGoals.walkDays"><option :value="7">7 jours</option><option :value="14">14 jours</option><option :value="28">28 jours</option></select></label>
+        <p v-if="sportReminder && (sportProgress.mini<data.sportGoals.mini || sportProgress.game<data.sportGoals.game)" class="v52-reminder">⏰ Fin de semaine : il reste des activités à faire, si tu en as envie.</p>
+      </section>
+      <section v-if="widgetVisible('weight') && data.weightSettings.enabled" id="dashboard-weight" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('weight')+10}">
+        <div class="v52-heading"><h2>⚖️ Suivi du poids</h2><button @click="setTab('sport')">Historique</button></div>
+        <p>Dernière mesure : <strong>{{weightLatest===null?'Non renseignée':weightLatest+' kg'}}</strong> · Objectif : {{data.weightSettings.target||'Non défini'}} kg</p>
+        <p>Pesées prévues : mardi et vendredi matin (modifiables dans Sport).</p>
+        <form class="v52-inline" @submit.prevent="saveWeight"><input type="date" v-model="weightForm.date" required><input type="number" min="1" max="500" step="0.1" v-model.number="weightForm.weight" placeholder="Poids (kg)" required><button>Enregistrer</button></form>
+      </section>
+      <section v-if="widgetVisible('foodReview')" id="dashboard-foodReview" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('foodReview')+10}">
+        <h2>🍽️ Bilan alimentaire</h2><p>{{foodSummary.total}} repas évalués cette semaine · {{foodSummary.respected}} menus respectés · {{foodSummary.changed}} remplacés · {{foodSummary.quantityOk}} quantités ressenties adaptées.</p>
+        <button type="button" @click="setTab('menu')">Voir le menu et les bilans</button>
+      </section>
+      <section id="dashboard-meals" class="today-meals" :style="{order:data.dashboardWidgets.indexOf('meals')+10}" v-if="widgetVisible('meals')"><h2>Repas du jour</h2><div v-for="kind in ['lunch','dinner']" :key="kind" class="daily-meal"><strong>{{kind==='lunch'?'Déjeuner':'Dîner'}} :</strong> {{todayMeals[kind].name||'Non prévu'}} <span class="meal-state">{{todayMeals[kind].state==='done'?'✓ Pris':todayMeals[kind].state==='missed'?'↪ Pas la même chose':'Pas pris'}}</span><button type="button" @click="openFoodReview(today,kind,'taken')">✓ Pris</button><button type="button" @click="openFoodReview(today,kind,'changed')">↪ Autre chose</button></div><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
       <section id="dashboard-priorities" class="priority-box" :style="{order:data.dashboardWidgets.indexOf('priorities')+10}" v-if="widgetVisible('priorities')"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ taskDue(item.task) ? '· échéance '+formatDate(taskDue(item.task)) : '' }}</small></li></ol></section>
       <div id="dashboard-tasks" class="dashboard" :style="{order:data.dashboardWidgets.indexOf('tasks')+10}" v-if="widgetVisible('tasks')">
 
@@ -797,6 +815,32 @@
       </div>
     </section>
 
+    <section class="view view-sport v52-sport" v-if="view==='sport'">
+      <section class="v52-card"><h2>🌱 Bouger un peu</h2><p>Objectifs souples, exercices courts, aucune pénalité. Arrête les mouvements douloureux.</p>
+        <div class="v52-stats"><div>🦵 Renforcement <b>{{sportProgress.mini}} / {{data.sportGoals.mini}}</b></div><div>🎮 Jeu <b>{{sportProgress.game}} / {{data.sportGoals.game}}</b></div><div>🚶 Balade <b>{{sportProgress.walk}} / {{data.sportGoals.walk}}</b></div></div>
+        <label>Type de mini-séance <select v-model="sportMode"><option value="surprise">Surprise totale</option><option value="genoux">Genoux</option><option value="renfo">Renforcement</option><option value="cardio">Cardio doux</option><option value="mobilite">Mobilité</option><option value="ludique">Ludique</option></select></label>
+        <label>Niveau autorisé <select v-model="sportLevel"><option value="doux">Doux uniquement</option><option value="moyen">Doux et moyen</option></select></label>
+        <div class="v52-actions"><button @click="generateSport('mini')">🎲 Mini-séance (3 à 5 min)</button><button @click="generateSport('short')">🦥 Mini-flemme (1 exercice)</button><button @click="generateSport('game')">🎮 Jeu actif</button><button @click="generateSport('walk')">🚶 Balade</button></div>
+        <div class="v52-card v52-generated" v-if="sportDraft.length || sportPick">
+          <h3>Ta proposition aléatoire</h3>
+          <template v-if="sportDraft.length"><div class="v52-ex" v-for="(ex,i) in sportDraft" :key="ex.id"><label><input type="checkbox" v-model="ex.completed"> <strong>{{ex.name}}</strong> · {{ex.reps}} <small>{{ex.description}}</small></label><button @click="replaceSportExercise(i)">↻ Remplacer</button></div></template>
+          <template v-if="sportPick"><h3>{{sportPick.name}}</h3><label>Durée réalisée (minutes) <input type="number" min="1" max="600" v-model.number="sportPick.minutes"></label></template>
+          <div class="v52-actions"><button @click="generateSport(sportDraftKind)">🎲 Autre tirage</button><button @click="completeSport">✓ Enregistrer l'activité</button></div>
+        </div>
+      </section>
+      <section class="v52-card"><h2>📚 Catalogue des exercices ({{data.sportExercises.length}})</h2><details><summary>Afficher, modifier, activer ou ajouter des exercices</summary>
+        <div class="v52-ex" v-for="ex in data.sportExercises" :key="ex.id"><label><input type="checkbox" v-model="ex.active"> <input class="v52-name" v-model="ex.name" aria-label="Nom exercice"> <small>{{ex.category}} · {{ex.level}}</small></label><input v-model="ex.reps" aria-label="Répétitions"><input v-model="ex.description" aria-label="Consigne"><select v-model="ex.level"><option value="doux">Doux</option><option value="moyen">Moyen</option></select><button @click="removeSportExercise(ex)">Supprimer</button></div>
+        <form class="v52-form-grid" @submit.prevent="addSportExercise"><input v-model="sportExerciseForm.name" placeholder="Nouvel exercice" required><select v-model="sportExerciseForm.category"><option value="genoux">Genoux</option><option value="renfo">Renforcement</option><option value="cardio">Cardio</option><option value="mobilite">Mobilité</option><option value="ludique">Ludique</option></select><select v-model="sportExerciseForm.level"><option value="doux">Doux</option><option value="moyen">Moyen</option></select><input v-model="sportExerciseForm.reps" placeholder="Répétitions"><input v-model="sportExerciseForm.description" placeholder="Consigne"><button>Ajouter</button></form>
+      </details></section>
+      <section class="v52-card"><h2>🗺️ Mes destinations de balade</h2><div class="v52-ex" v-for="loc in data.sportLocations" :key="loc.id"><label><input type="checkbox" v-model="loc.active"> <input v-model="loc.name" aria-label="Nom du lieu"></label><button @click="removeSportLocation(loc)">Supprimer</button></div><form class="v52-inline" @submit.prevent="addSportLocation"><input v-model="sportLocationName" placeholder="Nouvelle destination" required><button>Ajouter</button></form></section>
+      <section class="v52-card"><h2>⚖️ Poids : suivi facultatif</h2><label>Poids de départ (kg) <input type="number" min="1" max="500" step="0.1" v-model.number="data.weightSettings.start"></label><label>Poids cible (kg) <input type="number" min="1" max="500" step="0.1" v-model.number="data.weightSettings.target"></label><label><input type="checkbox" v-model="data.weightSettings.enabled"> Afficher sur le dashboard</label>
+        <p>Jours de pesée conseillés : <label><input type="checkbox" :checked="data.weightSettings.days.includes(2)" @change="data.weightSettings.days=$event.target.checked?[...new Set([...data.weightSettings.days,2])]:data.weightSettings.days.filter(x=>x!==2)"> Mardi</label> <label><input type="checkbox" :checked="data.weightSettings.days.includes(5)" @change="data.weightSettings.days=$event.target.checked?[...new Set([...data.weightSettings.days,5])]:data.weightSettings.days.filter(x=>x!==5)"> Vendredi</label></p>
+        <form class="v52-inline" @submit.prevent="saveWeight"><input type="date" v-model="weightForm.date" required><input type="number" min="1" max="500" step="0.1" placeholder="Poids (kg)" v-model.number="weightForm.weight" required><button>Enregistrer la mesure</button></form>
+        <h3>Tendance hebdomadaire</h3><div class="v52-history" v-for="w in weightWeekly" :key="w.week">Semaine du {{formatDate(w.week)}} : {{w.average}} kg ({{w.count}} mesure(s))</div>
+        <details><summary>Historique détaillé</summary><div class="v52-history" v-for="w in weightRecent" :key="w.id">{{formatDate(w.date)}} : {{w.weight}} kg <button @click="deleteWeight(w)">Supprimer</button></div></details>
+      </section>
+      <section class="v52-card"><h2>📜 Activités effectuées</h2><p v-if="!sportHistory.length">Aucune activité enregistrée.</p><div class="v52-history" v-for="s in sportHistory.slice(0,60)" :key="s.id">{{formatDate(s.date)}} · {{s.name}} · {{s.minutes}} min · +{{s.points}} pts <button @click="deleteSportSession(s)">Supprimer</button></div></section>
+    </section>
     <section class="view view-menu" v-if="view==='menu'">
       <div class="subtabs"><button v-for="t in [{id:'planning',name:'Planning'},{id:'dishes',name:'Plats'},{id:'ingredients',name:'Ingrédients'}]" :key="t.id" type="button" :class="{active:menuTab===t.id}" @click="menuTab=t.id">{{ t.name }}</button></div>
       <template v-if="menuTab==='planning'">
@@ -832,12 +876,12 @@
                 </div>
                 <button type="button" class="meal-clear" @click="clearMealChoice(day.date,kind)">Effacer ce repas</button>
               </div>
-              <div class="meal-checks"><button type="button" :class="{active:mealSlot(day.date,kind).state==='done'}" @click="setMealState(day.date,kind,'done')">✓ Fait</button><button type="button" :class="{active:mealSlot(day.date,kind).state==='missed'}" @click="setMealState(day.date,kind,'missed')">✕ Non respecté</button></div>
+              <p v-if="foodReview(day.date,kind)" class="v52-meal-summary">✓ Bilan enregistré : {{foodReview(day.date,kind).status==='taken'?'Prévu respecté':'Plat remplacé'}} · {{foodReview(day.date,kind).quantity==='ok'?'Quantité adaptée':foodReview(day.date,kind).quantity==='less'?'Pas assez':'Trop'}}</p><div class="meal-checks"><button type="button" :class="{active:mealSlot(day.date,kind).state==='done'}" @click="openFoodReview(day.date,kind,'taken')">✓ Pris</button><button type="button" :class="{active:mealSlot(day.date,kind).state==='missed'}" @click="openFoodReview(day.date,kind,'changed')">↪ Changé</button></div>
             </div>
           </article>
         </div>
       </section>
-      
+      <section class="v52-card"><h2>📊 Bilan alimentaire de la semaine</h2><p>{{foodSummary.total}} repas renseignés · {{foodSummary.respected}} respectés · {{foodSummary.changed}} changés · {{foodSummary.quantityOk}} quantités adaptées · {{foodSummary.balanced}} jugés équilibrés.</p></section>
       </template>
       <section v-if="menuTab==='dishes'" class="catalogue"><h2>Catalogue des plats</h2><p>Un plat peut ne contenir aucun ingrédient.</p>
         <div class="catalogue-form"><input v-model="dishDraft.name" placeholder="Nom du plat" @keyup.enter="addDish"><fieldset class="dish-multi-category"><legend>Catégories du plat</legend><label v-for="c in dishCategoryList" :key="c"><input type="checkbox" :value="c" v-model="dishDraft.categories"> {{c}}</label></fieldset><div class="dish-level-selects"><label>Difficulté <select v-model="dishDraft.difficulty"><option value="">Non définie</option><option v-for="v in data.dishDifficulties" :key="v" :value="v">{{v}}</option></select></label><label>Temps <select v-model="dishDraft.time"><option value="">Non défini</option><option v-for="v in data.dishTimes" :key="v" :value="v">{{v}}</option></select></label></div><p class="selected-ingredients">Ingrédients sélectionnés : {{dishDraft.ingredientIds.map(id=>data.ingredients.find(i=>i.id===id)?.name).filter(Boolean).join(', ')||'Aucun'}}</p>
@@ -1316,6 +1360,22 @@
 
   </main>
   </div>
+    <!-- V52 : bilan alimentaire manuel (repas pris ou remplacé) -->
+    <div class="modal-backdrop" v-if="foodForm.open"><section class="modal v52-modal" role="dialog" aria-modal="true" aria-label="Bilan du repas"><h2>🍽️ Bilan du {{foodForm.kind==='lunch'?'déjeuner':'dîner'}} du {{formatDate(foodForm.date)}}</h2>
+      <p>Prévu : <strong>{{mealSlot(foodForm.date,foodForm.kind).name || data.dishes.find(d=>d.id===mealSlot(foodForm.date,foodForm.kind).dishId)?.name || 'Non renseigné'}}</strong></p>
+      <form @submit.prevent="saveFoodReview" class="v52-form">
+        <fieldset><legend>Respect du menu</legend><label><input type="radio" v-model="foodForm.status" value="taken"> Pris comme prévu</label><label><input type="radio" v-model="foodForm.status" value="changed"> Changé : j'ai mangé autre chose</label></fieldset>
+        <template v-if="foodForm.status==='changed'"><label>Plat réellement mangé <input v-model="foodForm.actual" required placeholder="Nom du plat (sans l'ajouter au catalogue)"></label></template>
+        <label>Type de plat <select v-model="foodForm.category"><option value="">À choisir</option><option v-for="cat in dishCategoryList" :key="cat" :value="cat">{{cat}}</option></select></label>
+        <label>Équilibre du plat, selon ton appréciation <select v-model="foodForm.health"><option value="unknown">Je ne sais pas</option><option value="balanced">Plutôt équilibré</option><option value="average">À améliorer</option><option value="unbalanced">Peu équilibré</option></select></label>
+        <label>As-tu mangé suffisamment ? <select v-model="foodForm.quantity"><option value="less">Pas assez</option><option value="ok">Quantité adaptée</option><option value="more">Trop</option></select></label>
+        <label>Dans quel récipient ? <select v-model="foodForm.container" required><option value="">Choisir</option><option v-for="x in data.foodContainers" :key="x" :value="x">{{x}}</option></select></label>
+        <div class="v52-inline"><input v-model="foodContainerNew" placeholder="Nom d'un nouveau récipient"><button type="button" @click="addFoodContainer">+ Ajouter</button></div>
+        <label>Ce récipient était-il adapté à ce repas ? <select v-model="foodForm.containerRating"><option value="good">Bien adapté</option><option value="neutral">Moyen</option><option value="bad">Pas adapté</option></select></label>
+        <div class="v52-actions"><button type="submit">Enregistrer le bilan (+2 pts)</button><button type="button" @click="foodForm.open=false">Annuler</button></div>
+      </form>
+    </section></div>
+    <div class="modal-backdrop" v-if="foodReminder.open"><section class="modal v52-modal" role="dialog" aria-modal="true"><h2>🍽️ Repas d'hier à compléter</h2><p>Il manque le bilan de {{foodReminder.items.length}} repas du {{formatDate(foodReminder.date)}}. Ce rappel n'apparaîtra qu'une fois.</p><div class="v52-actions"><button v-for="kind in foodReminder.items" :key="kind" @click="reviewReminderMeal(kind)">Compléter {{kind==='lunch'?'le déjeuner':'le dîner'}}</button><button @click="closeFoodReminder">Ignorer</button></div></section></div>
 </div>
 
 <!-- ============ TEMPLATE : LIGNE DE TÂCHE ============ -->
@@ -1445,7 +1505,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261106-v51"></script>
+<script src="app.js?v=20261106-v52"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

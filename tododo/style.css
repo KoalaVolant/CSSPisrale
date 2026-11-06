@@ -365,3 +365,21 @@
 
 /* V30 : champs d’édition visibles uniquement à la demande */
 .v30-dependency{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px}.v30-dependency select{max-width:240px}.catalogue-row{flex-wrap:wrap;align-items:center}.catalogue-row>small{margin-right:8px}.v29-line{flex-wrap:wrap}
+
+/* V52 : Sport & bien-être et bilans alimentaires */
+.v52-card{border:1px solid var(--main-color,#ddd);background:var(--fnd,#fafafa);border-radius:12px;margin:12px 0;padding:14px;min-width:0}
+.v52-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.v52-card h2{margin:0 0 10px}.v52-card label{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;margin:5px}
+.v52-card input,.v52-card select,.v52-modal input,.v52-modal select{padding:6px;border:1px solid #bbb;border-radius:6px;max-width:100%}
+.v52-card button,.v52-modal button{padding:6px 10px;border-radius:7px;border:1px solid var(--fnd3,#9bb);cursor:pointer}
+.v52-goals{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center}.v52-goals input{width:58px}
+.v52-reminder{padding:10px;border-left:4px solid #a77b38;background:#fff4df;color:#5a4223}
+.v52-actions,.v52-inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:9px 0}
+.v52-form-grid{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.v52-form-grid input{flex:1 1 150px}.v52-ex{display:flex;align-items:center;gap:7px;flex-wrap:wrap;border-bottom:1px solid #ddd;padding:8px 0}
+.v52-ex label{flex:1 1 200px}.v52-ex input.v52-name{min-width:140px}.v52-ex small{display:block;color:#666}
+.v52-history{border-bottom:1px solid #ddd;padding:8px 2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.v52-stats{display:flex;flex-wrap:wrap;gap:10px}.v52-stats>div{padding:10px;background:white;border-radius:7px;flex:1 1 140px}.v52-stats b{display:block}
+.v52-generated{background:#fff}.v52-modal{width:min(96vw,620px);max-height:92vh;overflow:auto}.v52-form{display:grid;gap:10px}
+.v52-form>label{display:grid;gap:5px}.v52-form fieldset label{display:block;margin:7px}.v52-meal-summary{font-size:12px;padding:6px;background:#e9f4ed;border-radius:6px}
+@media(max-width:700px){.v52-goals{grid-template-columns:minmax(0,1fr) auto}.v52-inline input{min-width:0;flex:1 1 140px}.v52-card{padding:10px}}
