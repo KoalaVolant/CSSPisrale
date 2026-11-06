@@ -20,6 +20,21 @@ const DEFAULT_URGENCIES = [
   { id: 'medium', name: 'Moyenne', color: '#f59e0b' },
   { id: 'high',   name: 'Haute',   color: '#ef4444' },
 ];
+const DEFAULT_ALTER_REVIEW_QUESTIONS = [
+  { id:'enjoyed', label:'A pu profiter de sa journée' },
+  { id:'clothes', label:'A choisi les habits' },
+  { id:'game', label:'A choisi le jeu' },
+  { id:'meal', label:'A mangé le repas' },
+  { id:'music', label:'A choisi la musique' },
+  { id:'interaction', label:'A interagi avec une personne qui savait que c’était lui' }
+];
+function normalizeAlterReviewQuestions(list) {
+  if (!Array.isArray(list)) return clone(DEFAULT_ALTER_REVIEW_QUESTIONS);
+  const seen = new Set();
+  return list.filter(q=>q && typeof q.id==='string' && typeof q.label==='string' && q.label.trim() && !seen.has(q.id) && seen.add(q.id))
+    .map(q=>({id:q.id,label:q.label.trim()}));
+}
+
 const DEFAULT_DIFFICULTIES = [
   { id: 'easy',   name: 'Facile',    color: '#22c55e' },
   { id: 'medium', name: 'Moyenne',   color: '#f59e0b' },
@@ -212,6 +227,7 @@ function defaultData() {
     alters: [],
     alterDays: {},
     alterReviews: [],
+    alterReviewQuestions: clone(DEFAULT_ALTER_REVIEW_QUESTIONS),
     moodTypes: [],
     moodEntries: [],
     alterActivities: [],
@@ -278,6 +294,7 @@ function loadData() {
     if (!raw) return defaultData();
     const d = Object.assign(defaultData(), JSON.parse(raw));
     for(const k of ['alters','alterReviews','moodTypes','moodEntries','alterActivities'])if(!Array.isArray(d[k]))d[k]=[];
+    d.alterReviewQuestions=normalizeAlterReviewQuestions(d.alterReviewQuestions);
     if(!d.alterDays||typeof d.alterDays!=='object'||Array.isArray(d.alterDays))d.alterDays={};
     if(!Number.isInteger(d.moodReminderHour))d.moodReminderHour=19;
     d.categories = normalizeCategories(d.categories).filter(c => c.name !== 'Travail');
@@ -287,7 +304,7 @@ function loadData() {
     if (!Array.isArray(d.habits)) d.habits = [];
     if (!Array.isArray(d.activities)) d.activities = [];
     if (!Array.isArray(d.workTickets)) d.workTickets = [];
-    d.workTickets=d.workTickets.filter(t=>t&&typeof t==='object').map(t=>({...t,items:Array.isArray(t.items)?t.items:[]}));
+    d.workTickets=d.workTickets.filter(t=>t&&typeof t==='object').map(t=>{const items=Array.isArray(t.items)?t.items:[];return {...t,items,waiting:items.some(i=>!i.done)?false:!!t.waiting};});
     if (!Array.isArray(d.workTicketTypes)) d.workTicketTypes = [];
     if (!Array.isArray(d.usualLists)) d.usualLists = [];
     d.eveningNotes = typeof d.eveningNotes === 'string' ? d.eveningNotes : '';
@@ -543,6 +560,7 @@ const app = createApp({
       data.customAchievements=Array.isArray(src.customAchievements)?src.customAchievements:[];
       data.appointments=Array.isArray(src.appointments)?src.appointments:[];
       for(const k of ['alters','alterReviews','moodTypes','moodEntries','alterActivities'])data[k]=Array.isArray(src[k])?src[k]:[];
+      data.alterReviewQuestions=normalizeAlterReviewQuestions(src.alterReviewQuestions);
       data.alterDays=src.alterDays&&typeof src.alterDays==='object'&&!Array.isArray(src.alterDays)?src.alterDays:{};
       data.moodReminderHour=Number.isInteger(src.moodReminderHour)?src.moodReminderHour:19;
       data.appointmentCategories=Array.isArray(src.appointmentCategories)?src.appointmentCategories:[];
@@ -566,7 +584,7 @@ const app = createApp({
       if (data.eveningNotes.trim()) { if (!data.textareas.length) data.textareas.push({id:uid(),title:'To do du soir',content:data.eveningNotes}); data.eveningNotes=''; }
       data.usualLists = Array.isArray(src.usualLists) ? src.usualLists : [];
       data.workTicketTypes = Array.isArray(src.workTicketTypes) ? src.workTicketTypes : [];
-      data.workTickets = Array.isArray(src.workTickets) ? src.workTickets : [];
+      data.workTickets = (Array.isArray(src.workTickets) ? src.workTickets : []).filter(t=>t&&typeof t==='object').map(t=>{const items=Array.isArray(t.items)?t.items:[];return {...t,items,waiting:items.some(i=>!i.done)?false:!!t.waiting};});
       // Les tickets synchronisés doivent également disposer de champs de saisie locaux.
       if (typeof ticketInputs !== 'undefined') {
         data.workTickets.forEach(t => { if (!ticketInputs[t.id]) ticketInputs[t.id] = {name:'',points:10}; });
@@ -1191,7 +1209,7 @@ const app = createApp({
     const ticketActivityDate = t => { const raw=t.lastActivityAt || t.createdAtTime || t.createdAt || t.startDate; if(!raw)return NaN; const ms=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw).getTime();return ms; };
     const ticketStale = t => Number.isFinite(ticketActivityDate(t)) && ticketNow.value-ticketActivityDate(t)>=86400000;
     const ticketNeedsAction = t => (t.items||[]).some(i=>!i.done);
-    const ticketWaiting = t => !!t.waiting;
+    const ticketWaiting = t => !!t.waiting && !ticketNeedsAction(t);
     const ticketColorState = t => ticketNeedsAction(t)?'pending':ticketWaiting(t)?'waiting':ticketStale(t)?'stale':'clear';
     const ticketStateRank = t => ({pending:0,stale:1,waiting:2,clear:3})[ticketColorState(t)];
     const ticketCreatedLabel = t => {const raw=t.createdAtTime||t.createdAt; if(!raw)return 'Date inconnue'; const dt=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw);return Number.isNaN(dt.getTime())?String(raw):dt.toLocaleString('fr-FR',{dateStyle:'short',timeStyle: /^\d{4}-\d{2}-\d{2}$/.test(raw)?undefined:'short'});};
@@ -1200,7 +1218,7 @@ const app = createApp({
 
     const ticketDragged = ref(null);
     const openTickets = computed(()=>{
-      const list=data.workTickets.filter(t=>!t.done && (!hideWaitingTickets.value || !t.waiting));
+      const list=data.workTickets.filter(t=>!t.done && (!hideWaitingTickets.value || !ticketWaiting(t)));
       const urgency=t=>levelRank(data.workUrgencies,t.urgency);
       const difficulty=t=>levelRank(data.workDifficulties,t.difficulty);
       switch(ticketSort.value){
@@ -1242,14 +1260,14 @@ const app = createApp({
     }
     function addTicketItem(ticket) {
       const draft=ticketInputs[ticket.id]||(ticketInputs[ticket.id]={name:'',points:10});const name=String(draft.name||'').trim();if(!name)return;
-      ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});touchTicket(ticket);
+      ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});ticket.waiting=false;touchTicket(ticket);
       ticketInputs[ticket.id]={name:'',points:10};
     }
     function ticketItemBlocker(ticket,item){const prev=(ticket.items||[]).find(x=>x.id===item.dependsOn);return prev&&!prev.done?prev:null;}
     function validateTicketDependency(ticket,item){let id=item.dependsOn;const seen=new Set([item.id]);while(id){if(seen.has(id)){item.dependsOn='';notify('Dépendance circulaire interdite');return;}seen.add(id);id=ticket.items.find(x=>x.id===id)?.dependsOn||'';}}
     function toggleTicketItem(ticket,item) {
       if(!item.done&&ticketItemBlocker(ticket,item)){notify('Termine la tâche précédente avant celle-ci');return;}
-      item.done=!item.done;item.doneAt=item.done?today.value:'';touchTicket(ticket);
+      item.done=!item.done;item.doneAt=item.done?today.value:'';if(!item.done)ticket.waiting=false;touchTicket(ticket);
       if(!item.done&&ticket.done){ticket.done=false;ticket.doneAt='';}
     }
     function finishTicket(ticket) {
@@ -1269,6 +1287,7 @@ const app = createApp({
       if(item.done)data.archived+=ticketItemValue(ticket,item);
       ticket.items=ticket.items.filter(x=>x.id!==item.id);
       if(ticket.done){ticket.done=false;ticket.doneAt='';}
+      if(ticketNeedsAction(ticket))ticket.waiting=false;
     }
     function ticketPoints(ticket){return (ticket.items||[]).filter(x=>x.done).reduce((s,x)=>s+ticketItemValue(ticket,x),0);}
 
@@ -2718,8 +2737,26 @@ const app = createApp({
     const alterActivityDraft=reactive({alterId:'',title:'',description:''});
     function addAlterActivity(){if(!alterActivityDraft.title.trim())return;data.alterActivities.push({id:uid(),alterId:alterActivityDraft.alterId,title:alterActivityDraft.title.trim(),description:alterActivityDraft.description.trim()});alterActivityDraft.title='';alterActivityDraft.description='';}
     function removeAlterActivity(a){if(confirm('Supprimer cette idée ?'))data.alterActivities=data.alterActivities.filter(x=>x.id!==a.id);}
-    const alterReviewQuestions=[['enjoyed','A pu profiter de sa journée'],['clothes','A choisi les habits'],['game','A choisi le jeu'],['meal','A mangé le repas'],['interaction','A interagi avec une personne qui savait que c’était lui']];
-    const alterReviewForm=reactive({open:false,date:'',alterId:'',name:'',enjoyed:null,clothes:null,game:null,meal:null,interaction:null,notes:''});
+    const alterReviewQuestions=computed(()=>data.alterReviewQuestions.map(q=>[q.id,q.label]));
+    const alterReviewConfigOpen=ref(false);
+    const newAlterReviewQuestion=ref('');
+    function addAlterReviewQuestion(){
+      const label=newAlterReviewQuestion.value.trim();
+      if(!label)return;
+      data.alterReviewQuestions.push({id:'custom_'+uid(),label});
+      newAlterReviewQuestion.value='';
+    }
+    function removeAlterReviewQuestion(q){
+      if(confirm('Supprimer cette question du formulaire ? Les réponses historiques restent conservées.'))
+        data.alterReviewQuestions=data.alterReviewQuestions.filter(x=>x.id!==q.id);
+    }
+    function moveAlterReviewQuestion(q,delta){
+      const i=data.alterReviewQuestions.findIndex(x=>x.id===q.id),j=i+delta;
+      if(i<0||j<0||j>=data.alterReviewQuestions.length)return;
+      [data.alterReviewQuestions[i],data.alterReviewQuestions[j]]=[data.alterReviewQuestions[j],data.alterReviewQuestions[i]];
+    }
+
+    const alterReviewForm=reactive({open:false,date:'',alterId:'',name:'',enjoyed:null,clothes:null,game:null,meal:null,music:null,interaction:null,notes:''});
     // Une seule fiche par journée, même si d'anciennes synchronisations ont produit des doublons.
     const uniqueAlterReviews=computed(()=>{
       const byDate=new Map();
@@ -2741,17 +2778,17 @@ const app = createApp({
     function openPendingAlterReview(){
       if(!pendingAlterReview.value||alterReviewForm.open)return;
       const [date,id]=pendingAlterReview.value;
-      Object.assign(alterReviewForm,{open:true,date,alterId:id,name:data.alters.find(a=>a.id===id)?.name||'Alter supprimé',enjoyed:null,clothes:null,game:null,meal:null,interaction:null,notes:''});
+      Object.assign(alterReviewForm,{open:true,date,alterId:id,name:data.alters.find(a=>a.id===id)?.name||'Alter supprimé',...Object.fromEntries(alterReviewQuestions.value.map(([k])=>[k,null])),notes:''});
     }
     function editAlterReview(review){
       if(!review)return;
       Object.assign(alterReviewForm,{open:true,date:review.date,alterId:review.alterId,name:review.name||data.alters.find(a=>a.id===review.alterId)?.name||'Alter',
-        ...Object.fromEntries(alterReviewQuestions.map(([k])=>[k,review[k]??null])),notes:review.notes||''});
+        ...Object.fromEntries(alterReviewQuestions.value.map(([k])=>[k,review[k]??null])),notes:review.notes||''});
     }
     function saveAlterReview(){
       if(!alterReviewForm.date || alterReviewForm.date>=today.value){notify('Le bilan se remplit à partir du lendemain de la journée');return;}
       const entry={date:alterReviewForm.date,alterId:alterReviewForm.alterId,name:alterReviewForm.name,
-        ...Object.fromEntries(alterReviewQuestions.map(([k])=>[k,alterReviewForm[k]])),notes:alterReviewForm.notes};
+        ...Object.fromEntries(alterReviewQuestions.value.map(([k])=>[k,alterReviewForm[k]])),notes:alterReviewForm.notes};
       const existing=data.alterReviews.find(r=>r.date===entry.date);
       if(existing)Object.assign(existing,entry);
       else data.alterReviews.push({id:uid(),...entry});
@@ -2777,12 +2814,21 @@ const app = createApp({
     function removeMoodType(type){if(!confirm('Supprimer cette humeur ? Les entrées historiques seront conservées.'))return;data.moodTypes=data.moodTypes.filter(x=>x.id!==type.id);}
     const draggedMood=ref('');
     function dropMoodType(target){const i=data.moodTypes.findIndex(t=>t.id===draggedMood.value),j=data.moodTypes.findIndex(t=>t.id===target.id);if(i<0||j<0||i===j)return;data.moodTypes.splice(j,0,...data.moodTypes.splice(i,1));const moved=data.moodTypes.find(t=>t.id===draggedMood.value);if(moved)moved.polarity=moodTypePolarity(target);normalizeMoodOrder();draggedMood.value='';}
-    function saveMood(){if(!moodForm.date)return;const value=Math.max(-5,Math.min(5,Number(moodForm.score)||0));const ids=[...moodForm.moodIds];const entry={id:moodForm.id||uid(),date:moodForm.date,moodIds:ids,moodId:ids[0]||'',moodName:ids.map(id=>moodTypeFor(id)?.name).filter(Boolean).join(', '),moodColor:moodTypeFor(ids[0])?.color||'#999',note:moodForm.note,score:value};const old=data.moodEntries.find(x=>x.id===entry.id);if(old)Object.assign(old,entry);else data.moodEntries.push(entry);Object.assign(moodForm,{id:'',date:todayStr(),moodIds:[],note:'',score:0});moodPromptDismissed.value=today.value;notify('Entrée du journal enregistrée');}
+    function saveMood(){if(!moodForm.date)return;const value=Math.max(-5,Math.min(5,Number(moodForm.score)||0));const ids=[...moodForm.moodIds];const entry={id:moodForm.id||uid(),date:moodForm.date,moodIds:ids,moodId:ids[0]||'',moodName:ids.map(id=>moodTypeFor(id)?.name).filter(Boolean).join(', '),moodColor:moodTypeFor(ids[0])?.color||'#999',note:moodForm.note,score:value};const old=data.moodEntries.find(x=>x.id===entry.id);if(old)Object.assign(old,entry);else data.moodEntries.push(entry);Object.assign(moodForm,{id:'',date:todayStr(),moodIds:[],note:'',score:0});moodPromptDismissed.value=entry.date;notify('Entrée du journal enregistrée');}
     function editMoodEntry(e){Object.assign(moodForm,{id:e.id,date:e.date,moodIds:[...(e.moodIds|| (e.moodId?[e.moodId]:[]))],note:e.note||'',score:e.score});}
     function removeMoodEntry(e){if(confirm('Supprimer cette note ?'))data.moodEntries=data.moodEntries.filter(x=>x.id!==e.id);}
     const moodPromptDismissed=ref('');
-    const moodPromptOpen=computed(()=>(nowMinute.value>=0)&&(new Date().getHours()*60+new Date().getMinutes()>=Number(data.moodReminderHour||0)*60)&&moodPromptDismissed.value!==today.value&&!data.moodEntries.some(x=>x.date===today.value));
-    function dismissMoodPrompt(){moodPromptDismissed.value=today.value;}
+    const moodPromptDate=computed(()=>{
+      // Si le bilan de la veille a été oublié, le proposer dès le lendemain.
+      const yesterday=dateAdd(today.value,-1);
+      if(!data.moodEntries.some(x=>x.date===yesterday) && moodPromptDismissed.value!==yesterday)return yesterday;
+      if(new Date().getHours()*60+new Date().getMinutes()>=Number(data.moodReminderHour||0)*60 &&
+          !data.moodEntries.some(x=>x.date===today.value) && moodPromptDismissed.value!==today.value)return today.value;
+      return '';
+    });
+    const moodPromptOpen=computed(()=>nowMinute.value>=0 && !!moodPromptDate.value);
+    function openMoodPrompt(){if(!moodPromptDate.value)return;Object.assign(moodForm,{id:'',date:moodPromptDate.value,moodIds:[],note:'',score:0});dismissMoodPrompt();setTab('mood');}
+    function dismissMoodPrompt(){moodPromptDismissed.value=moodPromptDate.value||today.value;}
     const nowMinute=ref(0);
     setInterval(()=>{nowMinute.value++;today.value=todayStr();if(pendingAlterReview.value&&!alterReviewForm.open&&!pendingAppointment.value&&!apptForm.open)openPendingAlterReview();},60000);
     nextTick(()=>{if(pendingAlterReview.value)openPendingAlterReview();});
@@ -2791,7 +2837,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
+      projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,

@@ -381,3 +381,9 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 .dashboard .view-undated { flex: 1 1 100%; width: 100%; min-width: 0; }
 .dashboard .view-undated .task-list-box { display: flex; flex-wrap: wrap; }
 @media (max-width: 800px) { .dashboard .view-undated { width: 100%; } }
+
+/* Todo Quest v51 : distinguer les rendez-vous terminés dans le calendrier */
+.calendar-event.calendar-event-done{opacity:.63;text-decoration:line-through;filter:saturate(.55);border:1px dashed #65776e;cursor:pointer}
+.alter-review-config-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0}
+.alter-review-config-row input{flex:1 1 220px;min-width:0}
+.alter-review-config-row button{padding:5px 9px}
