@@ -701,6 +701,556 @@ const SPORT_DEFAULT_EXERCISES = [
     "reps": "60 secondes",
     "seconds": 60,
     "active": true
+  },
+  {
+    "id": "sport-v56-01",
+    "name": "Assis-debout avec pause",
+    "category": "renfo",
+    "description": "Depuis une chaise stable, se lever avec contrôle, marquer une pause puis se rasseoir.",
+    "level": "doux",
+    "reps": "5 fois, pause 2 s debout",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/strength-exercises/"
+  },
+  {
+    "id": "sport-v56-02",
+    "name": "Montée de talon à une jambe avec appui",
+    "category": "genoux",
+    "description": "Tenir un support solide, lever doucement le talon sur une jambe, redescendre sans rebond.",
+    "level": "moyen",
+    "reps": "6 par côté",
+    "seconds": 75,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/strength-exercises/"
+  },
+  {
+    "id": "sport-v56-03",
+    "name": "Mini-fente arrière avec appui",
+    "category": "genoux",
+    "description": "Avec un support, reculer légèrement un pied et fléchir peu les genoux, puis revenir.",
+    "level": "moyen",
+    "reps": "5 par jambe",
+    "seconds": 75,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-04",
+    "name": "Demi-squat lent sans charge",
+    "category": "genoux",
+    "description": "Pieds écartés, descendre modérément les hanches, genoux alignés avec les pieds.",
+    "level": "moyen",
+    "reps": "6 fois",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.orthoinfo.org/recovery/knee-conditioning-program/"
+  },
+  {
+    "id": "sport-v56-05",
+    "name": "Abduction de hanche allongée",
+    "category": "genoux",
+    "description": "Sur le côté, lever doucement la jambe supérieure, garder le bassin stable.",
+    "level": "moyen",
+    "reps": "6 par côté",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.orthoinfo.org/recovery/knee-conditioning-program/"
+  },
+  {
+    "id": "sport-v56-06",
+    "name": "Adduction de hanche allongée",
+    "category": "genoux",
+    "description": "Sur le côté, soulever doucement la jambe inférieure sans torsion.",
+    "level": "moyen",
+    "reps": "6 par côté",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.orthoinfo.org/recovery/knee-conditioning-program/"
+  },
+  {
+    "id": "sport-v56-07",
+    "name": "Extension de hanche sur le ventre",
+    "category": "renfo",
+    "description": "Allongé sur le ventre, contracter les fessiers et décoller légèrement une jambe.",
+    "level": "moyen",
+    "reps": "6 par jambe",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.orthoinfo.org/recovery/knee-conditioning-program/"
+  },
+  {
+    "id": "sport-v56-08",
+    "name": "Pont fessier avec pause",
+    "category": "renfo",
+    "description": "Allongé, genoux fléchis, lever le bassin et maintenir brièvement.",
+    "level": "moyen",
+    "reps": "8 fois, pause 2 s",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-09",
+    "name": "Pont fessier une jambe assisté",
+    "category": "renfo",
+    "description": "Depuis un pont, délester doucement un pied; garder le bassin horizontal.",
+    "level": "difficile",
+    "reps": "5 par côté",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-10",
+    "name": "Chaise contre le mur courte",
+    "category": "renfo",
+    "description": "Dos au mur, fléchir légèrement les genoux sans descendre trop bas.",
+    "level": "moyen",
+    "reps": "3 × 15 s",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-11",
+    "name": "Fente arrière contrôlée",
+    "category": "renfo",
+    "description": "Reculer un pied et fléchir selon l’amplitude confortable, sans impact.",
+    "level": "difficile",
+    "reps": "6 par jambe",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-12",
+    "name": "Squat au poids du corps",
+    "category": "renfo",
+    "description": "Descendre les hanches dans une amplitude confortable, dos stable et talons au sol.",
+    "level": "moyen",
+    "reps": "8 répétitions",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-13",
+    "name": "Squat tempo lent",
+    "category": "renfo",
+    "description": "Effectuer un squat sans charge avec descente contrôlée; interrompre si douleur.",
+    "level": "difficile",
+    "reps": "6 répétitions, descente 3 s",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-14",
+    "name": "Soulevé de bassin isométrique",
+    "category": "renfo",
+    "description": "Maintenir le bassin relevé en pont, sans cambrer le dos.",
+    "level": "doux",
+    "reps": "3 × 10 s",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-15",
+    "name": "Charnière de hanches sans charge",
+    "category": "renfo",
+    "description": "Incliner le buste depuis les hanches, dos neutre, puis se redresser.",
+    "level": "doux",
+    "reps": "8 répétitions",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-16",
+    "name": "Pompes sur les genoux",
+    "category": "renfo",
+    "description": "Sur tapis, mains sous épaules, abaisser doucement le buste puis pousser.",
+    "level": "moyen",
+    "reps": "6 répétitions",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-17",
+    "name": "Pompes classiques",
+    "category": "renfo",
+    "description": "En appui mains-pieds, garder le tronc aligné durant la descente.",
+    "level": "difficile",
+    "reps": "6 répétitions",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-18",
+    "name": "Gainage sur avant-bras",
+    "category": "renfo",
+    "description": "Avant-bras au sol, corps aligné; variante sur genoux possible.",
+    "level": "moyen",
+    "reps": "3 × 15 s",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-19",
+    "name": "Gainage latéral sur genou",
+    "category": "renfo",
+    "description": "Sur le côté, appui avant-bras et genou, soulever le bassin.",
+    "level": "moyen",
+    "reps": "2 × 15 s par côté",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-20",
+    "name": "Gainage latéral complet",
+    "category": "renfo",
+    "description": "En appui sur un avant-bras et les pieds, garder le corps aligné.",
+    "level": "difficile",
+    "reps": "2 × 20 s par côté",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-21",
+    "name": "Dead bug alterné",
+    "category": "renfo",
+    "description": "Sur le dos, engager le ventre et tendre bras/jambe opposés sans cambrer.",
+    "level": "moyen",
+    "reps": "6 par côté",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-22",
+    "name": "Bird-dog complet",
+    "category": "renfo",
+    "description": "À quatre pattes, tendre bras et jambe opposés en gardant le bassin stable.",
+    "level": "moyen",
+    "reps": "6 par côté",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-23",
+    "name": "Planche avec toucher d’épaule",
+    "category": "renfo",
+    "description": "En position de planche, toucher une épaule avec la main opposée sans tourner les hanches.",
+    "level": "difficile",
+    "reps": "8 alternances",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-24",
+    "name": "Élévation frontale avec bouteille",
+    "category": "renfo",
+    "description": "Lever une petite bouteille devant soi jusqu’aux épaules, lentement.",
+    "level": "moyen",
+    "reps": "8 répétitions",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-25",
+    "name": "Curl biceps avec bouteilles",
+    "category": "renfo",
+    "description": "Coudes près du corps, plier les bras avec de petites bouteilles.",
+    "level": "doux",
+    "reps": "10 répétitions",
+    "seconds": 75,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-26",
+    "name": "Rowing avec bouteilles légères",
+    "category": "renfo",
+    "description": "Buste incliné dos neutre, tirer les coudes vers l’arrière avec charges légères.",
+    "level": "moyen",
+    "reps": "8 répétitions",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-27",
+    "name": "Développé épaules léger",
+    "category": "renfo",
+    "description": "Pousser de petites charges au-dessus de la tête sans cambrer.",
+    "level": "moyen",
+    "reps": "8 répétitions",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-28",
+    "name": "Rotation douce du cou",
+    "category": "mobilite",
+    "description": "Assis, tourner lentement la tête vers une épaule sans forcer.",
+    "level": "doux",
+    "reps": "3 par côté",
+    "seconds": 45,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/flexibility-exercises/"
+  },
+  {
+    "id": "sport-v56-29",
+    "name": "Inclinaison latérale du cou",
+    "category": "etirement",
+    "description": "Incliner légèrement l’oreille vers une épaule, sans tirer la tête.",
+    "level": "doux",
+    "reps": "3 × 5 s par côté",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/flexibility-exercises/"
+  },
+  {
+    "id": "sport-v56-30",
+    "name": "Inclinaison latérale du buste",
+    "category": "mobilite",
+    "description": "Debout, glisser une main le long de la cuisse en inclinant légèrement le buste.",
+    "level": "doux",
+    "reps": "5 par côté",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/flexibility-exercises/"
+  },
+  {
+    "id": "sport-v56-31",
+    "name": "Ouverture de poitrine debout",
+    "category": "etirement",
+    "description": "Mains derrière le dos ou contre un mur, ouvrir doucement la poitrine.",
+    "level": "doux",
+    "reps": "3 × 10 s",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/flexibility-exercises/"
+  },
+  {
+    "id": "sport-v56-32",
+    "name": "Étirement latéral du dos",
+    "category": "etirement",
+    "description": "Un bras au-dessus de la tête, incliner doucement le buste du côté opposé.",
+    "level": "doux",
+    "reps": "15 s par côté",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/flexibility-exercises/"
+  },
+  {
+    "id": "sport-v56-33",
+    "name": "Étirement du quadriceps avec appui",
+    "category": "etirement",
+    "description": "Debout avec appui, rapprocher doucement le talon de la fesse sans tirer le genou.",
+    "level": "moyen",
+    "reps": "15 s par jambe",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.orthoinfo.org/recovery/knee-conditioning-program/"
+  },
+  {
+    "id": "sport-v56-34",
+    "name": "Étirement des fléchisseurs de hanche",
+    "category": "etirement",
+    "description": "Position de fente courte avec appui, avancer doucement le bassin.",
+    "level": "moyen",
+    "reps": "15 s par côté",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-35",
+    "name": "Étirement des avant-bras",
+    "category": "etirement",
+    "description": "Bras tendu, guider doucement la main vers soi, sans douleur.",
+    "level": "doux",
+    "reps": "15 s par bras",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-36",
+    "name": "Marche talon-pointe avec appui",
+    "category": "equilibre",
+    "description": "Marcher un pied devant l’autre près d’un mur, sans se presser.",
+    "level": "moyen",
+    "reps": "8 pas",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/balance-exercises/"
+  },
+  {
+    "id": "sport-v56-37",
+    "name": "Pas arrière avec appui",
+    "category": "equilibre",
+    "description": "Avec une chaise stable, faire un petit pas en arrière puis revenir.",
+    "level": "doux",
+    "reps": "6 par côté",
+    "seconds": 60,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/balance-exercises/"
+  },
+  {
+    "id": "sport-v56-38",
+    "name": "Équilibre tandem",
+    "category": "equilibre",
+    "description": "Un pied devant l’autre, tenir près d’un mur ou d’un dossier stable.",
+    "level": "moyen",
+    "reps": "2 × 15 s",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/balance-exercises/"
+  },
+  {
+    "id": "sport-v56-39",
+    "name": "Équilibre une jambe sans appui",
+    "category": "equilibre",
+    "description": "Près d’un support, soulever un pied et chercher la stabilité.",
+    "level": "difficile",
+    "reps": "2 × 15 s par pied",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/balance-exercises/"
+  },
+  {
+    "id": "sport-v56-40",
+    "name": "Pas en huit autour de repères",
+    "category": "equilibre",
+    "description": "Marcher en dessinant un huit autour de deux repères espacés.",
+    "level": "moyen",
+    "reps": "60 secondes",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.nhs.uk/live-well/exercise/balance-exercises/"
+  },
+  {
+    "id": "sport-v56-41",
+    "name": "Marche dynamique bras alternés",
+    "category": "cardio",
+    "description": "Marcher sur place en balançant les bras naturellement.",
+    "level": "doux",
+    "reps": "90 secondes",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-42",
+    "name": "Step touch rapide sans saut",
+    "category": "fitness",
+    "description": "Alterner un pas latéral et le regroupement des pieds sur un rythme régulier.",
+    "level": "moyen",
+    "reps": "60 secondes",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-43",
+    "name": "Jack sans saut",
+    "category": "fitness",
+    "description": "Écarter une jambe à la fois en levant les bras, sans sauter.",
+    "level": "doux",
+    "reps": "45 secondes",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-44",
+    "name": "Montées de genoux rythmées",
+    "category": "fitness",
+    "description": "Lever alternativement les genoux à hauteur confortable en avançant les bras.",
+    "level": "moyen",
+    "reps": "45 secondes",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-45",
+    "name": "Shadow boxing cadencé",
+    "category": "fitness",
+    "description": "Enchaîner des coups de poing dans l’air en restant stable sur les appuis.",
+    "level": "moyen",
+    "reps": "60 secondes",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-46",
+    "name": "Mountain climber lent sur support",
+    "category": "fitness",
+    "description": "Mains sur support très stable, alterner la montée des genoux sans impact.",
+    "level": "difficile",
+    "reps": "30 secondes × 2",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.acefitness.org/resources/everyone/exercise-library/"
+  },
+  {
+    "id": "sport-v56-47",
+    "name": "Danse freestyle deux chansons",
+    "category": "danse",
+    "description": "Danser librement sur deux extraits musicaux, avec pauses et sans saut.",
+    "level": "moyen",
+    "reps": "2 à 3 minutes",
+    "seconds": 180,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-48",
+    "name": "Pas de salsa de base",
+    "category": "danse",
+    "description": "Alterner des pas en avant et arrière sur un rythme doux, sans pivoter brusquement.",
+    "level": "doux",
+    "reps": "60 secondes",
+    "seconds": 90,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-49",
+    "name": "Pas de merengue sur place",
+    "category": "danse",
+    "description": "Faire de petits pas alternés avec un mouvement léger des bras.",
+    "level": "doux",
+    "reps": "60 secondes",
+    "seconds": 120,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
+  },
+  {
+    "id": "sport-v56-50",
+    "name": "Enchaînement danse cardio sans saut",
+    "category": "danse",
+    "description": "Alterner pas latéraux, marche rythmée et mouvements de bras, sans impact.",
+    "level": "moyen",
+    "reps": "2 minutes",
+    "seconds": 180,
+    "active": true,
+    "sourceUrl": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/"
   }
 ];
 
@@ -853,6 +1403,16 @@ function loadData() {
     // V52 : données Sport / alimentation, compatibilité anciennes sauvegardes.
     for (const k of ['sportExercises','sportSessions','sportLocations','weightEntries','foodContainers']) {
       if (!Array.isArray(d[k])) d[k]=clone(defaultData()[k]);
+    }
+    // V56: expansion unique du catalogue, conserve modifications et suppressions utilisateur.
+    if (!d.sportCatalogV56) {
+      const existingIds = new Set(d.sportExercises.filter(x => x && x.id).map(x => x.id));
+      for (const ex of SPORT_DEFAULT_EXERCISES) {
+        if (String(ex.id).startsWith('sport-v56-') && !existingIds.has(ex.id)) {
+          d.sportExercises.push(clone(ex));
+        }
+      }
+      d.sportCatalogV56 = true;
     }
     if (!d.sportGoals || typeof d.sportGoals !== 'object') d.sportGoals=clone(defaultData().sportGoals);
     if (!d.sportPoints || typeof d.sportPoints !== 'object') d.sportPoints=clone(defaultData().sportPoints);
@@ -3353,6 +3913,7 @@ const app = createApp({
     const sportDraft = ref([]);
     const sportDraftKind = ref('mini');
     const sportMinutes = ref(12);
+    const sportLongExerciseCount = ref(8); // 4 à 10 exercices pour la séance 10-15 min
     const sportPick = ref(null);
     const sportExerciseForm = reactive({name:'',category:'cardio',description:'',level:'doux',reps:'30 secondes',seconds:60});
     const sportLocationName = ref('');
@@ -3367,7 +3928,7 @@ const app = createApp({
     }));
     const sportHistory=computed(()=>[...data.sportSessions].sort((a,b)=>String(b.createdAt||b.date).localeCompare(String(a.createdAt||a.date))));
     const sportReminder=computed(()=>{const dow=new Date(today.value+'T12:00:00').getDay();return dow>=4||dow===0;});
-    const sportPool=computed(()=>data.sportExercises.filter(x=>x.active!==false && (sportLevel.value==='moyen'||x.level!=='moyen')));
+    const sportPool=computed(()=>data.sportExercises.filter(x=>x && x.active!==false && (sportLevel.value==='difficile' || (sportLevel.value==='moyen' && x.level!=='difficile') || (sportLevel.value==='doux' && x.level==='doux'))));
     const sportRandom=(items)=>items[Math.floor(Math.random()*items.length)];
     function generateSport(kind='mini'){
       sportDraftKind.value=kind;
@@ -3384,8 +3945,11 @@ const app = createApp({
         sportPick.value=sportRandom(options.length?options:items)||null;sportDraft.value=[];return;
       }
       const all=sportPool.value.filter(x=>sportMode.value==='surprise'||sportMode.value==='mini'||x.category===sportMode.value);
-      const fallback=all.length?all:sportPool.value;
-      const n=kind==='short'?1:Math.min(3,fallback.length);
+      const availableByDuration = kind==='short' || kind==='mini'
+        ? all.filter(x => (Number(x.seconds)||60) <= 90)
+        : all;
+      const fallback=availableByDuration.length ? availableByDuration : (all.length?all:sportPool.value);
+      const n=kind==='short'?1:kind==='long'?Math.min(Math.max(4,Math.min(10,Math.trunc(Number(sportLongExerciseCount.value)||8))),fallback.length):Math.min(3,fallback.length);
       const picked=[];
       const available=[...fallback];
       // Dans le mode Surprise, garder le renforcement des genoux présent,
@@ -3400,7 +3964,14 @@ const app = createApp({
       while(picked.length<n && available.length){const ix=Math.floor(Math.random()*available.length);picked.push(available.splice(ix,1)[0]);}
       sportDraft.value=picked.map(x=>({...x,completed:false}));sportPick.value=null;
     }
-    function replaceSportExercise(index){const used=new Set(sportDraft.value.map(x=>x.id));const choices=sportPool.value.filter(x=>!used.has(x.id));if(!choices.length)return; sportDraft.value.splice(index,1,{...sportRandom(choices),completed:false});}
+    function replaceSportExercise(index){
+      const used=new Set(sportDraft.value.map(x=>x.id));
+      const choices=sportPool.value.filter(x=>!used.has(x.id) &&
+        (sportMode.value==='surprise'||x.category===sportMode.value) &&
+        (!['mini','short'].includes(sportDraftKind.value)||(Number(x.seconds)||60)<=90));
+      if(!choices.length){notify('Aucun autre exercice disponible avec ces filtres');return;}
+      sportDraft.value.splice(index,1,{...sportRandom(choices),completed:false});
+    }
     function completeSport(){
       const plannedKind=sportDraftKind.value;
       const exercises=sportDraft.value.filter(x=>x.completed);
@@ -3508,7 +4079,7 @@ const app = createApp({
     const wellnessMaxMeals=computed(()=>Math.max(1,...wellnessWeeks.value.map(x=>x.meals)));
     const wellnessWeightChart=computed(()=>{
       const valid=wellnessWeeks.value.filter(x=>x.weight!==null);
-      if(!valid.length)return {points:'',labels:[],min:0,max:0};
+      if(!valid.length)return {points:[],segments:[],labels:[],min:0,max:0};
       const min=Math.floor((Math.min(...valid.map(x=>x.weight))-.5)*10)/10;
       const max=Math.ceil((Math.max(...valid.map(x=>x.weight))+.5)*10)/10;
       const spread=Math.max(0.5,max-min);
@@ -3559,7 +4130,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportPick,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessWeeks,wellnessTotals,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
+      sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportLongExerciseCount,sportPick,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessWeeks,wellnessTotals,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,

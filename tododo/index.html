@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261106-v53">
-  <link rel="stylesheet" href="stylekoala.css?v=20261106-v53">
-  <link rel="stylesheet" href="styletest.css?v=20261106-v53">
+  <link rel="stylesheet" href="style.css?v=20261106-v56">
+  <link rel="stylesheet" href="stylekoala.css?v=20261106-v56">
+  <link rel="stylesheet" href="styletest.css?v=20261106-v56">
 </head>
 <body>
 
@@ -818,20 +818,21 @@
     <section class="view view-sport v52-sport" v-if="view==='sport'">
       <section class="v52-card"><h2>🌱 Bouger un peu</h2><p>Objectifs souples, exercices courts, aucune pénalité. Arrête les mouvements douloureux.</p>
         <div class="v52-stats"><div>🦵 Renforcement <b>{{sportProgress.mini}} / {{data.sportGoals.mini}}</b></div><div>🎮 Jeu <b>{{sportProgress.game}} / {{data.sportGoals.game}}</b></div><div>🚶 Balade <b>{{sportProgress.walk}} / {{data.sportGoals.walk}}</b></div></div>
-        <label>Type de mini-séance <select v-model="sportMode"><option value="surprise">Surprise totale</option><option value="genoux">Genoux</option><option value="renfo">Renforcement</option><option value="cardio">Cardio doux</option><option value="mobilite">Mobilité</option><option value="ludique">Ludique</option></select></label>
-        <label>Niveau autorisé <select v-model="sportLevel"><option value="doux">Doux uniquement</option><option value="moyen">Doux et moyen</option></select></label>
+        <label>Type de mini-séance <select v-model="sportMode"><option value="surprise">Surprise totale</option><option value="genoux">Genoux</option><option value="renfo">Renforcement</option><option value="cardio">Cardio doux</option><option value="mobilite">Mobilité</option><option value="ludique">Ludique</option><option value="etirement">Étirements</option><option value="equilibre">Équilibre</option><option value="fitness">Fitness</option><option value="danse">Danse</option></select></label>
+        <label>Niveau autorisé <select v-model="sportLevel"><option value="doux">Doux uniquement</option><option value="moyen">Doux et moyen</option><option value="difficile">Doux, moyen et difficile</option></select></label>
+        <label>Nombre d’exercices pour la séance longue (10 à 15 min) <input type="number" min="4" max="10" step="1" v-model.number="sportLongExerciseCount" aria-label="Nombre d’exercices de séance longue"> <small>4 à 10 exercices, tirés au sort. La mini-séance reste limitée à 3 exercices.</small></label>
         <div class="v52-actions"><button @click="generateSport('mini')">🎲 Mini-séance (3 à 5 min)</button><button @click="generateSport('long')">⏱️ Séance longue (10 à 15 min)</button><button @click="generateSport('short')">🦥 Mini-flemme (1 exercice)</button><button @click="generateSport('game')">🎮 Jeu actif</button><button @click="generateSport('walk')">🚶 Balade</button></div>
         <div class="v52-card v52-generated" v-if="sportDraft.length || sportPick">
           <h3>Ta proposition aléatoire</h3>
-          <template v-if="sportDraft.length"><div class="v52-ex" v-for="(ex,i) in sportDraft" :key="ex.id"><label><input type="checkbox" v-model="ex.completed"> <strong>{{ex.name}}</strong> · {{ex.reps}} <small>{{ex.description}}</small></label><button @click="replaceSportExercise(i)">↻ Remplacer</button></div></template>
+          <template v-if="sportDraft.length"><div class="v52-ex" v-for="(ex,i) in sportDraft" :key="ex.id"><label><input type="checkbox" v-model="ex.completed"> <strong>{{ex.name}}</strong> · {{ex.reps}} <small>· {{Math.ceil((Number(ex.seconds)||60)/60)}} min env. · {{ex.description}}</small></label><button @click="replaceSportExercise(i)">↻ Remplacer</button></div></template>
           <label v-if="sportDraftKind==='long' && sportDraft.length">Durée totale réalisée (10 à 15 min) <input type="number" min="10" max="15" v-model.number="sportMinutes"></label>
           <template v-if="sportPick"><h3>{{sportPick.name}}</h3><label>Durée réalisée (minutes) <input type="number" min="1" max="600" v-model.number="sportPick.minutes"></label></template>
           <div class="v52-actions"><button @click="generateSport(sportDraftKind)">🎲 Autre tirage</button><button @click="completeSport">✓ Enregistrer l'activité</button></div>
         </div>
       </section>
       <section class="v52-card"><h2>📚 Catalogue des exercices ({{data.sportExercises.length}})</h2><details><summary>Afficher, modifier, activer ou ajouter des exercices</summary>
-        <div class="v52-ex" v-for="ex in data.sportExercises" :key="ex.id"><label><input type="checkbox" v-model="ex.active"> <input class="v52-name" v-model="ex.name" aria-label="Nom exercice"> <small>{{ex.category}} · {{ex.level}}</small></label><input v-model="ex.reps" aria-label="Répétitions"><input v-model="ex.description" aria-label="Consigne"><select v-model="ex.level"><option value="doux">Doux</option><option value="moyen">Moyen</option></select><button @click="removeSportExercise(ex)">Supprimer</button></div>
-        <form class="v52-form-grid" @submit.prevent="addSportExercise"><input v-model="sportExerciseForm.name" placeholder="Nouvel exercice" required><select v-model="sportExerciseForm.category"><option value="genoux">Genoux</option><option value="renfo">Renforcement</option><option value="cardio">Cardio</option><option value="mobilite">Mobilité</option><option value="ludique">Ludique</option></select><select v-model="sportExerciseForm.level"><option value="doux">Doux</option><option value="moyen">Moyen</option></select><input v-model="sportExerciseForm.reps" placeholder="Répétitions"><input v-model="sportExerciseForm.description" placeholder="Consigne"><button>Ajouter</button></form>
+        <div class="v52-ex" v-for="ex in data.sportExercises" :key="ex.id"><label><input type="checkbox" v-model="ex.active"> <input class="v52-name" v-model="ex.name" aria-label="Nom exercice"> <small>{{ex.category}} · {{ex.level}} · {{Math.ceil((Number(ex.seconds)||60)/60)}} min</small><a v-if="ex.sourceUrl" :href="ex.sourceUrl" target="_blank" rel="noopener noreferrer" title="Source de référence pour la famille de mouvements">Source</a></label><input v-model="ex.reps" aria-label="Répétitions"><input v-model="ex.description" aria-label="Consigne"><select v-model="ex.level"><option value="doux">Doux</option><option value="moyen">Moyen</option><option value="difficile">Difficile</option></select><input type="number" min="15" max="600" step="15" v-model.number="ex.seconds" aria-label="Durée cible en secondes"><button @click="removeSportExercise(ex)">Supprimer</button></div>
+        <form class="v52-form-grid" @submit.prevent="addSportExercise"><input v-model="sportExerciseForm.name" placeholder="Nouvel exercice" required><select v-model="sportExerciseForm.category"><option value="genoux">Genoux</option><option value="renfo">Renforcement</option><option value="cardio">Cardio</option><option value="mobilite">Mobilité</option><option value="ludique">Ludique</option><option value="etirement">Étirements</option><option value="equilibre">Équilibre</option><option value="fitness">Fitness</option><option value="danse">Danse</option></select><select v-model="sportExerciseForm.level"><option value="doux">Doux</option><option value="moyen">Moyen</option><option value="difficile">Difficile</option></select><input v-model="sportExerciseForm.reps" placeholder="Répétitions"><input v-model="sportExerciseForm.description" placeholder="Consigne"><button>Ajouter</button></form>
       </details></section>
       <section class="v52-card"><h2>🗺️ Mes destinations de balade</h2><div class="v52-ex" v-for="loc in data.sportLocations" :key="loc.id"><label><input type="checkbox" v-model="loc.active"> <input v-model="loc.name" aria-label="Nom du lieu"></label><button @click="removeSportLocation(loc)">Supprimer</button></div><form class="v52-inline" @submit.prevent="addSportLocation"><input v-model="sportLocationName" placeholder="Nouvelle destination" required><button>Ajouter</button></form></section>
       <section class="v52-card"><h2>⚖️ Poids : suivi facultatif</h2><label>Poids de départ (kg) <input type="number" min="1" max="500" step="0.1" v-model.number="data.weightSettings.start"></label><label>Poids cible (kg) <input type="number" min="1" max="500" step="0.1" v-model.number="data.weightSettings.target"></label><label><input type="checkbox" v-model="data.weightSettings.enabled"> Afficher sur le dashboard</label>
@@ -878,7 +879,7 @@
         <p class="v53-caution">Minutes déclarées ou estimées dans les activités enregistrées.</p>
       </section>
       <section class="v52-card"><h3>📉 Poids : moyennes hebdomadaires</h3>
-        <p v-if="!wellnessWeightChart.segments.length">Ajoute des pesées pour afficher la tendance. Les semaines sans mesure ne sont pas interpolées.</p>
+        <p v-if="!wellnessWeightChart.segments?.length">Ajoute des pesées pour afficher la tendance. Les semaines sans mesure ne sont pas interpolées.</p>
         <template v-else><div class="v53-plot"><div class="v53-plot-label">{{wellnessWeightChart.max}} kg</div><svg viewBox="0 0 400 135" role="img" aria-label="Évolution des moyennes hebdomadaires du poids" preserveAspectRatio="none"><line x1="10" y1="120" x2="390" y2="120" stroke="#b3c7bc"/><line x1="10" y1="15" x2="390" y2="15" stroke="#dde8e0"/><polyline v-for="(points,i) in wellnessWeightChart.segments" :key="i" :points="points" fill="none" stroke="#4d8977" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle v-for="(point,i) in wellnessWeightChart.points.filter(Boolean)" :key="i" :cx="point.x" :cy="point.y" r="4" fill="#386957"><title>{{formatDate(point.week)}} : {{point.weight}} kg</title></circle></svg><div class="v53-plot-label">{{wellnessWeightChart.min}} kg</div></div></template>
         <p class="v53-caution">Deux pesées hebdomadaires prévues (mardi et vendredi), sans obligation. Un point représente la moyenne des mesures effectivement saisies cette semaine.</p>
       </section>
@@ -1553,7 +1554,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261106-v53"></script>
+<script src="app.js?v=20261106-v56"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
