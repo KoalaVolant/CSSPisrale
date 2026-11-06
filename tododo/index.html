@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261106-v56">
-  <link rel="stylesheet" href="stylekoala.css?v=20261106-v56">
-  <link rel="stylesheet" href="styletest.css?v=20261106-v56">
+  <link rel="stylesheet" href="style.css?v=20261106-v57">
+  <link rel="stylesheet" href="stylekoala.css?v=20261106-v57">
+  <link rel="stylesheet" href="styletest.css?v=20261106-v57">
 </head>
 <body>
 
@@ -824,8 +824,16 @@
         <div class="v52-actions"><button @click="generateSport('mini')">🎲 Mini-séance (3 à 5 min)</button><button @click="generateSport('long')">⏱️ Séance longue (10 à 15 min)</button><button @click="generateSport('short')">🦥 Mini-flemme (1 exercice)</button><button @click="generateSport('game')">🎮 Jeu actif</button><button @click="generateSport('walk')">🚶 Balade</button></div>
         <div class="v52-card v52-generated" v-if="sportDraft.length || sportPick">
           <h3>Ta proposition aléatoire</h3>
-          <template v-if="sportDraft.length"><div class="v52-ex" v-for="(ex,i) in sportDraft" :key="ex.id"><label><input type="checkbox" v-model="ex.completed"> <strong>{{ex.name}}</strong> · {{ex.reps}} <small>· {{Math.ceil((Number(ex.seconds)||60)/60)}} min env. · {{ex.description}}</small></label><button @click="replaceSportExercise(i)">↻ Remplacer</button></div></template>
-          <label v-if="sportDraftKind==='long' && sportDraft.length">Durée totale réalisée (10 à 15 min) <input type="number" min="10" max="15" v-model.number="sportMinutes"></label>
+          <template v-if="sportDraft.length">
+            <p class="v57-plan" role="status">Durée totale planifiée : <strong>{{sportTimeLabel(sportDraftTotalSeconds)}}</strong> pour {{sportDraft.length}} exercices. <span v-if="sportDraftKind==='long'">La durée est répartie entre les exercices : répète les mouvements par petits passages, avec des pauses si nécessaire.</span></p>
+            <div class="v52-ex" v-for="(ex,i) in sportDraft" :key="ex.id"><label><input type="checkbox" v-model="ex.completed"> <strong>{{ex.name}}</strong> · {{ex.reps}} <small>· durée prévue : <strong>{{sportTimeLabel(ex.plannedSeconds)}}</strong><template v-if="sportDraftKind==='long' && sportPassages(ex)>1"> · environ {{sportPassages(ex)}} passages (sans forcer)</template> · {{ex.description}}</small></label><button @click="replaceSportExercise(i)">↻ Remplacer</button></div>
+            <p class="v57-plan">Exercices cochés : {{sportTimeLabel(sportDraftDoneSeconds)}} prévus sur {{sportTimeLabel(sportDraftTotalSeconds)}}.</p>
+          </template>
+          <template v-if="sportDraftKind==='long' && sportDraft.length">
+            <label>Durée visée (minutes, 10 à 15) <input type="number" min="10" max="15" step="1" :value="sportMinutes" @change="setSportTargetMinutes($event.target.value)"></label>
+            <label>Durée réellement effectuée (minutes) <input type="number" min="0.25" max="180" step="0.25" v-model.number="sportActualMinutes"></label>
+            <small>Si tu arrêtes avant la fin, coche uniquement les exercices réalisés et indique le temps réellement passé. La durée n'est jamais créditée automatiquement à 12 minutes.</small>
+          </template>
           <template v-if="sportPick"><h3>{{sportPick.name}}</h3><label>Durée réalisée (minutes) <input type="number" min="1" max="600" v-model.number="sportPick.minutes"></label></template>
           <div class="v52-actions"><button @click="generateSport(sportDraftKind)">🎲 Autre tirage</button><button @click="completeSport">✓ Enregistrer l'activité</button></div>
         </div>
@@ -859,10 +867,13 @@
       </section>
       <section class="v52-card"><h3>🍽️ Répartition des ressentis alimentaires</h3>
         <p v-if="!wellnessTotals.meals">Aucun bilan de repas sur la période sélectionnée.</p>
-        <div v-else class="v53-bars">
-          <div v-for="b in [{title:'Menu respecté',value:wellnessTotals.respected},{title:'Menu changé',value:wellnessTotals.changed},{title:'Quantité adaptée',value:wellnessTotals.quantityOk},{title:'Quantité ressentie insuffisante',value:wellnessTotals.quantityLess},{title:'Quantité ressentie excessive',value:wellnessTotals.quantityMore},{title:'Plat jugé plutôt équilibré',value:wellnessTotals.balanced},{title:'Plat jugé à améliorer',value:wellnessTotals.average},{title:'Plat jugé peu équilibré',value:wellnessTotals.unbalanced},{title:'Récipient jugé adapté',value:wellnessTotals.containersGood}]" :key="b.title" class="v53-bar-row">
-            <div class="v53-bar-head"><span>{{b.title}}</span><strong>{{b.value}} / {{wellnessTotals.meals}} ({{wellnessPct(b.value,wellnessTotals.meals)}} %)</strong></div>
-            <div class="v53-bar-track"><div class="v53-bar-fill" :style="{width:wellnessPct(b.value,wellnessTotals.meals)+'%'}"></div></div>
+        <div v-else class="v57-feeling-charts">
+          <div v-for="g in wellnessFeelGroups" :key="g.title" class="v57-feeling-chart">
+            <h4>{{g.title}}</h4>
+            <div class="v57-stacked-track" role="img" :aria-label="g.title+' : '+g.segments.map(s=>s.label+' '+s.count).join(', ')">
+              <div v-for="s in g.segments" :key="s.label" class="v57-stacked-segment" :style="{width:s.percent+'%',backgroundColor:s.color}" :title="s.label+' : '+s.count+' repas ('+wellnessPct(s.count,g.total)+' %)'" ></div>
+            </div>
+            <div class="v57-legend"><span v-for="s in g.segments" :key="s.label" class="v57-legend-item"><i :style="{backgroundColor:s.color}"></i>{{s.label}} : <strong>{{s.count}}</strong> ({{wellnessPct(s.count,g.total)}} %)</span></div>
           </div>
         </div>
         <p class="v53-caution">Les catégories nutritionnelles sont des appréciations saisies manuellement, pas une estimation scientifique de la qualité des repas.</p>
@@ -1554,7 +1565,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261106-v56"></script>
+<script src="app.js?v=20261106-v57"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

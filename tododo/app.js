@@ -3912,7 +3912,8 @@ const app = createApp({
     const sportLevel = ref('doux');
     const sportDraft = ref([]);
     const sportDraftKind = ref('mini');
-    const sportMinutes = ref(12);
+    const sportMinutes = ref(12); // durée visée de la séance longue
+    const sportActualMinutes = ref(12); // durée réellement déclarée
     const sportLongExerciseCount = ref(8); // 4 à 10 exercices pour la séance 10-15 min
     const sportPick = ref(null);
     const sportExerciseForm = reactive({name:'',category:'cardio',description:'',level:'doux',reps:'30 secondes',seconds:60});
@@ -3930,9 +3931,37 @@ const app = createApp({
     const sportReminder=computed(()=>{const dow=new Date(today.value+'T12:00:00').getDay();return dow>=4||dow===0;});
     const sportPool=computed(()=>data.sportExercises.filter(x=>x && x.active!==false && (sportLevel.value==='difficile' || (sportLevel.value==='moyen' && x.level!=='difficile') || (sportLevel.value==='doux' && x.level==='doux'))));
     const sportRandom=(items)=>items[Math.floor(Math.random()*items.length)];
+    // La durée totale est la somme des temps attribués aux exercices.
+    // Pour une séance longue, on répartit 10-15 min sur les exercices sélectionnés.
+    // Le nombre de passages indique explicitement les répétitions du mouvement.
+    function distributeSportDuration(exercises, targetMinutes){
+      if(!exercises.length)return [];
+      const targetUnits=Math.round(Math.max(10,Math.min(15,Number(targetMinutes)||12))*4); // quarts de minute
+      const weights=exercises.map(x=>Math.max(15,Number(x.seconds)||60));
+      const sum=weights.reduce((s,x)=>s+x,0);
+      // minimum 30 secondes par mouvement
+      const units=exercises.map(()=>2);
+      let rest=Math.max(0,targetUnits-units.length*2);
+      const ideal=weights.map(w=>rest*w/sum);
+      for(let i=0;i<units.length;i++){const whole=Math.floor(ideal[i]);units[i]+=whole;rest-=whole;}
+      const order=ideal.map((x,i)=>({i,part:x-Math.floor(x)})).sort((a,b)=>b.part-a.part);
+      for(let i=0;i<rest;i++)units[order[i%order.length].i]++;
+      return exercises.map((x,i)=>({...x,plannedSeconds:units[i]*15}));
+    }
+    const sportDraftTotalSeconds=computed(()=>sportDraft.value.reduce((sum,x)=>sum+(Number(x.plannedSeconds)||Number(x.seconds)||60),0));
+    const sportDraftDoneSeconds=computed(()=>sportDraft.value.filter(x=>x.completed).reduce((sum,x)=>sum+(Number(x.plannedSeconds)||Number(x.seconds)||60),0));
+    function sportTimeLabel(seconds){const s=Math.round(Math.max(0,Number(seconds)||0));return `${Math.floor(s/60)} min${s%60?' '+String(s%60).padStart(2,'0')+' s':''}`;}
+    function sportPassages(ex){return Math.max(1,Math.ceil((Number(ex.plannedSeconds)||Number(ex.seconds)||60)/Math.max(15,Number(ex.seconds)||60)));}
+    function setSportTargetMinutes(value){
+      sportMinutes.value=Math.max(10,Math.min(15,Math.round(Number(value)||12)));
+      if(sportDraftKind.value==='long'&&sportDraft.value.length){
+        sportDraft.value=distributeSportDuration(sportDraft.value,sportMinutes.value);
+        sportActualMinutes.value=sportDraftTotalSeconds.value/60;
+      }
+    }
     function generateSport(kind='mini'){
       sportDraftKind.value=kind;
-      if(kind==='long')sportMinutes.value=12;
+      if(kind==='long'){sportMinutes.value=12;sportActualMinutes.value=12;}
       if(kind==='game'){
         const options=['Ring Fit Adventure','Just Dance'];
         const previous=sportPick.value?.name;
@@ -3962,7 +3991,9 @@ const app = createApp({
         }
       }
       while(picked.length<n && available.length){const ix=Math.floor(Math.random()*available.length);picked.push(available.splice(ix,1)[0]);}
-      sportDraft.value=picked.map(x=>({...x,completed:false}));sportPick.value=null;
+      sportDraft.value=kind==='long' ? distributeSportDuration(picked.map(x=>({...x,completed:false})),sportMinutes.value) : picked.map(x=>({...x,completed:false,plannedSeconds:Number(x.seconds)||60}));
+      if(kind==='long')sportActualMinutes.value=sportDraftTotalSeconds.value/60;
+      sportPick.value=null;
     }
     function replaceSportExercise(index){
       const used=new Set(sportDraft.value.map(x=>x.id));
@@ -3970,7 +4001,9 @@ const app = createApp({
         (sportMode.value==='surprise'||x.category===sportMode.value) &&
         (!['mini','short'].includes(sportDraftKind.value)||(Number(x.seconds)||60)<=90));
       if(!choices.length){notify('Aucun autre exercice disponible avec ces filtres');return;}
-      sportDraft.value.splice(index,1,{...sportRandom(choices),completed:false});
+      const newExercise={...sportRandom(choices),completed:false};
+      sportDraft.value.splice(index,1,{...newExercise,plannedSeconds:Number(newExercise.seconds)||60});
+      if(sportDraftKind.value==='long'){sportDraft.value=distributeSportDuration(sportDraft.value,sportMinutes.value);sportActualMinutes.value=sportDraftTotalSeconds.value/60;}
     }
     function completeSport(){
       const plannedKind=sportDraftKind.value;
@@ -3981,7 +4014,7 @@ const app = createApp({
       const points=Number(data.sportPoints[kind])||0;
       data.sportSessions.push({id:uid(),date:today.value,createdAt:new Date().toISOString(),kind,
         name:['mini','long','short'].includes(kind)?exercises.map(x=>x.name).join(', '):sportPick.value.name,
-        exerciseIds:exercises.map(x=>x.id),minutes:kind==='game'?Math.max(1,Number(sportPick.value.minutes)||15):kind==='walk'?Math.max(1,Number(sportPick.value.minutes)||20):kind==='short'?1:kind==='long'?Math.max(10,Math.min(15,Number(sportMinutes.value)||12)):Math.max(3,Math.min(5,exercises.length)),points});
+        exerciseIds:exercises.map(x=>x.id),minutes:kind==='game'?Math.max(1,Number(sportPick.value.minutes)||15):kind==='walk'?Math.max(1,Number(sportPick.value.minutes)||20):['mini','long','short'].includes(plannedKind)?(kind==='long'?Math.max(1,Number(sportActualMinutes.value)||sportDraftDoneSeconds.value/60):Math.max(0.25,Math.round(sportDraftDoneSeconds.value/15)/4)):Math.max(1,Number(sportPick.value?.minutes)||1),points});
       sportDraft.value=[];sportPick.value=null;notify('Activité enregistrée : +'+points+' points');
     }
     function deleteSportSession(x){if(confirm('Supprimer cette activité et ses points ?'))data.sportSessions=data.sportSessions.filter(y=>y.id!==x.id);}
@@ -4064,6 +4097,8 @@ const app = createApp({
           average:meals.filter(x=>x.health==='average').length,
           unbalanced:meals.filter(x=>x.health==='unbalanced').length,
           containersGood:meals.filter(x=>x.containerRating==='good').length,
+          containersNeutral:meals.filter(x=>x.containerRating==='neutral').length,
+          containersBad:meals.filter(x=>x.containerRating==='bad').length,
           activityCount:acts.length,
           minutes:acts.reduce((n,x)=>n+(Number(x.minutes)||0),0),
           weight:mean===null?null:Math.round(mean*100)/100, weightCount:weights.length});
@@ -4071,9 +4106,24 @@ const app = createApp({
       return rows;
     });
     const wellnessTotals=computed(()=>wellnessWeeks.value.reduce((a,r)=>{
-      for(const key of ['meals','respected','changed','quantityOk','quantityLess','quantityMore','balanced','average','unbalanced','containersGood','activityCount','minutes'])a[key]+=r[key];
+      for(const key of ['meals','respected','changed','quantityOk','quantityLess','quantityMore','balanced','average','unbalanced','containersGood','containersNeutral','containersBad','activityCount','minutes'])a[key]+=r[key];
       return a;
-    },{meals:0,respected:0,changed:0,quantityOk:0,quantityLess:0,quantityMore:0,balanced:0,average:0,unbalanced:0,containersGood:0,activityCount:0,minutes:0}));
+    },{meals:0,respected:0,changed:0,quantityOk:0,quantityLess:0,quantityMore:0,balanced:0,average:0,unbalanced:0,containersGood:0,containersNeutral:0,containersBad:0,activityCount:0,minutes:0}));
+    const wellnessFeelGroups=computed(()=>{
+      const t=wellnessTotals.value;
+      const make=(title,items)=>{
+        const known=items.reduce((sum,x)=>sum+x.count,0);
+        const unknown=Math.max(0,t.meals-known);
+        return {title,total:t.meals,segments:[...items.map(x=>({...x,percent:t.meals?100*x.count/t.meals:0})),
+          {label:'Non renseigné',count:unknown,color:'#d4d9d6',percent:t.meals?100*unknown/t.meals:0}]};
+      };
+      return [
+        make('Respect du menu',[{label:'Respecté',count:t.respected,color:'#598c77'},{label:'Remplacé',count:t.changed,color:'#d6a064'}]),
+        make('Quantité ressentie',[{label:'Adaptée',count:t.quantityOk,color:'#598c77'},{label:'Pas assez',count:t.quantityLess,color:'#e0b46f'},{label:'Trop',count:t.quantityMore,color:'#b87b86'}]),
+        make('Équilibre estimé du plat',[{label:'Plutôt équilibré',count:t.balanced,color:'#598c77'},{label:'À améliorer',count:t.average,color:'#e0b46f'},{label:'Peu équilibré',count:t.unbalanced,color:'#b87b86'}]),
+        make('Appréciation du récipient',[{label:'Adapté',count:t.containersGood,color:'#598c77'},{label:'Moyen',count:t.containersNeutral,color:'#e0b46f'},{label:'Pas adapté',count:t.containersBad,color:'#b87b86'}]),
+      ];
+    });
     function wellnessPct(num,den){return den?Math.round(100*num/den):0;}
     const wellnessMaxMinutes=computed(()=>Math.max(1,...wellnessWeeks.value.map(x=>x.minutes)));
     const wellnessMaxMeals=computed(()=>Math.max(1,...wellnessWeeks.value.map(x=>x.meals)));
@@ -4130,7 +4180,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportLongExerciseCount,sportPick,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessWeeks,wellnessTotals,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
+      sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
