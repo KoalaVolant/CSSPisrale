@@ -1,0 +1,14 @@
+TODO QUEST V65 TEST + SYNCHRONISATION FIREBASE
+
+Cette variante réactive Google Authentication et Firestore dans la V65 TEST.
+
+IMPORTANT : utilisez le MÊME compte Firebase que votre application habituelle : toutes les modifications réalisées après connexion seront enregistrées dans le MÊME document cloud et apparaîtront sur les autres appareils. Cette version est expérimentale.
+
+1. Exportez impérativement votre JSON depuis l’application habituelle, puis conservez une copie hors du navigateur.
+2. Déployez les six fichiers de ce dossier au bon emplacement GitHub Pages.
+3. Connectez-vous avec Google et attendez l’état « Synchronisé ». Le document Firebase existant prévaut à la première connexion.
+4. Ne faites pas de tests destructifs sur des données importantes. N’utilisez pas simultanément l’application de production et cette variante pour éditer le même compte : la synchronisation actuelle ne fusionne pas les modifications concurrentes.
+5. Pour importer un JSON, utilisez Configuration > Sauvegarde > Importer. Attention : lorsque connecté, l’import remplace et synchronise les données cloud.
+
+Cette variante garde un stockage local séparé (todo-quest-v65-test-isolated), mais le cloud est commun.
+Aucune garantie de protection complète contre les conflits multi-appareils ; sauvegardez votre JSON avant les essais.
