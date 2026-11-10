@@ -1,4 +1,4 @@
-const CACHE='tqm-shell-v7';
+const CACHE='tqm-shell-v7-1';
 const ASSETS=['./','./index.html','./mobile.css','./app-mobile.js','./style.css','./stylekoala.css','./styletest.css','./firebase-config.js','./sport-catalog-v67.js','./sync-merge-v72.js','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('tqm-shell-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});

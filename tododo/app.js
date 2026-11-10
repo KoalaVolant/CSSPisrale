@@ -1473,11 +1473,13 @@ function loadData() {
 }
 
 function loadUi() {
-  const defaults = { filtersOpen: false, tab: 'home', projectSort: 'manual', collapsedProjects: [] };
+  const defaults = { filtersOpen: false, tab: 'home', projectSort: 'manual', collapsedProjects: [], dashboardMode: 'essential', dashboardModes: {} };
   try {
     const ui = Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
     if (!TABS.some(t => t.id === ui.tab)) ui.tab = 'home';   // onglet inconnu -> accueil
     if (!Array.isArray(ui.collapsedProjects)) ui.collapsedProjects = [];
+    if (!['essential','complete'].includes(ui.dashboardMode)) ui.dashboardMode = 'complete';
+    if (!ui.dashboardModes || typeof ui.dashboardModes !== 'object' || Array.isArray(ui.dashboardModes)) ui.dashboardModes = {};
     if (!['manual', 'urgency','alter'].includes(ui.projectSort)) ui.projectSort = 'manual';
     return ui;
   } catch (e) {
@@ -4279,6 +4281,50 @@ const app = createApp({
     const dashboardLive=computed(()=>({tasks:dayTasks.value.length,habits:dayHabits.value.length,alerts:notificationItems.value.length}));
     const dashboardCatalogue=[{id:'appointments',name:'Rendez-vous de la semaine'},{id:'randomNotes',name:'Ajouter une note au pif'},{id:'habits',name:'Habitudes'},{id:'routines',name:'Routines du jour'},{id:'meals',name:'Repas du jour'},{id:'sport',name:'Sport & objectifs'},{id:'weight',name:'Poids'},{id:'foodReview',name:'Bilans alimentaires'},{id:'wellnessReport',name:'Bilan global TCA et poids'},{id:'priorities',name:'Priorités suggérées'},{id:'tasks',name:'Tâches Aujourd’hui / À venir'}];
     const dashboardEdit=ref(false);
+    // V74 : preferences locales seulement, aucune modification du document Firebase.
+    // En vue Complete, les blocs existants et leur ordre sont preserves exactement.
+    const dashboardDefaultModes = {
+      appointments:'context',randomNotes:'hidden',habits:'context',routines:'context',
+      meals:'hidden',sport:'context',weight:'hidden',foodReview:'hidden',
+      wellnessReport:'hidden',priorities:'context',tasks:'always'
+    };
+    const dashboardDisplayModes = [
+      {value:'always',label:'Toujours'},
+      {value:'context',label:'Si pertinent'},
+      {value:'hidden',label:'Masque en Essentiel'}
+    ];
+    function dashboardWidgetMode(id){
+      return ['always','context','hidden'].includes(ui.dashboardModes?.[id])
+        ? ui.dashboardModes[id] : (dashboardDefaultModes[id] || 'hidden');
+    }
+    function dashboardWidgetRelevant(id){
+      switch(id){
+        case 'appointments': return appointmentToday.value.length>0 || appointmentWeek.value.length>0;
+        case 'habits': return dashboardHabits.value.length>0 || pausedDashboardHabits.value.length>0;
+        case 'routines': return (data.customRoutines||[]).length>0;
+        case 'sport': return !!sportReminder.value;
+        case 'tasks': return todayTasks.value.length>0 || upcomingTasks.value.length>0;
+        case 'priorities': return suggestedTasks.value.length>0;
+        case 'meals': return !!(todayMeals.value?.lunch?.name || todayMeals.value?.dinner?.name);
+        case 'randomNotes': return false; // Bloc de saisie : jamais contextuel automatiquement.
+        case 'weight': return !!data.weightSettings?.enabled && !!weightRecent.value?.length;
+        case 'foodReview': return !!foodReminder.open;
+        case 'wellnessReport': return wellnessTotals.value?.meals>0;
+        default: return false;
+      }
+    }
+    function dashboardShouldShow(id){
+      if(!widgetVisible(id))return false;
+      if(ui.dashboardMode!=='essential')return true;
+      const mode=dashboardWidgetMode(id);
+      return mode==='always'||(mode==='context'&&dashboardWidgetRelevant(id));
+    }
+    const dashboardEssentialSummary=computed(()=>({
+      tasks:todayTasks.value.length,
+      appointments:appointmentToday.value.length,
+      habits:dashboardHabits.value.filter(h=>!habitDoneToday(h)).length,
+      late:data.tasks.filter(t=>t.status!=='done' && t.scope!=='work' && t.due && t.due<today.value).length
+    }));
     function widgetVisible(id){return id!=='planner'&&data.dashboardWidgets.includes(id);}
     function setWidgetVisible(id,on){data.dashboardWidgets=on?[...new Set([...data.dashboardWidgets,id])]:data.dashboardWidgets.filter(x=>x!==id);}
     function moveDashboardWidget(id,direction){const a=data.dashboardWidgets;const i=a.indexOf(id),j=i+direction;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];}
@@ -4890,7 +4936,7 @@ const app = createApp({
       for(const line of series){let group=[];for(const point of line.points){if(point)group.push(point.x+','+point.y);else if(group.length){line.segments.push(group.join(' '));group=[];}}if(group.length)line.segments.push(group.join(' '));}
       return {width,height,labels:list.map(x=>x.label),series};
     });
-    const dashboardNav=computed(()=>data.dashboardWidgets.map(id=>dashboardCatalogue.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,name:x.name})));
+    const dashboardNav=computed(()=>data.dashboardWidgets.filter(id=>dashboardShouldShow(id)).map(id=>dashboardCatalogue.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,name:x.name})));
     function jumpDashboard(id){nextTick(()=>document.getElementById('dashboard-'+id)?.scrollIntoView({behavior:'smooth',block:'start'}));}
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
@@ -4900,7 +4946,7 @@ const app = createApp({
       sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,pantryExpiring,pantryOverdue,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,calendarLayers,calendarTasksOn,calendarMilestonesOn,openCalendarTask,openCalendarMilestone,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
-      ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,dashboardDragged,dropDashboardWidget,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestionMode,suggestionLeftovers,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
+      ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,dashboardDisplayModes,dashboardWidgetMode,dashboardShouldShow,dashboardEssentialSummary,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,dashboardDragged,dropDashboardWidget,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestionMode,suggestionLeftovers,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
       randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
       dishEditSearch,toggleDishIngredient,dishCategoryOpen,dishCategoryDragged,dishCategoryIsOpen,toggleDishCategory,reorderDishCategory,ticketWaiting,ticketCreatedLabel,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,

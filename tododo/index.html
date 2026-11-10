@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261110-v71-catalogue">
-  <link rel="stylesheet" href="stylekoala.css?v=20261110-v71-catalogue">
-  <link rel="stylesheet" href="styletest.css?v=20261110-v71-catalogue">
+  <title>Todo Quest · PC V74.1 TEST</title>
+  <link rel="stylesheet" href="style.css?v=pc-v74-1-check">
+  <link rel="stylesheet" href="stylekoala.css?v=pc-v74-1-check">
+  <link rel="stylesheet" href="styletest.css?v=pc-v74-1-check">
 </head>
 <body>
 
@@ -16,7 +16,7 @@
   <header class="app-header tq69-header">
     <div class="tq69-topline">
       <div class="app-brand tq69-brand">
-        <h1 class="app-title">Todo Quest</h1>
+        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V74.1 TEST">v74.1 <span>test</span></small></h1>
         <div class="sync-box tq69-sync">
           <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
           <template v-if="firebaseReady">
@@ -451,23 +451,37 @@
     <div class="modal-backdrop" v-if="pendingAppointment"><section class="modal form-panel" role="dialog" aria-modal="true"><h2>Rendez-vous à confirmer</h2><p>As-tu effectué « {{pendingAppointment.title}} » ({{formatDate(pendingAppointment.start)}} au {{formatDate(pendingAppointment.end)}}) ?</p><button v-if="pendingAppointment.status==='pending'" @click="confirmAppointment(pendingAppointment,true)">Oui, effectué</button><button v-if="pendingAppointment.status==='pending'" @click="confirmAppointment(pendingAppointment,false)">Non, reporter</button><div v-if="pendingAppointment.status==='postpone'"><label>Nouvelle date <input type="date" v-model="postponeDate" :min="today"></label><button @click="rescheduleAppointment(pendingAppointment)">Confirmer le report</button><button @click="confirmAppointment(pendingAppointment,true)">Finalement effectué</button></div></section></div>
     <!-- ============ ACCUEIL : prochaine récompense + Aujourd'hui / À venir ============ -->
     <section class="view view-home" v-if="view === 'home'">
+      <div class="v74-dashboard-head">
+        <div><h2>Ma journee</h2><p>Une vue legere ou tous tes blocs, au choix.</p></div>
+        <div class="v74-mode-control" role="group" aria-label="Affichage du dashboard">
+          <button type="button" :class="{active:ui.dashboardMode==='essential'}" :aria-pressed="ui.dashboardMode==='essential'" @click="ui.dashboardMode='essential'">Essentiel</button>
+          <button type="button" :class="{active:ui.dashboardMode==='complete'}" :aria-pressed="ui.dashboardMode==='complete'" @click="ui.dashboardMode='complete'">Complet</button>
+        </div>
+      </div>
+      <div v-if="ui.dashboardMode==='essential'" class="v74-summary" aria-label="Resume du jour">
+        <div><strong>{{dashboardEssentialSummary.tasks}}</strong><span>Taches aujourd'hui</span></div>
+        <div><strong>{{dashboardEssentialSummary.appointments}}</strong><span>Rendez-vous</span></div>
+        <div><strong>{{dashboardEssentialSummary.habits}}</strong><span>Habitudes a faire</span></div>
+        <div><strong>{{dashboardEssentialSummary.late}}</strong><span>Taches en retard</span></div>
+      </div>
+
       <section class="v59-hub"><h2>🎲 Une idée pour maintenant</h2><p class="hint">Une proposition tirée de tes tâches, habitudes, activités ou du sport. Aucun temps à renseigner.</p>
         <div class="v59-actions"><button @click="chooseAction">🎲 Je ne sais pas quoi faire</button><button @click="setTab('calendar');dayView='day'">📅 Ma journée</button></div>
         <div class="v59-chooser" v-if="chooserChoice"><strong>{{chooserChoice.source}} : {{chooserChoice.title}}</strong><button @click="openChooserChoice">Ouvrir directement</button><button @click="chooseAction">Autre idée</button></div>
         <details><summary>Options de la suggestion</summary><label>Énergie <select v-model="chooserEnergy"><option value="low">Petite énergie / flemme</option><option value="normal">Normale</option></select></label><label>Type <select v-model="chooserKind"><option value="all">Tout</option><option value="useful">Utile</option><option value="pleasure">Plaisir</option></select></label></details>
       </section>
-      <section class="v59-hub"><details><summary>⚙️ Automatismes de la version test</summary><label><input type="checkbox" v-model="data.testSettings.automationEnabled"> Activer les rappels automatiques locaux (proposition)</label><p>Les prochaines occurrences des tâches récurrentes sont créées après validation. Les rappels sont calculés à l'ouverture, sans notifications externes.</p></details></section>
-      <section id="dashboard-appointments" class="appointments-home" v-if="widgetVisible('appointments')" :style="{order:data.dashboardWidgets.indexOf('appointments')+10}"><div class="appointments-home-header"><h2>📅 Rendez-vous</h2><button @click="openAppointment()">＋ Ajouter un rendez-vous</button><button @click="setTab('calendar')">Ouvrir le calendrier</button></div><h3>Aujourd'hui</h3><p v-if="!appointmentToday.length">Aucun rendez-vous aujourd'hui.</p><article v-for="a in appointmentToday" :key="a.id" class="appointment-line" :style="{'border-left-color':categoryFor(a.categoryId)?.color||'#999'}"><strong>{{a.title}}</strong><span class="appointment-category-label" :style="{'--appt-category-color':categoryFor(a.categoryId)?.color||'#999'}">{{categoryFor(a.categoryId)?.name||'Sans catégorie'}}</span> <small>{{weekDate(a.start)}} au {{weekDate(a.end)}}</small><small v-if="linkedLabel(a)">Lié : {{linkedLabel(a)}}</small><button @click="openAppointment(a)">Modifier</button></article><h3>Rendez-vous de la semaine</h3><p v-if="!appointmentWeek.length">Aucun rendez-vous cette semaine.</p><article v-for="a in appointmentWeek" :key="a.id" class="appointment-line" :style="{'border-left-color':categoryFor(a.categoryId)?.color||'#999'}"><strong>{{a.title}}</strong><span class="appointment-category-label" :style="{'--appt-category-color':categoryFor(a.categoryId)?.color||'#999'}">{{categoryFor(a.categoryId)?.name||'Sans catégorie'}}</span><small>{{weekDate(a.start)}} au {{weekDate(a.end)}}</small><small v-if="linkedLabel(a)">Lié : {{linkedLabel(a)}}</small><button @click="openAppointment(a)">Modifier</button></article></section>
-      <nav class="dashboard-mini-nav" aria-label="Accès rapide aux blocs du dashboard"><button type="button" v-for="item in dashboardNav.filter(x=>widgetVisible(x.id))" :key="item.id" @click="jumpDashboard(item.id)">{{item.name}}</button></nav>
-      <details class="config-fold"><summary>Personnaliser le dashboard</summary><p>Glisse les blocs avec ⠿ pour changer leur ordre. Affiche ou masque chaque bloc ci-dessous.</p><div v-for="w in dashboardSorted" :key="w.id" class="v29-widget-choice v58-draggable" :draggable="widgetVisible(w.id)" @dragstart="dashboardDragged=w.id;$event.dataTransfer.effectAllowed='move'" @dragover.prevent="$event.dataTransfer.dropEffect='move'" @drop.prevent="dropDashboardWidget(w.id)" @dragend="dashboardDragged=''" :class="{'v58-dragging':dashboardDragged===w.id}"><span class="v58-grip" aria-hidden="true">⠿</span><label><input type="checkbox" :checked="widgetVisible(w.id)" @change="setWidgetVisible(w.id,$event.target.checked)"> {{ w.name }}</label><button type="button" @click="moveDashboardWidget(w.id,-1)" :disabled="!widgetVisible(w.id) || data.dashboardWidgets.indexOf(w.id)<1">↑</button><button type="button" @click="moveDashboardWidget(w.id,1)" :disabled="!widgetVisible(w.id) || data.dashboardWidgets.indexOf(w.id)===data.dashboardWidgets.length-1">↓</button></div></details>
+      <section class="v59-hub" v-if="ui.dashboardMode==='complete'"><details><summary>⚙️ Automatismes de la version test</summary><label><input type="checkbox" v-model="data.testSettings.automationEnabled"> Activer les rappels automatiques locaux (proposition)</label><p>Les prochaines occurrences des tâches récurrentes sont créées après validation. Les rappels sont calculés à l'ouverture, sans notifications externes.</p></details></section>
+      <section id="dashboard-appointments" class="appointments-home" v-if="dashboardShouldShow('appointments')" :style="{order:data.dashboardWidgets.indexOf('appointments')+10}"><div class="appointments-home-header"><h2>📅 Rendez-vous</h2><button @click="openAppointment()">＋ Ajouter un rendez-vous</button><button @click="setTab('calendar')">Ouvrir le calendrier</button></div><h3>Aujourd'hui</h3><p v-if="!appointmentToday.length">Aucun rendez-vous aujourd'hui.</p><article v-for="a in appointmentToday" :key="a.id" class="appointment-line" :style="{'border-left-color':categoryFor(a.categoryId)?.color||'#999'}"><strong>{{a.title}}</strong><span class="appointment-category-label" :style="{'--appt-category-color':categoryFor(a.categoryId)?.color||'#999'}">{{categoryFor(a.categoryId)?.name||'Sans catégorie'}}</span> <small>{{weekDate(a.start)}} au {{weekDate(a.end)}}</small><small v-if="linkedLabel(a)">Lié : {{linkedLabel(a)}}</small><button @click="openAppointment(a)">Modifier</button></article><h3>Rendez-vous de la semaine</h3><p v-if="!appointmentWeek.length">Aucun rendez-vous cette semaine.</p><article v-for="a in appointmentWeek" :key="a.id" class="appointment-line" :style="{'border-left-color':categoryFor(a.categoryId)?.color||'#999'}"><strong>{{a.title}}</strong><span class="appointment-category-label" :style="{'--appt-category-color':categoryFor(a.categoryId)?.color||'#999'}">{{categoryFor(a.categoryId)?.name||'Sans catégorie'}}</span><small>{{weekDate(a.start)}} au {{weekDate(a.end)}}</small><small v-if="linkedLabel(a)">Lié : {{linkedLabel(a)}}</small><button @click="openAppointment(a)">Modifier</button></article></section>
+      <nav class="dashboard-mini-nav" aria-label="Accès rapide aux blocs du dashboard"><button type="button" v-for="item in dashboardNav" :key="item.id" @click="jumpDashboard(item.id)">{{item.name}}</button></nav>
+      <details class="config-fold"><summary>Personnaliser le dashboard</summary><p>Glisse les blocs avec ⠿ pour changer leur ordre. Affiche ou masque chaque bloc ci-dessous. En mode Essentiel, choisis aussi quand il doit apparaitre.</p><div v-for="w in dashboardSorted" :key="w.id" class="v29-widget-choice v58-draggable" :draggable="widgetVisible(w.id)" @dragstart="dashboardDragged=w.id;$event.dataTransfer.effectAllowed='move'" @dragover.prevent="$event.dataTransfer.dropEffect='move'" @drop.prevent="dropDashboardWidget(w.id)" @dragend="dashboardDragged=''" :class="{'v58-dragging':dashboardDragged===w.id}"><span class="v58-grip" aria-hidden="true">⠿</span><label><input type="checkbox" :checked="widgetVisible(w.id)" @change="setWidgetVisible(w.id,$event.target.checked)"> {{ w.name }}</label><select class="v74-visibility" :value="dashboardWidgetMode(w.id)" @change="ui.dashboardModes[w.id]=$event.target.value" :aria-label="'Affichage Essentiel de '+w.name"><option v-for="m in dashboardDisplayModes" :key="m.value" :value="m.value">{{m.label}}</option></select><button type="button" @click="moveDashboardWidget(w.id,-1)" :disabled="!widgetVisible(w.id) || data.dashboardWidgets.indexOf(w.id)<1">↑</button><button type="button" @click="moveDashboardWidget(w.id,1)" :disabled="!widgetVisible(w.id) || data.dashboardWidgets.indexOf(w.id)===data.dashboardWidgets.length-1">↓</button></div></details>
 
 
-      <section id="dashboard-randomNotes" class="random-note-home" v-if="widgetVisible('randomNotes')" :style="{order:data.dashboardWidgets.indexOf('randomNotes')+10}"><h3>Note au pif</h3><textarea rows="2" v-model="randomNoteDraft" placeholder="Noter une idée rapide…"></textarea><select v-model="randomNoteNewType" aria-label="Type de note"><option value="">Sans type</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select><input v-model="dashboardNewNoteType" placeholder="Créer un nouveau type (facultatif)" aria-label="Nouveau type de note"><button type="button" @click="addRandomNote(true)">＋ Ajouter la note</button></section>
-      <section class="challenge-dashboard" v-if="currentChallenges.some(c=>c.enabled!==false && !c.hiddenHome)">
+      <section id="dashboard-randomNotes" class="random-note-home" v-if="dashboardShouldShow('randomNotes')" :style="{order:data.dashboardWidgets.indexOf('randomNotes')+10}"><h3>Note au pif</h3><textarea rows="2" v-model="randomNoteDraft" placeholder="Noter une idée rapide…"></textarea><select v-model="randomNoteNewType" aria-label="Type de note"><option value="">Sans type</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select><input v-model="dashboardNewNoteType" placeholder="Créer un nouveau type (facultatif)" aria-label="Nouveau type de note"><button type="button" @click="addRandomNote(true)">＋ Ajouter la note</button></section>
+      <section class="challenge-dashboard" v-if="ui.dashboardMode==='complete' && currentChallenges.some(c=>c.enabled!==false && !c.hiddenHome)">
         <h2>Défis en cours</h2>
         <div v-for="c in currentChallenges.filter(x=>x.enabled!==false && !x.hiddenHome)" :key="c.id" class="challenge-summary"><strong>{{ c.name }}</strong> · {{ c.current }}/{{ c.target }} · +{{ c.points }} pts <span v-if="c.awarded">✓ Terminé</span><button v-if="c.awarded" type="button" @click="hideChallengeHome(c)">Retirer de l’accueil</button></div>
       </section>
-      <section id="dashboard-habits" class="home-habits" :style="{order:data.dashboardWidgets.indexOf('habits')+10}" v-if="widgetVisible('habits') && (dashboardHabits.length || pausedDashboardHabits.length)">
+      <section id="dashboard-habits" class="home-habits" :style="{order:data.dashboardWidgets.indexOf('habits')+10}" v-if="dashboardShouldShow('habits') && (dashboardHabits.length || pausedDashboardHabits.length)">
         <section class="home-habit-group" v-for="group in [{malus:false,title:'Bonnes habitudes',open:goodHabitsHomeOpen},{malus:true,title:'Mauvaises habitudes',open:badHabitsHomeOpen}]" :key="group.title">
           <button class="habit-group-toggle" type="button" @click="group.malus ? badHabitsHomeOpen=!badHabitsHomeOpen : goodHabitsHomeOpen=!goodHabitsHomeOpen" :aria-expanded="group.malus ? badHabitsHomeOpen : goodHabitsHomeOpen">{{ group.malus ? (badHabitsHomeOpen?'▾':'▸') : (goodHabitsHomeOpen?'▾':'▸') }} {{ group.title }} ({{ dashboardHabits.filter(h=>!!h.malus===group.malus).length }})</button>
           <div class="habit-dashboard" :class="{'bad-habits-three':group.malus}" v-if="group.malus ? badHabitsHomeOpen : goodHabitsHomeOpen">
@@ -478,7 +492,7 @@
         </section>
         <details class="v61-paused" v-if="pausedDashboardHabits.length"><summary>⏸ Habitudes en pause ({{pausedDashboardHabits.length}})</summary><div class="v60-item" v-for="h in pausedDashboardHabits" :key="h.id"><strong>{{h.title}}</strong><span>jusqu’au {{formatDate(h.pausedUntil)}}</span><button type="button" @click="toggleHabitPause(h)">Reprendre</button></div></details>
       </section>
-      <section id="dashboard-routines" class="v62-feature v63-routine-dashboard" v-if="widgetVisible('routines')" :style="{order:data.dashboardWidgets.indexOf('routines')+10}">
+      <section id="dashboard-routines" class="v62-feature v63-routine-dashboard" v-if="dashboardShouldShow('routines')" :style="{order:data.dashboardWidgets.indexOf('routines')+10}">
         <div class="v52-heading"><h2>🧩 Routines du jour</h2><button type="button" @click="setTab('habits')">Gérer les routines</button></div>
         <p v-if="!data.customRoutines.length" class="hint">Aucune routine créée. Regroupe tes habitudes dans « Habitudes & routines » pour les retrouver ici.</p>
         <details v-for="r in data.customRoutines" :key="r.id" class="v63-routine-item" open>
@@ -493,7 +507,7 @@
         </details>
         <small>Les points sont comptés par les habitudes existantes : aucun doublon pour la routine.</small>
       </section>
-      <section v-if="widgetVisible('sport')" id="dashboard-sport" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('sport')+10}">
+      <section v-if="dashboardShouldShow('sport')" id="dashboard-sport" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('sport')+10}">
         <div class="v52-heading"><h2>🌱 Objectifs Sport</h2><div class="v53-actions"><button type="button" @click="setTab('sport')">Ouvrir Sport</button><button type="button" @click="setTab('wellness-report')">Bilan global</button></div></div>
         <div class="v52-goals"><label>🦵 Mini-séances / semaine <input type="number" min="0" max="30" v-model.number="data.sportGoals.mini"></label><strong>{{sportProgress.mini}} / {{data.sportGoals.mini}}</strong>
         <label>🎮 Jeux / semaine <input type="number" min="0" max="30" v-model.number="data.sportGoals.game"></label><strong>{{sportProgress.game}} / {{data.sportGoals.game}}</strong>
@@ -502,20 +516,20 @@
         <div class="v68-sport-shortcuts"><button type="button" @click="setTab('sport');generateSport('mini')">🎲 Mini-séance</button><button type="button" @click="setTab('sport');generateSport('long')">⏱ Séance longue</button><button type="button" @click="setTab('sport');generateSport('game')">🎮 Jeu actif</button><button type="button" @click="setTab('sport');generateSport('walk')">🚶 Balade</button></div>
         <p v-if="sportReminder && (sportProgress.mini<data.sportGoals.mini || sportProgress.game<data.sportGoals.game)" class="v52-reminder">⏰ Fin de semaine : il reste des activités à faire, si tu en as envie.</p>
       </section>
-      <section v-if="widgetVisible('weight') && data.weightSettings.enabled" id="dashboard-weight" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('weight')+10}">
+      <section v-if="dashboardShouldShow('weight') && data.weightSettings.enabled" id="dashboard-weight" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('weight')+10}">
         <div class="v52-heading"><h2>⚖️ Suivi du poids</h2><button @click="setTab('wellness-report')">Bilan global</button></div>
         <p>Dernière mesure : <strong>{{weightLatest===null?'Non renseignée':weightLatest+' kg'}}</strong> · Objectif : {{data.weightSettings.target||'Non défini'}} kg</p>
         <p>Pesées prévues : mardi et vendredi matin (modifiables dans Sport).</p>
         <form class="v52-inline" @submit.prevent="saveWeight"><input type="date" v-model="weightForm.date" required><input type="number" min="1" max="500" step="0.1" v-model.number="weightForm.weight" placeholder="Poids (kg)" required><button>Enregistrer</button></form>
       </section>
-      <section v-if="widgetVisible('foodReview')" id="dashboard-foodReview" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('foodReview')+10}">
+      <section v-if="dashboardShouldShow('foodReview')" id="dashboard-foodReview" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('foodReview')+10}">
         <h2>🍽️ Bilan alimentaire</h2><p>{{foodSummary.total}} repas évalués cette semaine · {{foodSummary.respected}} menus respectés · {{foodSummary.changed}} remplacés · {{foodSummary.quantityOk}} quantités ressenties adaptées.</p>
         <button type="button" @click="setTab('wellness-report')">Voir les graphiques et le bilan</button>
       </section>
-      <section v-if="widgetVisible('wellnessReport')" id="dashboard-wellnessReport" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('wellnessReport')+10}"><div class="v52-heading"><h2>📊 Bilan global TCA et poids</h2><button type="button" @click="setTab('wellness-report')">Voir les graphiques</button></div><div class="v52-stats"><div>Repas évalués <b>{{wellnessTotals.meals}}</b></div><div>Menus respectés <b>{{wellnessPct(wellnessTotals.respected,wellnessTotals.meals)}} %</b></div><div>Activité <b>{{wellnessTotals.minutes}} min</b></div><div>Poids <b>{{wellnessTrend===null?'Pas assez de mesures':(wellnessTrend>0?'+':'')+wellnessTrend+' kg'}}</b></div></div><small>Résultats descriptifs des {{wellnessRange}} dernières semaines.</small></section>
-      <section id="dashboard-meals" class="today-meals" :style="{order:data.dashboardWidgets.indexOf('meals')+10}" v-if="widgetVisible('meals')"><h2>Repas du jour</h2><div v-for="kind in ['lunch','dinner']" :key="kind" class="daily-meal"><strong>{{kind==='lunch'?'Déjeuner':'Dîner'}} :</strong> {{todayMeals[kind].name||'Non prévu'}} <span class="meal-state">{{todayMeals[kind].state==='done'?'✓ Pris':todayMeals[kind].state==='missed'?'↪ Pas la même chose':'Pas pris'}}</span><button type="button" @click="openFoodReview(today,kind,'taken')">✓ Pris</button><button type="button" @click="openFoodReview(today,kind,'changed')">↪ Autre chose</button></div><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
-      <section id="dashboard-priorities" class="priority-box" :style="{order:data.dashboardWidgets.indexOf('priorities')+10}" v-if="widgetVisible('priorities')"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ taskDue(item.task) ? '· échéance '+formatDate(taskDue(item.task)) : '' }}</small></li></ol></section>
-      <div id="dashboard-tasks" class="dashboard" :style="{order:data.dashboardWidgets.indexOf('tasks')+10}" v-if="widgetVisible('tasks')">
+      <section v-if="dashboardShouldShow('wellnessReport')" id="dashboard-wellnessReport" class="v52-card" :style="{order:data.dashboardWidgets.indexOf('wellnessReport')+10}"><div class="v52-heading"><h2>📊 Bilan global TCA et poids</h2><button type="button" @click="setTab('wellness-report')">Voir les graphiques</button></div><div class="v52-stats"><div>Repas évalués <b>{{wellnessTotals.meals}}</b></div><div>Menus respectés <b>{{wellnessPct(wellnessTotals.respected,wellnessTotals.meals)}} %</b></div><div>Activité <b>{{wellnessTotals.minutes}} min</b></div><div>Poids <b>{{wellnessTrend===null?'Pas assez de mesures':(wellnessTrend>0?'+':'')+wellnessTrend+' kg'}}</b></div></div><small>Résultats descriptifs des {{wellnessRange}} dernières semaines.</small></section>
+      <section id="dashboard-meals" class="today-meals" :style="{order:data.dashboardWidgets.indexOf('meals')+10}" v-if="dashboardShouldShow('meals')"><h2>Repas du jour</h2><div v-for="kind in ['lunch','dinner']" :key="kind" class="daily-meal"><strong>{{kind==='lunch'?'Déjeuner':'Dîner'}} :</strong> {{todayMeals[kind].name||'Non prévu'}} <span class="meal-state">{{todayMeals[kind].state==='done'?'✓ Pris':todayMeals[kind].state==='missed'?'↪ Pas la même chose':'Pas pris'}}</span><button type="button" @click="openFoodReview(today,kind,'taken')">✓ Pris</button><button type="button" @click="openFoodReview(today,kind,'changed')">↪ Autre chose</button></div><button type="button" @click="setTab('menu')">Ouvrir le menu de la semaine</button></section>
+      <section id="dashboard-priorities" class="priority-box" :style="{order:data.dashboardWidgets.indexOf('priorities')+10}" v-if="dashboardShouldShow('priorities')"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ taskDue(item.task) ? '· échéance '+formatDate(taskDue(item.task)) : '' }}</small></li></ol></section>
+      <div id="dashboard-tasks" class="dashboard" :style="{order:data.dashboardWidgets.indexOf('tasks')+10}" v-if="dashboardShouldShow('tasks')">
 
         <section class="view view-today">
           <h2>Aujourd'hui <small>({{ todayTasks.length }})</small> <small class="list-points">{{ todayPoints }} pts à gagner</small></h2>
@@ -1700,9 +1714,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="sport-catalog-v67.js?v=20261110-v71-catalogue"></script>
-<script src="./sync-merge-v72.js?v=20261110-v72"></script>
-<script src="app.js?v=20261110-v71-catalogue"></script>
+<script src="sport-catalog-v67.js?v=pc-v74-1-check"></script>
+<script src="./sync-merge-v72.js?v=pc-v74-1-check"></script>
+<script src="app.js?v=pc-v74-1-check"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
@@ -1712,7 +1726,7 @@
         var warning = document.createElement('div');
         warning.setAttribute('role', 'alert');
         warning.style.cssText = 'padding:24px;margin:30px auto;max-width:760px;background:#fff3f3;border:2px solid #bd2020;color:#711;font:16px Arial,sans-serif;line-height:1.5';
-        warning.textContent = 'Todo Quest n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, app.js, firebase-config.js, style.css, stylekoala.css), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
+        warning.textContent = 'Todo Quest PC V74.1 n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, app.js, firebase-config.js, style.css, stylekoala.css), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
         document.body.prepend(warning);
       }
     }, 1200);
