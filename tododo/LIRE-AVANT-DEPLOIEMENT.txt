@@ -1,0 +1,28 @@
+TODO QUEST V72 - PC + MOBILE V6 (TEST)
+
+CONTENU :
+- Racine : site PC, avec synchronisation Firebase transactionnelle V72.
+- mobile/ : application mobile avec 6 onglets dont Notes au pif.
+- sync-merge-v72.js : moteur commun de fusion et detection de conflits.
+
+DEPLOIEMENT :
+1. Faire un export JSON depuis la version PC.
+2. Dans GitHub, créer d'abord une branche de test, ne PAS deployer directement les deux interfaces en production.
+3. Remplacer les fichiers de la racine tododo/ et du sous-dossier mobile/ dans la branche de test.
+4. Tester avec UN COMPTE FIREBASE DE TEST independant, ou avec une copie dans un autre projet Firebase.
+5. Verifier les scenarios ci-dessous avant d'activer en production.
+
+TESTS :
+- PC ajoute une note, mobile ajoute une tache : les deux existent apres sync.
+- Mobile modifie une note, PC modifie une autre note : les deux changements sont conserves.
+- PC/mobile modifient la meme note differemment : statut CONFLIT ; aucune ecriture cloud automatique.
+- Tester report d'habitude, prix definitif, recompenses et points.
+- Tester hors ligne : attention, le nouveau mode ne garantit PAS encore une queue durable hors connexion.
+- Tester rechargement, connexion, deconnexion, mode PWA et acces Notes.
+
+LIMITES :
+- Gestion des conflits : bloque et exige une resolution manuelle ; ne propose pas encore d'interface de fusion.
+- Anciennes versions PC/mobile ne disposent pas du garde-fou transactionnel : NE PAS les utiliser en parallele.
+- Le meme document Firebase reste utilise ; les limites de taille/performance ne sont pas resolues.
+- Les fonctions Dashboard, chrono, effort, suggestion et refactorisation totale restent a developper.
+- Aucun acces aux regles Firestore, donc aucun audit definitif de celles-ci.

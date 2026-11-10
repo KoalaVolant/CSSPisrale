@@ -286,3 +286,8 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 }
 
 .tqm-version-tag{display:inline-block;margin-left:8px;padding:2px 5px;border-radius:5px;border:1px solid rgba(255,255,255,.3);font-size:10px;font-weight:500;vertical-align:middle;opacity:.8;white-space:nowrap}
+
+/* Mobile V8 : durée approximative */
+#app .tqm-task-duration{font-size:.82rem;color:var(--muted,#64748b);margin:3px 0 6px}
+#app .tq-estimated-duration small{display:block;font-size:.78rem;opacity:.75;margin-top:3px}
+#app .tq-estimated-duration input{width:100%;min-height:44px}

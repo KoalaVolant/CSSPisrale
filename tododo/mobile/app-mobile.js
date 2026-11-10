@@ -211,7 +211,7 @@ function formatLongDate(str) {
 // Une tâche complète avec toutes ses valeurs par défaut
 function newTask(fields = {}) {
   return {
-    id: uid(), title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', startDate:'', recurrence:'', subtasks:[],
+    id: uid(), title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', startDate:'', recurrence:'', subtasks:[], estimatedMinutes: null,
     urgency: '', difficulty: '', doneAt: '', ticketName: '',
     ...fields,
   };
@@ -2540,7 +2540,7 @@ const app = createApp({
 
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
-      open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '',
+      open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', estimatedMinutes: null,
       urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',alterId:'',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',
     });
 
@@ -2553,13 +2553,13 @@ const app = createApp({
     function openTaskForm(task = null, projectId = '') {
       if (task) {
         Object.assign(taskForm, {
-          id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal',
+          id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal', estimatedMinutes: task.estimatedMinutes ?? null,
           status: task.status, projectId: task.projectId || '', due: task.due || '',
           urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '', dependsOn: task.dependsOn || '', milestoneId:task.milestoneId||'',alterId:task.alterId||'',startDate:task.startDate||'',recurrence:task.recurrence||'',recurrenceEnd:task.recurrenceEnd||'',subtaskBonusMode:task.subtaskBonusMode||'add',subtaskBonusPoints:task.subtaskBonusPoints??task.points??10,subtaskBonusMultiplier:task.subtaskBonusMultiplier||1.5,subtasks:clone(task.subtasks||[]).map(s=>({...s,points:Number.isFinite(Number(s.points))?Number(s.points):5})),subtaskDraft:'',
         });
       } else {
         Object.assign(taskForm, {
-          id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId, scope: view.value==='work'?'work':'personal',
+          id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId, scope: view.value==='work'?'work':'personal', estimatedMinutes: null,
           due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',
         });
       }
@@ -2616,8 +2616,16 @@ const app = createApp({
       const title = taskForm.title.trim();
       if (!title) return;
       if(taskForm.recurrenceEnd && taskForm.recurrenceEnd<(taskForm.due||taskForm.startDate||today.value)){notify('La fin de récurrence précède la première échéance');return;}
+      const rawDuration = taskForm.estimatedMinutes;
+      const durationIsBlank = rawDuration === null || rawDuration === '' || rawDuration === undefined;
+      const duration = durationIsBlank ? null : Number(rawDuration);
+      if (!durationIsBlank && (!Number.isSafeInteger(duration) || duration < 1 || duration > 100000)) {
+        notify('La durée approximative doit être un nombre entier de minutes (1 à 100000).');
+        return;
+      }
       const fields = {
         title,
+        estimatedMinutes: duration,
         category: taskForm.scope === 'work' ? (taskForm.workCategoryNames[0] || '') : (taskForm.category || ''),
         workCategoryNames: taskForm.scope === 'work' ? [...taskForm.workCategoryNames] : [],
         ticketName: '',

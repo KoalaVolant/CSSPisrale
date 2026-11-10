@@ -549,3 +549,7 @@ body{background:#f7faf9;color:#203a35}
 /* Version installée: PC V74.1 TEST */
 .tq69-brand .app-title .tq-version-tag{display:inline-flex;align-items:baseline;gap:4px;vertical-align:middle;margin-left:8px;padding:2px 6px;border:1px solid #cedbd4;border-radius:6px;background:#f3f7f4;color:#6f8078;font-size:11px!important;font-weight:500;letter-spacing:0;line-height:1.15;white-space:nowrap}
 .tq-version-tag span{font-size:10px;opacity:.8}
+
+/* V75 : durée approximative facultative des tâches */
+.tq-estimated-duration small{display:block;font-size:.78rem;opacity:.7;margin-top:3px}
+.tq-duration-pill{font-size:.75rem;font-weight:400;opacity:.8;margin-left:8px;white-space:nowrap}

@@ -1,0 +1,10 @@
+TODO QUEST V71 - Correctif catalogue sportif uniquement
+
+Cause : sportCatalogV67 pouvait valoir true tandis que les 50 exercices manquaient du document Firebase. V70 ignorait alors l ajout.
+
+V71 : verifie l existence de chaque ID sport-v67-01 a sport-v67-50 sur les chargements locaux et cloud, complete seulement ceux qui manquent et synchronise le catalogue corrige apres la premiere lecture Firebase. Les exercices presents et leurs modifications restent inchanges.
+
+Deployer TOUS les fichiers de l archive a la place de V70, Ctrl+F5.
+Onglet Sport > Catalogue des exercices : attendu 98 si les 48 initiaux restent presents. Verifier la sauvegarde cloud avant modification, et tester apres reconnexion et actualisation.
+Le JSON fourni est une ancienne copie : ne PAS l importer sur tes donnees actuelles.
+Aucun test sur la connexion Firebase reelle n a ete effectue.

@@ -1,0 +1,11 @@
+TODO QUEST PC V74.1 TEST - VERSION VISIBLE
+
+Installer TOUS les fichiers contenus dans cette archive à la RACINE du dossier /tododo/ dans GitHub, et non dans /tododo/TodoQuest_PC_V74_1_VERSION_VISIBLE_TEST/.
+Ne pas remplacer le dossier mobile.
+
+Controle immédiat : à côté de Todo Quest, le petit badge «v74.1 test» doit apparaître.
+Si aucun badge n’est visible, index.html V74.1 n’est pas celui servi par le site (mauvais dossier/branche, publication GitHub Pages ou cache).
+Sur la page Accueil, les boutons Essentiel / Complet doivent se trouver au-dessus des blocs du tableau de bord.
+Pour une nouvelle configuration le mode Essentiel est sélectionné par défaut. Une préférence «Complet» déjà mémorisée sur ce navigateur reste respectée.
+Utiliser Ctrl+F5 sur PC ou vider le cache du site pour vérifier. Les liens CSS/JS comportent un identifiant de version propre à cette archive.
+Cette version utilise le moteur V72 pour Firebase ; la concurrence PC/mobile reste à valider sur base de test. Sauvegarder/exporter les données et éviter des modifications concurrentes sur la base de production.
