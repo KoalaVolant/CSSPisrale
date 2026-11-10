@@ -1437,6 +1437,14 @@ function loadData() {
       }
       d.sportCatalogV56 = true;
     }
+    // V67 : ajout idempotent de 50 exercices, sans remplacer le catalogue utilisateur.
+    if (!d.sportCatalogV67) {
+      const ids = new Set(d.sportExercises.filter(x => x && x.id).map(x => x.id));
+      for (const ex of (window.TODO_SPORT_V67 || [])) {
+        if (!ids.has(ex.id)) d.sportExercises.push(clone(ex));
+      }
+      d.sportCatalogV67 = true;
+    }
     if (!d.sportGoals || typeof d.sportGoals !== 'object') d.sportGoals=clone(defaultData().sportGoals);
     if (!d.sportPoints || typeof d.sportPoints !== 'object') d.sportPoints=clone(defaultData().sportPoints);
     if (d.sportPoints.long === undefined) d.sportPoints.long=20;
@@ -2028,8 +2036,15 @@ const app = createApp({
       data.rewards.forEach(r => {r.favorite=false;});
       reward.favorite=!wasFavorite;
     }
+    const randomRewardCategory=ref('');
+    const randomRewardExcludeFavorite=ref(false);
+    function randomRewardEligible(r){
+      return rewardRemaining(r)>0 &&
+        (!randomRewardCategory.value || r.category===randomRewardCategory.value) &&
+        (!randomRewardExcludeFavorite.value || !r.favorite);
+    }
     function depositRandomReward() {
-      const eligible=data.rewards.filter(r=>rewardRemaining(r)>0);
+      const eligible=data.rewards.filter(randomRewardEligible);
       if (!eligible.length || balance.value<=0) {notify('Aucune récompense à financer ou aucun point disponible');return;}
       const reward=eligible[Math.floor(Math.random()*eligible.length)];
       depositReward(reward, true);
@@ -3269,6 +3284,51 @@ const app = createApp({
       h.pointAwards[today.value]=Math.round((baseAward+(q ? q.done*Math.max(0,Number(h.quantityBonus)||0) : 0))*100)/100;
       h.postponed=(h.postponed||[]).filter(d=>d!==today.value);
       notify('Habitude enregistrée');
+    }
+    function missedHabitDates(h) {
+      if (h.malus || habitIsFinished(h)) return [];
+      const start=h.startDate||h.createdAt||today.value;
+      const result=[];
+      for(let i=1;i<=Math.min(90,Math.max(0,dayDiff(start,today.value)));i++) {
+        const d=new Date(today.value+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-i);
+        const date=d.toISOString().slice(0,10);
+        if(date<start)break;
+        if((h.history||[]).includes(date)||(h.postponed||[]).includes(date))continue;
+        if(h.pausedUntil && date<=h.pausedUntil && date>=start)continue;
+        const dow=d.getUTCDay();
+        if(h.frequency==='daily' ||
+          h.frequency==='weekdays'&&(h.weekdays||[]).includes(dow) ||
+          h.frequency==='interval' && dayDiff(start,date)%Math.max(1,h.every||2)===0)
+          result.push(date);
+      }
+      return result;
+    }
+    function completeHabitPast(h) {
+      const dates=missedHabitDates(h);
+      if(!dates.length){notify('Aucune occurrence quotidienne passée à régulariser (90 jours)');return;}
+      const date=prompt('Date réellement effectuée (AAAA-MM-JJ) :\n'+dates.slice(0,10).join(', '),dates[0]);
+      if(date===null)return;
+      if(!dates.includes(date)){notify('Date non prévue, déjà validée ou hors période');return;}
+      if(!confirm('Enregistrer « '+h.title+' » comme effectuée le '+date+' ?'))return;
+      if(!Array.isArray(h.history))h.history=[];
+      if(!h.pointAwards)h.pointAwards=Object.fromEntries(habitAwards(h).map(a=>[a.date,a.points]));
+      h.history.push(date);h.history.sort();
+      const award=habitAwards(h).find(a=>a.date===date);
+      h.pointAwards[date]=award?.points??0;
+      notify('Habitude validée rétroactivement le '+date);
+    }
+    function postponeLateHabit(h) {
+      const dates=missedHabitDates(h);
+      if(!dates.length){notify('Aucune occurrence passée à reporter (90 jours)');return;}
+      const date=prompt('Occurrence à reporter (AAAA-MM-JJ) :',dates[0]);
+      if(date===null)return;
+      if(!dates.includes(date)){notify('Date non admissible');return;}
+      if(!confirm('Reporter l’occurrence du '+date+' à demain ?'))return;
+      if(!Array.isArray(h.postponed))h.postponed=[];
+      h.postponed.push(date);
+      const d=new Date(today.value+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);
+      h.forceDue=d.toISOString().slice(0,10);
+      notify('Occurrence reportée à demain');
     }
     function postponeHabit(h) {
       if (!confirm('Reporter « '+h.title+' » à demain ?')) return;
@@ -4731,7 +4791,7 @@ const app = createApp({
       // urgences & difficultés
       newLevel, levelUsage, addLevel, renameLevel, setLevelColor, moveLevel, deleteLevel,
       // points
-      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, formatPoints, toggleRewardFavorite, depositReward, depositRandomReward, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, gratitudeMoment, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, moveTicketType, balanceForm, openBalanceForm, applyBalance, resetBalance,
+      earned, balance, challengeTotal, nextReward, favoriteReward, rewardRemaining, formatPoints, toggleRewardFavorite, depositReward, depositRandomReward, randomRewardCategory, randomRewardExcludeFavorite, randomRewardEligible, withdrawReward, gratitudeTotal, savedTotal, gratitudeDraft, gratitudeMoment, todayGratitude, sortedGratitude, saveGratitude, deleteGratitude, workCategories, newWorkCategory, addWorkCategory, deleteWorkCategory, addWorkDifficulty, deleteWorkDifficulty, addWorkUrgency, deleteWorkUrgency, moveWorkLevel, moveTicketType, balanceForm, openBalanceForm, applyBalance, resetBalance,
       rewardFilters, visibleRewards, groupedRewards, visibleInventory, unusedInventory, usedInventory, rewardClaimCount, setInventoryUsed,
       // filtres
       filters, resetFilters, activeFilterCount, taskDue, todayTasks, upcomingTasks, undatedTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
@@ -4752,7 +4812,7 @@ const app = createApp({
       // données
       exportData, importData, resetAll,
       CHALLENGE_KINDS, challengeForm, openChallengeForm,newChallengeFromHabit, saveChallenge, deleteChallenge, toggleChallenge, hideChallengeHome, currentChallenges, challengeHistory, challengeProgress,
-      habitForm, habitWeekdays,addHabitProgressionStep,removeHabitProgressionStep,activateHabitProgression,habitProgressionCompleted,openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
+      habitForm, habitWeekdays,addHabitProgressionStep,removeHabitProgressionStep,activateHabitProgression,habitProgressionCompleted,openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, completeHabitPast, postponeLateHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
       activityForm, randomActivity, pickRandomActivity, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
       formatDate, mealMode, setMealMode, mealDishSearch, isMealEditing, toggleMealEditing, closeMealEditing, chooseMealDish, clearMealChoice, eveningPreview, renderEveningMarkdown, addTextarea, removeTextarea, openWorkQuickPaste,

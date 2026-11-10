@@ -430,3 +430,13 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 .modal button{border-radius:9px;padding:7px 12px;min-height:34px;}
 .modal .form-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid #e6eeea;}
 @media(max-width:560px){.modal-backdrop{padding:8px}.modal{padding:14px;border-radius:12px;max-height:96dvh}}
+
+/* V67 : controles compacts, accessibilite des fenetres et gestion des longues listes */
+.v67-random-option{display:inline-flex;align-items:center;gap:5px;font-size:12px;flex-wrap:wrap}
+.v67-random-option select{max-width:155px;min-width:90px}
+.modal-backdrop{padding:16px;backdrop-filter:blur(3px)}
+.modal{box-shadow:0 18px 65px rgba(20,38,34,.23);border:1px solid var(--fnd2);overscroll-behavior:contain}
+.modal input:not([type=checkbox]):not([type=radio]),.modal select,.modal textarea{min-height:35px;border-radius:7px;padding:7px;border:1px solid var(--main-color)}
+.modal input:focus-visible,.modal select:focus-visible,.modal textarea:focus-visible,.modal button:focus-visible{outline:2px solid var(--tit);outline-offset:2px}
+.modal .form-actions{position:sticky;bottom:0;background:var(--white,#fff);padding:9px 3px;border-top:1px solid var(--fnd2);z-index:2}
+@media(max-width:560px){.modal-backdrop{padding:7px}.modal{max-height:calc(100dvh - 14px)}}
