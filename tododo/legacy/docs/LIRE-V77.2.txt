@@ -1,0 +1,17 @@
+TODO QUEST PC V77.2 TEST
+
+BASE : V77.1.
+
+CORRECTION : la taille du texte des cartes en vue SIMPLE est désormais explicitement définie :
+- titre de tâche 13 px
+- points 12 px
+- champs et boutons 12 px
+- légendes 11 px
+Les TITRES de colonnes Aujourd’hui / À venir et la vue DÉTAILLÉE gardent leurs tailles précédentes.
+Les deux colonnes et leur ouverture permanente sont conservées.
+
+SUITE TECHNIQUE : ajout d’un test statique de non-régression (tests/test_dashboard_static.py) vérifiant classes HTML, présence des actions, absence de balises details dans la vue détaillée et ciblage CSS sans impact direct sur le mode Détaillé. Cela ne remplace pas des tests navigateur.
+
+INSTALLATION : GitHub /tododo/ ; remplacer les fichiers PC, y compris dashboard-v77.css. Laisser /mobile/ intact. Commit puis Ctrl+F5. Badge v77.2 test.
+
+PRUDENCE : aucun changement du JavaScript métier ni de Firebase. Les tests concurrents Firebase V72 restent en attente.
