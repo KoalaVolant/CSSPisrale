@@ -1,3 +1,11 @@
-Todo Quest V67 - prototype. 50 exercices en catalogue separe, sauvegarde JSON conservee, retrovalidation des habitudes et report des retards, filtres de recompenses aleatoires, ameliorations CSS.
-Ouvrir via serveur HTTP local. Faire un export JSON avant connexion a Firebase. Tests de synchronisation et UI non realises.
-L architecture est amorcee par la separation du catalogue sport ; le refactoring complet app.js n est pas encore effectue.
+Todo Quest V68 - Evolution ciblee depuis V67
+
+Inclus :
+- Habitudes : historique editable des validations, controle retroactif et taux individuel sur 28 jours.
+- Calendrier : filtres par rendez-vous, taches et jalons ; ouverture de la fiche d origine.
+- Dashboard sport : raccourcis mini / longue / jeu / balade.
+- V67 conservee : 50 exercices, filtres recompenses aleatoires, synchro Firebase.
+- Sauvegarde JSON : copie originale, aucun import automatique.
+
+Attention : tests de syntaxe seulement. Validation navigateur et Firebase non realisee.
+Les dates de debut, dependances de taches, projets termines et modules repas/humeur/alters ne sont pas modifies.

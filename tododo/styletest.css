@@ -440,3 +440,14 @@ select:not(.tag select),select option,select optgroup{color:#263b34;background-c
 .modal input:focus-visible,.modal select:focus-visible,.modal textarea:focus-visible,.modal button:focus-visible{outline:2px solid var(--tit);outline-offset:2px}
 .modal .form-actions{position:sticky;bottom:0;background:var(--white,#fff);padding:9px 3px;border-top:1px solid var(--fnd2);z-index:2}
 @media(max-width:560px){.modal-backdrop{padding:7px}.modal{max-height:calc(100dvh - 14px)}}
+
+/* V68 - Historique d'habitudes, calendrier unifie, sport depuis le dashboard */
+.v68-habit-regularity{padding:8px 10px;background:var(--fnd,#f5f5f5);border-radius:9px;margin:8px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.v68-history-line{display:flex;align-items:center;gap:10px;justify-content:space-between;border-bottom:1px solid var(--main-color,#ddd);padding:5px 0}
+.v68-history-line button{font-size:12px;padding:4px 9px;border-radius:7px;border:1px solid #bbb;background:transparent}
+.v68-cal-layers,.v68-sport-shortcuts{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:8px 0}
+.v68-cal-layers label{display:inline-flex;align-items:center;gap:5px;font-size:13px}
+.calendar-day .v68-calendar-task,.calendar-day .v68-calendar-milestone{display:block;text-align:left;width:100%;height:auto;margin:3px 0;padding:4px 5px;border-radius:5px;border:1px solid var(--fnd3,#aaa);font-size:11px;white-space:normal;overflow-wrap:anywhere}
+.calendar-day .v68-calendar-task{background:#e5f0e9;color:#1e4738}
+.calendar-day .v68-calendar-milestone{background:#eee8f6;color:#49305d}
+.v68-sport-shortcuts button{border:1px solid var(--fnd3,#aaa);background:var(--fnd,#eee);border-radius:8px;padding:7px 10px}

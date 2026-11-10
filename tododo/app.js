@@ -3317,6 +3317,45 @@ const app = createApp({
       h.pointAwards[date]=award?.points??0;
       notify('Habitude validée rétroactivement le '+date);
     }
+    function undoHabitPast(h,date) {
+      if (h.malus || !(h.history||[]).includes(date)) return;
+      if (!confirm('Annuler la validation du '+date+' pour « '+h.title+' » ? Les points correspondants seront retirés.')) return;
+      h.history=h.history.filter(d=>d!==date);
+      if (h.pointAwards) delete h.pointAwards[date];
+      notify('Validation du '+date+' annulée');
+    }
+    function habitPeriodStats(h,days=28) {
+      const end=today.value;
+      const from=dateAddSafe(end,-days+1);
+      const start=[from,h.startDate||h.createdAt||from].sort().pop();
+      const stop=[end,h.endDate||end].sort()[0];
+      if(start>stop) return {expected:0,done:0,postponed:0,rate:null};
+      let expected=0,done=0,postponed=0;
+      const history=new Set(h.history||[]),reports=new Set(h.postponed||[]);
+      if(h.frequency==='weekly') {
+        const weeks=new Map();
+        for(let d=start;d<=stop;d=dateAddSafe(d,1)){
+          if(h.pausedUntil && d<=h.pausedUntil && d>=start)continue;
+          const w=monday(d);if(!weeks.has(w))weeks.set(w,[]);weeks.get(w).push(d);
+        }
+        for(const dates of weeks.values()){
+          const target=Math.min(Math.max(1,Number(h.weeklyTarget)||3),dates.length);
+          expected+=target;
+          done+=Math.min(target,dates.filter(d=>history.has(d)).length);
+        }
+      } else {
+        for(let d=start;d<=stop;d=dateAddSafe(d,1)){
+          if(h.pausedUntil&&d<=h.pausedUntil)continue;
+          const dow=new Date(d+'T12:00:00Z').getUTCDay();
+          const scheduled=h.frequency==='daily'||h.frequency==='weekdays'&&(h.weekdays||[]).includes(dow)||h.frequency==='interval'&&dayDiff(h.startDate||h.createdAt||start,d)%Math.max(1,Number(h.every)||2)===0;
+          if(!scheduled&&!history.has(d))continue;
+          if(reports.has(d)){postponed++;continue;}
+          expected++;if(history.has(d))done++;
+        }
+      }
+      return {expected,done,postponed,rate:expected?Math.round(done/expected*100):null};
+    }
+    function dateAddSafe(value,days){const d=new Date(value+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10);}
     function postponeLateHabit(h) {
       const dates=missedHabitDates(h);
       if(!dates.length){notify('Aucune occurrence passée à reporter (90 jours)');return;}
@@ -4258,6 +4297,12 @@ const app = createApp({
     const calendarTitle=computed(()=>calMode.value==='month'?new Date(calAnchor.value+'T12:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'}):'Semaine du '+formatDate(dateMonday(calAnchor.value)));
     const calendarDays=computed(()=>{const start=calMode.value==='month'?dateMonday(calAnchor.value.slice(0,7)+'-01'):dateMonday(calAnchor.value);const n=calMode.value==='month'?42:7;return Array.from({length:n},(_,i)=>dateAdd(start,i));});
     const appointmentsOn=date=>data.appointments.filter(a=>a.start<=date&&a.end>=date).sort((a,b)=>a.start.localeCompare(b.start)||a.title.localeCompare(b.title,'fr'));
+    const calendarLayers=reactive({appointments:true,tasks:true,milestones:true});
+    function calendarTasksOn(date){return calendarLayers.tasks ? data.tasks.filter(t=>t.status!=='done' && ((t.startDate&&t.startDate<=date&&taskDue(t)>=date) || taskDue(t)===date)) : [];}
+    function calendarMilestonesOn(date){return calendarLayers.milestones ? data.projectMilestones.filter(m=>m.due===date) : [];}
+    function openCalendarTask(task){openTaskForm(task);}
+    function openCalendarMilestone(m){const project=data.projects.find(p=>p.id===m.projectId);setTab('projects');if(project)nextTick(()=>document.querySelector('[data-project-id="'+project.id+'"]')?.scrollIntoView({block:'center'}));}
+
     const categoryFor=id=>data.appointmentCategories.find(c=>c.id===id);
     const appointmentUpcoming=computed(()=>data.appointments.filter(a=>a.end>=today.value && a.status!=='missed').sort((a,b)=>a.start.localeCompare(b.start)||a.title.localeCompare(b.title,'fr')));
     const appointmentToday=computed(()=>appointmentsOn(today.value));
@@ -4771,7 +4816,7 @@ const app = createApp({
       wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
       sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
-      ingredientOwnedFilter,pantryExpiring,pantryOverdue,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
+      ingredientOwnedFilter,pantryExpiring,pantryOverdue,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,calendarLayers,calendarTasksOn,calendarMilestonesOn,openCalendarTask,openCalendarMilestone,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,dashboardDragged,dropDashboardWidget,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestionMode,suggestionLeftovers,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
       randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
@@ -4812,7 +4857,7 @@ const app = createApp({
       // données
       exportData, importData, resetAll,
       CHALLENGE_KINDS, challengeForm, openChallengeForm,newChallengeFromHabit, saveChallenge, deleteChallenge, toggleChallenge, hideChallengeHome, currentChallenges, challengeHistory, challengeProgress,
-      habitForm, habitWeekdays,addHabitProgressionStep,removeHabitProgressionStep,activateHabitProgression,habitProgressionCompleted,openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, completeHabitPast, postponeLateHabit, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
+      habitForm, habitWeekdays,addHabitProgressionStep,removeHabitProgressionStep,activateHabitProgression,habitProgressionCompleted,openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, completeHabitPast, postponeLateHabit, undoHabitPast, habitPeriodStats, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,
       activityForm, randomActivity, pickRandomActivity, openActivityForm, saveActivity, deleteActivity, createFromActivity,
       // utilitaires
       formatDate, mealMode, setMealMode, mealDishSearch, isMealEditing, toggleMealEditing, closeMealEditing, chooseMealDish, clearMealChoice, eveningPreview, renderEveningMarkdown, addTextarea, removeTextarea, openWorkQuickPaste,
