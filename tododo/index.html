@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Todo Quest · PC V76 TEST</title>
+  <title>Todo Quest · PC V76.1 TEST</title>
   <link rel="stylesheet" href="style.css?v=pc-v76-suggest">
   <link rel="stylesheet" href="stylekoala.css?v=pc-v76-suggest">
   <link rel="stylesheet" href="styletest.css?v=pc-v76-suggest">
@@ -16,7 +16,7 @@
   <header class="app-header tq69-header">
     <div class="tq69-topline">
       <div class="app-brand tq69-brand">
-        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V76 TEST">v76 <span>test</span></small></h1>
+        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V76.1 TEST">v76.1 <span>test</span></small></h1>
         <div class="sync-box tq69-sync">
           <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
           <template v-if="firebaseReady">
@@ -468,24 +468,11 @@
           <button type="button" :class="{active:ui.dashboardMode==='complete'}" :aria-pressed="ui.dashboardMode==='complete'" @click="ui.dashboardMode='complete'">Complet</button>
         </div>
       </div>
-      <div v-if="ui.dashboardMode==='essential'" class="v74-summary" aria-label="Resume du jour">
-        <div><strong>{{dashboardEssentialSummary.tasks}}</strong><span>Taches aujourd'hui</span></div>
-        <div><strong>{{dashboardEssentialSummary.appointments}}</strong><span>Rendez-vous</span></div>
-        <div><strong>{{dashboardEssentialSummary.habits}}</strong><span>Habitudes a faire</span></div>
-        <div><strong>{{dashboardEssentialSummary.late}}</strong><span>Taches en retard</span></div>
-      </div>
-
-      <section class="v59-hub v76-chooser"><h2>🎲 Je ne sais pas quoi faire</h2><p class="hint">Suggestions selon les échéances, la durée approximative et l’effort renseignés. Une durée inconnue reste éligible.</p>
-        <div class="v76-chooser-filters"><label>Temps disponible <select v-model="chooserTime"><option value="any">Peu importe</option><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option></select></label><label>Effort maximal <select v-model="chooserEffort"><option value="any">Peu importe</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="high">Important</option></select></label></div>
-        <div class="v59-actions"><button @click="chooseAction">🎲 Je ne sais pas quoi faire</button><button @click="setTab('calendar');dayView='day'">📅 Ma journée</button></div>
-        <div class="v59-chooser" v-if="chooserChoice"><strong>{{chooserChoice.source}} : {{chooserChoice.title}}</strong><small v-if="chooserChoice.source==='Tâche'">{{chooserTaskInfo(chooserChoice)}}</small><button @click="openChooserChoice">Ouvrir directement</button><button @click="chooseAction">Autre idée</button></div>
-        <details><summary>Options de la suggestion</summary><label>Énergie <select v-model="chooserEnergy"><option value="low">Petite énergie / flemme</option><option value="normal">Normale</option></select></label><label>Type <select v-model="chooserKind"><option value="all">Tout</option><option value="useful">Utile</option><option value="pleasure">Plaisir</option></select></label></details>
-      </section>
-      
-<section class="v76-incomplete" aria-label="Tâches incomplètes">
- <div class="v76-incomplete-head"><h2>🧩 Tâches incomplètes <small>({{incompleteCount}})</small></h2><button type="button" @click="incompleteOpen=!incompleteOpen" :aria-expanded="incompleteOpen">{{incompleteOpen?'Masquer':'Compléter les tâches'}}</button></div>
+      <div class="v761-incomplete-launch"><button type="button" @click="incompleteOpen=!incompleteOpen;$nextTick(()=>document.getElementById('v761-incomplete-panel')?.scrollIntoView({block:'start',behavior:'smooth'}))">🧩 Tâches incomplètes <strong>({{incompleteCount}})</strong> {{incompleteOpen?'▴':'▾'}}</button><small>Durée, effort, catégorie ou projet non renseignés</small></div>
+      <section id="v761-incomplete-panel" class="v76-incomplete" v-if="incompleteOpen" aria-label="Tâches incomplètes">
+ <div class="v76-incomplete-head"><h2>🧩 Tâches à compléter <small>({{incompleteCount}})</small></h2><button type="button" @click="incompleteOpen=false">Fermer</button></div>
  <p class="hint">Tâches non terminées auxquelles il manque au moins une durée, un effort, une catégorie ou un projet. Rien n'est obligatoire pour terminer une tâche.</p>
- <template v-if="incompleteOpen">
+ <template>
   <label>Afficher les tâches sans <select v-model="incompleteFilter"><option value="all">N'importe quel champ</option><option value="duration">Durée</option><option value="effort">Effort</option><option value="category">Catégorie</option><option value="project">Projet</option></select></label>
   <p v-if="!incompleteTasks.length">Aucune tâche à compléter pour ce filtre.</p>
   <div class="v76-incomplete-list">
@@ -501,6 +488,27 @@
   </div>
  </template>
 </section>
+<div v-if="ui.dashboardMode==='essential'" class="v74-summary" aria-label="Resume du jour">
+        <div><strong>{{dashboardEssentialSummary.tasks}}</strong><span>Taches aujourd'hui</span></div>
+        <div><strong>{{dashboardEssentialSummary.appointments}}</strong><span>Rendez-vous</span></div>
+        <div><strong>{{dashboardEssentialSummary.habits}}</strong><span>Habitudes a faire</span></div>
+        <div><strong>{{dashboardEssentialSummary.late}}</strong><span>Taches en retard</span></div>
+      </div>
+
+      <section class="v59-hub v76-chooser"><h2>🎲 Je ne sais pas quoi faire</h2><p class="hint">Suggestions selon les échéances, la durée approximative et l’effort renseignés. Une durée inconnue reste éligible.</p>
+        <div class="v761-chooser-controls">
+  <label>Durée estimée <select v-model="chooserTime"><option value="any">Toutes les durées</option><option value="lt5">Moins de 5 min</option><option value="b5_10">5 à moins de 10 min</option><option value="b10_15">10 à moins de 15 min</option><option value="b15_30">15 à moins de 30 min</option><option value="b30_60">30 à moins de 60 min</option><option value="b60_120">1 h à moins de 2 h</option><option value="b120_180">2 h à moins de 3 h</option><option value="gte180">3 h et plus</option></select></label>
+  <label>Effort maximal <select v-model="chooserEffort"><option value="any">Tous les efforts</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="high">Important</option></select></label>
+  <label>Combinaison <select v-model="chooserOperator"><option value="and">Durée ET effort</option><option value="or">Durée OU effort</option></select></label>
+  <label class="v761-unknown"><input type="checkbox" v-model="chooserUnknown"> Inclure les tâches sans durée / effort renseigné</label>
+</div>
+<small class="v761-explain">Tranches : borne basse incluse, borne haute exclue. « OU » ne change le résultat que si les deux filtres sont actifs. Les habitudes et autres activités restent proposées.</small>
+        <div class="v59-actions"><button @click="chooseAction">🎲 Je ne sais pas quoi faire</button><button @click="setTab('calendar');dayView='day'">📅 Ma journée</button></div>
+        <div class="v59-chooser" v-if="chooserChoice"><strong>{{chooserChoice.source}} : {{chooserChoice.title}}</strong><small v-if="chooserChoice.source==='Tâche'">{{chooserTaskInfo(chooserChoice)}}</small><button @click="openChooserChoice">Ouvrir directement</button><button @click="chooseAction">Autre idée</button></div>
+        <details><summary>Options de la suggestion</summary><label>Énergie <select v-model="chooserEnergy"><option value="low">Petite énergie / flemme</option><option value="normal">Normale</option></select></label><label>Type <select v-model="chooserKind"><option value="all">Tout</option><option value="useful">Utile</option><option value="pleasure">Plaisir</option></select></label></details>
+      </section>
+      
+
 
       <section class="v59-hub" v-if="ui.dashboardMode==='complete'"><details><summary>⚙️ Automatismes de la version test</summary><label><input type="checkbox" v-model="data.testSettings.automationEnabled"> Activer les rappels automatiques locaux (proposition)</label><p>Les prochaines occurrences des tâches récurrentes sont créées après validation. Les rappels sont calculés à l'ouverture, sans notifications externes.</p></details></section>
       <section id="dashboard-appointments" class="appointments-home" v-if="dashboardShouldShow('appointments')" :style="{order:data.dashboardWidgets.indexOf('appointments')+10}"><div class="appointments-home-header"><h2>📅 Rendez-vous</h2><button @click="openAppointment()">＋ Ajouter un rendez-vous</button><button @click="setTab('calendar')">Ouvrir le calendrier</button></div><h3>Aujourd'hui</h3><p v-if="!appointmentToday.length">Aucun rendez-vous aujourd'hui.</p><article v-for="a in appointmentToday" :key="a.id" class="appointment-line" :style="{'border-left-color':categoryFor(a.categoryId)?.color||'#999'}"><strong>{{a.title}}</strong><span class="appointment-category-label" :style="{'--appt-category-color':categoryFor(a.categoryId)?.color||'#999'}">{{categoryFor(a.categoryId)?.name||'Sans catégorie'}}</span> <small>{{weekDate(a.start)}} au {{weekDate(a.end)}}</small><small v-if="linkedLabel(a)">Lié : {{linkedLabel(a)}}</small><button @click="openAppointment(a)">Modifier</button></article><h3>Rendez-vous de la semaine</h3><p v-if="!appointmentWeek.length">Aucun rendez-vous cette semaine.</p><article v-for="a in appointmentWeek" :key="a.id" class="appointment-line" :style="{'border-left-color':categoryFor(a.categoryId)?.color||'#999'}"><strong>{{a.title}}</strong><span class="appointment-category-label" :style="{'--appt-category-color':categoryFor(a.categoryId)?.color||'#999'}">{{categoryFor(a.categoryId)?.name||'Sans catégorie'}}</span><small>{{weekDate(a.start)}} au {{weekDate(a.end)}}</small><small v-if="linkedLabel(a)">Lié : {{linkedLabel(a)}}</small><button @click="openAppointment(a)">Modifier</button></article></section>
@@ -563,20 +571,21 @@
       <section id="dashboard-priorities" class="priority-box" :style="{order:data.dashboardWidgets.indexOf('priorities')+10}" v-if="dashboardShouldShow('priorities')"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ taskDue(item.task) ? '· échéance '+formatDate(taskDue(item.task)) : '' }}</small></li></ol></section>
       <div id="dashboard-tasks" class="dashboard" :style="{order:data.dashboardWidgets.indexOf('tasks')+10}" v-if="dashboardShouldShow('tasks')">
 
-<div class="v76-task-mode" role="group" aria-label="Présentation des tâches"><strong>Affichage des tâches</strong><button type="button" :class="{active:dashboardTasksMode==='simple'}" @click="dashboardTasksMode='simple'">Simple</button><button type="button" :class="{active:dashboardTasksMode==='detailed'}" @click="dashboardTasksMode='detailed'">Détaillé</button></div>
+<div class="v761-task-mode"><strong>Présentation des tâches</strong><div class="v761-mode-choices"><button type="button" :class="{active:dashboardTasksMode==='simple'}" @click="dashboardTasksMode='simple'">Simple</button><button type="button" :class="{active:dashboardTasksMode==='detailed'}" @click="dashboardTasksMode='detailed'">Détaillé</button></div></div>
 <template v-if="dashboardTasksMode==='simple'">
- <section class="v76-simple-group" v-for="group in [{name:'Aujourd’hui',list:todayTasks},{name:'À venir',list:upcomingTasks}]" :key="group.name">
-  <h2>{{group.name}} <small>({{group.list.length}})</small></h2><p v-if="!group.list.length">Aucune tâche.</p>
-  <article class="v76-simple-task" v-for="t in group.list" :key="t.id">
-   <div class="v76-simple-meta"><strong>{{t.title}}</strong><span>{{t.category||'Sans catégorie'}} · {{projectName(t.projectId)||'Sans projet'}}</span><small>{{t.malus?'−':'+'}}{{t.points||0}} pts · Échéance : {{taskDue(t)?formatDate(taskDue(t)):'Non définie'}}</small></div>
-   <div class="v76-simple-actions"><button type="button" :disabled="!!blockingTask(t)" @click="changeStatus(t,'done')">✓ Terminé</button><button type="button" @click="duplicateTask(t,'tomorrow')">+ Demain</button><button type="button" @click="duplicateTask(t,'followup')">+ Suite</button></div>
+ <section class="v761-task-group" v-for="group in [{name:'Aujourd’hui',list:todayTasks},{name:'À venir',list:upcomingTasks}]" :key="group.name">
+  <h3>{{group.name}} <small>({{group.list.length}})</small></h3>
+  <p v-if="!group.list.length">Aucune tâche.</p>
+  <article class="v761-task" v-for="t in group.list" :key="t.id" :style="{'--v761-accent':chooserTaskCategoryColor(t)||chooserTaskProjectColor(t)||'#7b8b83'}">
+   <div class="v761-task-title"><strong>{{t.title}}</strong><span :class="{'v761-malus':t.malus}">{{t.malus?'−':'+'}}{{t.points||0}} pts</span></div>
+   <div class="v761-task-fields"><label class="v761-task-field" :style="{'--v761-tag':chooserTaskCategoryColor(t)||'#dce5e1'}"><small>Catégorie</small><select :value="t.category||''" @change="updateTask(t,'category',$event.target.value)"><option value="">Sans catégorie</option><option v-for="c in categories" :key="c" :value="c">{{c}}</option></select></label><label class="v761-task-field" :style="{'--v761-tag':chooserTaskProjectColor(t)||'#dce5e1'}"><small>Projet</small><select :value="t.projectId||''" @change="updateTask(t,'projectId',$event.target.value)"><option value="">Sans projet</option><option v-for="p in data.projects" :key="p.id" :value="p.id">{{p.name}}</option></select></label><label class="v761-task-field"><small>Échéance</small><input type="date" :value="taskDue(t)||''" @change="changeDue(t,$event.target.value)"></label></div>
+   <div class="v761-task-actions"><button type="button" :disabled="!!blockingTask(t)" @click="changeStatus(t,'done')">✓ Terminé</button><button type="button" @click="duplicateTask(t,'tomorrow')">+ Demain</button><button type="button" @click="duplicateTask(t,'followup')">+ Suite</button></div>
   </article>
  </section>
 </template>
-
 <template v-else>
 
-        <section class="view view-today">
+        <section class="view view-today v761-detail-group"><details><summary>Aujourd’hui · ouvrir la liste</summary>
           <h2>Aujourd'hui <small>({{ todayTasks.length }})</small> <small class="list-points">{{ todayPoints }} pts à gagner</small></h2>
           <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui.</p>
           <div class="task-list">
@@ -585,9 +594,9 @@
                        @edit-selected="editSelected" @delete-selected="deleteSelected"
                        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
           </div>
-        </section>
+        </details></section>
 
-        <section class="view view-upcoming">
+        <section class="view view-upcoming v761-detail-group"><details><summary>À venir · ouvrir la liste</summary>
           <h2>À venir <small>({{ upcomingTasks.length }})</small> <small class="list-points">{{ upcomingPoints }} pts à gagner</small></h2>
           <p class="empty" v-if="!upcomingTasks.length">Aucune tâche à venir.</p>
           <div class="task-list">
@@ -596,7 +605,7 @@
                        @edit-selected="editSelected" @delete-selected="deleteSelected"
                        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
           </div>
-        </section>
+        </details></section>
 
 
 

@@ -315,3 +315,39 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 .v76-choice{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
 .v76-choice small{color:#64746b}
 @media(max-width:650px){.v76-simple-task{flex-direction:column;align-items:stretch}.v76-simple-actions button{flex:1;min-height:38px}.v76-incomplete,.v76-mobile-chooser{padding:12px}.v76-editgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* V76.1 : vues de tâches : colonne unique, contrôle distinct, champs éditables */
+.view-home #dashboard-tasks{display:block!important;width:100%!important;min-width:0;}
+#dashboard-tasks .v761-task-mode{display:flex!important;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;margin:8px 0 14px;background:var(--fnd3,#edf3ef);border-radius:12px;flex-wrap:wrap;}
+#dashboard-tasks .v761-mode-choices{display:inline-flex;gap:5px;margin-left:auto;align-items:center;}
+#dashboard-tasks .v761-mode-choices button{flex:0 0 auto!important;width:auto!important;min-width:72px;font-size:13px;line-height:1.3;padding:7px 10px;}
+#dashboard-tasks .v761-mode-choices button.active{background:#326455;color:white;}
+#dashboard-tasks .v761-task-group{display:block!important;width:100%!important;min-width:0;margin:12px 0 16px;padding:0!important;}
+#dashboard-tasks .v761-task-group>h3{font-size:1.04rem;margin:8px 0;}
+#dashboard-tasks .v761-task{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;align-items:center;padding:12px;margin:7px 0;border:1px solid #d8e0dd;border-left:4px solid var(--v761-accent);border-radius:12px;background:var(--fnd,#fff);min-width:0;}
+#dashboard-tasks .v761-task-title{grid-column:1 / -1;display:flex;justify-content:space-between;gap:12px;align-items:center;min-width:0;}
+#dashboard-tasks .v761-task-title strong{overflow-wrap:anywhere;}
+#dashboard-tasks .v761-task-title span{font-weight:700;white-space:nowrap;}
+#dashboard-tasks .v761-task-title .v761-malus{color:#b34d46;}
+#dashboard-tasks .v761-task-fields{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px;min-width:0;}
+#dashboard-tasks .v761-task-field{display:flex;flex-direction:column;gap:4px;min-width:130px;max-width:225px;border:0;padding:0;margin:0;background:transparent;}
+#dashboard-tasks .v761-task-field small{font-size:11px;opacity:.72;}
+#dashboard-tasks .v761-task-field select,#dashboard-tasks .v761-task-field input{width:100%;min-width:0;max-width:100%;height:36px;padding:6px 9px!important;border:1px solid var(--v761-tag,#cad6ce)!important;border-left:4px solid var(--v761-tag,#cad6ce)!important;border-radius:8px;background:var(--fnd,#fff);font-size:13px;}
+#dashboard-tasks .v761-task-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;min-width:0;}
+#dashboard-tasks .v761-task-actions button{width:auto!important;min-width:0!important;flex:0 0 auto!important;white-space:nowrap;font-size:12px;padding:7px 10px;}
+#dashboard-tasks .v761-detail-group{display:block!important;width:100%!important;min-width:0!important;padding:0!important;margin:8px 0;}
+#dashboard-tasks .v761-detail-group>details{display:block;width:100%;border:1px solid #d6e0d9;border-radius:10px;padding:10px;}
+#dashboard-tasks .v761-detail-group summary{cursor:pointer;font-weight:600;padding:5px;}
+#dashboard-tasks .v761-detail-group .task-list{display:block;}
+.v761-incomplete-launch{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:12px 0;}
+.v761-incomplete-launch button{border-radius:10px;padding:9px 13px;border:1px solid #a9c7b7;font-weight:650;}
+.v761-incomplete-launch small{color:var(--ink-soft,#5d7068);}
+#v761-incomplete-panel{scroll-margin-top:80px;margin:0 0 16px;max-width:100%;}
+.v761-chooser-controls{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;align-items:flex-end;}
+.v761-chooser-controls>label{display:flex;flex-direction:column;gap:4px;min-width:155px;flex:1 1 170px;font-size:13px;}
+.v761-chooser-controls select{min-width:0;max-width:100%;width:100%;}
+.v761-chooser-controls .v761-unknown{flex-direction:row;align-items:center;flex:1 1 240px;padding:8px 0;}
+.v761-chooser-controls .v761-unknown input{width:auto;}
+.v761-explain{display:block;font-size:12px;opacity:.76;line-height:1.4;margin:5px 0;}
+@media(max-width:1000px){#dashboard-tasks .v761-task{grid-template-columns:minmax(0,1fr)}#dashboard-tasks .v761-task-actions{justify-content:flex-start;}}
+@media(max-width:650px){#dashboard-tasks .v761-task-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;}#dashboard-tasks .v761-task-field{min-width:0;max-width:none;}#dashboard-tasks .v761-task-actions button{flex:1 1 auto!important;}}
