@@ -1,0 +1,17 @@
+TODO QUEST V66 - VERSION TEST
+
+Modifications :
+- Habitudes en pause dans le bloc Habitudes du dashboard.
+- Tâches avec date de début : affichées Aujourd’hui depuis le début jusqu’à l’échéance incluse ; ensuite En retard.
+- À l’échéance, étiquette DATE D’ÉCHÉANCE.
+- Listes déplacé dans Autres ; Alters et Humeur & Psychologie regroupés sous Psychologie.
+- Succès & objectifs retiré de la navigation (données conservées).
+- Pourcentages d’épargne des récompenses.
+- Fenêtres modales harmonisées.
+- Tâches de projet glissables vers jalons, entre jalons et hors jalon ; ordre des tâches d’un jalon ajustable.
+- Navigation rapide du dashboard suit l’ordre des widgets.
+
+DEPLOIEMENT : sauvegarder les fichiers originaux ; déposer index.html, app.js, les trois CSS et firebase-config.js ensemble.
+Le JSON fourni est une sauvegarde, ne pas l’importer automatiquement.
+ATTENTION : Firebase V65 reste activé dans cette version. Ne pas tester en production sans sauvegarde exportée.
+CONTROLES : analyse syntaxique Node.js et parsing HTML, pas de tests fonctionnels en navigateur connecté à Firebase.

@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261106-v65sync">
-  <link rel="stylesheet" href="stylekoala.css?v=20261106-v65sync">
-  <link rel="stylesheet" href="styletest.css?v=20261106-v65sync">
+  <link rel="stylesheet" href="style.css?v=20261110-v66">
+  <link rel="stylesheet" href="stylekoala.css?v=20261110-v66">
+  <link rel="stylesheet" href="styletest.css?v=20261110-v66">
 </head>
 <body>
 
@@ -39,7 +39,7 @@
     <div class="favorite-reward" v-if="favoriteReward">
             <strong>★ Récompense favorite : {{ favoriteReward.name }}</strong>
             <span>{{ formatPoints(favoriteReward.saved) }} / {{ formatPoints(favoriteReward.cost) }} pts réservés · {{ formatPoints(rewardRemaining(favoriteReward)) }} pts restant à épargner</span>
-            <progress :value="Number(favoriteReward.saved)||0" :max="favoriteReward.cost"></progress>
+            <div class="tq-reward-progress"><progress :value="Number(favoriteReward.saved)||0" :max="Math.max(1,Number(favoriteReward.cost)||1)"></progress><small>{{Math.min(100,Math.round((Number(favoriteReward.saved)||0)/Math.max(1,Number(favoriteReward.cost)||1)*100))}} %</small></div>
             <button type="button" @click="depositReward(favoriteReward)">Épargner des points</button>
           </div>
 
@@ -54,7 +54,7 @@
   </div>
   <button type="button" class="nav-backdrop" aria-label="Fermer le menu" tabindex="-1"></button>
 
-  <div class="v59-test-warning" role="status"><strong>VERSION V65 TEST + SYNCHRO</strong> · Firebase réactivé : une fois connecté avec Google, les changements peuvent modifier tes données en ligne sur tous tes appareils. Exporte un JSON de sauvegarde avant tout test. Le cloud existant est chargé en priorité à la connexion.</div>
+  <div class="v59-test-warning" role="status"><strong>VERSION V66 TEST + SYNCHRO</strong> · Firebase réactivé : une fois connecté avec Google, les changements peuvent modifier tes données en ligne sur tous tes appareils. Exporte un JSON de sauvegarde avant tout test. Le cloud existant est chargé en priorité à la connexion.</div>
   <div class="layout">
 
     <!-- ============ MENU DE GAUCHE ============ -->
@@ -463,7 +463,7 @@
         <h2>Défis en cours</h2>
         <div v-for="c in currentChallenges.filter(x=>x.enabled!==false && !x.hiddenHome)" :key="c.id" class="challenge-summary"><strong>{{ c.name }}</strong> · {{ c.current }}/{{ c.target }} · +{{ c.points }} pts <span v-if="c.awarded">✓ Terminé</span><button v-if="c.awarded" type="button" @click="hideChallengeHome(c)">Retirer de l’accueil</button></div>
       </section>
-      <section id="dashboard-habits" class="home-habits" :style="{order:data.dashboardWidgets.indexOf('habits')+10}" v-if="widgetVisible('habits') && dashboardHabits.length">
+      <section id="dashboard-habits" class="home-habits" :style="{order:data.dashboardWidgets.indexOf('habits')+10}" v-if="widgetVisible('habits') && (dashboardHabits.length || pausedDashboardHabits.length)">
         <section class="home-habit-group" v-for="group in [{malus:false,title:'Bonnes habitudes',open:goodHabitsHomeOpen},{malus:true,title:'Mauvaises habitudes',open:badHabitsHomeOpen}]" :key="group.title">
           <button class="habit-group-toggle" type="button" @click="group.malus ? badHabitsHomeOpen=!badHabitsHomeOpen : goodHabitsHomeOpen=!goodHabitsHomeOpen" :aria-expanded="group.malus ? badHabitsHomeOpen : goodHabitsHomeOpen">{{ group.malus ? (badHabitsHomeOpen?'▾':'▸') : (goodHabitsHomeOpen?'▾':'▸') }} {{ group.title }} ({{ dashboardHabits.filter(h=>!!h.malus===group.malus).length }})</button>
           <div class="habit-dashboard" :class="{'bad-habits-three':group.malus}" v-if="group.malus ? badHabitsHomeOpen : goodHabitsHomeOpen">
@@ -472,8 +472,8 @@
         </div>
           </div>
         </section>
+        <details class="v61-paused" v-if="pausedDashboardHabits.length"><summary>⏸ Habitudes en pause ({{pausedDashboardHabits.length}})</summary><div class="v60-item" v-for="h in pausedDashboardHabits" :key="h.id"><strong>{{h.title}}</strong><span>jusqu’au {{formatDate(h.pausedUntil)}}</span><button type="button" @click="toggleHabitPause(h)">Reprendre</button></div></details>
       </section>
-      <details class="v61-paused" v-if="data.habits.some(x=>x.pausedUntil&&x.pausedUntil>=today)"><summary>⏸ Habitudes en pause ({{data.habits.filter(x=>x.pausedUntil&&x.pausedUntil>=today).length}})</summary><div class="v60-item" v-for="h in data.habits.filter(x=>x.pausedUntil&&x.pausedUntil>=today)" :key="h.id"><strong>{{h.title}}</strong><span>jusqu’au {{formatDate(h.pausedUntil)}}</span><button @click="toggleHabitPause(h)">Reprendre</button></div></details>
       <section id="dashboard-routines" class="v62-feature v63-routine-dashboard" v-if="widgetVisible('routines')" :style="{order:data.dashboardWidgets.indexOf('routines')+10}">
         <div class="v52-heading"><h2>🧩 Routines du jour</h2><button type="button" @click="setTab('habits')">Gérer les routines</button></div>
         <p v-if="!data.customRoutines.length" class="hint">Aucune routine créée. Regroupe tes habitudes dans « Habitudes & routines » pour les retrouver ici.</p>
@@ -1178,7 +1178,7 @@
             </button>
           </div>
           <p class="project-desc" v-if="p.description">{{ p.description }}</p>
-          <div class="project-milestones"><strong>Jalons ({{ projectStats(p).milestonesDone }}/{{ projectStats(p).milestonesTotal }})</strong><progress :value="projectStats(p).done + projectStats(p).milestonesDone" :max="Math.max(1, projectStats(p).total + projectStats(p).milestonesTotal)"></progress><div class="tq-milestone" v-for="m in milestones(p)" :key="m.id" :class="{'milestone-finished':milestoneDone(m),'milestone-overdue':m.due && m.due < today && !milestoneDone(m)}"><div class="milestone-progress"><span>{{milestoneTasks(m).filter(t=>t.status==='done').length}} / {{milestoneTasks(m).length}} sous-tâches</span><progress v-if="milestoneTasks(m).length" :value="milestoneTasks(m).filter(t=>t.status==='done').length" :max="milestoneTasks(m).length"></progress></div><input type="checkbox" :checked="milestoneDone(m)" :disabled="milestoneTasks(m).length>0&&!milestoneDone(m)" @change="toggleMilestone(m)"> <strong class="milestone-label">{{ m.title }}</strong><label class="tq-milestone-points">Points <input type="number" min="0" step="1" :value="Number(m.points)||0" @change.stop="setMilestonePoints(m,$event.target.value);$event.target.value=Number(m.points)||0" @click.stop></label><span class="milestone-state">{{milestoneDone(m)?'✓ Achevé':(m.due && m.due < today?'⚠ En retard':'En cours')}}</span><label class="milestone-date">Échéance <input type="date" v-model="m.due" @click.stop></label><button type="button" @click.stop="renameMilestone(m)" title="Renommer le jalon">✎ Renommer</button><button type="button" @click.stop="removeMilestone(m)" title="Supprimer le jalon">×</button><div class="tq-milestone-children"><div v-for="t in milestoneTasks(m)" :key="t.id"><button type="button" :disabled="!!blockingTask(t)" @click.stop="changeStatus(t,t.status==='done'?'todo':'done')">{{t.status==='done'?'↶':'☐'}}</button> {{t.title}} · {{t.points}} pts <button type="button" @click.stop="openTaskForm(t)">Modifier</button></div><input v-model="milestoneTaskDraft[m.id]" placeholder="Nouvelle sous-tâche" @click.stop @keyup.enter.stop="addMilestoneTask(m)"><button type="button" @click.stop="addMilestoneTask(m)">＋ Sous-tâche</button></div></div><div><input v-model="milestoneDraft[p.id]" placeholder="Nouveau jalon" @click.stop @keyup.enter.stop="addMilestone(p)"><button type="button" @click.stop="addMilestone(p)">Ajouter</button></div></div>
+          <div class="project-milestones"><strong>Jalons ({{ projectStats(p).milestonesDone }}/{{ projectStats(p).milestonesTotal }})</strong><progress :value="projectStats(p).done + projectStats(p).milestonesDone" :max="Math.max(1, projectStats(p).total + projectStats(p).milestonesTotal)"></progress><div class="tq-milestone" v-for="m in milestones(p)" :key="m.id" @dragover.prevent.stop="milestoneDrag.overId=m.id" @drop.prevent.stop="dropTaskIntoMilestone($event,p,m.id)" :data-drop-target="milestoneDrag.overId===m.id" :class="{'milestone-finished':milestoneDone(m),'milestone-overdue':m.due && m.due < today && !milestoneDone(m)}"><div class="milestone-progress"><span>{{milestoneTasks(m).filter(t=>t.status==='done').length}} / {{milestoneTasks(m).length}} sous-tâches</span><progress v-if="milestoneTasks(m).length" :value="milestoneTasks(m).filter(t=>t.status==='done').length" :max="milestoneTasks(m).length"></progress></div><input type="checkbox" :checked="milestoneDone(m)" :disabled="milestoneTasks(m).length>0&&!milestoneDone(m)" @change="toggleMilestone(m)"> <strong class="milestone-label">{{ m.title }}</strong><label class="tq-milestone-points">Points <input type="number" min="0" step="1" :value="Number(m.points)||0" @change.stop="setMilestonePoints(m,$event.target.value);$event.target.value=Number(m.points)||0" @click.stop></label><span class="milestone-state">{{milestoneDone(m)?'✓ Achevé':(m.due && m.due < today?'⚠ En retard':'En cours')}}</span><label class="milestone-date">Échéance <input type="date" v-model="m.due" @click.stop></label><button type="button" @click.stop="renameMilestone(m)" title="Renommer le jalon">✎ Renommer</button><button type="button" @click.stop="removeMilestone(m)" title="Supprimer le jalon">×</button><div class="tq-milestone-children"><div v-for="t in milestoneTasks(m)" :key="t.id" class="tq-draggable-task" draggable="true" @dragstart="startMilestoneTaskDrag($event,t)" @dragend="endMilestoneTaskDrag" @dragover.prevent.stop="milestoneDrag.overId=t.id" @drop.prevent.stop="dropTaskIntoMilestone($event,p,m.id,t.id)"><span class="tq-drag-grip" title="Déplacer / réordonner">⠿</span> <button type="button" :disabled="!!blockingTask(t)" @click.stop="changeStatus(t,t.status==='done'?'todo':'done')">{{t.status==='done'?'↶':'☐'}}</button> {{t.title}} · {{t.points}} pts <button type="button" @click.stop="openTaskForm(t)">Modifier</button></div><input v-model="milestoneTaskDraft[m.id]" placeholder="Nouvelle sous-tâche" @click.stop @keyup.enter.stop="addMilestoneTask(m)"><button type="button" @click.stop="addMilestoneTask(m)">＋ Sous-tâche</button></div></div><div><input v-model="milestoneDraft[p.id]" placeholder="Nouveau jalon" @click.stop @keyup.enter.stop="addMilestone(p)"><button type="button" @click.stop="addMilestone(p)">Ajouter</button></div></div>
           <div class="project-progress">
             <progress :value="projectStats(p).done" :max="Math.max(1, projectStats(p).total)"></progress>
             <span>{{ projectStats(p).done }} / {{ projectStats(p).total }} tâches · {{ projectStats(p).milestonesDone }} / {{ projectStats(p).milestonesTotal }} jalons · {{ projectStats(p).points }} pts à gagner</span>
@@ -1189,9 +1189,9 @@
           </div>
         </header>
 
-        <div class="task-list" v-if="isProjectOpen(p.id)">
+        <div class="task-list" v-if="isProjectOpen(p.id)"><div class="tq-drop-unassigned" @dragover.prevent.stop="milestoneDrag.overId='none-'+p.id" @drop.prevent.stop="dropTaskIntoMilestone($event,p,'')" :data-drop-target="milestoneDrag.overId==='none-'+p.id">↳ Déposer ici pour retirer la tâche de son jalon</div>
           <p class="empty" v-if="!projectTasks(p).length">Pas encore de tâche dans ce projet.</p>
-          <div class="project-task" v-for="t in projectTasks(p)" :key="t.id" :class="'status-' + t.status">
+          <div class="project-task" v-for="t in projectTasks(p)" :key="t.id" :class="'status-' + t.status" draggable="true" @dragstart="startMilestoneTaskDrag($event,t)" @dragend="endMilestoneTaskDrag" @dragover.prevent.stop="milestoneDrag.overId=t.id" @drop.prevent.stop="dropTaskIntoMilestone($event,p,t.milestoneId||'',t.id)"><span class="tq-drag-grip" title="Glisser vers un jalon">⠿</span>
             <span class="project-task-title">{{ t.title }}</span><div class="v60-subtasks" v-if="t.subtasks?.length" @click.stop><label v-for="s in t.subtasks" :key="s.id"><input type="checkbox" :checked="s.done" @change="toggleTaskSubtask(t,s)">{{s.title}} · <input type="number" min="0" step="0.25" class="v61-subpoint" :value="Number(s.points)||0" @click.stop @change.stop="setSubtaskPoints(t,s,$event.target.value)"> pts</label></div><small v-if="data.alters.find(a=>a.id===(t.alterId||p.alterId))" class="alter-tag">{{data.alters.find(a=>a.id===(t.alterId||p.alterId))?.name}}</small><small v-if="blockingTask(t)" class="tq-blocked">🔒 Bloquée</small>
             <button type="button" v-if="blockingTask(t)" @click.stop="openTaskForm(t)">Dépendance</button><small v-if="blockingTask(t)">Bloquée par {{blockingTask(t).title}}</small><span class="project-task-points" :class="{ 'is-malus': t.malus }">{{ t.malus ? '−' : '' }}{{ t.points }} pts</span>
             <button type="button" @click="openTaskForm(t)">Modifier</button>
@@ -1356,7 +1356,7 @@
             <small>Déjà obtenue {{ rewardClaimCount(r) }} fois</small>
             <div class="reward-fl"><p class="reward-category">{{ r.category || 'Sans catégorie' }}</p>
             <p class="reward-cost">{{ r.cost }} pts</p></div>
-            <progress :value="Number(r.saved)||0" :max="r.cost"></progress>
+            <div class="tq-reward-progress"><progress :value="Number(r.saved)||0" :max="Math.max(1,Number(r.cost)||1)"></progress><small>{{Math.min(100,Math.round((Number(r.saved)||0)/Math.max(1,Number(r.cost)||1)*100))}} %</small></div>
             <p class="reward-status">Épargne : <strong>{{ formatPoints(r.saved) }} / {{ formatPoints(r.cost) }} pts</strong> · Reste à épargner : {{ formatPoints(rewardRemaining(r)) }} pts</p>
             <div v-if="(r.conditions||[]).length" class="reward-conditions"><strong>Conditions : {{ r.conditions.filter(c=>c.done).length }}/{{ r.conditions.length }}</strong><label v-for="c in r.conditions" :key="c.id"><input type="checkbox" v-model="c.done"> {{ c.text }}</label></div>
             <p v-if="canClaimReward(r)">Récompense disponible.</p><p v-else-if="balance + (Number(r.saved)||0) >= r.cost">Valider les conditions restantes pour réclamer.</p>
@@ -1468,7 +1468,7 @@
     </section>
 
 
-    <section class="view v29-view" v-if="view==='achievements'">
+    <section class="view v29-view" v-if="false && view==='achievements'">
       <h2>Mes succès et objectifs</h2><button type="button" @click="openAchievement()">＋ Nouvel objectif ou succès</button>
       <p v-if="!data.customAchievements.length">Crée tes propres objectifs, puis mets leur progression à jour. Aucun point n’est attribué automatiquement.</p>
       <div class="achievement-grid"><article class="v29-panel" v-for="a in data.customAchievements" :key="a.id"><h3>{{a.current>=a.target?'🏆':'🎯'}} {{a.name}}</h3><p>{{a.description}}</p><progress :value="Math.min(a.current,a.target)" :max="a.target"></progress><p>{{a.current}} / {{a.target}}</p><button type="button" @click="a.current=Math.min(a.target,a.current+1)">+1</button><button type="button" @click="a.current=Math.max(0,a.current-1)">−1</button><button type="button" @click="openAchievement(a)">Modifier</button><button type="button" @click="removeAchievement(a)">Supprimer</button></article></div>
@@ -1643,6 +1643,7 @@
                    @click="openPicker" @change="onDue">
           </label>
 
+          <span class="tag tq-active-period" v-if="task.startDate && task.startDate <= today && (!effectiveDue || effectiveDue > today) && task.status !== 'done'">Aujourd’hui</span>
           <span class="tag tag-late" v-if="isOverdue">En retard</span>
           <button type="button" class="task-duplicate" @click.stop="$emit('duplicate',task,'tomorrow')" title="Dupliquer avec échéance demain">+ Demain</button>
           <button type="button" class="task-duplicate" @click.stop="$emit('duplicate',task,'followup')" title="Créer une tâche suivante liée">+ Suite</button>
@@ -1693,7 +1694,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js?v=20261106-v65sync"></script>
+<script src="app.js?v=20261110-v66"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

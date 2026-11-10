@@ -51,7 +51,7 @@ const TABS = [
   { id: 'mood', label: 'Humeur & Psychologie' },
   { id: 'all',        label: 'Toutes les tâches' },
   { id: 'work',       label: 'Travail' },
-  { id: 'usual-lists', label: 'Listes de tâches habituelles' },
+  { id: 'usual-lists', label: 'Listes' },
   { id: 'menu', label: 'Menu de la semaine' },
   { id: 'sport', label: 'Sport & bien-être' },
   { id: 'wellness-report', label: 'Bilan global' },
@@ -76,10 +76,11 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','calendar','all','work','habits','usual-lists','done','alters','mood'] },
+  { title: 'Tâches', ids: ['home','calendar','all','work','habits','done'] },
+  { title: 'Psychologie', ids: ['alters','mood'] },
   { title: 'TCA et poids', ids: ['menu','shopping','sport','wellness-report'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },
-  { title: 'Autres', ids: ['gratitude','evening','random-notes','challenges','achievements','statistics','budget'] },
+  { title: 'Autres', ids: ['gratitude','evening','random-notes','challenges','statistics','budget','usual-lists'] },
   { title: 'Configuration', ids: ['projects','categories','levels','trash','data'] },
 ].map(group => ({ ...group, tabs: group.ids.map(id => TABS.find(t => t.id === id)).filter(Boolean) }));
 
@@ -1487,6 +1488,8 @@ const TaskRow = {
       return !!this.effectiveDue && this.effectiveDue < this.today && this.task.status !== 'done';
     },
     dueLabel() {
+      if (this.effectiveDue === this.today) return "DATE D'ÉCHÉANCE";
+      if (this.task.startDate && this.task.startDate <= this.today && (!this.effectiveDue || this.effectiveDue > this.today)) return 'Aujourd’hui · échéance '+formatLongDate(this.effectiveDue);
       return formatLongDate(this.effectiveDue);
     },
     calculatedPoints() { return taskValue(this.task); },
@@ -2246,10 +2249,17 @@ const app = createApp({
 
     // Les tâches terminées ne sont plus dans ces listes : elles sont dans l'onglet "Terminés"
     const activeTasks   = computed(() => data.tasks.filter(t => t.scope !== 'work' && t.status !== 'done'));
-    const todayTasks    = computed(() => applyFilters(activeTasks.value.filter(t => (!t.startDate || t.startDate<=today.value) && taskDue(t) && taskDue(t) <= today.value)));
-    const upcomingTasks = computed(() => applyFilters(activeTasks.value.filter(t => (t.startDate && t.startDate>today.value) || (taskDue(t) && taskDue(t) > today.value))));
-    // Taches sans echeance, notamment celles creees sous un jalon de projet.
-    const undatedTasks = computed(() => applyFilters(activeTasks.value.filter(t => !taskDue(t))));
+    function taskIsToday(t) {
+      const due=taskDue(t), start=t.startDate||'';
+      if(start && start>today.value)return false;
+      if(due && due<today.value)return true; // Vraie tâche en retard, toujours visible
+      if(due===today.value)return true;
+      return !!(start && start<=today.value && (!due || due>=today.value));
+    }
+    const todayTasks = computed(() => applyFilters(activeTasks.value.filter(taskIsToday)));
+    const upcomingTasks = computed(() => applyFilters(activeTasks.value.filter(t => !taskIsToday(t) && ((t.startDate && t.startDate>today.value) || (taskDue(t) && taskDue(t)>today.value)))));
+    // Sans échéance et sans date de début active, pas de doublon dans Aujourd'hui.
+    const undatedTasks = computed(() => applyFilters(activeTasks.value.filter(t => !taskDue(t) && !taskIsToday(t))));
     const allTasks      = computed(() => applyFilters(activeTasks.value));
     const workTasks = computed(() => [...data.tasks.filter(t => t.scope === 'work' && t.status !== 'done')].sort((a,b)=>Number(a.status==='done')-Number(b.status==='done') || (a.due||'9999').localeCompare(b.due||'9999')));
     const copyForm = reactive({open:false});
@@ -3245,6 +3255,7 @@ const app = createApp({
       return true;
     }
     const dashboardHabits = computed(() => data.habits.filter(h=>(!h.pausedUntil||h.pausedUntil<today.value)&&(habitDue(h)||habitLateDays(h)>0)));
+    const pausedDashboardHabits = computed(() => data.habits.filter(h=>!habitIsFinished(h)&&h.pausedUntil&&h.pausedUntil>=today.value));
     function completeHabit(h) {
       if(h.malus || habitIsFinished(h)||(h.pausedUntil&&h.pausedUntil>=today.value))return;
       if ((h.startDate||h.createdAt||today.value)>today.value || habitDoneToday(h)) return;
@@ -3799,6 +3810,27 @@ const app = createApp({
       const milestone=task.milestoneId && data.projectMilestones.find(m=>m.id===task.milestoneId && m.projectId===task.projectId);
       return milestone ? `${milestone.title} - ${task.title}` : task.title;
     }
+    const milestoneDrag=reactive({taskId:'',projectId:'',overId:''});
+    function startMilestoneTaskDrag(event,task){
+      milestoneDrag.taskId=task.id;milestoneDrag.projectId=task.projectId;milestoneDrag.overId='';
+      if(event.dataTransfer){event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain','todo-task:'+task.id);}
+      event.stopPropagation();
+    }
+    function endMilestoneTaskDrag(){milestoneDrag.taskId='';milestoneDrag.projectId='';milestoneDrag.overId='';}
+    function dropTaskIntoMilestone(event,project,milestoneId,targetTaskId=''){
+      event.preventDefault();event.stopPropagation();
+      const task=data.tasks.find(t=>t.id===milestoneDrag.taskId);
+      if(!task || task.projectId!==project.id){endMilestoneTaskDrag();return;}
+      if(targetTaskId===task.id){endMilestoneTaskDrag();return;}
+      task.milestoneId=milestoneId||'';
+      if(targetTaskId){
+        const from=data.tasks.indexOf(task);
+        data.tasks.splice(from,1);
+        const target=data.tasks.findIndex(t=>t.id===targetTaskId);
+        if(target>=0)data.tasks.splice(target,0,task);else data.tasks.push(task);
+      }
+      endMilestoneTaskDrag();
+    }
     function milestoneTasks(m){return data.tasks.filter(t=>t.projectId===m.projectId&&t.milestoneId===m.id);}
     function linkMilestoneTask(m,id){const t=data.tasks.find(t=>t.id===id && t.projectId===m.projectId);if(t)t.milestoneId=m.id;}
     function addMilestoneTask(m){const title=String(milestoneTaskDraft[m.id]||'').trim();if(!title)return;data.tasks.push(newTask({title,projectId:m.projectId,milestoneId:m.id,scope:'personal'}));milestoneTaskDraft[m.id]='';}
@@ -3878,7 +3910,7 @@ const app = createApp({
       chooserChoice.value=eligible[Math.floor(Math.random()*eligible.length)];
       chooserLastSources.value=[...chooserLastSources.value.slice(-5),source];
     }
-    const dayTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&(!t.startDate||t.startDate<=today.value)&&(t.due===today.value||(!t.due&&t.scope!=='work'))).slice(0,12));
+    const dayTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work'&&taskIsToday(t)).slice(0,12));
     const dayHabits=computed(()=>data.habits.filter(h=>!h.malus&&!habitIsFinished(h)&&habitDue(h)&&!habitDoneToday(h)).slice(0,12));
     const contextPeriod=computed(()=>{let h=new Date().getHours();return h<12?'Matin':h<18?'Après-midi':'Soir';});
     const focusTask=ref(null);
@@ -4040,7 +4072,7 @@ const app = createApp({
     function openMoodDay(date){if(!date)return;const entry=moodEntriesForDate(date)[0];if(entry){editMoodEntry(entry);}else{Object.assign(moodForm,{id:'',date,moodIds:[],note:'',score:0});for(const key of Object.keys(moodQuestionsAnswers))delete moodQuestionsAnswers[key];}document.querySelector('.mood-view form')?.scrollIntoView({behavior:'smooth',block:'center'});}
     // V60 : détail du jour, sans attribuer d'heure fictive aux tâches.
     const dayView=ref('day');
-    const dayOverview=computed(()=>({tasks:data.tasks.filter(t=>t.status!=='done'&&(!t.startDate||t.startDate<=today.value)&&(t.due===today.value||!t.due)),habits:dayHabits.value,appointments:appointmentToday.value,alerts:notificationItems.value}));
+    const dayOverview=computed(()=>({tasks:data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work'&&taskIsToday(t)),habits:dayHabits.value,appointments:appointmentToday.value,alerts:notificationItems.value}));
     const dayMilestones=computed(()=>{
       const result=[];const now=today.value;
       for(const t of data.tasks){if(t.startDate===now)result.push({id:'task-start-'+t.id,label:'▶ Tâche commence aujourd’hui',title:t.title,kind:'task',item:t});if(t.due===now)result.push({id:'task-due-'+t.id,label:t.status==='done'?'✓ Tâche terminée aujourd’hui':'⚑ Tâche à terminer aujourd’hui',title:t.title,kind:'task',item:t});}
@@ -4670,7 +4702,7 @@ const app = createApp({
       for(const line of series){let group=[];for(const point of line.points){if(point)group.push(point.x+','+point.y);else if(group.length){line.segments.push(group.join(' '));group=[];}}if(group.length)line.segments.push(group.join(' '));}
       return {width,height,labels:list.map(x=>x.label),series};
     });
-    const dashboardNav=dashboardCatalogue.map(x=>({id:x.id,name:x.name}));
+    const dashboardNav=computed(()=>data.dashboardWidgets.map(id=>dashboardCatalogue.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,name:x.name})));
     function jumpDashboard(id){nextTick(()=>document.getElementById('dashboard-'+id)?.scrollIntoView({behavior:'smooth',block:'start'}));}
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
@@ -4684,8 +4716,8 @@ const app = createApp({
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
       randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
       dishEditSearch,toggleDishIngredient,dishCategoryOpen,dishCategoryDragged,dishCategoryIsOpen,toggleDishCategory,reorderDishCategory,ticketWaiting,ticketCreatedLabel,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
-      favoriteDish,addReplacedMealToCatalogue,dishCats,setDishCats,dishFoodTypes,dishCategoryFilter,dishFoodTypeFilter,suggestDishCategory,suggestFoodType,suggestPage,suggestPageSize,suggestedDishPages,paginatedDishes,menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneTaskLabel,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,setMilestonePoints,removeMilestone,milestones,weekSummary,
-      menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,
+      favoriteDish,addReplacedMealToCatalogue,dishCats,setDishCats,dishFoodTypes,dishCategoryFilter,dishFoodTypeFilter,suggestDishCategory,suggestFoodType,suggestPage,suggestPageSize,suggestedDishPages,paginatedDishes,menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneDrag,startMilestoneTaskDrag,endMilestoneTaskDrag,dropTaskIntoMilestone,milestoneTaskLabel,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,setMilestonePoints,removeMilestone,milestones,weekSummary,
+      menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,pausedDashboardHabits,
       // état
       budgetMonth,budgetSection,budgetCategories,budgetCategoryName,reorderDrag,startReorder,dropReorder,cashForm,cashBalance,cashIncome,cashExpenses,addCashEntry,removeCashEntry,moveBudgetCategory,addBudgetCategory,renameBudgetCategory,deleteBudgetCategory,budgetEntryForm,budgetRecurringForm,budgetSwileForm,budgetItems,budgetDisplayItems,budgetSummary,budgetSwileSource,budgetSwileNext,recurringForMonth,money,changeBudgetMonth,monthAfter,addBudgetEntry,addBudgetRecurring,addBudgetSwile,overrideRecurring,resetRecurringOverride,removeBudgetEntry,removeBudgetRecurring,removeBudgetSwile,
       usualDragged,usualNewItem,addUsualList,removeUsualList,addUsualHeading,addUsualItem,toggleUsualItem,resetUsualList,deleteUsualItem,startUsualDrag,dropUsualItem,
