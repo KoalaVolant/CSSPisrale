@@ -211,7 +211,7 @@ function formatLongDate(str) {
 // Une tâche complète avec toutes ses valeurs par défaut
 function newTask(fields = {}) {
   return {
-    id: uid(), title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', startDate:'', recurrence:'', subtasks:[], estimatedMinutes: null,
+    id: uid(), title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', startDate:'', recurrence:'', subtasks:[], estimatedMinutes: null, estimatedEffort: '',
     urgency: '', difficulty: '', doneAt: '', ticketName: '',
     ...fields,
   };
@@ -2540,7 +2540,7 @@ const app = createApp({
 
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
-      open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', estimatedMinutes: null,
+      open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', estimatedMinutes: null, estimatedEffort: '',
       urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',alterId:'',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',
     });
 
@@ -2553,13 +2553,13 @@ const app = createApp({
     function openTaskForm(task = null, projectId = '') {
       if (task) {
         Object.assign(taskForm, {
-          id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal', estimatedMinutes: task.estimatedMinutes ?? null,
+          id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal', estimatedMinutes: task.estimatedMinutes ?? null, estimatedEffort: task.estimatedEffort || '',
           status: task.status, projectId: task.projectId || '', due: task.due || '',
           urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '', dependsOn: task.dependsOn || '', milestoneId:task.milestoneId||'',alterId:task.alterId||'',startDate:task.startDate||'',recurrence:task.recurrence||'',recurrenceEnd:task.recurrenceEnd||'',subtaskBonusMode:task.subtaskBonusMode||'add',subtaskBonusPoints:task.subtaskBonusPoints??task.points??10,subtaskBonusMultiplier:task.subtaskBonusMultiplier||1.5,subtasks:clone(task.subtasks||[]).map(s=>({...s,points:Number.isFinite(Number(s.points))?Number(s.points):5})),subtaskDraft:'',
         });
       } else {
         Object.assign(taskForm, {
-          id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId, scope: view.value==='work'?'work':'personal', estimatedMinutes: null,
+          id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId, scope: view.value==='work'?'work':'personal', estimatedMinutes: null, estimatedEffort: '',
           due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',
         });
       }
@@ -2619,13 +2619,14 @@ const app = createApp({
       const rawDuration = taskForm.estimatedMinutes;
       const durationIsBlank = rawDuration === null || rawDuration === '' || rawDuration === undefined;
       const duration = durationIsBlank ? null : Number(rawDuration);
-      if (!durationIsBlank && (!Number.isSafeInteger(duration) || duration < 1 || duration > 100000)) {
-        notify('La durée approximative doit être un nombre entier de minutes (1 à 100000).');
+      if (!durationIsBlank && (!Number.isFinite(duration) || duration <= 0 || duration > 100000 || Math.abs(duration * 100 - Math.round(duration * 100)) > 1e-7)) {
+        notify('La durée approximative doit être supérieure à 0, avec au maximum 2 décimales (ex : 2,5 min).');
         return;
       }
       const fields = {
         title,
         estimatedMinutes: duration,
+        estimatedEffort: ['light','medium','high'].includes(taskForm.estimatedEffort) ? taskForm.estimatedEffort : '',
         category: taskForm.scope === 'work' ? (taskForm.workCategoryNames[0] || '') : (taskForm.category || ''),
         workCategoryNames: taskForm.scope === 'work' ? [...taskForm.workCategoryNames] : [],
         ticketName: '',
@@ -2916,6 +2917,13 @@ const app = createApp({
         const tags = workTags(task);
         task.workCategoryNames = tags.includes(value) ? tags.filter(c=>c!==value) : [...tags,value];
         task.category = task.workCategoryNames[0] || '';
+      } else if (field === 'estimatedMinutes') {
+        const raw = String(value ?? '').trim().replace(',', '.');
+        const duration = raw === '' ? null : Number(raw);
+        if (raw !== '' && (!Number.isFinite(duration) || duration <= 0 || duration > 100000 || Math.abs(duration * 100 - Math.round(duration * 100)) > 1e-7)) { notify('Durée invalide (maximum deux décimales)'); return; }
+        task.estimatedMinutes = duration;
+      } else if (field === 'estimatedEffort') {
+        task.estimatedEffort = ['light','medium','high'].includes(value) ? value : '';
       } else if (['category', 'projectId', 'urgency', 'difficulty'].includes(field)) {
         if(task.scope==='work' && field==='projectId')return;
         task[field] = value || '';

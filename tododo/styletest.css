@@ -553,3 +553,6 @@ body{background:#f7faf9;color:#203a35}
 /* V75 : durée approximative facultative des tâches */
 .tq-estimated-duration small{display:block;font-size:.78rem;opacity:.7;margin-top:3px}
 .tq-duration-pill{font-size:.75rem;font-weight:400;opacity:.8;margin-left:8px;white-space:nowrap}
+
+/* V75.1 : minute + effort, saisie directe */
+.tq-estimate-form{display:grid;gap:8px;margin:8px 0}.tq-duration-presets{display:flex;flex-wrap:wrap;gap:6px}.tq-duration-presets button{padding:7px 11px;border-radius:10px;border:1px solid #9aa8b675;cursor:pointer}.tq-duration-presets button.active{outline:2px solid #368978}.tq-estimate-form small{opacity:.7;font-size:.8rem}.tq-task-estimates,.tqm-estimates{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}.tq-task-estimates label,.tqm-estimate-field{display:inline-flex;align-items:center;gap:5px;font-size:.8rem}.tq-task-estimates input,.tqm-estimate-field input{width:72px;min-width:0;padding:5px;border-radius:7px}.tq-task-estimates select,.tqm-estimate-field select{max-width:130px;padding:5px;border-radius:7px}.tqm-estimate-field input,.tqm-estimate-field select{min-height:38px}.tqm-estimates{background:rgba(127,127,127,.06);padding:7px;border-radius:10px}
