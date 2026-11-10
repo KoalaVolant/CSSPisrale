@@ -1,4 +1,4 @@
-/* Todo Quest Mobile V1 : la logique et les donnees restent celles de la V71 */
+/* Todo Quest Mobile V2 : la logique et les donnees restent celles de la V71 */
 :root{--tqm-forest:#28564b;--tqm-sage:#e8f3ee;--tqm-border:#d3e4dc;--tqm-ink:#203e35}
 html,body{max-width:100%;overflow-x:hidden;background:#f6faf8!important;color:var(--tqm-ink);}
 body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;}
@@ -37,9 +37,23 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 .tqm-balance{white-space:nowrap;background:#ffffff23;border:1px solid #ffffff44;padding:9px 13px;border-radius:13px;font-size:21px;font-weight:800}.tqm-balance small{font-size:12px;font-weight:500}
 .tqm-auth{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:12px;font-size:12px}.tqm-auth .tqm-email{overflow-wrap:anywhere;max-width:100%;flex:1}
 .tqm-auth button,.tqm-auth a{font-size:12px!important;text-decoration:none;color:white!important;background:#ffffff24;border:1px solid #ffffff45;border-radius:8px;padding:6px 9px;min-height:30px!important}
-.tqm-bottom-nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));background:#fff;border-top:1px solid var(--tqm-border);box-shadow:0 -4px 20px #264b3b18;z-index:80;}
+.tqm-bottom-nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));background:#fff;border-top:1px solid var(--tqm-border);box-shadow:0 -4px 20px #264b3b18;z-index:80;}
 .tqm-bottom-nav button{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;background:transparent!important;color:#607d71!important;border:0!important;border-radius:11px;padding:6px 2px!important;min-height:55px!important;}
 .tqm-bottom-nav button span{font-size:22px;line-height:1.1}.tqm-bottom-nav button small{font-size:11px;font-weight:600}
 .tqm-bottom-nav button.active{background:var(--tqm-sage)!important;color:var(--tqm-forest)!important}
 @media(min-width:800px){.tqm-bottom-nav{left:calc(50% - 390px);right:calc(50% - 390px);border:1px solid var(--tqm-border);border-radius:16px 16px 0 0}}
 @media(max-width:560px){#app .app-main{padding:10px 9px 28px!important}#app .view-sport .catalogue-row{max-width:100%}#app .view-shopping .catalogue-row button{flex:1 1 auto}#app .task-tags{flex-wrap:wrap}}
+
+/* V2 : habits, five-tab navigation and one-column touch-friendly cards */
+#app .view-habits{display:block!important;}
+#app .view-habits>article.habit-entry,#app .view-habits article.habit-entry{width:100%!important;max-width:100%!important;margin:10px 0!important;background:#fff;border:1px solid var(--tqm-border);border-radius:15px;padding:12px;}
+#app .view-habits .habit-actions{display:flex!important;flex-wrap:wrap!important;align-items:center;gap:7px!important;width:100%!important;}
+#app .view-habits .habit-actions button{flex:1 1 125px;white-space:normal;min-height:42px;}
+#app .view-habits .habit-quantity{display:flex;gap:5px;align-items:center;flex-wrap:nowrap;max-width:100%;}
+#app .view-habits .habit-quantity input{max-width:65px;width:65px!important;min-width:0;padding:6px;}
+#app .view-habits .v68-habit-regularity{display:flex;flex-direction:column;gap:4px;padding:9px;background:var(--tqm-sage);border-radius:10px;margin-top:8px;}
+#app .view-habits details{margin-top:10px;}
+#app .view-habits .v64-stage-row{display:flex;flex-wrap:wrap;align-items:center;gap:7px;}
+.tqm-bottom-nav button{min-width:0!important;}
+.tqm-bottom-nav button small{font-size:10px;white-space:nowrap;}
+@media(max-width:380px){.tqm-bottom-nav{padding-left:2px;padding-right:2px;gap:1px}.tqm-bottom-nav button{padding:5px 0!important}.tqm-bottom-nav button span{font-size:20px}.tqm-bottom-nav button small{font-size:9px}}

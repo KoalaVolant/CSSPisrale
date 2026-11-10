@@ -10,10 +10,10 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Todo Quest Mobile</title>
-  <link rel="stylesheet" href="../style.css?v=20261110-mobile-v1">
-  <link rel="stylesheet" href="../stylekoala.css?v=20261110-mobile-v1">
-  <link rel="stylesheet" href="../styletest.css?v=20261110-mobile-v1">
-  <link rel="stylesheet" href="mobile.css?v=1">
+  <link rel="stylesheet" href="../style.css?v=20261110-mobile-v2">
+  <link rel="stylesheet" href="../stylekoala.css?v=20261110-mobile-v2">
+  <link rel="stylesheet" href="../styletest.css?v=20261110-mobile-v2">
+  <link rel="stylesheet" href="mobile.css?v=2">
 </head>
 <body>
 
@@ -1581,6 +1581,7 @@
   <button type="button" :class="{active:view==='all'||view==='home'||view==='projects'}" :aria-current="view==='all'?'page':null" @click="setTab('all')"><span aria-hidden="true">☑</span><small>Tâches</small></button>
   <button type="button" :class="{active:view==='sport'}" :aria-current="view==='sport'?'page':null" @click="setTab('sport')"><span aria-hidden="true">◉</span><small>Sport</small></button>
   <button type="button" :class="{active:view==='shopping'}" :aria-current="view==='shopping'?'page':null" @click="setTab('shopping')"><span aria-hidden="true">🛒</span><small>Courses</small></button>
+  <button type="button" :class="{active:view==='habits'}" :aria-current="view==='habits'?'page':null" @click="setTab('habits')"><span aria-hidden="true">🌱</span><small>Habitudes</small></button>
   <button type="button" :class="{active:view==='calendar'}" :aria-current="view==='calendar'?'page':null" @click="setTab('calendar')"><span aria-hidden="true">▦</span><small>Calendrier</small></button>
 </nav>
 </div>
@@ -1717,9 +1718,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="../firebase-config.js"></script>
-<script src="../sport-catalog-v67.js?v=20261110-mobile-v1"></script>
+<script src="../sport-catalog-v67.js?v=20261110-mobile-v2"></script>
 <script>window.TODO_QUEST_MOBILE = true;</script>
-<script src="../app.js?v=20261110-mobile-v1"></script>
+<script src="../app.js?v=20261110-mobile-v2"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

@@ -1,7 +1,7 @@
 {
   "name": "Todo Quest Mobile",
   "short_name": "TQ Mobile",
-  "description": "Tâches, Sport, Courses et Calendrier de Todo Quest",
+  "description": "Tâches, Sport, Courses, Habitudes et Calendrier de Todo Quest",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
