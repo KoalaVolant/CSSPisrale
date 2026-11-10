@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Todo Quest · PC V76.3 TEST</title>
-  <link rel="stylesheet" href="style.css?v=pc-v76-3-renderfix">
-  <link rel="stylesheet" href="stylekoala.css?v=pc-v76-3-renderfix">
-  <link rel="stylesheet" href="styletest.css?v=pc-v76-3-renderfix">
+  <title>Todo Quest · PC V77 TEST</title>
+  <link rel="stylesheet" href="style.css?v=pc-v77-layout">
+  <link rel="stylesheet" href="stylekoala.css?v=pc-v77-layout">
+  <link rel="stylesheet" href="styletest.css?v=pc-v77-layout">
+  <link rel="stylesheet" href="dashboard-v77.css?v=pc-v77-layout">
 </head>
 <body>
 
@@ -16,7 +17,7 @@
   <header class="app-header tq69-header">
     <div class="tq69-topline">
       <div class="app-brand tq69-brand">
-        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V76.3 TEST">v76.3 <span>test</span></small></h1>
+        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V77 TEST">v77 <span>test</span></small></h1>
         <div class="sync-box tq69-sync">
           <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
           <template v-if="firebaseReady">
@@ -571,6 +572,7 @@
 
 <div class="v761-task-mode"><strong>Présentation des tâches</strong><div class="v761-mode-choices"><button type="button" :class="{active:dashboardTasksMode==='simple'}" @click="dashboardTasksMode='simple'">Simple</button><button type="button" :class="{active:dashboardTasksMode==='detailed'}" @click="dashboardTasksMode='detailed'">Détaillé</button></div></div>
 <template v-if="dashboardTasksMode==='simple'">
+ <div class="v77-task-columns v77-simple-columns">
  <section class="v761-task-group" v-for="group in [{name:'Aujourd’hui',list:todayTasks},{name:'À venir',list:upcomingTasks}]" :key="group.name">
   <h3>{{group.name}} <small>({{group.list.length}})</small></h3>
   <p v-if="!group.list.length">Aucune tâche.</p>
@@ -580,8 +582,10 @@
    <div class="v761-task-actions"><button type="button" :disabled="!!blockingTask(t)" @click="changeStatus(t,'done')">✓ Terminé</button><button type="button" @click="duplicateTask(t,'tomorrow')">+ Demain</button><button type="button" @click="duplicateTask(t,'followup')">+ Suite</button></div>
   </article>
  </section>
+ </div>
 </template>
 <template v-else>
+<div class="v77-task-columns v77-detailed-columns">
 
         <section class="view view-today v761-detail-group"><details><summary>Aujourd’hui · ouvrir la liste</summary>
           <h2>Aujourd'hui <small>({{ todayTasks.length }})</small> <small class="list-points">{{ todayPoints }} pts à gagner</small></h2>
@@ -604,9 +608,7 @@
                        @status="changeStatus" @points="changePoints" @due="changeDue" @update="updateTask" @duplicate="duplicateTask"></task-list>
           </div>
         </details></section>
-
-
-
+</div>
 </template>
       </div>
     </section>
@@ -1771,9 +1773,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="sport-catalog-v67.js?v=pc-v76-3-renderfix"></script>
-<script src="./sync-merge-v72.js?v=pc-v76-3-renderfix"></script>
-<script src="app.js?v=pc-v76-3-renderfix"></script>
+<script src="sport-catalog-v67.js?v=pc-v77-layout"></script>
+<script src="./sync-merge-v72.js?v=pc-v77-layout"></script>
+<script src="app.js?v=pc-v77-layout"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
@@ -1783,7 +1785,7 @@
         var warning = document.createElement('div');
         warning.setAttribute('role', 'alert');
         warning.style.cssText = 'padding:24px;margin:30px auto;max-width:760px;background:#fff3f3;border:2px solid #bd2020;color:#711;font:16px Arial,sans-serif;line-height:1.5';
-        warning.textContent = 'Todo Quest PC V76.3 n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, app.js, firebase-config.js, style.css, stylekoala.css), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
+        warning.textContent = 'Todo Quest PC V77 n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, app.js, firebase-config.js, style.css, stylekoala.css), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
         document.body.prepend(warning);
       }
     }, 1200);
