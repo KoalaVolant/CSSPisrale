@@ -10,11 +10,11 @@
 <meta content="TQ Mobile" name="apple-mobile-web-app-title"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<title>Todo Quest Mobile V5</title>
-<link href="./style.css?v=20261110-mobile-v6" rel="stylesheet"/>
-<link href="./stylekoala.css?v=20261110-mobile-v6" rel="stylesheet"/>
-<link href="./styletest.css?v=20261110-mobile-v6" rel="stylesheet"/>
-<link href="mobile.css?v=6" rel="stylesheet"/>
+<title>Todo Quest Mobile V7 TEST</title>
+<link href="./style.css?v=20261110-mobile-v7" rel="stylesheet"/>
+<link href="./stylekoala.css?v=20261110-mobile-v7" rel="stylesheet"/>
+<link href="./styletest.css?v=20261110-mobile-v7" rel="stylesheet"/>
+<link href="mobile.css?v=7" rel="stylesheet"/>
 </head>
 <body>
 <div id="app" v-cloak="">
@@ -22,6 +22,10 @@
 <div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
 <div class="tqm-auth"><button class="tqm-install" hidden="" id="tqm-install" type="button">Installer</button><template v-if="firebaseReady"><button @click="signIn" type="button" v-if="!user">Se connecter avec Google</button><template v-else=""><span class="tqm-email">{{user.email}}</span><button @click="signOut" type="button">Quitter</button></template></template><a href="../index.html">Version complète ↗</a></div>
 </header>
+<div id="tqm-network-warning" class="tqm-network-warning" role="status" hidden>
+  <strong>Connexion indisponible</strong>
+  <span>La synchronisation ne peut pas être confirmée. Évite les modifications tant que le réseau n'est pas rétabli.</span>
+</div>
 <!-- En-tete historique conserve pour la logique mais masque sur mobile -->
 <header class="app-header tq69-header">
 <div class="tq69-topline">
@@ -1658,10 +1662,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js"></script>
-<script src="./sport-catalog-v67.js?v=20261110-mobile-v6"></script>
+<script src="./sport-catalog-v67.js?v=20261110-mobile-v7"></script>
 <script>window.TODO_QUEST_MOBILE = true;</script>
-<script src="./sync-merge-v72.js?v=20261110-v72"></script>
-<script src="./app-mobile.js?v=20261110-mobile-v6"></script>
+<script src="./sync-merge-v72.js?v=20261110-v72-v7"></script>
+<script src="./app-mobile.js?v=20261110-mobile-v7"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
@@ -1703,6 +1707,14 @@
     window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;btn.hidden=false;});
     btn.addEventListener('click',function(){if(!deferred)return;deferred.prompt();deferred.userChoice.then(function(){btn.hidden=true;deferred=null;});});
     window.addEventListener('appinstalled',function(){btn.hidden=true;deferred=null;});
+  })();
+  // Signalisation réseau purement informative : ne prétend PAS confirmer l'état Firestore.
+  (function () {
+    var warning = document.getElementById('tqm-network-warning');
+    function refresh() { warning.hidden = navigator.onLine !== false; }
+    window.addEventListener('online', refresh);
+    window.addEventListener('offline', refresh);
+    refresh();
   })();
   if ('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('./sw.js').catch(console.warn);
 </script>
