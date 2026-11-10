@@ -76,3 +76,27 @@
   #dashboard-tasks .v77-task-columns { grid-template-columns: minmax(0,1fr); gap: 8px; }
   #dashboard-tasks .v761-task-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
+
+/* V77.1: detailed columns are ALWAYS expanded; no native collapsible wrapper.
+   Keep compact spacing and inherited text sizes from V77. */
+#dashboard-tasks .v771-detail-content {
+  display: block !important;
+  box-sizing: border-box;
+  width: 100%; min-width: 0;
+  padding: 5px 6px !important;
+  border: 1px solid #d6e0d9;
+  border-radius: 8px;
+}
+#dashboard-tasks .v77-detailed-columns .v761-detail-group h2 {
+  margin: 3px 0 8px !important;
+  padding: 0 2px !important;
+  font-size: 1.04rem;
+  line-height: 1.35;
+}
+#dashboard-tasks .v77-detailed-columns .v761-detail-group .task-list {
+  display: block !important;
+  min-width: 0;
+}
+#dashboard-tasks .v77-simple-columns .v761-task-group > h3 {
+  font-size: 1.04rem; line-height: 1.35;
+}
