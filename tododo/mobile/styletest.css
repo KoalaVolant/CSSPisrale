@@ -531,3 +531,17 @@ body{background:#f7faf9;color:#203a35}
  #app>.mobile-nav-bar{order:-2;width:100%}
  #app>.tq69-header{order:-1}
 }
+
+/* V74 : dashboard PC - aucune modification des regles metier. */
+.v74-dashboard-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#eef5f0;border:1px solid #d3e4d9;border-radius:14px;padding:14px 18px;order:-200}
+.v74-dashboard-head h2{margin:0;color:#275c4b;font-size:1.15rem}
+.v74-dashboard-head p{margin:4px 0 0;font-size:.85rem;color:#527368}
+.v74-mode-control{display:flex;border:1px solid #abcdbd;border-radius:10px;padding:3px;gap:3px;background:white}
+.v74-mode-control button{border:0;background:transparent;color:#345e50;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+.v74-mode-control button.active{background:#347b63;color:white}
+.v74-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;order:-190}
+.v74-summary>div{background:#fff;border:1px solid #dae8df;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:5px}
+.v74-summary strong{color:#27674e;font-size:1.4rem}
+.v74-summary span{font-size:.8rem;color:#54756b}
+.v74-visibility{max-width:180px;border-radius:8px;padding:5px;border:1px solid #bdd2c5;background:#fff}
+@media(max-width:800px){.v74-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.v74-dashboard-head{padding:12px}.v74-mode-control button{padding:8px 11px}}
