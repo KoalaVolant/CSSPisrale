@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Todo Quest · PC V75.1.1 TEST</title>
-  <link rel="stylesheet" href="style.css?v=pc-v75-1-estimate">
-  <link rel="stylesheet" href="stylekoala.css?v=pc-v75-1-estimate">
-  <link rel="stylesheet" href="styletest.css?v=pc-v75-1-estimate">
+  <title>Todo Quest · PC V76 TEST</title>
+  <link rel="stylesheet" href="style.css?v=pc-v76-suggest">
+  <link rel="stylesheet" href="stylekoala.css?v=pc-v76-suggest">
+  <link rel="stylesheet" href="styletest.css?v=pc-v76-suggest">
 </head>
 <body>
 
@@ -16,7 +16,7 @@
   <header class="app-header tq69-header">
     <div class="tq69-topline">
       <div class="app-brand tq69-brand">
-        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V75.1.1 TEST">v75.1 <span>test</span></small></h1>
+        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V76 TEST">v76 <span>test</span></small></h1>
         <div class="sync-box tq69-sync">
           <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
           <template v-if="firebaseReady">
@@ -475,11 +475,33 @@
         <div><strong>{{dashboardEssentialSummary.late}}</strong><span>Taches en retard</span></div>
       </div>
 
-      <section class="v59-hub"><h2>🎲 Une idée pour maintenant</h2><p class="hint">Une proposition tirée de tes tâches, habitudes, activités ou du sport. Aucun temps à renseigner.</p>
+      <section class="v59-hub v76-chooser"><h2>🎲 Je ne sais pas quoi faire</h2><p class="hint">Suggestions selon les échéances, la durée approximative et l’effort renseignés. Une durée inconnue reste éligible.</p>
+        <div class="v76-chooser-filters"><label>Temps disponible <select v-model="chooserTime"><option value="any">Peu importe</option><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option></select></label><label>Effort maximal <select v-model="chooserEffort"><option value="any">Peu importe</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="high">Important</option></select></label></div>
         <div class="v59-actions"><button @click="chooseAction">🎲 Je ne sais pas quoi faire</button><button @click="setTab('calendar');dayView='day'">📅 Ma journée</button></div>
-        <div class="v59-chooser" v-if="chooserChoice"><strong>{{chooserChoice.source}} : {{chooserChoice.title}}</strong><button @click="openChooserChoice">Ouvrir directement</button><button @click="chooseAction">Autre idée</button></div>
+        <div class="v59-chooser" v-if="chooserChoice"><strong>{{chooserChoice.source}} : {{chooserChoice.title}}</strong><small v-if="chooserChoice.source==='Tâche'">{{chooserTaskInfo(chooserChoice)}}</small><button @click="openChooserChoice">Ouvrir directement</button><button @click="chooseAction">Autre idée</button></div>
         <details><summary>Options de la suggestion</summary><label>Énergie <select v-model="chooserEnergy"><option value="low">Petite énergie / flemme</option><option value="normal">Normale</option></select></label><label>Type <select v-model="chooserKind"><option value="all">Tout</option><option value="useful">Utile</option><option value="pleasure">Plaisir</option></select></label></details>
       </section>
+      
+<section class="v76-incomplete" aria-label="Tâches incomplètes">
+ <div class="v76-incomplete-head"><h2>🧩 Tâches incomplètes <small>({{incompleteCount}})</small></h2><button type="button" @click="incompleteOpen=!incompleteOpen" :aria-expanded="incompleteOpen">{{incompleteOpen?'Masquer':'Compléter les tâches'}}</button></div>
+ <p class="hint">Tâches non terminées auxquelles il manque au moins une durée, un effort, une catégorie ou un projet. Rien n'est obligatoire pour terminer une tâche.</p>
+ <template v-if="incompleteOpen">
+  <label>Afficher les tâches sans <select v-model="incompleteFilter"><option value="all">N'importe quel champ</option><option value="duration">Durée</option><option value="effort">Effort</option><option value="category">Catégorie</option><option value="project">Projet</option></select></label>
+  <p v-if="!incompleteTasks.length">Aucune tâche à compléter pour ce filtre.</p>
+  <div class="v76-incomplete-list">
+   <article class="v76-incomplete-card" v-for="t in incompleteTasks" :key="t.id">
+    <div><strong>{{t.title}}</strong><small>À compléter : {{taskMissingFields(t).map(f=>missingFieldLabels[f]).join(' · ')}}</small></div>
+    <div class="v76-editgrid">
+      <label>Durée (min) <input type="number" min="0.01" step="any" inputmode="decimal" :value="t.estimatedMinutes??''" placeholder="—" @change="updateTask(t,'estimatedMinutes',$event.target.value);$event.target.value=t.estimatedMinutes??''"></label>
+      <label>Effort <select :value="t.estimatedEffort||''" @change="updateTask(t,'estimatedEffort',$event.target.value)"><option value="">Non renseigné</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="high">Important</option></select></label>
+      <label>Catégorie <select :value="t.category||''" @change="updateTask(t,'category',$event.target.value)"><option value="">Sans catégorie</option><option v-for="c in categories" :key="c" :value="c">{{c}}</option></select></label>
+      <label v-if="t.scope!=='work'">Projet <select :value="t.projectId||''" @change="updateTask(t,'projectId',$event.target.value)"><option value="">Sans projet</option><option v-for="p in data.projects" :key="p.id" :value="p.id">{{p.name}}</option></select></label>
+    </div><button type="button" @click="openTaskForm(t)">Modifier la fiche</button>
+   </article>
+  </div>
+ </template>
+</section>
+
       <section class="v59-hub" v-if="ui.dashboardMode==='complete'"><details><summary>⚙️ Automatismes de la version test</summary><label><input type="checkbox" v-model="data.testSettings.automationEnabled"> Activer les rappels automatiques locaux (proposition)</label><p>Les prochaines occurrences des tâches récurrentes sont créées après validation. Les rappels sont calculés à l'ouverture, sans notifications externes.</p></details></section>
       <section id="dashboard-appointments" class="appointments-home" v-if="dashboardShouldShow('appointments')" :style="{order:data.dashboardWidgets.indexOf('appointments')+10}"><div class="appointments-home-header"><h2>📅 Rendez-vous</h2><button @click="openAppointment()">＋ Ajouter un rendez-vous</button><button @click="setTab('calendar')">Ouvrir le calendrier</button></div><h3>Aujourd'hui</h3><p v-if="!appointmentToday.length">Aucun rendez-vous aujourd'hui.</p><article v-for="a in appointmentToday" :key="a.id" class="appointment-line" :style="{'border-left-color':categoryFor(a.categoryId)?.color||'#999'}"><strong>{{a.title}}</strong><span class="appointment-category-label" :style="{'--appt-category-color':categoryFor(a.categoryId)?.color||'#999'}">{{categoryFor(a.categoryId)?.name||'Sans catégorie'}}</span> <small>{{weekDate(a.start)}} au {{weekDate(a.end)}}</small><small v-if="linkedLabel(a)">Lié : {{linkedLabel(a)}}</small><button @click="openAppointment(a)">Modifier</button></article><h3>Rendez-vous de la semaine</h3><p v-if="!appointmentWeek.length">Aucun rendez-vous cette semaine.</p><article v-for="a in appointmentWeek" :key="a.id" class="appointment-line" :style="{'border-left-color':categoryFor(a.categoryId)?.color||'#999'}"><strong>{{a.title}}</strong><span class="appointment-category-label" :style="{'--appt-category-color':categoryFor(a.categoryId)?.color||'#999'}">{{categoryFor(a.categoryId)?.name||'Sans catégorie'}}</span><small>{{weekDate(a.start)}} au {{weekDate(a.end)}}</small><small v-if="linkedLabel(a)">Lié : {{linkedLabel(a)}}</small><button @click="openAppointment(a)">Modifier</button></article></section>
       <nav class="dashboard-mini-nav" aria-label="Accès rapide aux blocs du dashboard"><button type="button" v-for="item in dashboardNav" :key="item.id" @click="jumpDashboard(item.id)">{{item.name}}</button></nav>
@@ -541,6 +563,19 @@
       <section id="dashboard-priorities" class="priority-box" :style="{order:data.dashboardWidgets.indexOf('priorities')+10}" v-if="dashboardShouldShow('priorities')"><h2>Priorités suggérées <button type="button" @click="refreshPriorities">↻ Actualiser</button></h2><small>Classement par échéance : retard, aujourd’hui, dates futures, puis sans date. Urgence et difficulté départagent les tâches de même échéance.</small><p v-if="!suggestedTasks.length">Aucune tâche à prioriser.</p><ol><li v-for="item in suggestedTasks" :key="item.task.id">{{ item.task.title }} <small>{{ taskDue(item.task) ? '· échéance '+formatDate(taskDue(item.task)) : '' }}</small></li></ol></section>
       <div id="dashboard-tasks" class="dashboard" :style="{order:data.dashboardWidgets.indexOf('tasks')+10}" v-if="dashboardShouldShow('tasks')">
 
+<div class="v76-task-mode" role="group" aria-label="Présentation des tâches"><strong>Affichage des tâches</strong><button type="button" :class="{active:dashboardTasksMode==='simple'}" @click="dashboardTasksMode='simple'">Simple</button><button type="button" :class="{active:dashboardTasksMode==='detailed'}" @click="dashboardTasksMode='detailed'">Détaillé</button></div>
+<template v-if="dashboardTasksMode==='simple'">
+ <section class="v76-simple-group" v-for="group in [{name:'Aujourd’hui',list:todayTasks},{name:'À venir',list:upcomingTasks}]" :key="group.name">
+  <h2>{{group.name}} <small>({{group.list.length}})</small></h2><p v-if="!group.list.length">Aucune tâche.</p>
+  <article class="v76-simple-task" v-for="t in group.list" :key="t.id">
+   <div class="v76-simple-meta"><strong>{{t.title}}</strong><span>{{t.category||'Sans catégorie'}} · {{projectName(t.projectId)||'Sans projet'}}</span><small>{{t.malus?'−':'+'}}{{t.points||0}} pts · Échéance : {{taskDue(t)?formatDate(taskDue(t)):'Non définie'}}</small></div>
+   <div class="v76-simple-actions"><button type="button" :disabled="!!blockingTask(t)" @click="changeStatus(t,'done')">✓ Terminé</button><button type="button" @click="duplicateTask(t,'tomorrow')">+ Demain</button><button type="button" @click="duplicateTask(t,'followup')">+ Suite</button></div>
+  </article>
+ </section>
+</template>
+
+<template v-else>
+
         <section class="view view-today">
           <h2>Aujourd'hui <small>({{ todayTasks.length }})</small> <small class="list-points">{{ todayPoints }} pts à gagner</small></h2>
           <p class="empty" v-if="!todayTasks.length">Rien pour aujourd'hui.</p>
@@ -565,6 +600,7 @@
 
 
 
+</template>
       </div>
     </section>
 
@@ -1728,9 +1764,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="sport-catalog-v67.js?v=pc-v75-1-estimate"></script>
-<script src="./sync-merge-v72.js?v=pc-v75-1-estimate"></script>
-<script src="app.js?v=pc-v75-1-estimate"></script>
+<script src="sport-catalog-v67.js?v=pc-v76-suggest"></script>
+<script src="./sync-merge-v72.js?v=pc-v76-suggest"></script>
+<script src="app.js?v=pc-v76-suggest"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

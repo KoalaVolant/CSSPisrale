@@ -4097,7 +4097,7 @@ const app = createApp({
     // La difficulté influe sur la sélection des tâches, pas sur leur présence dans le pool.
     const chooserLastSources=ref([]);
     function chooseAction(){
-      const pool=chooserPool.value;
+      const pool=chooserFilteredPool.value;
       if(!pool.length){chooserChoice.value=null;notify('Aucune proposition disponible');return;}
       const sources=[...new Set(pool.map(x=>x.source))];
       // Équilibrer les sources : 40 tâches ne doivent pas étouffer 3 habitudes.
@@ -4107,9 +4107,61 @@ const app = createApp({
       const source=choices[Math.floor(Math.random()*choices.length)];
       const same=pool.filter(x=>x.source===source&&x.id!==chooserChoice.value?.id);
       const eligible=same.length?same:pool.filter(x=>x.source===source);
-      chooserChoice.value=eligible[Math.floor(Math.random()*eligible.length)];
+      // Tirage pondéré : échéances proches et habitudes du jour sont favorisées, jamais imposées.
+      const weights=eligible.map(x=>chooserPriority(x));
+      const totalWeight=weights.reduce((a,b)=>a+b,0);
+      let draw=Math.random()*totalWeight,chosen=eligible[eligible.length-1];
+      for(let i=0;i<eligible.length;i++){draw-=weights[i];if(draw<=0){chosen=eligible[i];break;}}
+      chooserChoice.value=chosen;
       chooserLastSources.value=[...chooserLastSources.value.slice(-5),source];
     }
+
+    // V76 : les informations manquantes sont un diagnostic, pas une contrainte pour clôturer.
+    const incompleteFilter=ref('all');
+    const incompleteOpen=ref(false);
+    const taskMissingFields=(t)=>{
+      if(!t || t.status==='done')return [];
+      const result=[];
+      if(t.estimatedMinutes===null || t.estimatedMinutes===undefined || t.estimatedMinutes==='' || !Number.isFinite(Number(t.estimatedMinutes)) || Number(t.estimatedMinutes)<=0)result.push('duration');
+      if(!['light','medium','high'].includes(t.estimatedEffort))result.push('effort');
+      if(!String(t.category||'').trim())result.push('category');
+      if(t.scope!=='work' && !t.projectId)result.push('project');
+      return result;
+    };
+    const missingFieldLabels={duration:'Durée',effort:'Effort',category:'Catégorie',project:'Projet'};
+    const incompleteTasks=computed(()=>data.tasks.filter(t=>t.status!=='done' && taskMissingFields(t).length && (incompleteFilter.value==='all'||taskMissingFields(t).includes(incompleteFilter.value))).sort((a,b)=>taskMissingFields(b).length-taskMissingFields(a).length||String(a.title).localeCompare(String(b.title))));
+    const incompleteCount=computed(()=>data.tasks.filter(t=>t.status!=='done'&&taskMissingFields(t).length).length);
+    const dashboardTasksMode=ref('simple');
+    try{dashboardTasksMode.value=localStorage.getItem('tq-pc-dashboard-task-mode-v76')==='detailed'?'detailed':'simple';}catch(e){}
+    watch(dashboardTasksMode,(v)=>{try{localStorage.setItem('tq-pc-dashboard-task-mode-v76',v);}catch(e){}});
+    const chooserTime=ref('any');
+    const chooserEffort=ref('any');
+    const chooserTaskInfo=(choice)=>{
+      if(!choice||choice.source!=='Tâche')return '';
+      const t=data.tasks.find(t=>t.id===choice.id);if(!t)return '';
+      const mins=t.estimatedMinutes!=null&&Number(t.estimatedMinutes)>0?String(t.estimatedMinutes).replace('.',',')+' min':'Durée inconnue';
+      const effort={light:'léger',medium:'moyen',high:'important'}[t.estimatedEffort]||'effort inconnu';
+      return mins+' · '+effort;
+    };
+    const chooserFilteredPool=computed(()=>chooserPool.value.filter(x=>{
+      if(x.source!=='Tâche')return true;
+      const t=data.tasks.find(t=>t.id===x.id);if(!t)return false;
+      const max=Number(chooserTime.value);const mins=Number(t.estimatedMinutes);
+      if(chooserTime.value!=='any' && t.estimatedMinutes!=null && t.estimatedMinutes!=='' && Number.isFinite(mins) && mins>max)return false;
+      const ranks={light:1,medium:2,high:3};
+      if(chooserEffort.value!=='any' && ranks[t.estimatedEffort] && ranks[t.estimatedEffort]>ranks[chooserEffort.value])return false;
+      return true;
+    }));
+    const chooserPriority=(x)=>{
+      if(x.source!=='Tâche')return x.source==='Habitude'?2:1;
+      const t=data.tasks.find(t=>t.id===x.id);if(!t)return 1;
+      let score=1;const due=taskDue(t);
+      if(due&&due<today.value)score+=7;else if(due===today.value)score+=5;else if(due&&due<=dateAddSafe(today.value,3))score+=2;
+      if(t.startDate && t.startDate<=today.value)score+=1;
+      if(chooserEnergy.value==='low' && t.estimatedEffort==='light')score+=2;
+      return score;
+    };
+
     const dayTasks=computed(()=>data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work'&&taskIsToday(t)).slice(0,12));
     const dayHabits=computed(()=>data.habits.filter(h=>!h.malus&&!habitIsFinished(h)&&habitDue(h)&&!habitDoneToday(h)).slice(0,12));
     const contextPeriod=computed(()=>{let h=new Date().getHours();return h<12?'Matin':h<18?'Après-midi':'Soir';});
@@ -4958,7 +5010,7 @@ const app = createApp({
     const badHabitsHomeOpen = ref(true);
     return {
       routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,groceryExcludedIds,groceryShoppingExists,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,leftoverPlanDate,leftoverPlanKind,planLeftoverSelected,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
-      wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
+      wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooserFilteredPool,chooserTime,chooserEffort,chooserTaskInfo,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
       sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,pantryExpiring,pantryOverdue,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,calendarLayers,calendarTasksOn,calendarMilestonesOn,openCalendarTask,openCalendarMilestone,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
@@ -4987,7 +5039,7 @@ const app = createApp({
       filters, resetFilters, activeFilterCount, taskDue, todayTasks, upcomingTasks, undatedTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
       // tâches
       quickForm, openQuickForm, toggleQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
-      taskForm, openTaskForm, toggleTaskForm, saveTask, duplicateTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName,
+      taskForm, openTaskForm, toggleTaskForm, saveTask, duplicateTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName, incompleteFilter,incompleteOpen,taskMissingFields,missingFieldLabels,incompleteTasks,incompleteCount,dashboardTasksMode,
       selection, toggleSelect, selectMany, deselectMany, editSelected, deleteSelected, bulkForm, saveBulk,
       todayPoints, upcomingPoints,
       // projets

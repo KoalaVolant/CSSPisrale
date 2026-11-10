@@ -10,16 +10,16 @@
 <meta content="TQ Mobile" name="apple-mobile-web-app-title"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<title>Todo Quest · Mobile V8.1 TEST</title>
-<link href="./style.css?v=20261110-mobile-v8-1" rel="stylesheet"/>
-<link href="./stylekoala.css?v=20261110-mobile-v8-1" rel="stylesheet"/>
-<link href="./styletest.css?v=20261110-mobile-v8-1" rel="stylesheet"/>
+<title>Todo Quest · Mobile V9 TEST</title>
+<link href="./style.css?v=20261110-mobile-v9" rel="stylesheet"/>
+<link href="./stylekoala.css?v=20261110-mobile-v9" rel="stylesheet"/>
+<link href="./styletest.css?v=20261110-mobile-v9" rel="stylesheet"/>
 <link href="mobile.css?v=7-1" rel="stylesheet"/>
 </head>
 <body>
 <div id="app" v-cloak="">
 <header class="tqm-header">
-<div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span><small class="tqm-version-tag" title="Version installée : Mobile V8.1 TEST">v8.1 test</small></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
+<div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span><small class="tqm-version-tag" title="Version installée : Mobile V9 TEST">v9 test</small></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
 <div class="tqm-auth"><button class="tqm-install" hidden="" id="tqm-install" type="button">Installer</button><template v-if="firebaseReady"><button @click="signIn" type="button" v-if="!user">Se connecter avec Google</button><template v-else=""><span class="tqm-email">{{user.email}}</span><button @click="signOut" type="button">Quitter</button></template></template><a href="../index.html">Version complète ↗</a></div>
 </header>
 <div id="tqm-network-warning" class="tqm-network-warning" role="status" hidden>
@@ -549,6 +549,28 @@
 </section>
 <!-- ============ TOUTES LES TÂCHES (en cours) ============ -->
 <section class="view tqm-tasks-page" v-if="view === 'all'">
+<section class="v76-mobile-chooser"><h2>🎲 Je ne sais pas quoi faire</h2><div class="v76-chooser-filters"><label>Temps <select v-model="chooserTime"><option value="any">Peu importe</option><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option></select></label><label>Effort <select v-model="chooserEffort"><option value="any">Peu importe</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="high">Important</option></select></label></div><button type="button" @click="chooseAction">Me proposer une idée</button><div v-if="chooserChoice" class="v76-choice"><strong>{{chooserChoice.title}}</strong><small>{{chooserChoice.source}} · {{chooserTaskInfo(chooserChoice)}}</small><button type="button" @click="openChooserChoice">Ouvrir</button><button type="button" @click="chooseAction">Autre idée</button></div></section>
+
+<section class="v76-incomplete" aria-label="Tâches incomplètes">
+ <div class="v76-incomplete-head"><h2>🧩 Tâches incomplètes <small>({{incompleteCount}})</small></h2><button type="button" @click="incompleteOpen=!incompleteOpen" :aria-expanded="incompleteOpen">{{incompleteOpen?'Masquer':'Compléter les tâches'}}</button></div>
+ <p class="hint">Tâches non terminées auxquelles il manque au moins une durée, un effort, une catégorie ou un projet. Rien n'est obligatoire pour terminer une tâche.</p>
+ <template v-if="incompleteOpen">
+  <label>Afficher les tâches sans <select v-model="incompleteFilter"><option value="all">N'importe quel champ</option><option value="duration">Durée</option><option value="effort">Effort</option><option value="category">Catégorie</option><option value="project">Projet</option></select></label>
+  <p v-if="!incompleteTasks.length">Aucune tâche à compléter pour ce filtre.</p>
+  <div class="v76-incomplete-list">
+   <article class="v76-incomplete-card" v-for="t in incompleteTasks" :key="t.id">
+    <div><strong>{{t.title}}</strong><small>À compléter : {{taskMissingFields(t).map(f=>missingFieldLabels[f]).join(' · ')}}</small></div>
+    <div class="v76-editgrid">
+      <label>Durée (min) <input type="number" min="0.01" step="any" inputmode="decimal" :value="t.estimatedMinutes??''" placeholder="—" @change="updateTask(t,'estimatedMinutes',$event.target.value);$event.target.value=t.estimatedMinutes??''"></label>
+      <label>Effort <select :value="t.estimatedEffort||''" @change="updateTask(t,'estimatedEffort',$event.target.value)"><option value="">Non renseigné</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="high">Important</option></select></label>
+      <label>Catégorie <select :value="t.category||''" @change="updateTask(t,'category',$event.target.value)"><option value="">Sans catégorie</option><option v-for="c in categories" :key="c" :value="c">{{c}}</option></select></label>
+      <label v-if="t.scope!=='work'">Projet <select :value="t.projectId||''" @change="updateTask(t,'projectId',$event.target.value)"><option value="">Sans projet</option><option v-for="p in data.projects" :key="p.id" :value="p.id">{{p.name}}</option></select></label>
+    </div><button type="button" @click="openTaskForm(t)">Modifier la fiche</button>
+   </article>
+  </div>
+ </template>
+</section>
+
 <div class="tqm-task-head"><p>Les tâches personnelles, sans les champs inutiles sur téléphone.</p><button @click="openTaskForm()" class="tqm-primary" type="button">＋ Nouvelle tâche</button></div>
 <div aria-label="Afficher les tâches" class="tqm-task-pills" role="group">
 <button :class="{active:mobileTaskScope===choice.id}" :key="choice.id" @click="mobileTaskScope=choice.id" type="button" v-for="choice in [{id:'today',name:'Aujourd’hui'},{id:'upcoming',name:'À venir'},{id:'late',name:'En retard'},{id:'all',name:'Toutes'}]">{{choice.name}}</button>
@@ -575,7 +597,7 @@
 <p class="tqm-task-blocked" v-if="blockingTask(task)">🔒 Dépend de : {{blockingTask(task).title}}</p>
 <div class="tqm-subtasks" v-if="task.subtasks&amp;&amp;task.subtasks.length"><strong>Sous-tâches {{task.subtasks.filter(s=&gt;s.done).length}} / {{task.subtasks.length}}</strong>
 <label :key="sub.id" v-for="sub in task.subtasks"><input :checked="sub.done" @change="updateTask(task,'subtaskToggle',sub.id)" type="checkbox"/> <span>{{sub.title}}</span></label></div>
-<div class="tqm-task-actions"><button :disabled="!!blockingTask(task)" @click="changeStatus(task,'done');mobileLastDone=task.id" class="tqm-primary" type="button">✓ Terminer</button><button @click="openTaskForm(task)" type="button">Modifier</button><button @click="mobilePostponeTask(task)" type="button">Demain</button><button @click="deleteTask(task)" class="tqm-danger" type="button">Supprimer</button></div>
+<div class="tqm-task-actions"><button :disabled="!!blockingTask(task)" @click="changeStatus(task,'done');mobileLastDone=task.id" class="tqm-primary" type="button">✓ Terminer</button><button @click="openTaskForm(task)" type="button">Modifier</button><button @click="mobilePostponeTask(task)" type="button">Demain</button><button type="button" @click="duplicateTask(task,'followup')">+ Suite</button><button @click="deleteTask(task)" class="tqm-danger" type="button">Supprimer</button></div>
 </article>
 </section>
 <section class="view tqm-notes-view" v-if="view === 'random-notes'">
@@ -1676,10 +1698,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js"></script>
-<script src="./sport-catalog-v67.js?v=20261110-mobile-v8-1"></script>
+<script src="./sport-catalog-v67.js?v=20261110-mobile-v9"></script>
 <script>window.TODO_QUEST_MOBILE = true;</script>
 <script src="./sync-merge-v72.js?v=20261110-v72-v7"></script>
-<script src="./app-mobile.js?v=20261110-mobile-v8-1"></script>
+<script src="./app-mobile.js?v=20261110-mobile-v9"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
