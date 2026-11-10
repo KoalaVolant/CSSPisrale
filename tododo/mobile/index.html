@@ -10,11 +10,11 @@
 <meta content="TQ Mobile" name="apple-mobile-web-app-title"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<title>Todo Quest Mobile V4</title>
-<link href="./style.css?v=20261110-mobile-v4" rel="stylesheet"/>
-<link href="./stylekoala.css?v=20261110-mobile-v4" rel="stylesheet"/>
-<link href="./styletest.css?v=20261110-mobile-v4" rel="stylesheet"/>
-<link href="mobile.css?v=4" rel="stylesheet"/>
+<title>Todo Quest Mobile V5</title>
+<link href="./style.css?v=20261110-mobile-v6" rel="stylesheet"/>
+<link href="./stylekoala.css?v=20261110-mobile-v6" rel="stylesheet"/>
+<link href="./styletest.css?v=20261110-mobile-v6" rel="stylesheet"/>
+<link href="mobile.css?v=6" rel="stylesheet"/>
 </head>
 <body>
 <div id="app" v-cloak="">
@@ -426,7 +426,14 @@
 </section>
 <div>
 <header class="calendar-toolbar"><h2>Calendrier</h2><button @click="moveCalendar(-1)">←</button><strong>{{calendarTitle}}</strong><button @click="moveCalendar(1)">→</button><button @click="calAnchor=today">Aujourd'hui</button><select v-model="calMode"><option value="day">Jour</option><option value="week">Semaine</option><option value="month">Mois</option></select><button @click="openAppointment()">＋ Rendez-vous</button></header>
-<details class="tqm-secondary-info tqm-hidden-calendar-settings"><summary>Filtres du calendrier</summary><div class="v68-cal-layers"><label><input type="checkbox" v-model="calendarLayers.appointments"/> Rendez-vous</label><label><input type="checkbox" v-model="calendarLayers.tasks"/> Tâches actives / échéances</label><label><input type="checkbox" v-model="calendarLayers.milestones"/> Jalons datés</label></div></details>
+<div class="tqm-calendar-filters" aria-label="Éléments visibles dans le calendrier">
+<span class="tqm-calendar-filters-title">Afficher dans l’agenda</span>
+<div class="tqm-calendar-filter-row">
+<label><input type="checkbox" v-model="calendarLayers.appointments"/> <span>Rendez-vous</span></label>
+<label><input type="checkbox" v-model="calendarLayers.tasks"/> <span>Tâches actives</span></label>
+<label><input type="checkbox" v-model="calendarLayers.deadlines"/> <span>Échéances</span></label>
+<label><input type="checkbox" v-model="calendarLayers.milestones"/> <span>Jalons</span></label>
+</div></div>
 <div aria-label="Agenda de la période" class="tqm-agenda">
 <section :class="{'tqm-agenda-today':date===today}" :key="'agenda-'+date" class="tqm-agenda-day" v-for="date in mobileCalendarDays">
 <div class="tqm-agenda-day-head"><strong>{{weekDate(date)}}</strong><button @click="openAppointment(null,date)" aria-label="Ajouter un rendez-vous ce jour" type="button">＋</button></div>
@@ -553,23 +560,33 @@
 <div class="tqm-task-actions"><button :disabled="!!blockingTask(task)" @click="changeStatus(task,'done');mobileLastDone=task.id" class="tqm-primary" type="button">✓ Terminer</button><button @click="openTaskForm(task)" type="button">Modifier</button><button @click="mobilePostponeTask(task)" type="button">Demain</button><button @click="deleteTask(task)" class="tqm-danger" type="button">Supprimer</button></div>
 </article>
 </section>
-<section class="view view-random-notes" v-if="view === 'random-notes'">
-<h3>Notes au pif</h3>
-<div class="random-note-create"><textarea placeholder="Une idée, un truc à noter…" rows="2" v-model="randomNoteDraft"></textarea><select aria-label="Type de note" v-model="randomNoteNewType"><option value="">Sans type</option><option :key="type" :value="type" v-for="type in data.randomNoteTypes">{{type}}</option></select><button @click="addRandomNote()" type="button">＋ Ajouter</button></div>
-<details class="config-fold random-note-config"><summary>⚙ Gérer les types de notes</summary>
-<div class="random-note-types"><input @keyup.enter="addRandomNoteType" placeholder="Créer un type" v-model="randomNoteTypeDraft"/><button @click="addRandomNoteType" type="button">Créer un type</button></div>
-<div class="random-type-manager"><div :key="type" @dragend="randomNoteTypeDragged=''" @dragover.prevent="" @dragstart="randomNoteTypeDragged=type" @drop.prevent="reorderRandomNoteType(type)" class="random-type-entry" draggable="true" v-for="type in data.randomNoteTypes"><span class="drag-grip" title="Réordonner">⠿</span><strong>{{type}}</strong><button @click="renameRandomNoteType(type)" type="button">Renommer</button><button @click="deleteRandomNoteType(type)" type="button">Supprimer</button></div></div>
-</details>
-<label class="random-note-filter">Afficher <select v-model="randomNoteTypeFilter"><option value="">Tous les types</option><option :key="type" :value="type" v-for="type in data.randomNoteTypes">{{type}}</option></select></label>
-<section :key="group.type" class="random-note-group" v-for="group in randomNoteGroups">
-<h4>{{group.title}} <small>({{group.notes.length}})</small></h4>
-<article :key="note.id" @dragend="randomNoteDragged=''" @dragover.prevent="" @dragstart="randomNoteDragged=note.id" @drop.prevent="dropRandomNote(note)" class="random-note-card" draggable="true" v-for="note in group.notes">
-<div class="random-note-head"><span class="drag-grip" title="Changer l'ordre">⠿</span><input aria-label="Titre facultatif" placeholder="Titre facultatif" v-if="randomNoteEditing===note.id" v-model="note.title"/><button @click="randomNoteEditing=randomNoteEditing===note.id?'':note.id" type="button">{{randomNoteEditing===note.id?'Terminer':'Modifier'}}</button><button @click="deleteRandomNote(note)" type="button">Supprimer</button></div>
-<template v-if="randomNoteEditing===note.id"><select v-model="note.type"><option value="">Sans type</option><option :key="type" :value="type" v-for="type in data.randomNoteTypes">{{type}}</option></select><textarea placeholder="Ta note…" rows="2" v-model="note.content"></textarea></template>
-<p class="random-note-body" v-else="">{{note.content||'Note vide'}}</p>
-</article>
-</section>
-<p v-if="!randomNoteGroups.length">Aucune note dans cette sélection.</p>
+<section class="view tqm-notes-view" v-if="view === 'random-notes'">
+  <div class="tqm-notes-title"><h2>Notes au pif</h2><small>{{data.randomNotes.length}} note(s)</small></div>
+  <div class="tqm-notes-compose">
+    <textarea v-model="randomNoteDraft" rows="3" placeholder="Une idée à garder, un rappel, un truc au pif…" aria-label="Nouvelle note"></textarea>
+    <div class="tqm-notes-compose-actions">
+      <select v-model="randomNoteNewType" aria-label="Type de note"><option value="">Sans type</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select>
+      <button type="button" @click="addRandomNote()" :disabled="!randomNoteDraft.trim()">+ Ajouter</button>
+    </div>
+  </div>
+  <label class="tqm-notes-filter">Afficher
+    <select v-model="randomNoteTypeFilter"><option value="">Toutes les notes</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select>
+  </label>
+  <div class="tqm-notes-list">
+    <article v-for="note in visibleRandomNotes" :key="note.id" class="tqm-note-card">
+      <template v-if="randomNoteEditing===note.id">
+        <input v-model="note.title" placeholder="Titre" aria-label="Titre de la note"/>
+        <textarea v-model="note.content" rows="4" aria-label="Contenu de la note"></textarea>
+        <select v-model="note.type" aria-label="Catégorie"><option value="">Sans type</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select>
+      </template>
+      <template v-else><h3>{{note.title||'Sans titre'}}</h3><p>{{note.content||'Note vide'}}</p><small v-if="note.type">{{note.type}}</small></template>
+      <div class="tqm-note-actions">
+        <button type="button" @click="randomNoteEditing=randomNoteEditing===note.id?'':note.id">{{randomNoteEditing===note.id?'Terminer':'Modifier'}}</button>
+        <button type="button" class="tqm-note-delete" @click="deleteRandomNote(note)">Supprimer</button>
+      </div>
+    </article>
+    <p v-if="!visibleRandomNotes.length" class="tqm-notes-empty">Aucune note dans cette sélection.</p>
+  </div>
 </section>
 <section class="view view-evening" v-if="view === 'evening'">
 <p>Crée plusieurs notes Markdown indépendantes, avec un titre et une sauvegarde automatique.</p>
@@ -870,6 +887,34 @@
 </div>
 </section>
 <section class="view view-sport v52-sport" v-if="view==='sport'">
+<div v-if="sportFocusOpen" class="tqm-focus-overlay" role="dialog" aria-modal="true" aria-label="Séance de sport en cours">
+ <div class="tqm-focus-shell">
+  <header class="tqm-focus-header"><div><small>TODO QUEST · MODE SÉANCE</small><h2>{{sportPick ? sportPick.name : 'Ma séance'}}</h2></div><button type="button" class="tqm-focus-exit" @click="closeSportFocus">Quitter</button></header>
+  <template v-if="sportDraft.length">
+   <div class="tqm-focus-progress"><span>Exercice {{sportFocusIndex+1}} / {{sportDraft.length}}</span><span>{{sportDraft.filter(x=>x.completed).length}} terminé(s)</span></div>
+   <div class="tqm-focus-track"><div :style="{width:100*sportDraft.filter(x=>x.completed).length/sportDraft.length+'%'}"></div></div>
+   <div class="tqm-focus-exercise" v-if="sportDraft[sportFocusIndex]">
+    <div class="tqm-focus-counter">{{sportFocusIndex+1}} / {{sportDraft.length}}</div>
+    <h3>{{sportDraft[sportFocusIndex].name}}</h3>
+    <p class="tqm-focus-reps">{{sportDraft[sportFocusIndex].reps}}</p>
+    <p class="tqm-focus-duration">Durée prévue : <strong>{{sportTimeLabel(sportDraft[sportFocusIndex].plannedSeconds)}}</strong></p>
+    <p class="tqm-focus-description">{{sportDraft[sportFocusIndex].description}}</p>
+    <p v-if="sportDraftKind==='long' && sportPassages(sportDraft[sportFocusIndex])>1" class="tqm-focus-hint">Environ {{sportPassages(sportDraft[sportFocusIndex])}} passages, avec pauses si nécessaire.</p>
+    <label class="tqm-focus-done"><input type="checkbox" v-model="sportDraft[sportFocusIndex].completed"/> Exercice réalisé</label>
+   </div>
+   <nav class="tqm-focus-navigation" aria-label="Naviguer dans les exercices"><button type="button" :disabled="sportFocusIndex===0" @click="sportFocusIndex--">← Précédent</button><button type="button" :disabled="sportFocusIndex>=sportDraft.length-1" @click="sportFocusIndex++">Suivant →</button></nav>
+   <button type="button" class="tqm-focus-reroll" @click="replaceSportExercise(sportFocusIndex)">↻ Changer cet exercice</button>
+  </template>
+  <template v-if="sportPick"><div class="tqm-focus-exercise"><h3>{{sportPick.name}}</h3><label class="tqm-focus-field">Durée réellement effectuée (min)<input type="number" min="1" max="600" v-model.number="sportPick.minutes"/></label></div></template>
+  <div class="tqm-focus-end">
+   <label v-if="sportDraftKind==='long' && sportDraft.length" class="tqm-focus-field">Durée réellement effectuée (minutes)<input type="number" min="0.25" max="180" step="0.25" v-model.number="sportActualMinutes"/></label>
+   <div class="tqm-focus-feeling"><strong>Ton ressenti (facultatif)</strong><label>Difficulté<select v-model="sportFeedback.effort"><option value="easy">Facile</option><option value="ok">Correcte</option><option value="hard">Difficile</option><option value="too-hard">Trop difficile</option></select></label><label><input type="checkbox" v-model="sportFeedback.discomfort"/> Douleur ou inconfort</label><label><input type="checkbox" v-model="sportFeedback.liked"/> Envie de refaire</label></div>
+   <button type="button" class="tqm-focus-save" @click="completeSport">✓ Enregistrer ma séance</button>
+   <small>Seuls les exercices cochés sont pris en compte. Tu peux quitter sans enregistrer.</small>
+  </div>
+ </div>
+</div>
+
 <section class="v52-card"><h2>🌱 Bouger un peu</h2><p>Objectifs souples, exercices courts, aucune pénalité. Arrête les mouvements douloureux.</p>
 <div class="v52-stats"><div>🦵 Renforcement <b>{{sportProgress.mini}} / {{data.sportGoals.mini}}</b></div><div>🎮 Jeu <b>{{sportProgress.game}} / {{data.sportGoals.game}}</b></div><div>🚶 Balade <b>{{sportProgress.walk}} / {{data.sportGoals.walk}}</b></div></div>
 <label>Thème de séance <select v-model="sportMode"><option value="surprise">Surprise totale</option><option value="corps">Corps entier (varié)</option><option value="detente">Détente / récupération</option><option value="genoux">Genoux</option><option value="renfo">Renforcement</option><option value="cardio">Cardio doux</option><option value="mobilite">Mobilité</option><option value="ludique">Ludique</option><option value="etirement">Étirements</option><option value="equilibre">Équilibre</option><option value="fitness">Fitness</option><option value="danse">Danse</option></select></label>
@@ -877,7 +922,7 @@
 <label class="tqm-hide-field">Nombre d’exercices pour la séance longue (10 à 15 min) <input aria-label="Nombre d’exercices de séance longue" max="10" min="4" step="1" type="number" v-model.number="sportLongExerciseCount"/> <small>4 à 10 exercices, tirés au sort. La mini-séance reste limitée à 3 exercices.</small></label>
 <div class="v52-actions"><button @click="generateSport('mini')">🎲 Mini-séance (3 à 5 min)</button><button @click="generateSport('long')">⏱️ Séance longue (10 à 15 min)</button><button @click="generateSport('short')">🦥 Mini-flemme (1 exercice)</button><button @click="generateSport('game')">🎮 Jeu actif</button><button @click="generateSport('walk')">🚶 Balade</button></div>
 <div class="v52-card v52-generated" v-if="sportDraft.length || sportPick">
-<h3>Ta proposition aléatoire</h3>
+<h3>Ta proposition aléatoire</h3><button type="button" class="tqm-focus-start" @click="startSportFocus">▶ Mode séance : se concentrer</button>
 <template v-if="sportDraft.length">
 <p class="v57-plan" role="status">Durée totale planifiée : <strong>{{sportTimeLabel(sportDraftTotalSeconds)}}</strong> pour {{sportDraft.length}} exercices. <span v-if="sportDraftKind==='long'">La durée est répartie entre les exercices : répète les mouvements par petits passages, avec des pauses si nécessaire.</span></p>
 <div :key="ex.id" class="v52-ex" v-for="(ex,i) in sportDraft"><label><input type="checkbox" v-model="ex.completed"/> <strong>{{ex.name}}</strong> · {{ex.reps}} <small>· durée prévue : <strong>{{sportTimeLabel(ex.plannedSeconds)}}</strong><template v-if="sportDraftKind==='long' &amp;&amp; sportPassages(ex)&gt;1"> · environ {{sportPassages(ex)}} passages (sans forcer)</template> · {{ex.description}}</small></label><button @click="replaceSportExercise(i)">↻ Remplacer</button></div>
@@ -1509,6 +1554,7 @@
 <button :aria-current="view==='shopping'?'page':null" :class="{active:view==='shopping'}" @click="setTab('shopping')" type="button"><span aria-hidden="true">🛒</span><small>Courses</small></button>
 <button :aria-current="view==='habits'?'page':null" :class="{active:view==='habits'}" @click="setTab('habits')" type="button"><span aria-hidden="true">🌱</span><small>Habitudes</small></button>
 <button :aria-current="view==='calendar'?'page':null" :class="{active:view==='calendar'}" @click="setTab('calendar')" type="button"><span aria-hidden="true">▦</span><small>Agenda</small></button>
+<button :aria-current="view==='random-notes'?'page':null" :class="{active:view==='random-notes'}" @click="setTab('random-notes')" type="button"><span aria-hidden="true">✎</span><small>Notes</small></button>
 </nav>
 </div>
 <!-- ============ TEMPLATE : LIGNE DE TÂCHE ============ -->
@@ -1612,9 +1658,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js"></script>
-<script src="./sport-catalog-v67.js?v=20261110-mobile-v4"></script>
+<script src="./sport-catalog-v67.js?v=20261110-mobile-v6"></script>
 <script>window.TODO_QUEST_MOBILE = true;</script>
-<script src="./app-mobile.js?v=20261110-mobile-v4"></script>
+<script src="./sync-merge-v72.js?v=20261110-v72"></script>
+<script src="./app-mobile.js?v=20261110-mobile-v6"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

@@ -1,7 +1,7 @@
 {
-  "name": "Todo Quest Mobile V4",
+  "name": "Todo Quest Mobile V6",
   "short_name": "TQ Mobile",
-  "description": "Tâches, sport, courses, habitudes et agenda",
+  "description": "Tâches, sport, courses, habitudes, agenda et notes",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

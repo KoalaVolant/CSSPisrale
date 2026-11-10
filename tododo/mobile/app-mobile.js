@@ -3599,22 +3599,64 @@ const app = createApp({
       syncing:   'Synchronisation…',
       synced:    'Synchronisé',
       error:     'Erreur de synchro',
+      conflict:  'Conflit : exporte tes données, puis recharge la page',
     }[syncState.value]));
 
     const clientId = uid();           // identifie cet onglet / appareil
     let auth = null, db = null, docRef = null;
     let unsubscribe = null, saveTimer = null, lastSyncedJson = '', firstSnapshot = true;
     let cloudInitialized = false; // aucune écriture avant lecture du premier état serveur
+    let baseSnapshot = null; // dernier document distant connu
+    let writingCloud = false;
+    let hasConflict = false;
 
-    function pushToCloud() {
-      if (!docRef || !cloudInitialized) return Promise.resolve();
+    async function pushToCloud() {
+      if (!docRef || !cloudInitialized || hasConflict || writingCloud) return;
+      writingCloud = true;
       syncState.value = 'syncing';
-      const payload = JSON.parse(JSON.stringify(data));
-      payload._by = clientId;
-      payload._savedAt = firebase.firestore.FieldValue.serverTimestamp();
-      return docRef.set(payload)
-        .then(() => { syncState.value = 'synced'; })
-        .catch(err => { console.error('Firestore :', err); syncState.value = 'error'; });
+      const localCopy = JSON.parse(JSON.stringify(data));
+      const localJson = JSON.stringify(localCopy);
+      const clean = obj => Object.fromEntries(Object.entries(obj || {}).filter(([key]) => key !== '_by' && key !== '_savedAt'));
+      const originalBase = clean(baseSnapshot);
+      try {
+        const merged = await db.runTransaction(async tx => {
+          const doc = await tx.get(docRef);
+          const latest = clean(doc.exists ? doc.data() : {});
+          const result = window.TodoQuestMerge.threeWay(originalBase, localCopy, latest);
+          if (result.conflicts.length) {
+            const err = new Error('Conflit sur : ' + result.conflicts.slice(0, 8).join(', '));
+            err.isSyncConflict = true;
+            throw err;
+          }
+          const payload = { ...result.result, _by: clientId,
+            _savedAt: firebase.firestore.FieldValue.serverTimestamp() };
+          tx.set(docRef, payload);
+          return result.result;
+        });
+        baseSnapshot = JSON.parse(JSON.stringify(merged));
+        if (JSON.stringify(data) === localJson) {
+          applyRemote(merged);
+          syncState.value = 'synced';
+        } else {
+          // Une saisie a continue pendant la transaction: ne pas la perdre.
+          lastSyncedJson = JSON.stringify(merged);
+          syncState.value = 'syncing';
+        }
+      } catch (err) {
+        console.error('Firestore V72 :', err);
+        if (err.isSyncConflict) {
+          hasConflict = true;
+          syncState.value = 'conflict';
+          notify('Conflit entre appareils : aucune donnee distante ecrasee. Exporte un JSON avant de recharger.');
+        } else syncState.value = 'error';
+      } finally {
+        writingCloud = false;
+        if (!hasConflict && docRef && cloudInitialized &&
+            JSON.stringify(data) !== lastSyncedJson) {
+          clearTimeout(saveTimer);
+          saveTimer = setTimeout(() => { saveTimer = null; pushToCloud(); }, 1000);
+        }
+      }
     }
 
     function flushNow() {
@@ -3624,13 +3666,15 @@ const app = createApp({
 
     function applyRemote(remote) {
       applyData(remote);
-      lastSyncedJson = JSON.stringify(data);   // évite de renvoyer ce qu'on vient de recevoir
+      lastSyncedJson = JSON.stringify(data);
     }
 
     function startSync(u) {
       docRef = db.collection('users').doc(u.uid);
       firstSnapshot = true;
       cloudInitialized = false;
+      hasConflict = false;
+      baseSnapshot = null;
       syncState.value = 'syncing';
 
       unsubscribe = docRef.onSnapshot(snap => {
@@ -3648,6 +3692,7 @@ const app = createApp({
               return;
             }
             lastSyncedJson = JSON.stringify(data);
+            baseSnapshot = {};
             cloudInitialized = true;
             pushToCloud();
             return;
@@ -3655,6 +3700,7 @@ const app = createApp({
           // Toujours charger le document distant existant : aucun écrasement du cloud par
           // des données de test importées ou conservées localement, sans action explicite.
           applyRemote(remote);
+          baseSnapshot = JSON.parse(JSON.stringify(remote));
           cloudInitialized = true;
           // Sauvegarde une seule fois le catalogue ajouté au cloud, sans toucher aux autres valeurs.
           const remoteIds = new Set((Array.isArray(remote.sportExercises) ? remote.sportExercises : []).filter(x=>x && x.id).map(x=>x.id));
@@ -3670,9 +3716,17 @@ const app = createApp({
         }
 
         // Mises à jour venant d'un autre appareil
-        if (cloudInitialized && remote && remote._by !== clientId && !saveTimer) {
-          applyRemote(remote);
-          syncState.value = 'synced';
+        if (cloudInitialized && remote && remote._by !== clientId && !hasConflict) {
+          // Si une saisie locale attend, ne pas remplacer cette saisie par le cloud.
+          if (saveTimer || writingCloud || JSON.stringify(data) !== lastSyncedJson) {
+            if (!writingCloud && !saveTimer) {
+              saveTimer = setTimeout(() => { saveTimer = null; pushToCloud(); }, 1000);
+            }
+          } else {
+            applyRemote(remote);
+            baseSnapshot = JSON.parse(JSON.stringify(remote));
+            syncState.value = 'synced';
+          }
         }
       }, err => { console.error('Firestore :', err); syncState.value = 'error'; });
     }
@@ -3685,6 +3739,8 @@ const app = createApp({
       auth.onAuthStateChanged(u => {
         if (unsubscribe) { unsubscribe(); unsubscribe = null; }
         cloudInitialized = false;
+        hasConflict = false;
+        baseSnapshot = null;
         if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
         docRef = null;
         user.value = u ? { name: u.displayName, email: u.email } : null;
@@ -3693,7 +3749,7 @@ const app = createApp({
 
       // Envoi vers le cloud dès que les données changent (avec un petit délai)
       watch(data, () => {
-        if (!docRef || !cloudInitialized) return;
+        if (!docRef || !cloudInitialized || hasConflict) return;
         const json = JSON.stringify(data);
         if (json === lastSyncedJson) return;
         lastSyncedJson = json;
@@ -4324,8 +4380,13 @@ const app = createApp({
     const calendarTitle=computed(()=>calMode.value==='month'?new Date(calAnchor.value+'T12:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'}):'Semaine du '+formatDate(dateMonday(calAnchor.value)));
     const calendarDays=computed(()=>{const start=calMode.value==='month'?dateMonday(calAnchor.value.slice(0,7)+'-01'):dateMonday(calAnchor.value);const n=calMode.value==='month'?42:7;return Array.from({length:n},(_,i)=>dateAdd(start,i));});
     const appointmentsOn=date=>data.appointments.filter(a=>a.start<=date&&a.end>=date).sort((a,b)=>a.start.localeCompare(b.start)||a.title.localeCompare(b.title,'fr'));
-    const calendarLayers=reactive({appointments:true,tasks:true,milestones:true});
-    function calendarTasksOn(date){return calendarLayers.tasks ? data.tasks.filter(t=>t.status!=='done' && ((t.startDate&&t.startDate<=date&&taskDue(t)>=date) || taskDue(t)===date)) : [];}
+    const calendarLayers=reactive({appointments:true,tasks:true,deadlines:true,milestones:true});
+    // Preferences d'affichage propres au telephone, non synchronisees et sans suppression de donnees.
+    try { const saved=JSON.parse(localStorage.getItem('tqm-calendar-layers-v5')||'{}');
+      for(const key of ['appointments','tasks','deadlines','milestones']) if(typeof saved[key]==='boolean')calendarLayers[key]=saved[key];
+    } catch(e) { /* stockage indisponible : garder les valeurs par defaut */ }
+    watch(calendarLayers,()=>{try{localStorage.setItem('tqm-calendar-layers-v5',JSON.stringify({...calendarLayers}));}catch(e){}},{deep:true});
+    function calendarTasksOn(date){return data.tasks.filter(t=>t.status!=='done' && ((calendarLayers.tasks && t.startDate && t.startDate<=date && taskDue(t)>=date && taskDue(t)!==date) || (calendarLayers.deadlines && taskDue(t)===date)));}
     function calendarMilestonesOn(date){return calendarLayers.milestones ? data.projectMilestones.filter(m=>m.due===date) : [];}
     function openCalendarTask(task){openTaskForm(task);}
     function openCalendarMilestone(m){const project=data.projects.find(p=>p.id===m.projectId);setTab('projects');if(project)nextTick(()=>document.querySelector('[data-project-id="'+project.id+'"]')?.scrollIntoView({block:'center'}));}
@@ -4506,6 +4567,15 @@ const app = createApp({
     const sportActualMinutes = ref(12); // durée réellement déclarée
     const sportLongExerciseCount = ref(8); // 4 à 10 exercices pour la séance 10-15 min
     const sportPick = ref(null);
+    const sportFocusOpen = ref(false);
+    const sportFocusIndex = ref(0);
+    function startSportFocus(){
+      if(!sportDraft.value.length && !sportPick.value)return;
+      sportFocusIndex.value=0;
+      sportFocusOpen.value=true;
+    }
+    function closeSportFocus(){sportFocusOpen.value=false;}
+
     const sportWalkSteps=ref('');
     const sportFeedback=reactive({effort:'ok',discomfort:false,liked:true});
     const sportExerciseForm = reactive({name:'',category:'cardio',description:'',level:'doux',reps:'30 secondes',seconds:60});
@@ -4609,7 +4679,7 @@ const app = createApp({
       data.sportSessions.push({id:uid(),date:today.value,createdAt:new Date().toISOString(),kind,
         name:['mini','long','short'].includes(kind)?exercises.map(x=>x.name).join(', '):sportPick.value.name,
         exerciseIds:exercises.map(x=>x.id),steps:kind==='walk' && sportWalkSteps.value!==''?Number(sportWalkSteps.value):null,feedback:clone(sportFeedback),minutes:kind==='game'?Math.max(1,Number(sportPick.value.minutes)||15):kind==='walk'?Math.max(1,Number(sportPick.value.minutes)||20):['mini','long','short'].includes(plannedKind)?(kind==='long'?Math.max(1,Number(sportActualMinutes.value)||sportDraftDoneSeconds.value/60):Math.max(0.25,Math.round(sportDraftDoneSeconds.value/15)/4)):Math.max(1,Number(sportPick.value?.minutes)||1),points});
-      sportDraft.value=[];sportPick.value=null;Object.assign(sportFeedback,{effort:'ok',discomfort:false,liked:true});notify('Activité enregistrée : +'+points+' points');
+      sportDraft.value=[];sportPick.value=null;sportFocusOpen.value=false;sportFocusIndex.value=0;Object.assign(sportFeedback,{effort:'ok',discomfort:false,liked:true});notify('Activité enregistrée : +'+points+' points');
     }
     function deleteSportSession(x){if(confirm('Supprimer cette activité et ses points ?'))data.sportSessions=data.sportSessions.filter(y=>y.id!==x.id);}
     function addSportExercise(){const name=sportExerciseForm.name.trim();if(!name)return;data.sportExercises.push({...clone(sportExerciseForm),id:uid(),name,active:true});sportExerciseForm.name='';}
@@ -4879,7 +4949,7 @@ const app = createApp({
       mobileTaskScope,mobileTaskQuery,mobileTaskProject,mobileTaskCategory,mobileTaskSort,mobileLastDone,mobileTasks,mobilePostponeTask,mobileCalendarDays,
       routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,groceryExcludedIds,groceryShoppingExists,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,leftoverPlanDate,leftoverPlanKind,planLeftoverSelected,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
       wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
-      sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
+      sportFocusOpen,sportFocusIndex,startSportFocus,closeSportFocus,sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,pantryExpiring,pantryOverdue,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,calendarLayers,calendarTasksOn,calendarMilestonesOn,openCalendarTask,openCalendarMilestone,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,dashboardDragged,dropDashboardWidget,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestionMode,suggestionLeftovers,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,

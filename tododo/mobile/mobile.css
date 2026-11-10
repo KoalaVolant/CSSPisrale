@@ -199,3 +199,69 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 #app .view-shopping .shopping-add-form .shopping-ingredient-picker{display:none!important}
 #app .calendar-view .calendar-category{display:none!important}
 #app .view-habits .habit-entry[data-habit-type=bad] + .habit-entry{margin-top:0!important}
+
+/* V5 - filtres du calendrier et mode seance */
+#app .tqm-calendar-filters{background:#f7faf8;border:1px solid #d8e6df;border-radius:17px;padding:12px;margin:10px 0 14px}
+#app .tqm-calendar-filters-title{display:block;color:#405d51;font-size:12px;font-weight:700;margin-bottom:9px}
+#app .tqm-calendar-filter-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#app .tqm-calendar-filter-row label{display:flex;align-items:center;gap:7px;min-height:43px;padding:9px;border:1px solid #dbe7df;border-radius:12px;background:white;color:#2d4e42;font-size:13px;line-height:1.3;cursor:pointer}
+#app .tqm-calendar-filter-row input{accent-color:#3d8069;width:18px;height:18px;flex:0 0 18px}
+#app .tqm-focus-start{display:block;width:100%;padding:13px 15px!important;background:#2e755d!important;color:white!important;border:none!important;border-radius:13px!important;font-weight:750!important;margin:10px 0}
+#app .tqm-focus-overlay{position:fixed!important;inset:0!important;z-index:5000!important;overflow-y:auto;overscroll-behavior:contain;background:#eef5f0;color:#244538;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);display:block!important}
+#app .tqm-focus-shell{max-width:550px;min-height:100%;margin:auto;padding:18px 16px 35px;display:flex;flex-direction:column;gap:15px}
+#app .tqm-focus-header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#app .tqm-focus-header small{font-size:10px;letter-spacing:.14em;color:#608b74;font-weight:750}
+#app .tqm-focus-header h2{font-size:22px;margin:3px 0;text-transform:none;color:#24513e}
+#app .tqm-focus-exit{border:1px solid #bdd4c7;background:white;border-radius:11px;min-height:42px;padding:9px 12px;flex-shrink:0}
+#app .tqm-focus-progress{display:flex;justify-content:space-between;color:#587368;font-size:12px;font-weight:650}
+#app .tqm-focus-track{height:9px;border-radius:40px;background:#d8e6dd;overflow:hidden}
+#app .tqm-focus-track>div{height:100%;background:#44916e;transition:width .2s}
+#app .tqm-focus-exercise{background:white;border:1px solid #dbe9e0;border-radius:22px;padding:25px 19px;text-align:center;box-shadow:0 8px 26px #214b3620}
+#app .tqm-focus-counter{font-size:12px;color:#739481;font-weight:700}
+#app .tqm-focus-exercise h3{font-size:clamp(22px,6vw,32px);color:#24513e;margin:18px 0 8px;line-height:1.25}
+#app .tqm-focus-reps{font-size:19px;font-weight:700;margin:10px 0}
+#app .tqm-focus-duration{font-size:13px;color:#4e715b}
+#app .tqm-focus-description{font-size:16px;line-height:1.6;margin:20px auto;max-width:40ch}
+#app .tqm-focus-hint{font-size:13px;color:#5b7f69}
+#app .tqm-focus-done{display:flex;align-items:center;justify-content:center;gap:12px;background:#e6f3ea;padding:16px;border-radius:14px;color:#246044;font-size:16px;font-weight:750;cursor:pointer}
+#app .tqm-focus-done input{width:23px;height:23px;accent-color:#318563}
+#app .tqm-focus-navigation{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#app .tqm-focus-navigation button{border-radius:13px;background:white;border:1px solid #bbd3c5;min-height:51px;font-weight:700}
+#app .tqm-focus-navigation button:disabled{opacity:.35}
+#app .tqm-focus-reroll{min-height:45px;border:1px solid #bad5c5;border-radius:12px;background:transparent;color:#376c54}
+#app .tqm-focus-end{display:grid;gap:13px;border-top:1px solid #d3e0d7;padding-top:16px}
+#app .tqm-focus-field{display:grid;gap:7px;font-size:14px;font-weight:650}
+#app .tqm-focus-field input{width:100%;padding:12px;border:1px solid #bdd4c7;border-radius:11px}
+#app .tqm-focus-feeling{display:grid;gap:10px;background:white;padding:16px;border-radius:17px}
+#app .tqm-focus-feeling label{display:flex;align-items:center;gap:9px;font-size:14px}
+#app .tqm-focus-feeling select{min-width:0;flex:1;padding:9px;border:1px solid #cadfd1;border-radius:9px}
+#app .tqm-focus-save{min-height:54px;background:#286f55;border:0;border-radius:13px;color:white;font-size:16px;font-weight:750}
+#app .tqm-focus-end>small{text-align:center;font-size:12px;color:#567363}
+@media(max-width:360px){#app .tqm-calendar-filter-row{grid-template-columns:1fr}}
+
+/* V72 Mobile : sixieme onglet Notes, liste tactile simplifiee. */
+.tqm-bottom-nav{grid-template-columns:repeat(6,minmax(0,1fr));gap:0}
+.tqm-bottom-nav button{padding:5px 1px!important;min-width:0}
+.tqm-bottom-nav button small{font-size:9px!important;letter-spacing:-.15px}
+@media(max-width:385px){.tqm-bottom-nav button span{font-size:18px!important}.tqm-bottom-nav button small{font-size:8px!important}}
+#app .tqm-notes-view{display:grid;gap:13px}
+#app .tqm-notes-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#app .tqm-notes-title h2{font-size:21px;margin:0;color:var(--tqm-forest)}
+#app .tqm-notes-title small{color:#667b70}
+#app .tqm-notes-compose{padding:14px;background:#fff;border:1px solid var(--tqm-border);border-radius:17px;display:grid;gap:9px}
+#app .tqm-notes-compose textarea{width:100%;font-size:16px;min-height:85px;resize:vertical}
+#app .tqm-notes-compose-actions{display:grid;grid-template-columns:1fr auto;gap:8px}
+#app .tqm-notes-compose-actions button{background:#285a49;color:#fff;border:0;border-radius:11px;padding:9px 14px;font-weight:700}
+#app .tqm-notes-compose-actions button:disabled{opacity:.45}
+#app .tqm-notes-filter{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:#627c6d}
+#app .tqm-notes-filter select{width:min(70%,240px)}
+#app .tqm-notes-list{display:grid;gap:10px}
+#app .tqm-note-card{padding:14px;background:#fff;border:1px solid var(--tqm-border);border-radius:15px;display:grid;gap:8px;min-width:0}
+#app .tqm-note-card h3{margin:0;font-size:16px;color:#254e3e}
+#app .tqm-note-card p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.5}
+#app .tqm-note-card small{color:#698274}
+#app .tqm-note-card textarea{width:100%;min-height:110px}
+#app .tqm-note-actions{display:flex;gap:8px}
+#app .tqm-note-actions button{flex:1;border:1px solid #d2e5d8;background:#f3f9f5;color:#285a49;border-radius:10px;min-height:42px}
+#app .tqm-note-actions .tqm-note-delete{color:#a34b4b;background:#fff7f7;border-color:#f2dada}
+#app .tqm-notes-empty{text-align:center;color:#6c8676;padding:24px}

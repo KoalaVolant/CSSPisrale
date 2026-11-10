@@ -20,7 +20,7 @@ function ensureSportV67(exercises) {
 }
 
 const STORAGE_KEY = 'todo-quest-v65-test-isolated';
-const UI_KEY = window.TODO_QUEST_MOBILE ? 'todo-quest-ui-mobile-v1' : 'todo-quest-ui-v63-test';   // préférences d'affichage (propres à chaque appareil)
+const UI_KEY = 'todo-quest-ui-v63-test';   // préférences d'affichage (propres à chaque appareil)
 
 const STATUSES = [
   { value: 'todo',   label: 'Pas commencé' },
@@ -1473,7 +1473,7 @@ function loadData() {
 }
 
 function loadUi() {
-  const defaults = { filtersOpen: false, tab: window.TODO_QUEST_MOBILE ? 'shopping' : 'home', projectSort: 'manual', collapsedProjects: [] };
+  const defaults = { filtersOpen: false, tab: 'home', projectSort: 'manual', collapsedProjects: [] };
   try {
     const ui = Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
     if (!TABS.some(t => t.id === ui.tab)) ui.tab = 'home';   // onglet inconnu -> accueil
@@ -3599,22 +3599,64 @@ const app = createApp({
       syncing:   'Synchronisation…',
       synced:    'Synchronisé',
       error:     'Erreur de synchro',
+      conflict:  'Conflit : exporte tes données, puis recharge la page',
     }[syncState.value]));
 
     const clientId = uid();           // identifie cet onglet / appareil
     let auth = null, db = null, docRef = null;
     let unsubscribe = null, saveTimer = null, lastSyncedJson = '', firstSnapshot = true;
     let cloudInitialized = false; // aucune écriture avant lecture du premier état serveur
+    let baseSnapshot = null; // dernier document distant connu
+    let writingCloud = false;
+    let hasConflict = false;
 
-    function pushToCloud() {
-      if (!docRef || !cloudInitialized) return Promise.resolve();
+    async function pushToCloud() {
+      if (!docRef || !cloudInitialized || hasConflict || writingCloud) return;
+      writingCloud = true;
       syncState.value = 'syncing';
-      const payload = JSON.parse(JSON.stringify(data));
-      payload._by = clientId;
-      payload._savedAt = firebase.firestore.FieldValue.serverTimestamp();
-      return docRef.set(payload)
-        .then(() => { syncState.value = 'synced'; })
-        .catch(err => { console.error('Firestore :', err); syncState.value = 'error'; });
+      const localCopy = JSON.parse(JSON.stringify(data));
+      const localJson = JSON.stringify(localCopy);
+      const clean = obj => Object.fromEntries(Object.entries(obj || {}).filter(([key]) => key !== '_by' && key !== '_savedAt'));
+      const originalBase = clean(baseSnapshot);
+      try {
+        const merged = await db.runTransaction(async tx => {
+          const doc = await tx.get(docRef);
+          const latest = clean(doc.exists ? doc.data() : {});
+          const result = window.TodoQuestMerge.threeWay(originalBase, localCopy, latest);
+          if (result.conflicts.length) {
+            const err = new Error('Conflit sur : ' + result.conflicts.slice(0, 8).join(', '));
+            err.isSyncConflict = true;
+            throw err;
+          }
+          const payload = { ...result.result, _by: clientId,
+            _savedAt: firebase.firestore.FieldValue.serverTimestamp() };
+          tx.set(docRef, payload);
+          return result.result;
+        });
+        baseSnapshot = JSON.parse(JSON.stringify(merged));
+        if (JSON.stringify(data) === localJson) {
+          applyRemote(merged);
+          syncState.value = 'synced';
+        } else {
+          // Une saisie a continue pendant la transaction: ne pas la perdre.
+          lastSyncedJson = JSON.stringify(merged);
+          syncState.value = 'syncing';
+        }
+      } catch (err) {
+        console.error('Firestore V72 :', err);
+        if (err.isSyncConflict) {
+          hasConflict = true;
+          syncState.value = 'conflict';
+          notify('Conflit entre appareils : aucune donnee distante ecrasee. Exporte un JSON avant de recharger.');
+        } else syncState.value = 'error';
+      } finally {
+        writingCloud = false;
+        if (!hasConflict && docRef && cloudInitialized &&
+            JSON.stringify(data) !== lastSyncedJson) {
+          clearTimeout(saveTimer);
+          saveTimer = setTimeout(() => { saveTimer = null; pushToCloud(); }, 1000);
+        }
+      }
     }
 
     function flushNow() {
@@ -3624,13 +3666,15 @@ const app = createApp({
 
     function applyRemote(remote) {
       applyData(remote);
-      lastSyncedJson = JSON.stringify(data);   // évite de renvoyer ce qu'on vient de recevoir
+      lastSyncedJson = JSON.stringify(data);
     }
 
     function startSync(u) {
       docRef = db.collection('users').doc(u.uid);
       firstSnapshot = true;
       cloudInitialized = false;
+      hasConflict = false;
+      baseSnapshot = null;
       syncState.value = 'syncing';
 
       unsubscribe = docRef.onSnapshot(snap => {
@@ -3648,6 +3692,7 @@ const app = createApp({
               return;
             }
             lastSyncedJson = JSON.stringify(data);
+            baseSnapshot = {};
             cloudInitialized = true;
             pushToCloud();
             return;
@@ -3655,6 +3700,7 @@ const app = createApp({
           // Toujours charger le document distant existant : aucun écrasement du cloud par
           // des données de test importées ou conservées localement, sans action explicite.
           applyRemote(remote);
+          baseSnapshot = JSON.parse(JSON.stringify(remote));
           cloudInitialized = true;
           // Sauvegarde une seule fois le catalogue ajouté au cloud, sans toucher aux autres valeurs.
           const remoteIds = new Set((Array.isArray(remote.sportExercises) ? remote.sportExercises : []).filter(x=>x && x.id).map(x=>x.id));
@@ -3670,9 +3716,17 @@ const app = createApp({
         }
 
         // Mises à jour venant d'un autre appareil
-        if (cloudInitialized && remote && remote._by !== clientId && !saveTimer) {
-          applyRemote(remote);
-          syncState.value = 'synced';
+        if (cloudInitialized && remote && remote._by !== clientId && !hasConflict) {
+          // Si une saisie locale attend, ne pas remplacer cette saisie par le cloud.
+          if (saveTimer || writingCloud || JSON.stringify(data) !== lastSyncedJson) {
+            if (!writingCloud && !saveTimer) {
+              saveTimer = setTimeout(() => { saveTimer = null; pushToCloud(); }, 1000);
+            }
+          } else {
+            applyRemote(remote);
+            baseSnapshot = JSON.parse(JSON.stringify(remote));
+            syncState.value = 'synced';
+          }
         }
       }, err => { console.error('Firestore :', err); syncState.value = 'error'; });
     }
@@ -3685,6 +3739,8 @@ const app = createApp({
       auth.onAuthStateChanged(u => {
         if (unsubscribe) { unsubscribe(); unsubscribe = null; }
         cloudInitialized = false;
+        hasConflict = false;
+        baseSnapshot = null;
         if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
         docRef = null;
         user.value = u ? { name: u.displayName, email: u.email } : null;
@@ -3693,7 +3749,7 @@ const app = createApp({
 
       // Envoi vers le cloud dès que les données changent (avec un petit délai)
       watch(data, () => {
-        if (!docRef || !cloudInitialized) return;
+        if (!docRef || !cloudInitialized || hasConflict) return;
         const json = JSON.stringify(data);
         if (json === lastSyncedJson) return;
         lastSyncedJson = json;
