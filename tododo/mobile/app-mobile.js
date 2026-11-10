@@ -4129,6 +4129,40 @@ const app = createApp({
     const missingFieldLabels={duration:'Durée',effort:'Effort',category:'Catégorie',project:'Projet'};
     const incompleteTasks=computed(()=>data.tasks.filter(t=>t.status!=='done' && taskMissingFields(t).length && (incompleteFilter.value==='all'||taskMissingFields(t).includes(incompleteFilter.value))).sort((a,b)=>taskMissingFields(b).length-taskMissingFields(a).length||String(a.title).localeCompare(String(b.title))));
     const incompleteCount=computed(()=>data.tasks.filter(t=>t.status!=='done'&&taskMissingFields(t).length).length);
+    // V76.2 : brouillon indépendant de Firebase pour chaque tâche à compléter.
+    // Aucune modification de data.tasks avant le clic sur Enregistrer.
+    const incompleteDrafts=reactive({});
+    function incompleteDraftValue(task,field){
+      const d=incompleteDrafts[task.id];
+      return d ? d[field] : (task[field] ?? '');
+    }
+    function setIncompleteDraft(task,field,value){
+      if(!incompleteDrafts[task.id])incompleteDrafts[task.id]={
+        estimatedMinutes:task.estimatedMinutes ?? '',
+        estimatedEffort:task.estimatedEffort || '',
+        category:task.category || '',
+        projectId:task.projectId || ''
+      };
+      incompleteDrafts[task.id][field]=value;
+    }
+    function cancelIncompleteDraft(task){delete incompleteDrafts[task.id];}
+    function saveIncompleteDraft(task){
+      const d=incompleteDrafts[task.id];
+      if(!d)return;
+      const raw=String(d.estimatedMinutes ?? '').trim().replace(',','.');
+      const minutes=raw===''?null:Number(raw);
+      if(raw!==''&&(!Number.isFinite(minutes)||minutes<=0||minutes>100000||Math.abs(minutes*100-Math.round(minutes*100))>1e-7)){
+        notify('Durée invalide : nombre positif, deux décimales maximum.');return;
+      }
+      // Une seule phase de mise à jour réactive après validation des quatre champs.
+      task.estimatedMinutes=minutes;
+      task.estimatedEffort=['light','medium','high'].includes(d.estimatedEffort)?d.estimatedEffort:'';
+      task.category=String(d.category||'');
+      if(task.scope!=='work')task.projectId=String(d.projectId||'');
+      delete incompleteDrafts[task.id];
+      notify('Informations enregistrées : '+task.title);
+    }
+
     const dashboardTasksMode=ref('simple');
     try{dashboardTasksMode.value=localStorage.getItem('tq-pc-dashboard-task-mode-v76')==='detailed'?'detailed':'simple';}catch(e){}
     watch(dashboardTasksMode,(v)=>{try{localStorage.setItem('tq-pc-dashboard-task-mode-v76',v);}catch(e){}});
@@ -5061,7 +5095,7 @@ const app = createApp({
       filters, resetFilters, activeFilterCount, taskDue, todayTasks, upcomingTasks, undatedTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
       // tâches
       quickForm, openQuickForm, toggleQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
-      taskForm, openTaskForm, toggleTaskForm, saveTask, duplicateTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName, incompleteFilter,incompleteOpen,taskMissingFields,missingFieldLabels,incompleteTasks,incompleteCount,dashboardTasksMode,
+      taskForm, openTaskForm, toggleTaskForm, saveTask, duplicateTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName, incompleteFilter,incompleteOpen,taskMissingFields,missingFieldLabels,incompleteTasks,incompleteCount,incompleteDrafts,incompleteDraftValue,setIncompleteDraft,cancelIncompleteDraft,saveIncompleteDraft,dashboardTasksMode,
       selection, toggleSelect, selectMany, deselectMany, editSelected, deleteSelected, bulkForm, saveBulk,
       todayPoints, upcomingPoints,
       // projets

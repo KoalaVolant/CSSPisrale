@@ -351,3 +351,11 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 .v761-explain{display:block;font-size:12px;opacity:.76;line-height:1.4;margin:5px 0;}
 @media(max-width:1000px){#dashboard-tasks .v761-task{grid-template-columns:minmax(0,1fr)}#dashboard-tasks .v761-task-actions{justify-content:flex-start;}}
 @media(max-width:650px){#dashboard-tasks .v761-task-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;}#dashboard-tasks .v761-task-field{min-width:0;max-width:none;}#dashboard-tasks .v761-task-actions button{flex:1 1 auto!important;}}
+
+/* V76.2 - brouillon et boutons d'enregistrement séparés, sans saut de carte pendant la saisie */
+.v762-draft-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.v762-draft-actions button{min-height:38px;padding:8px 12px}
+.v762-draft-actions .v762-save:not(:disabled){background:#277c69;color:white;border-color:#277c69}
+.v762-draft-actions .v762-save:disabled{opacity:.55}
+.v76-incomplete-card{scroll-margin-top:100px}
+.v76-editgrid input,.v76-editgrid select{min-width:0;width:100%;box-sizing:border-box}

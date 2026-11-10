@@ -1,0 +1,17 @@
+TODO QUEST PC V76.2 / MOBILE V9.2 - CORRECTIF TEST
+
+Corrections :
+- Tâches incomplètes : brouillon par tâche, enregistrement explicite des 4 champs.
+- Aucune réorganisation de la liste pendant la saisie : la carte quitte la liste seulement après Enregistrer, si plus aucun champ manque.
+- Bouton Annuler pour abandonner le brouillon.
+- Plus d'appel Vue à chooserTaskCategoryColor / chooserTaskProjectColor depuis les cartes simples. Accès direct aux couleurs des catégories/projets.
+- Nouveau paramètre de version pour les CSS/JS PC et mobile et nouveau cache service worker mobile.
+
+À installer :
+- PC : remplacer les fichiers à la racine du site /tododo/.
+- Mobile : remplacer uniquement les fichiers du sous-dossier /tododo/mobile/.
+- Contrôler les badges PC v76.2 test / Mobile v9.2 test.
+- Après commit, Ctrl+F5 sur PC. Sur mobile, fermer puis rouvrir la PWA, ou recharger dans le navigateur.
+
+Important : n'utiliser qu'en environnement de test tant que la recette des écritures concurrentes Firebase V72 n'est pas validée.
+La base Firebase, les fonctions de synchronisation et le format de stockage ne sont pas modifiés.
