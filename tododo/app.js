@@ -4171,7 +4171,7 @@ const app = createApp({
     function openMoodDay(date){if(!date)return;const entry=moodEntriesForDate(date)[0];if(entry){editMoodEntry(entry);}else{Object.assign(moodForm,{id:'',date,moodIds:[],note:'',score:0});for(const key of Object.keys(moodQuestionsAnswers))delete moodQuestionsAnswers[key];}document.querySelector('.mood-view form')?.scrollIntoView({behavior:'smooth',block:'center'});}
     // V60 : détail du jour, sans attribuer d'heure fictive aux tâches.
     const dayView=ref('day');
-    const dayOverview=computed(()=>({tasks:data.tasks.filter(t=>t.status!=='done'&&t.scope!=='work'&&taskIsToday(t)),habits:dayHabits.value,appointments:appointmentToday.value,alerts:notificationItems.value}));
+    const dayOverview=computed(()=>({tasks:(Array.isArray(data.tasks)?data.tasks:[]).filter(t=>t.status!=='done'&&t.scope!=='work'&&taskIsToday(t)),habits:dayHabits.value||[],appointments:(Array.isArray(data.appointments)?data.appointments:[]).filter(a=>a.start<=today.value&&a.end>=today.value),alerts:notificationItems.value||[]}));
     const dayMilestones=computed(()=>{
       const result=[];const now=today.value;
       for(const t of data.tasks){if(t.startDate===now)result.push({id:'task-start-'+t.id,label:'▶ Tâche commence aujourd’hui',title:t.title,kind:'task',item:t});if(t.due===now)result.push({id:'task-due-'+t.id,label:t.status==='done'?'✓ Tâche terminée aujourd’hui':'⚑ Tâche à terminer aujourd’hui',title:t.title,kind:'task',item:t});}

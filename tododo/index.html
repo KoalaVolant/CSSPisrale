@@ -4,45 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Todo Quest</title>
-  <link rel="stylesheet" href="style.css?v=20261110-v66">
-  <link rel="stylesheet" href="stylekoala.css?v=20261110-v66">
-  <link rel="stylesheet" href="styletest.css?v=20261110-v66">
+  <link rel="stylesheet" href="style.css?v=20261110-v69-fix">
+  <link rel="stylesheet" href="stylekoala.css?v=20261110-v69-fix">
+  <link rel="stylesheet" href="styletest.css?v=20261110-v69-fix">
 </head>
 <body>
 
 <div id="app" v-cloak>
 
-  <!-- ============ BARRE DU HAUT : titre + synchro | points ============ -->
-  <header class="app-header">
-
-    <div class="app-brand">
-      <h1 class="app-title">Todo Quest</h1>
-
-      <div class="sync-box">
-        <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
-        <template v-if="firebaseReady">
-          <button type="button" class="sync-signin" v-if="!user" @click="signIn">Se connecter avec Google</button>
-          <template v-else>
-            <span class="sync-user">{{ user.email }}</span>
-            <button type="button" class="sync-signout" @click="signOut">Se déconnecter</button>
+  <!-- V69 : en-tete restructure, syncho et recompenses preservees -->
+  <header class="app-header tq69-header">
+    <div class="tq69-topline">
+      <div class="app-brand tq69-brand">
+        <h1 class="app-title">Todo Quest</h1>
+        <div class="sync-box tq69-sync">
+          <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
+          <template v-if="firebaseReady">
+            <button type="button" class="sync-signin" v-if="!user" @click="signIn">Se connecter avec Google</button>
+            <template v-else>
+              <span class="sync-user">{{ user.email }}</span>
+              <button type="button" class="sync-signout" @click="signOut">Se déconnecter</button>
+            </template>
           </template>
-        </template>
+        </div>
+      </div>
+      <div class="tq69-tools">
+        <div class="v59-search"><input type="search" v-model="globalQuery" placeholder="Rechercher partout…" aria-label="Recherche universelle"><div class="v59-search-results" v-if="globalQuery.trim().length>=2"><button v-for="item in globalResults" :key="item.type+'-'+item.id" type="button" @click="openGlobalResult(item)">{{item.type}} · {{item.title}}</button><small v-if="!globalResults.length">Aucun résultat</small></div></div>
+        <div class="points-box"><div class="tq69-points-number"><span class="points-badge" title="Solde de points">{{ balance }}</span><span class="points-label"> pts</span></div><div v-if="currentAlter" class="alter-day-badge" :style="{'border-color':currentAlter.color,'color':currentAlter.color}">C’est la journée de {{currentAlter.name}}</div></div>
       </div>
     </div>
-
-    <div class="v59-search"><input type="search" v-model="globalQuery" placeholder="Rechercher partout…" aria-label="Recherche universelle"><div class="v59-search-results" v-if="globalQuery.trim().length>=2"><button v-for="item in globalResults" :key="item.type+'-'+item.id" type="button" @click="openGlobalResult(item)">{{item.type}} · {{item.title}}</button><small v-if="!globalResults.length">Aucun résultat</small></div></div>
-    <div class="points-box">
-      <div class="points-badge" title="Solde de points">{{ balance }}</div>
-      <span class="points-label">pts</span><div v-if="currentAlter" class="alter-day-badge" :style="{'border-color':currentAlter.color,'color':currentAlter.color}">C’est la journée de {{currentAlter.name}}</div>
+    <div class="tq69-rewardsline">
+      <div class="tq69-surprise">
+        <strong class="tq69-section-title">🎲 Récompense surprise</strong>
+        <label class="v67-random-option">Catégorie <select v-model="randomRewardCategory"><option value="">Toutes</option><option v-for="c in data.rewardCategories" :key="c.name" :value="c.name">{{c.name}}</option></select></label>
+        <label class="v67-random-option"><input type="checkbox" v-model="randomRewardExcludeFavorite"> Exclure la favorite</label>
+        <button type="button" class="random-reward-save" @click="depositRandomReward" :disabled="balance<=0 || !data.rewards.some(randomRewardEligible)">Épargner au hasard</button>
+      </div>
+      <div class="favorite-reward tq69-favorite" v-if="favoriteReward">
+        <strong>★ Récompense favorite : {{ favoriteReward.name }}</strong>
+        <span>{{ formatPoints(favoriteReward.saved) }} / {{ formatPoints(favoriteReward.cost) }} pts réservés · {{ formatPoints(rewardRemaining(favoriteReward)) }} pts restants</span>
+        <div class="tq-reward-progress"><progress :value="Number(favoriteReward.saved)||0" :max="Math.max(1,Number(favoriteReward.cost)||1)"></progress><small>{{Math.min(100,Math.round((Number(favoriteReward.saved)||0)/Math.max(1,Number(favoriteReward.cost)||1)*100))}} %</small></div>
+        <button type="button" @click="depositReward(favoriteReward)">Épargner des points</button>
+      </div>
     </div>
-    <label class="v67-random-option">Catégorie surprise <select v-model="randomRewardCategory"><option value="">Toutes</option><option v-for="c in data.rewardCategories" :key="c.name" :value="c.name">{{c.name}}</option></select></label><label class="v67-random-option"><input type="checkbox" v-model="randomRewardExcludeFavorite"> Exclure la favorite</label><button type="button" class="random-reward-save" @click="depositRandomReward" :disabled="balance<=0 || !data.rewards.some(randomRewardEligible)">🎲 Épargner sur une récompense aléatoire</button>
-    <div class="favorite-reward" v-if="favoriteReward">
-            <strong>★ Récompense favorite : {{ favoriteReward.name }}</strong>
-            <span>{{ formatPoints(favoriteReward.saved) }} / {{ formatPoints(favoriteReward.cost) }} pts réservés · {{ formatPoints(rewardRemaining(favoriteReward)) }} pts restant à épargner</span>
-            <div class="tq-reward-progress"><progress :value="Number(favoriteReward.saved)||0" :max="Math.max(1,Number(favoriteReward.cost)||1)"></progress><small>{{Math.min(100,Math.round((Number(favoriteReward.saved)||0)/Math.max(1,Number(favoriteReward.cost)||1)*100))}} %</small></div>
-            <button type="button" @click="depositReward(favoriteReward)">Épargner des points</button>
-          </div>
-
   </header>
 
   <button type="button" class="back-to-top" aria-label="Revenir en haut" title="Revenir en haut" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Haut</button>
@@ -54,7 +58,7 @@
   </div>
   <button type="button" class="nav-backdrop" aria-label="Fermer le menu" tabindex="-1"></button>
 
-  <div class="v59-test-warning" role="status"><strong>VERSION V67 TEST + SYNCHRO</strong> · Firebase réactivé : une fois connecté avec Google, les changements peuvent modifier tes données en ligne sur tous tes appareils. Exporte un JSON de sauvegarde avant tout test. Le cloud existant est chargé en priorité à la connexion.</div>
+  <div class="v59-test-warning" role="status"><strong>VERSION V69 TEST + SYNCHRO</strong> · Firebase réactivé : une fois connecté avec Google, les changements peuvent modifier tes données en ligne sur tous tes appareils. Exporte un JSON de sauvegarde avant tout test. Le cloud existant est chargé en priorité à la connexion.</div>
   <div class="layout">
 
     <!-- ============ MENU DE GAUCHE ============ -->
@@ -429,11 +433,11 @@
           <div v-for="x in dayMilestones" :key="x.id" class="v61-day-alert"><strong>{{x.label}}</strong><span>{{x.title}}</span><button @click="openMilestoneItem(x)">Voir</button></div>
           <details class="v61-upcoming"><summary>Échéances à venir</summary><label>Horizon <select v-model.number="nextDeadlineDays"><option :value="3">3 jours</option><option :value="7">7 jours</option><option :value="14">14 jours</option><option :value="30">30 jours</option></select></label><div v-for="x in upcomingMilestones" :key="x.id" class="v61-day-alert"><strong>{{formatDate(x.date)}}</strong><span>{{x.title}}</span><button @click="openMilestoneItem(x)">Ouvrir</button></div><p v-if="!upcomingMilestones.length">Aucune échéance enregistrée.</p></details>
         </details>
-        <details open class="v62-day-section"><summary>📅 Rendez-vous ({{dayOverview.appointments.length}})</summary><p v-if="!dayOverview.appointments.length">Aucun rendez-vous</p><div class="v60-item" v-for="a in dayOverview.appointments" :key="a.id"><strong>{{a.title}}</strong> · {{a.start}} <button @click="openAppointment(a)">Ouvrir</button></div></details>
-        <details open class="v62-day-section"><summary>📋 Tâches et travail ({{dayOverview.tasks.length}})</summary>
-          <div class="v60-item" v-for="t in dayOverview.tasks" :key="t.id"><strong>{{t.title}}</strong><div class="v62-chips"><span>{{t.scope==='work'?'Travail':'Personnel'}}</span><span>Projet : {{data.projects.find(p=>p.id===t.projectId)?.name||'Aucun'}}</span><span>Catégorie : {{data.categories.find(c=>c.name===t.category)?.name||t.category||'Sans catégorie'}}</span><span>{{t.status||'À faire'}}</span></div><small>Début : {{t.startDate||'Non fixée'}} · Échéance : {{t.due||'Non fixée'}} · Urgence : {{t.urgency||'Aucune'}} · Difficulté : {{data.difficulties.find(d=>d.id===t.difficulty)?.name||'Non définie'}} · Sous-tâches : {{(t.subtasks||[]).filter(s=>s.done).length}}/{{(t.subtasks||[]).length}}</small><button @click="openDayItem(t)">Ouvrir la fiche</button></div><p v-if="!dayOverview.tasks.length">Aucune tâche prévue.</p>
+        <details open class="v62-day-section"><summary>📅 Rendez-vous ({{(dayOverview?.appointments?.length || 0)}})</summary><p v-if="!(dayOverview?.appointments?.length || 0)">Aucun rendez-vous</p><div class="v60-item" v-for="a in (dayOverview?.appointments || [])" :key="a.id"><strong>{{a.title}}</strong> · {{a.start}} <button @click="openAppointment(a)">Ouvrir</button></div></details>
+        <details open class="v62-day-section"><summary>📋 Tâches et travail ({{(dayOverview?.tasks?.length || 0)}})</summary>
+          <div class="v60-item" v-for="t in (dayOverview?.tasks || [])" :key="t.id"><strong>{{t.title}}</strong><div class="v62-chips"><span>{{t.scope==='work'?'Travail':'Personnel'}}</span><span>Projet : {{data.projects.find(p=>p.id===t.projectId)?.name||'Aucun'}}</span><span>Catégorie : {{data.categories.find(c=>c.name===t.category)?.name||t.category||'Sans catégorie'}}</span><span>{{t.status||'À faire'}}</span></div><small>Début : {{t.startDate||'Non fixée'}} · Échéance : {{t.due||'Non fixée'}} · Urgence : {{t.urgency||'Aucune'}} · Difficulté : {{data.difficulties.find(d=>d.id===t.difficulty)?.name||'Non définie'}} · Sous-tâches : {{(t.subtasks||[]).filter(s=>s.done).length}}/{{(t.subtasks||[]).length}}</small><button @click="openDayItem(t)">Ouvrir la fiche</button></div><p v-if="!(dayOverview?.tasks?.length || 0)">Aucune tâche prévue.</p>
         </details>
-        <details open class="v62-day-section"><summary>🌱 Habitudes ({{dayOverview.habits.length}})</summary><div class="v60-item" v-for="h in dayOverview.habits" :key="h.id"><strong>{{h.title}}</strong><button @click="openHabitForm(h)">Modifier</button><button @click="toggleHabitPause(h)">{{h.pausedUntil&&h.pausedUntil>=today?'Reprendre':'Pause'}}</button></div></details>
+        <details open class="v62-day-section"><summary>🌱 Habitudes ({{(dayOverview?.habits?.length || 0)}})</summary><div class="v60-item" v-for="h in (dayOverview?.habits || [])" :key="h.id"><strong>{{h.title}}</strong><button @click="openHabitForm(h)">Modifier</button><button @click="toggleHabitPause(h)">{{h.pausedUntil&&h.pausedUntil>=today?'Reprendre':'Pause'}}</button></div></details>
         <details open class="v62-day-section"><summary>🍽️ Repas du jour</summary><div class="v60-item"><strong>Déjeuner : {{dishName(todayMeals.lunch.dishId)||todayMeals.lunch.name||'Non prévu'}}</strong></div><div class="v60-item"><strong>Dîner : {{dishName(todayMeals.dinner.dishId)||todayMeals.dinner.name||'Non prévu'}}</strong></div><button @click="setTab('menu')">Modifier les repas</button></details>
       </section>
       <div v-show="dayView==='calendar'">
@@ -1697,8 +1701,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="sport-catalog-v67.js?v=20261110-v67"></script>
-<script src="app.js?v=20261110-v67"></script>
+<script src="sport-catalog-v67.js?v=20261110-v69-fix"></script>
+<script src="app.js?v=20261110-v69-fix"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

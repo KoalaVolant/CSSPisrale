@@ -1,11 +1,9 @@
-Todo Quest V68 - Evolution ciblee depuis V67
+Todo Quest V69 TEST + SYNCHRO
 
-Inclus :
-- Habitudes : historique editable des validations, controle retroactif et taux individuel sur 28 jours.
-- Calendrier : filtres par rendez-vous, taches et jalons ; ouverture de la fiche d origine.
-- Dashboard sport : raccourcis mini / longue / jeu / balade.
-- V67 conservee : 50 exercices, filtres recompenses aleatoires, synchro Firebase.
-- Sauvegarde JSON : copie originale, aucun import automatique.
+Correction defensive du rendu Ma journee (dayOverview) et refonte de l’en-tete.
 
-Attention : tests de syntaxe seulement. Validation navigateur et Firebase non realisee.
-Les dates de debut, dependances de taches, projets termines et modules repas/humeur/alters ne sont pas modifies.
+Installer TOUS les fichiers de l’archive ensemble et forcer le rafraichissement.
+Sauvegarde JSON incluse et non modifiee.
+Ne pas importer automatiquement le JSON : la synchronisation est conservee.
+
+Tests manuels necessaires : demarrage, Calendrier > Ma journee, habitudes, synchro, recherche et recompenses.
