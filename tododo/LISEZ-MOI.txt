@@ -1,13 +1,10 @@
-TODO QUEST V70 - correctifs recette V69
+TODO QUEST V71 - Correctif catalogue sportif uniquement
 
-- Bandeau orange supprime
-- En-tete mobile compact
-- Quantites d habitude toujours visibles, lecture seule apres validation
-- Report d occurrence : differe la presence/alerte de l habitude jusqu au lendemain sans supprimer les autres retards
-- Bilan 28 jours : onglet Habitudes & routines, sous chaque habitude
-- Calendrier / jalons : projet parent visible
-- Sport : migration des 50 exercices egalement lors du chargement Firebase ou import.
+Cause : sportCatalogV67 pouvait valoir true tandis que les 50 exercices manquaient du document Firebase. V70 ignorait alors l ajout.
 
-Deployer TOUS les fichiers ensemble, y compris sport-catalog-v67.js. Ctrl+F5.
-Le JSON embarque est une copie historique : ne pas le reimporter automatiquement.
-ATTENTION: sauvegarder les donnees cloud avant tests, modifications reelles non testees avec Firebase.
+V71 : verifie l existence de chaque ID sport-v67-01 a sport-v67-50 sur les chargements locaux et cloud, complete seulement ceux qui manquent et synchronise le catalogue corrige apres la premiere lecture Firebase. Les exercices presents et leurs modifications restent inchanges.
+
+Deployer TOUS les fichiers de l archive a la place de V70, Ctrl+F5.
+Onglet Sport > Catalogue des exercices : attendu 98 si les 48 initiaux restent presents. Verifier la sauvegarde cloud avant modification, et tester apres reconnexion et actualisation.
+Le JSON fourni est une ancienne copie : ne PAS l importer sur tes donnees actuelles.
+Aucun test sur la connexion Firebase reelle n a ete effectue.

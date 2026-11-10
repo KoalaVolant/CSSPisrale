@@ -3,6 +3,22 @@ const { createApp, reactive, ref, computed, watch, nextTick, provide } = Vue;
 /* ============================================================
    Constantes & utilitaires
    ============================================================ */
+// V71 : reconciliation par identifiant, independante des anciens drapeaux de migration.
+// N'ajoute que les exercices absents et conserve les personnalisations des exercices presents.
+function ensureSportV67(exercises) {
+  if (!Array.isArray(exercises)) return 0;
+  const extras = Array.isArray(window.TODO_SPORT_V67) ? window.TODO_SPORT_V67 : [];
+  const ids = new Set(exercises.filter(x => x && x.id).map(x => x.id));
+  let added = 0;
+  for (const exercise of extras) {
+    if (!exercise || !exercise.id || ids.has(exercise.id)) continue;
+    exercises.push(clone(exercise));
+    ids.add(exercise.id);
+    added++;
+  }
+  return added;
+}
+
 const STORAGE_KEY = 'todo-quest-v65-test-isolated';
 const UI_KEY = 'todo-quest-ui-v63-test';   // préférences d'affichage (propres à chaque appareil)
 
@@ -1437,14 +1453,9 @@ function loadData() {
       }
       d.sportCatalogV56 = true;
     }
-    // V67 : ajout idempotent de 50 exercices, sans remplacer le catalogue utilisateur.
-    if (!d.sportCatalogV67) {
-      const ids = new Set(d.sportExercises.filter(x => x && x.id).map(x => x.id));
-      for (const ex of (window.TODO_SPORT_V67 || [])) {
-        if (!ids.has(ex.id)) d.sportExercises.push(clone(ex));
-      }
-      d.sportCatalogV67 = true;
-    }
+    // V71 : meme si le drapeau historique est deja true, verifier les exercices reels.
+    ensureSportV67(d.sportExercises);
+    d.sportCatalogV67 = true;
     if (!d.sportGoals || typeof d.sportGoals !== 'object') d.sportGoals=clone(defaultData().sportGoals);
     if (!d.sportPoints || typeof d.sportPoints !== 'object') d.sportPoints=clone(defaultData().sportPoints);
     if (d.sportPoints.long === undefined) d.sportPoints.long=20;
@@ -1727,15 +1738,9 @@ const app = createApp({
       const fresh=defaultData();
       for (const k of ['sportExercises','sportSessions','sportLocations','weightEntries','foodContainers'])
         data[k]=Array.isArray(src[k])?clone(src[k]):clone(fresh[k]);
-      // V70 : la migration du catalogue doit aussi s'appliquer APRES chaque import/lecture Firebase.
-      // Avant : la migration ne se faisait que sur localStorage, puis la lecture cloud la supprimait.
-      if (!src.sportCatalogV67) {
-        const known=new Set(data.sportExercises.map(e=>e && e.id).filter(Boolean));
-        for(const ex of (window.TODO_SPORT_V67 || [])) {
-          if(!known.has(ex.id)) { data.sportExercises.push(clone(ex)); known.add(ex.id); }
-        }
-      }
-      data.sportCatalogV67 = !!src.sportCatalogV67 || !!(window.TODO_SPORT_V67 && window.TODO_SPORT_V67.length);
+      // V71 : reconciliation APRES chaque import/chargement distant, independante du drapeau.
+      ensureSportV67(data.sportExercises);
+      data.sportCatalogV67 = true;
       for (const k of ['sportGoals','sportPoints','weightSettings','foodReviews','foodCategoriesHealth','foodReminderShown'])
         data[k]=src[k] && typeof src[k]==='object' && !Array.isArray(src[k])?clone(src[k]):clone(fresh[k]);
       if(data.sportPoints.long===undefined)data.sportPoints.long=20;
@@ -3652,8 +3657,8 @@ const app = createApp({
           applyRemote(remote);
           cloudInitialized = true;
           // Sauvegarde une seule fois le catalogue ajouté au cloud, sans toucher aux autres valeurs.
-          const catalogueMigration = !remote.sportCatalogV67 && (window.TODO_SPORT_V67 || []).some(ex=>
-            !Array.isArray(remote.sportExercises) || !remote.sportExercises.some(old=>old && old.id===ex.id));
+          const remoteIds = new Set((Array.isArray(remote.sportExercises) ? remote.sportExercises : []).filter(x=>x && x.id).map(x=>x.id));
+          const catalogueMigration = (window.TODO_SPORT_V67 || []).some(ex => ex && ex.id && !remoteIds.has(ex.id));
           if(catalogueMigration) {
             pushToCloud();
             notify('Catalogue sportif enrichi et synchronisé.');
