@@ -1,0 +1,38 @@
+TODO QUEST MOBILE V1 (base V71)
+=====================================
+
+CONTENU
+- index.html : Todo Quest complet (bureau), toujours fonctionnel
+- mobile/index.html : nouvelle application mobile à 4 onglets
+- mobile/manifest.webmanifest, icônes, CSS, sw.js : installation mobile
+- app.js : logique métier partagée pour les 2 interfaces
+- firebase-config.js : même projet Firebase
+
+INSTALLATION SUR LE SITE EXISTANT
+1. Faire une copie des fichiers actuels du site.
+2. Extraire TOUS les fichiers de cette archive à la RACINE du site Todo Quest.
+   La structure doit garder le dossier mobile/ à côté de index.html.
+3. Ne pas réimporter le vieux fichier JSON. Le cloud actuel garde les données.
+4. Depuis le téléphone, ouvrir : https://ADRESSE-DE-TON-SITE/mobile/
+5. Se connecter avec le même compte Google.
+6. Installer sur l'écran d'accueil : Android Chrome > menu > Installer l'application ; iPhone Safari > Partager > Sur l'écran d'accueil.
+
+ATTENTION
+- Le site doit être servi en HTTPS pour une installation PWA complète.
+- Ce prototype utilise encore le modèle Firebase V71 : document utilisateur unique,
+  donc RISQUE DE CONFLIT si bureau et téléphone changent des données simultanément.
+  Éviter les modifications simultanées et exporter les données avant essais.
+- L'accès hors connexion aux données et la fusion des conflits NE SONT PAS GARANTIS.
+- Aucun accès à ton hébergement ni aux règles Firestore : déploiement réel non fait.
+- Il s'agit d'une interface mobile sur la logique complète V71, non d'une nouvelle base.
+- Le bouton 'Version complète' ouvre Todo Quest dans le site principal.
+
+RECETTE
+[ ] Ouverture mobile, 4 onglets visibles
+[ ] Connexion Google, Synchronisé
+[ ] Tâches : projet, catégorie, dates, points, modification
+[ ] Courses : ajout, prix définitif à l'achat, fin de courses
+[ ] Sport : exercices, séances et historique
+[ ] Calendrier : rendez-vous, tâches, jalons, navigation
+[ ] Depuis le PC, vérifier la remontée d'un ajout mobile
+[ ] Depuis mobile, vérifier une modification PC faite SEULEMENT APRES synchro

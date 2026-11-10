@@ -20,7 +20,7 @@ function ensureSportV67(exercises) {
 }
 
 const STORAGE_KEY = 'todo-quest-v65-test-isolated';
-const UI_KEY = 'todo-quest-ui-v63-test';   // préférences d'affichage (propres à chaque appareil)
+const UI_KEY = window.TODO_QUEST_MOBILE ? 'todo-quest-ui-mobile-v1' : 'todo-quest-ui-v63-test';   // préférences d'affichage (propres à chaque appareil)
 
 const STATUSES = [
   { value: 'todo',   label: 'Pas commencé' },
@@ -1473,7 +1473,7 @@ function loadData() {
 }
 
 function loadUi() {
-  const defaults = { filtersOpen: false, tab: 'home', projectSort: 'manual', collapsedProjects: [] };
+  const defaults = { filtersOpen: false, tab: window.TODO_QUEST_MOBILE ? 'shopping' : 'home', projectSort: 'manual', collapsedProjects: [] };
   try {
     const ui = Object.assign(defaults, JSON.parse(localStorage.getItem(UI_KEY) || '{}'));
     if (!TABS.some(t => t.id === ui.tab)) ui.tab = 'home';   // onglet inconnu -> accueil

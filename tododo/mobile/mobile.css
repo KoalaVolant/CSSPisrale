@@ -1,0 +1,45 @@
+/* Todo Quest Mobile V1 : la logique et les donnees restent celles de la V71 */
+:root{--tqm-forest:#28564b;--tqm-sage:#e8f3ee;--tqm-border:#d3e4dc;--tqm-ink:#203e35}
+html,body{max-width:100%;overflow-x:hidden;background:#f6faf8!important;color:var(--tqm-ink);}
+body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;}
+#app{padding-bottom:calc(88px + env(safe-area-inset-bottom));min-height:100vh;}
+#app .app-header,#app .mobile-nav-bar,#app .sidebar,#app .nav-backdrop,#app .back-to-top{display:none!important}
+#app .layout{display:block!important;min-height:0!important}
+#app .app-main{display:block!important;width:100%!important;max-width:760px!important;margin:0 auto!important;padding:12px 12px 25px!important;}
+#app .page-header{margin:0 0 14px!important;padding:8px 0!important;display:flex!important;gap:12px!important}
+#app .page-title{font-size:20px!important;color:var(--tqm-forest)!important;}
+#app .page-actions{display:flex;flex-wrap:wrap;gap:7px;}
+#app button:not(.tqm-bottom-nav button):not(.tqm-auth button),#app select,#app input,#app textarea{max-width:100%;}
+#app button,#app input,#app select,#app textarea{font-size:14px;}
+#app button{min-height:38px;}
+#app input,#app select,#app textarea{border:1px solid var(--tqm-border);border-radius:9px;padding:8px;background:#fff;min-height:38px;}
+#app .view{width:100%;max-width:100%;}
+#app .view-all .task-list-box,#app .view-projects{display:block!important;}
+#app .view-all .task-list-box article,#app .view-all .task-list-box [class*="status"]{width:100%!important;max-width:100%!important;margin:7px 0!important;}
+#app .view-shopping .catalogue-form{display:flex;flex-wrap:wrap;gap:8px;align-items:end;}
+#app .view-shopping .catalogue-form>input,#app .view-shopping .catalogue-form>label,#app .view-shopping .catalogue-form>select{flex:1 1 145px;min-width:0;}
+#app .view-shopping .shopping-category{border:1px solid var(--tqm-border);border-radius:15px;background:white;margin:12px 0;padding:10px;}
+#app .view-shopping .catalogue-row{display:flex;gap:8px;flex-wrap:wrap;padding:10px 4px;border-bottom:1px solid var(--tqm-border);}
+#app .view-shopping .catalogue-row>label:first-child{flex:1 1 100%;font-size:16px;}
+#app .view-shopping .catalogue-row input[type=checkbox]{width:22px;height:22px;min-height:0;vertical-align:middle;accent-color:var(--tqm-forest)}
+#app .view-shopping .shopping-checkout{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;}
+#app .view-shopping .shopping-checkout button,#app .shopping-add-form button{background:var(--tqm-forest)!important;color:white!important;border-radius:10px;}
+#app .modal-backdrop{position:fixed!important;z-index:220!important;inset:0!important;padding:12px!important;background:rgba(16,40,33,.54)!important;}
+#app .modal{max-height:calc(100dvh - 28px)!important;max-width:100%!important;width:min(100%,550px)!important;overflow-y:auto!important;border-radius:18px!important;padding:18px!important;background:white!important;box-shadow:0 15px 60px #142b2644;}
+#app .modal input,#app .modal select,#app .modal textarea{width:100%;}
+#app .modal .form-actions{display:flex;flex-wrap:wrap;gap:8px;}
+#app .toast{z-index:300!important;bottom:calc(90px + env(safe-area-inset-bottom))!important;}
+.tqm-header{position:relative;background:linear-gradient(135deg,#28564b,#3b7867);color:white;padding:17px 17px 13px;box-shadow:0 4px 16px #193a3020}
+.tqm-brandline{display:flex;justify-content:space-between;gap:14px;align-items:center}
+.tqm-brand{font-weight:780;letter-spacing:-.55px;font-size:22px;line-height:1.2}.tqm-brand span{font-weight:450;color:#d4ece0}
+.tqm-status{color:#e1f5e8;font-size:12px;margin-top:8px;display:flex;gap:6px;align-items:center}
+.tqm-dot{height:7px;width:7px;background:#c5e6cc;border-radius:50%;display:inline-block}.tqm-status.sync-error .tqm-dot{background:#ffb49b}
+.tqm-balance{white-space:nowrap;background:#ffffff23;border:1px solid #ffffff44;padding:9px 13px;border-radius:13px;font-size:21px;font-weight:800}.tqm-balance small{font-size:12px;font-weight:500}
+.tqm-auth{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:12px;font-size:12px}.tqm-auth .tqm-email{overflow-wrap:anywhere;max-width:100%;flex:1}
+.tqm-auth button,.tqm-auth a{font-size:12px!important;text-decoration:none;color:white!important;background:#ffffff24;border:1px solid #ffffff45;border-radius:8px;padding:6px 9px;min-height:30px!important}
+.tqm-bottom-nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));background:#fff;border-top:1px solid var(--tqm-border);box-shadow:0 -4px 20px #264b3b18;z-index:80;}
+.tqm-bottom-nav button{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;background:transparent!important;color:#607d71!important;border:0!important;border-radius:11px;padding:6px 2px!important;min-height:55px!important;}
+.tqm-bottom-nav button span{font-size:22px;line-height:1.1}.tqm-bottom-nav button small{font-size:11px;font-weight:600}
+.tqm-bottom-nav button.active{background:var(--tqm-sage)!important;color:var(--tqm-forest)!important}
+@media(min-width:800px){.tqm-bottom-nav{left:calc(50% - 390px);right:calc(50% - 390px);border:1px solid var(--tqm-border);border-radius:16px 16px 0 0}}
+@media(max-width:560px){#app .app-main{padding:10px 9px 28px!important}#app .view-sport .catalogue-row{max-width:100%}#app .view-shopping .catalogue-row button{flex:1 1 auto}#app .task-tags{flex-wrap:wrap}}
