@@ -1,0 +1,14 @@
+TODO QUEST MOBILE V4 - GITHUB
+
+Copier UNIQUEMENT le dossier mobile/ dans le chemin tododo/mobile/ de ton dépôt.
+NE PAS remplacer les fichiers de Todo Quest PC.
+
+Adresse : https://coderps.xyz/tododo/mobile/
+
+Version test : ne pas modifier PC et mobile simultanément (document Firebase partagé).
+Prendre un export JSON sur le PC avant les premiers tests.
+
+Personnalisation retenue : tâches personnelles, sport léger et pesées, courses avec prix définitif, habitudes, calendrier jour/semaine/mois.
+Les fonctions masquées sont conservées dans le code et dans Firebase ; leur interface reste disponible sur PC.
+
+Vérification : tester une tâche fictive, un article avec prix définitif, une habitude et un rendez-vous puis vérifier sur le PC après actualisation.

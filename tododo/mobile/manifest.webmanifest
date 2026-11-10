@@ -1,8 +1,8 @@
 {
-  "name": "Todo Quest Mobile",
+  "name": "Todo Quest Mobile V4",
   "short_name": "TQ Mobile",
-  "description": "Tâches, Sport, Courses, Habitudes et Calendrier de Todo Quest",
-  "start_url": "./index.html",
+  "description": "Tâches, sport, courses, habitudes et agenda",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f6faf8",
@@ -21,5 +21,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "id": "/tododo/mobile/"
 }

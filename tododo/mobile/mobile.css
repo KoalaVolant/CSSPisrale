@@ -57,3 +57,145 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 .tqm-bottom-nav button{min-width:0!important;}
 .tqm-bottom-nav button small{font-size:10px;white-space:nowrap;}
 @media(max-width:380px){.tqm-bottom-nav{padding-left:2px;padding-right:2px;gap:1px}.tqm-bottom-nav button{padding:5px 0!important}.tqm-bottom-nav button span{font-size:20px}.tqm-bottom-nav button small{font-size:9px}}
+
+/* V3 - navigation et lecture mobile */
+#app .tqm-header{padding:14px 16px 12px;}
+#app .tqm-auth{margin-top:8px;}
+#app .tqm-bottom-nav button{min-height:59px!important;}
+#app .calendar-view .calendar-grid{display:none!important}
+#app .calendar-view .calendar-toolbar{display:grid!important;grid-template-columns:40px minmax(0,1fr) 40px;gap:7px;align-items:center;background:#fff;border:1px solid var(--tqm-border);border-radius:16px;padding:12px;margin:0 0 12px!important}
+#app .calendar-toolbar h2{grid-column:1 / -1;margin:0;font-size:18px}
+#app .calendar-toolbar strong{font-size:13px;text-align:center;min-width:0;overflow-wrap:anywhere}
+#app .calendar-toolbar button{min-height:40px!important}
+#app .calendar-toolbar button:nth-of-type(3){grid-column:1 / 2}
+#app .calendar-toolbar select{grid-column:2 / 3;min-width:0}
+#app .calendar-toolbar button:last-child{grid-column:3 / 4;min-width:0;font-size:12px}
+#app .v60-tabs{display:flex;gap:8px;margin-bottom:12px}
+#app .v60-tabs button{flex:1;min-height:44px;border-radius:10px}
+.tqm-agenda{display:grid;gap:10px}
+.tqm-agenda-day{border:1px solid var(--tqm-border);border-radius:17px;background:#fff;padding:11px;min-width:0}
+.tqm-agenda-day.tqm-agenda-today{border-color:#47836f;box-shadow:0 0 0 1px #47836f22}
+.tqm-agenda-day-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px}
+.tqm-agenda-day-head strong{font-size:14px;text-transform:capitalize}
+.tqm-agenda-day-head button{min-height:34px!important;width:36px;flex:0 0 36px;background:var(--tqm-sage);border:0;border-radius:9px;font-size:20px}
+.tqm-agenda-events{display:grid;gap:6px}
+#app button.tqm-agenda-event{width:100%;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 9px;text-align:left;padding:11px 12px;border-radius:11px;border:1px solid var(--tqm-border);background:#f8fbf9;min-width:0}
+.tqm-agenda-event strong{font-size:14px;overflow-wrap:anywhere;flex:1 1 150px}
+.tqm-agenda-event small{font-size:11px;color:#5e776d;flex-basis:100%;margin-left:0}
+.tqm-event-type{font-size:10px;font-weight:750;letter-spacing:.03em;text-transform:uppercase;color:#456b5c}
+#app button.tqm-agenda-appt{border-left:4px solid #6e98b9}
+#app button.tqm-agenda-task{border-left:4px solid #63a484}
+#app button.tqm-agenda-milestone{border-left:4px solid #a28abc}
+.tqm-agenda-empty{color:#81938b;font-size:12px;margin:4px 0 2px}
+#app .tqm-secondary-info{border:1px solid var(--tqm-border);padding:10px 12px;border-radius:12px;background:white;margin:10px 0}
+#app .tqm-secondary-info summary{cursor:pointer;font-weight:650;font-size:13px;color:var(--tqm-forest)}
+#app .tqm-secondary-info[open] summary{margin-bottom:10px}
+#app .tqm-add-options{flex-basis:100%;border:1px dashed #b6cfc2;border-radius:10px;background:#f9fcfa;padding:8px 10px}
+#app .tqm-add-options summary{font-weight:650;font-size:13px}
+#app .tqm-option-fields{display:grid;gap:8px;margin-top:9px}
+#app .view-shopping >p:first-of-type{display:none}
+#app .view-shopping .catalogue-row{position:relative;display:grid;grid-template-columns:1fr auto;gap:5px 8px}
+#app .view-shopping .catalogue-row>label:first-child{grid-column:1/-1;display:flex;align-items:center;gap:8px}
+#app .view-shopping .catalogue-row>small{font-size:11px;color:#60756a}
+#app .view-shopping .shopping-checkout{padding:9px 12px;border-radius:12px;background:#eaf3ee;margin:10px 0}
+#app .view-shopping .shopping-category h3{font-size:15px;margin:2px 0 10px}
+#app .view-habits article.habit-entry{box-shadow:0 1px 4px #234a3510}
+#app .view-habits article.habit-entry button{border-radius:9px}
+#app .page-title{font-size:20px!important}
+#app .view-sport .catalogue{max-width:100%}
+#app .tqm-install[hidden]{display:none!important}
+@media(max-width:430px){#app .calendar-toolbar button:last-child{font-size:11px;padding:5px!important}#app .tqm-bottom-nav button small{font-size:10px!important}#app .app-main{padding-left:10px!important;padding-right:10px!important}}
+
+/* =====================================
+   V4 - mobile natif, selection utilisateur
+   Aucun champ de donnée supprimé.
+   ===================================== */
+:root{--tqm-forest:#244d43;--tqm-sage:#e8f2ed;--tqm-ink:#203b32;--tqm-border:#d9e6dd}
+#app .tqm-header{background:#244d43;box-shadow:none;padding:15px 16px 12px}
+#app .tqm-brand{font-size:20px}
+#app .tqm-status{margin-top:4px}
+#app .tqm-balance{font-size:17px;padding:7px 10px}
+#app .app-main{padding:13px 12px 24px!important}
+#app .page-title{font-size:21px!important;letter-spacing:-.04em}
+#app .tqm-bottom-nav{border-top-color:#d6e5dc;box-shadow:0 -5px 20px #102b2115;padding-top:6px}
+#app .tqm-bottom-nav button{border-radius:10px;gap:3px}
+#app .tqm-bottom-nav button small{font-size:10px}
+#app button:focus-visible,#app a:focus-visible,#app input:focus-visible{outline:3px solid #5aab83;outline-offset:2px}
+#app .tqm-tasks-page .tqm-task-head{display:flex;gap:9px;align-items:center;justify-content:space-between;margin:0 0 14px}
+#app .tqm-task-head p{font-size:12px;color:#6d8074;margin:0;flex:1}
+#app button.tqm-primary{background:#285a49!important;color:white!important;border-color:#285a49!important}
+#app .tqm-task-head button{white-space:nowrap;border:0;border-radius:12px;padding:10px 13px;font-weight:650}
+#app .tqm-task-pills{display:flex;overflow-x:auto;gap:7px;scrollbar-width:none;margin-bottom:13px;padding-bottom:2px}
+#app .tqm-task-pills button{flex:0 0 auto;border:1px solid #d1e1d6;border-radius:999px;padding:8px 12px;background:white;font-weight:650;min-height:42px}
+#app .tqm-task-pills button.active{background:#285a49;color:#fff;border-color:#285a49}
+#app .tqm-field{display:grid;gap:5px;margin-bottom:10px;font-size:12px;font-weight:650}
+#app .tqm-search input{min-height:45px;font-size:16px;border-radius:12px}
+#app .tqm-filter-panel{margin:0 0 12px;padding:11px 13px;background:#fff;border:1px solid var(--tqm-border);border-radius:12px}
+#app .tqm-filter-panel summary{font-weight:700;cursor:pointer;font-size:14px}
+#app .tqm-filter-grid{display:grid;gap:10px;padding-top:12px}
+#app .tqm-filter-grid label{display:grid;gap:4px;font-size:12px}
+#app .tqm-filter-grid button{border:1px solid var(--tqm-border);background:#f7faf8;border-radius:10px}
+#app .tqm-count{font-size:12px;color:#748879;margin:10px 0}
+#app .tqm-task-card{background:#fff;border:1px solid var(--tqm-border);border-radius:17px;padding:14px;margin-bottom:11px;box-shadow:0 3px 12px #173e2b07}
+#app .tqm-task-title{display:flex;align-items:flex-start;gap:9px;justify-content:space-between}
+#app .tqm-task-title strong{font-size:16px;line-height:1.35;overflow-wrap:anywhere;flex:1}
+#app .tqm-points{background:#edf7ef;color:#2e6748;font-weight:700;font-size:11px;white-space:nowrap;padding:5px 7px;border-radius:7px}
+#app .tqm-points.tqm-negative{background:#fff0f0;color:#a94444}
+#app .tqm-task-tags{display:flex;gap:5px;flex-wrap:wrap;margin:9px 0 0}
+#app .tqm-task-tags span{font-size:11px;padding:4px 7px;border-radius:7px;background:#f1f6f2;color:#52675a}
+#app .tqm-task-blocked{font-size:12px;margin:9px 0;color:#97622e}
+#app .tqm-subtasks{padding:11px 0;display:grid;gap:7px;font-size:13px}
+#app .tqm-subtasks strong{font-size:12px;color:#587366}
+#app .tqm-subtasks label{display:flex;gap:8px;align-items:center}
+#app .tqm-subtasks input{width:20px;height:20px;min-height:20px;accent-color:#285a49}
+#app .tqm-task-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:12px}
+#app .tqm-task-actions button{min-height:43px;font-weight:700;background:#f5f9f6;border:1px solid #dfebe2;color:#315444;border-radius:10px;padding:5px 3px;font-size:12px}
+#app .tqm-task-actions .tqm-danger{color:#9b5151;background:#fff8f8}
+#app .tqm-task-actions button:disabled{opacity:.45}
+#app .tqm-empty{padding:30px;text-align:center;background:#fff;border-radius:16px;color:#73867b}
+#app .tqm-undo{padding:11px;background:#e8f5e9;display:flex;justify-content:space-between;border-radius:10px}
+/* Ne pas montrer les contrôles de gestion et statistiques non retenus. */
+#app .view-sport>section.v52-card:nth-child(2),
+#app .view-sport>section.v52-card:nth-child(3),
+#app .view-sport>section.v52-card:nth-child(5){display:none!important}
+#app .view-sport>section.v52-card:nth-child(1)>p,
+#app .view-sport>section.v52-card:nth-child(1)>label.tqm-hide-field{display:none!important}
+#app .v52-sport .v52-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#app .v52-sport .v52-actions button{margin:0!important;padding:10px 7px!important;min-height:54px!important;border-radius:12px}
+#app .v52-sport>.v52-card{background:white;border-radius:17px;padding:14px;margin:0 0 12px}
+#app .v52-sport .v52-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#app .v52-sport .v52-stats>div{min-width:0;padding:10px 5px;border-radius:10px;background:#f2f7f3;font-size:11px;text-align:center}
+#app .v52-sport .v52-stats b{display:block;font-size:15px;margin-top:3px}
+#app .view-shopping>p.tqm-muted{font-size:12px;color:#758679}
+#app .view-shopping>.tqm-secondary-info,#app .view-shopping>.shopping-filters input[type=search]{display:none!important}
+#app .view-shopping .shopping-filters{margin:8px 0}
+#app .view-shopping .catalogue-row small{font-size:12px}
+#app .view-shopping .shopping-category h3{font-size:15px}
+#app .view-shopping .shopping-category h3{cursor:default}
+#app .view-shopping .shopping-checkout{background:#e9f4eb;padding:12px;border-radius:13px}
+#app .view-shopping .shopping-add-form{padding:12px;background:white;border:1px solid var(--tqm-border);border-radius:14px}
+#app .view-habits .habit-entry[data-habit-type=bad],#app .view-habits .habit-entry.habit-finished,
+#app .view-habits .v64-habit-stages,#app .view-habits .v64-challenge-button,
+#app .view-habits .v68-habit-regularity,#app .view-habits .habit-entry>details,
+#app .view-habits .tqm-habit-meta{display:none!important}
+#app .view-habits .habit-entry .habit-actions button{font-size:12px;flex:1 1 125px}
+#app .view-habits .habit-entry strong{font-size:15px}
+#app .view-habits h3:has(+ .habit-entry[data-habit-type=bad]){display:none}
+#app .calendar-view .v60-day,#app .calendar-view .tqm-hidden-calendar-settings{display:none!important}
+#app .calendar-view .calendar-toolbar{display:flex!important;flex-wrap:wrap!important;justify-content:space-between!important;gap:7px!important;padding:12px!important}
+#app .calendar-view .calendar-toolbar h2{flex:1 0 100%;grid-column:auto}
+#app .calendar-view .calendar-toolbar strong{flex:1 1 100px;text-align:center}
+#app .calendar-view .calendar-toolbar select{flex:1 1 100%;grid-column:auto}
+#app .calendar-view .calendar-toolbar button:nth-of-type(3),#app .calendar-view .calendar-toolbar button:last-child{grid-column:auto}
+#app .tqm-agenda-day{border-radius:16px}
+#app .tqm-agenda-event{min-height:62px}
+#app .tqm-hide-field{display:none!important}
+/* Task form: hide non-requested input fields, but do not delete source data. */
+#app .task-form .tqm-hide-field{display:none!important}
+@media(max-width:400px){#app .tqm-task-actions{grid-template-columns:repeat(2,minmax(0,1fr))}#app .tqm-task-head{flex-wrap:wrap}#app .tqm-task-head button{flex:0 0 auto}}
+
+/* V4 : actions secondaires dépriorisées */
+#app .view-shopping .shopping-add-form>label:first-child{display:none!important}
+#app .view-shopping .shopping-add-form .shopping-ingredient-picker{display:none!important}
+#app .calendar-view .calendar-category{display:none!important}
+#app .view-habits .habit-entry[data-habit-type=bad] + .habit-entry{margin-top:0!important}
