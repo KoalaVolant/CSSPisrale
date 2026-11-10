@@ -1,9 +1,13 @@
-Todo Quest V69 TEST + SYNCHRO
+TODO QUEST V70 - correctifs recette V69
 
-Correction defensive du rendu Ma journee (dayOverview) et refonte de l’en-tete.
+- Bandeau orange supprime
+- En-tete mobile compact
+- Quantites d habitude toujours visibles, lecture seule apres validation
+- Report d occurrence : differe la presence/alerte de l habitude jusqu au lendemain sans supprimer les autres retards
+- Bilan 28 jours : onglet Habitudes & routines, sous chaque habitude
+- Calendrier / jalons : projet parent visible
+- Sport : migration des 50 exercices egalement lors du chargement Firebase ou import.
 
-Installer TOUS les fichiers de l’archive ensemble et forcer le rafraichissement.
-Sauvegarde JSON incluse et non modifiee.
-Ne pas importer automatiquement le JSON : la synchronisation est conservee.
-
-Tests manuels necessaires : demarrage, Calendrier > Ma journee, habitudes, synchro, recherche et recompenses.
+Deployer TOUS les fichiers ensemble, y compris sport-catalog-v67.js. Ctrl+F5.
+Le JSON embarque est une copie historique : ne pas le reimporter automatiquement.
+ATTENTION: sauvegarder les donnees cloud avant tests, modifications reelles non testees avec Firebase.

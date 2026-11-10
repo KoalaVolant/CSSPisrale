@@ -1727,6 +1727,15 @@ const app = createApp({
       const fresh=defaultData();
       for (const k of ['sportExercises','sportSessions','sportLocations','weightEntries','foodContainers'])
         data[k]=Array.isArray(src[k])?clone(src[k]):clone(fresh[k]);
+      // V70 : la migration du catalogue doit aussi s'appliquer APRES chaque import/lecture Firebase.
+      // Avant : la migration ne se faisait que sur localStorage, puis la lecture cloud la supprimait.
+      if (!src.sportCatalogV67) {
+        const known=new Set(data.sportExercises.map(e=>e && e.id).filter(Boolean));
+        for(const ex of (window.TODO_SPORT_V67 || [])) {
+          if(!known.has(ex.id)) { data.sportExercises.push(clone(ex)); known.add(ex.id); }
+        }
+      }
+      data.sportCatalogV67 = !!src.sportCatalogV67 || !!(window.TODO_SPORT_V67 && window.TODO_SPORT_V67.length);
       for (const k of ['sportGoals','sportPoints','weightSettings','foodReviews','foodCategoriesHealth','foodReminderShown'])
         data[k]=src[k] && typeof src[k]==='object' && !Array.isArray(src[k])?clone(src[k]):clone(fresh[k]);
       if(data.sportPoints.long===undefined)data.sportPoints.long=20;
@@ -3228,7 +3237,7 @@ const app = createApp({
     function habitIsFinished(h) { return !!h.completed || !!(h.endDate && h.endDate < today.value); }
     function markHabitFinished(h) { if(!confirm('Marquer cette routine comme terminée ?'))return; h.completed=true; h.endDate=h.endDate||today.value; }
     function habitLateDays(h){
-      if(h.malus || habitIsFinished(h))return 0;
+      if(h.malus || habitIsFinished(h) || (h.lateDeferredUntil && h.lateDeferredUntil>today.value))return 0;
       const start=h.startDate||h.createdAt||today.value;
       if(start>today.value || habitDoneToday(h))return 0;
       const last=[...(h.history||[])].filter(d=>d<today.value).sort().pop();
@@ -3258,6 +3267,7 @@ const app = createApp({
     function habitDoneToday(h) {return (h.history||[]).includes(today.value);}
     function habitDue(h) {
       if(habitIsFinished(h)||(h.pausedUntil&&h.pausedUntil>=today.value))return false;
+      if(h.lateDeferredUntil && h.lateDeferredUntil>today.value)return false;
       if(h.malus)return (h.startDate||h.createdAt||today.value)<=today.value;
       if ((h.startDate||h.createdAt||today.value)>today.value) return false;
       if (habitDoneToday(h)) return true;
@@ -3364,10 +3374,13 @@ const app = createApp({
       if(!dates.includes(date)){notify('Date non admissible');return;}
       if(!confirm('Reporter l’occurrence du '+date+' à demain ?'))return;
       if(!Array.isArray(h.postponed))h.postponed=[];
-      h.postponed.push(date);
-      const d=new Date(today.value+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);
-      h.forceDue=d.toISOString().slice(0,10);
-      notify('Occurrence reportée à demain');
+      if(!h.postponed.includes(date))h.postponed.push(date);
+      const tomorrow=dateAddSafe(today.value,1);
+      h.forceDue=tomorrow;
+      // Masquer le retard ET la proposition du jour jusqu'à demain.
+      // Les autres occurrences en retard ne sont pas effacées silencieusement.
+      h.lateDeferredUntil=tomorrow;
+      notify('Occurrence du '+date+' reportée au '+tomorrow+'. Reprise demain.');
     }
     function postponeHabit(h) {
       if (!confirm('Reporter « '+h.title+' » à demain ?')) return;
@@ -3376,6 +3389,7 @@ const app = createApp({
       if (!Array.isArray(h.postponed)) h.postponed=[];
       if (!h.postponed.includes(today.value)) h.postponed.push(today.value);
       h.forceDue=tomorrow;
+      h.lateDeferredUntil=tomorrow;
     }
     function undoHabit(h) { if(!confirm('Annuler la réalisation du jour ?'))return; h.history=(h.history||[]).filter(d=>d!==today.value); if(h.pointAwards)delete h.pointAwards[today.value]; }
     function deleteHabit(h) {if(confirm('Supprimer cette habitude et son historique ?')) {data.trash.unshift({id:uid(),type:'habit',deletedAt:new Date().toISOString(),payload:clone(h)});data.habits=data.habits.filter(x=>x.id!==h.id);}}
@@ -3637,8 +3651,16 @@ const app = createApp({
           // des données de test importées ou conservées localement, sans action explicite.
           applyRemote(remote);
           cloudInitialized = true;
-          syncState.value = 'synced';
-          notify('Données Firebase chargées. Pense à exporter un JSON avant les tests.');
+          // Sauvegarde une seule fois le catalogue ajouté au cloud, sans toucher aux autres valeurs.
+          const catalogueMigration = !remote.sportCatalogV67 && (window.TODO_SPORT_V67 || []).some(ex=>
+            !Array.isArray(remote.sportExercises) || !remote.sportExercises.some(old=>old && old.id===ex.id));
+          if(catalogueMigration) {
+            pushToCloud();
+            notify('Catalogue sportif enrichi et synchronisé.');
+          } else {
+            syncState.value = 'synced';
+            notify('Données Firebase chargées. Pense à exporter un JSON avant les tests.');
+          }
           return;
         }
 
