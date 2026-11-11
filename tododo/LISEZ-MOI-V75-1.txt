@@ -1,7 +1,0 @@
-TODO QUEST PC V75.1 + MOBILE V8.1 - TEST
-
-Durée approximative facultative, libre en minutes avec 2 décimales maximum (ex : 2.5). Boutons 5, 10, 15, 30, 45, 60 minutes dans les formulaires de tâches.
-Effort estimé facultatif : Non renseigné / Léger / Moyen / Important. Distinct de la difficulté historique.
-PC : durée et effort directement modifiables depuis la liste des tâches. Mobile : durée et effort directement modifiables sur les cartes de tâches.
-Aucun chronomètre, ni calcul automatique de points lié à ces deux champs. Anciennes tâches compatibles.
-Installer PC à la racine du dépôt, mobile dans /mobile. Tester sur copie Firebase, synchronisation V72 concurrente toujours non validée.
