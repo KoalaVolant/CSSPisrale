@@ -359,3 +359,25 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 .v762-draft-actions .v762-save:disabled{opacity:.55}
 .v76-incomplete-card{scroll-margin-top:100px}
 .v76-editgrid input,.v76-editgrid select{min-width:0;width:100%;box-sizing:border-box}
+
+/* V9.4 : dashboard-like compact habit list; advanced management in details */
+#app .view-habits .tqm-habit-compact-list{display:grid;gap:8px}
+#app .view-habits .tqm-habit-compact-list>h3{margin:7px 0 2px;font-size:16px}
+#app .view-habits .tqm-habit-compact{background:#fff;border:1px solid var(--tqm-border);border-left:4px solid #5b9b7d;border-radius:12px;padding:10px 11px;margin:0;min-width:0}
+#app .view-habits .tqm-habit-done{background:#f0f8f3;opacity:.85}
+#app .view-habits .tqm-habit-late{border-left-color:#d49260}
+#app .view-habits .tqm-habit-summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 9px;margin-bottom:6px}
+#app .view-habits .tqm-habit-summary strong{font-size:15px;flex:1;min-width:120px;overflow-wrap:anywhere}
+#app .view-habits .tqm-habit-summary small,#app .view-habits .tqm-habit-state{font-size:11px;color:#5b7165}
+#app .view-habits .tqm-habit-main-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#app .view-habits .tqm-habit-main-actions button{min-height:34px!important;padding:5px 10px!important;font-size:12px!important;flex:0 1 auto}
+#app .view-habits .tqm-habit-main-actions button:first-of-type{background:var(--tqm-forest)!important;color:white!important}
+#app .view-habits .tqm-habit-quantity{display:flex;align-items:center;gap:5px;font-size:12px;margin-right:auto;white-space:nowrap}
+#app .view-habits .tqm-habit-quantity input{width:52px!important;min-width:0!important;max-width:52px!important;min-height:32px!important;padding:4px!important;text-align:center}
+#app .view-habits .tqm-habit-more{margin:5px 0 0!important;border:0;padding:0}
+#app .view-habits .tqm-habit-more summary{display:inline-block;cursor:pointer;color:#587669;font-size:11px;padding:4px 0;list-style:none}
+#app .view-habits .tqm-habit-more summary::before{content:'⋯ ';font-weight:700}
+#app .view-habits .tqm-habit-more-actions{display:flex;flex-wrap:wrap;gap:5px;padding-top:6px;border-top:1px solid var(--tqm-border)}
+#app .view-habits .tqm-habit-more-actions button{font-size:12px!important;min-height:34px!important;padding:5px 8px!important}
+#app .view-habits .tqm-habit-other{margin:8px 0;border:1px solid var(--tqm-border);border-radius:10px;padding:10px;background:white}
+#app .view-habits .tqm-habit-other-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;gap:8px}

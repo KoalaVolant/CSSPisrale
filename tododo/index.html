@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Todo Quest · PC V77.3 TEST</title>
-  <link rel="stylesheet" href="style.css?v=pc-v77-3-refactor">
-  <link rel="stylesheet" href="stylekoala.css?v=pc-v77-3-refactor">
-  <link rel="stylesheet" href="styletest.css?v=pc-v77-3-refactor">
-  <link rel="stylesheet" href="dashboard-v77.css?v=pc-v77-3-refactor">
+  <title>Todo Quest · PC V77.4 TEST</title>
+  <link rel="stylesheet" href="style.css?v=pc-v77-4">
+  <link rel="stylesheet" href="stylekoala.css?v=pc-v77-4">
+  <link rel="stylesheet" href="styletest.css?v=pc-v77-4">
+  <link rel="stylesheet" href="dashboard-v77.css?v=pc-v77-4">
 </head>
 <body>
 
@@ -17,7 +17,7 @@
   <header class="app-header tq69-header">
     <div class="tq69-topline">
       <div class="app-brand tq69-brand">
-        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V77.3 TEST">v77.3 <span>test</span></small></h1>
+        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V77.4 TEST">v77.4 <span>test</span></small></h1>
         <div class="sync-box tq69-sync">
           <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
           <template v-if="firebaseReady">
@@ -577,7 +577,7 @@
   <h3>{{group.name}} <small>({{group.list.length}})</small></h3>
   <p v-if="!group.list.length">Aucune tâche.</p>
   <article class="v761-task" v-for="t in group.list" :key="t.id" :style="{'--v761-accent':(data.categories.find(c=>c.name===t.category)?.color||'')||(data.projects.find(p=>p.id===t.projectId)?.color||'')||'#7b8b83'}">
-   <div class="v761-task-title"><strong>{{t.title}}</strong><span :class="{'v761-malus':t.malus}">{{t.malus?'−':'+'}}{{t.points||0}} pts</span></div>
+   <div class="v761-task-title"><strong>{{t.title}}</strong><span class="v774-task-head-actions"><span :class="{'v761-malus':t.malus}">{{t.malus?'−':'+'}}{{t.points||0}} pts</span><button type="button" class="v774-edit" @click="openTaskForm(t)" :aria-label="'Modifier la tâche '+t.title">✎ Modifier</button></span></div>
    <div class="v761-task-fields"><label class="v761-task-field" :style="{'--v761-tag':(data.categories.find(c=>c.name===t.category)?.color||'')||'#dce5e1'}"><small>Catégorie</small><select :value="t.category||''" @change="updateTask(t,'category',$event.target.value)"><option value="">Sans catégorie</option><option v-for="c in categories" :key="c" :value="c">{{c}}</option></select></label><label class="v761-task-field" :style="{'--v761-tag':(data.projects.find(p=>p.id===t.projectId)?.color||'')||'#dce5e1'}"><small>Projet</small><select :value="t.projectId||''" @change="updateTask(t,'projectId',$event.target.value)"><option value="">Sans projet</option><option v-for="p in data.projects" :key="p.id" :value="p.id">{{p.name}}</option></select></label><label class="v761-task-field"><small>Échéance</small><input type="date" :value="taskDue(t)||''" @change="changeDue(t,$event.target.value)"></label></div>
    <div class="v761-task-actions"><button type="button" :disabled="!!blockingTask(t)" @click="changeStatus(t,'done')">✓ Terminé</button><button type="button" @click="duplicateTask(t,'tomorrow')">+ Demain</button><button type="button" @click="duplicateTask(t,'followup')">+ Suite</button></div>
   </article>
@@ -1773,13 +1773,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="sport-catalog-v67.js?v=pc-v77-3-refactor"></script>
-<script src="./sync-merge-v72.js?v=pc-v77-3-refactor"></script>
-<script src="./js/01-core.js?v=pc-v77-3-refactor"></script>
-<script src="./js/02-catalogue.js?v=pc-v77-3-refactor"></script>
-<script src="./js/03-storage.js?v=pc-v77-3-refactor"></script>
-<script src="./js/04-task-components.js?v=pc-v77-3-refactor"></script>
-<script src="./js/05-application.js?v=pc-v77-3-refactor"></script>
+<script src="sport-catalog-v67.js?v=pc-v77-4"></script>
+<script src="./sync-merge-v72.js?v=pc-v77-4"></script>
+<script src="./js/01-core.js?v=pc-v77-4"></script>
+<script src="./js/02-catalogue.js?v=pc-v77-4"></script>
+<script src="./js/03-storage.js?v=pc-v77-4"></script>
+<script src="./js/04-task-components.js?v=pc-v77-4"></script>
+<script src="./js/05-application.js?v=pc-v77-4"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
@@ -1789,7 +1789,7 @@
         var warning = document.createElement('div');
         warning.setAttribute('role', 'alert');
         warning.style.cssText = 'padding:24px;margin:30px auto;max-width:760px;background:#fff3f3;border:2px solid #bd2020;color:#711;font:16px Arial,sans-serif;line-height:1.5';
-        warning.textContent = 'Todo Quest PC V77.3 n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, dossier js/, firebase-config.js et fichiers CSS), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
+        warning.textContent = 'Todo Quest PC V77.4 n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, dossier js/, firebase-config.js et fichiers CSS), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
         document.body.prepend(warning);
       }
     }, 1200);

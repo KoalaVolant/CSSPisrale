@@ -10,16 +10,16 @@
 <meta content="TQ Mobile" name="apple-mobile-web-app-title"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<title>Todo Quest · Mobile V9.3 TEST</title>
+<title>Todo Quest · Mobile V9.4 TEST</title>
 <link href="./style.css?v=20261110-mobile-v9-3" rel="stylesheet"/>
 <link href="./stylekoala.css?v=20261110-mobile-v9-3" rel="stylesheet"/>
 <link href="./styletest.css?v=20261110-mobile-v9-3" rel="stylesheet"/>
-<link href="mobile.css?v=9-3" rel="stylesheet"/>
+<link href="mobile.css?v=9-4" rel="stylesheet"/>
 </head>
 <body>
 <div id="app" v-cloak="">
 <header class="tqm-header">
-<div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span><small class="tqm-version-tag" title="Version installée : Mobile V9.3 TEST">v9.3 test</small></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
+<div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span><small class="tqm-version-tag" title="Version installée : Mobile V9.4 TEST">v9.4 test</small></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
 <div class="tqm-auth"><button class="tqm-install" hidden="" id="tqm-install" type="button">Installer</button><template v-if="firebaseReady"><button @click="signIn" type="button" v-if="!user">Se connecter avec Google</button><template v-else=""><span class="tqm-email">{{user.email}}</span><button @click="signOut" type="button">Quitter</button></template></template><a href="../index.html">Version complète ↗</a></div>
 </header>
 <div id="tqm-network-warning" class="tqm-network-warning" role="status" hidden>
@@ -821,14 +821,35 @@
 </form>
 </div>
 <p class="empty" v-if="!data.habits.length">Aucune habitude enregistrée.</p>
-<h3>Bonnes habitudes</h3>
-<template :key="habit.id" v-for="(habit,hi) in sortedHabits"><h3 v-if="habit.malus &amp;&amp; (hi===0 || !sortedHabits[hi-1].malus)">Mauvaises habitudes</h3><article :class="{'habit-overdue':habitLateDays(habit)&gt;0,'habit-finished':habitIsFinished(habit)}" :data-habit-type="habit.malus ? 'bad' : 'good'" :key="habit.id" class="habit-entry">
-<div><strong>{{ habit.title }}</strong> <strong v-if="!habit.malus &amp;&amp; habitQuantity(habit)">({{ habitQuantity(habit).done }}/{{ habitQuantity(habit).max }})</strong> <span v-if="habitIsFinished(habit)">✓ Routine terminée</span> <small v-if="habitLateDays(habit)&gt;0">{{ habitLateDays(habit) }} jour(s) de retard</small> <span v-if="!habit.malus &amp;&amp; habitDoneToday(habit)">✓ réalisée aujourd'hui</span><br/><small v-if="habit.malus">{{ (habit.penalties||[]).length }} malus · −{{ (habit.penalties||[]).reduce((s,p)=&gt;s+Number(p.points||0),0) }} pts</small><small class="tqm-habit-meta" v-else="">{{ habitCount(habit) }} réalisation(s) · {{ habitAwards(habit).reduce((s,a)=&gt;s+a.points,0) }} pts gagnés · {{ habit.frequency === 'daily' ? 'quotidienne' : habit.frequency === 'weekly' ? habit.weeklyTarget + ' fois/semaine' : habit.frequency === 'interval' ? 'tous les '+habit.every+' jours' : 'jours choisis' }}</small></div>
-<div class="habit-actions"><button :disabled="habitIsFinished(habit)" @click="penalizeHabit(habit)" type="button" v-if="habit.malus">− {{ habit.basePoints }} pts</button><button @click="undoHabitPenalty(habit)" type="button" v-if="habit.malus &amp;&amp; habitPenaltiesToday(habit)">Annuler dernier −</button><span class="habit-quantity" v-if="!habit.malus &amp;&amp; habitQuantity(habit)">Fait <input :disabled="habitDoneToday(habit)" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" @change="setHabitQuantity(habit,'done',$event.target.value)" min="0" type="number"/> / <input :disabled="habitDoneToday(habit)" :value="habitQuantity(habit).max" @change="setHabitQuantity(habit,'max',$event.target.value)" min="1" type="number"/></span><button :disabled="habitDoneToday(habit)||habitIsFinished(habit)" @click="completeHabit(habit)" type="button" v-if="!habit.malus">Terminer</button><button :disabled="habitDoneToday(habit)||habitIsFinished(habit)" @click="postponeHabit(habit)" type="button" v-if="!habit.malus">Reporter à demain</button><button @click="completeHabitPast(habit)" type="button" v-if="!habit.malus &amp;&amp; habitLateDays(habit)&gt;0">Fait un jour passé</button><button @click="postponeLateHabit(habit)" type="button" v-if="!habit.malus &amp;&amp; habitLateDays(habit)&gt;0">Reporter un retard</button><button @click="undoHabit(habit)" type="button" v-if="!habit.malus &amp;&amp; habitDoneToday(habit)">Annuler le suivi</button><button @click="markHabitFinished(habit)" type="button" v-if="!habitIsFinished(habit)">Finir la routine</button><button @click="toggleHabitPause(habit)" type="button">{{habit.pausedUntil&amp;&amp;habit.pausedUntil&gt;=today?'▶ Reprendre':'⏸ Pause'}}</button><span v-if="habit.pausedUntil&amp;&amp;habit.pausedUntil&gt;=today">En pause jusqu’au {{formatDate(habit.pausedUntil)}}</span><button @click="openHabitForm(habit)" type="button">Modifier</button><button @click="deleteHabit(habit)" type="button">Supprimer</button></div>
-<div class="v64-habit-stages" v-if="!habit.malus &amp;&amp; (habit.progressionSteps||[]).length"><strong>🎯 Paliers · {{habitProgressionCompleted(habit)}} réalisation(s) cette semaine</strong><div :key="step.id||idx" class="v64-stage-row" v-for="(step,idx) in habit.progressionSteps"><span>Palier {{idx+1}} : {{step.weeklyTarget}} / semaine</span><span v-if="habit.activeProgressionStep===idx">✓ Actif</span><button @click="activateHabitProgression(habit,idx)" type="button" v-else="">Activer</button></div></div><button @click="newChallengeFromHabit(habit)" class="v64-challenge-button" type="button" v-if="!habit.malus">🏆 Créer un défi depuis cette habitude</button>
-<div class="v68-habit-regularity" v-if="!habit.malus"><strong>📊 Régularité sur 28 jours : {{habitPeriodStats(habit).rate===null?'Non calculable':habitPeriodStats(habit).rate+' %'}}</strong><small> {{habitPeriodStats(habit).done}} / {{habitPeriodStats(habit).expected}} occurrences attendues · {{habitPeriodStats(habit).postponed}} report(s) exclus</small></div>
-<details v-if="habit.malus"><summary>Historique des malus</summary><p :key="p.id" v-for="p in [...(habit.penalties||[])].reverse()">{{ formatDate(p.date) }} · −{{ p.points }} pts</p></details><details v-else=""><summary>Historique des réalisations et points</summary><p :key="a.date" class="v68-history-line" v-for="a in [...habitAwards(habit)].reverse()">{{ formatDate(a.date) }} · +{{ a.points }} pts · série {{ a.streak }} <button :aria-label="'Annuler la validation du '+formatDate(a.date)" @click="undoHabitPast(habit,a.date)" type="button">Annuler</button></p><p v-if="!habitCount(habit)">Aucune réalisation</p></details>
-</article></template>
+<div class="tqm-habit-compact-list">
+  <h3>🌱 Mes habitudes <small>({{ sortedHabits.filter(h=>!h.malus && !habitIsFinished(h)).length }})</small></h3>
+  <article class="tqm-habit-compact" v-for="habit in sortedHabits.filter(h=>!h.malus && !habitIsFinished(h))" :key="habit.id" :class="{'tqm-habit-done':habitDoneToday(habit),'tqm-habit-late':habitLateDays(habit)>0}">
+    <div class="tqm-habit-summary">
+      <strong>{{habit.title}}</strong>
+      <span class="tqm-habit-state" v-if="habitDoneToday(habit)">✓ Fait</span>
+      <small v-else-if="habit.pausedUntil && habit.pausedUntil>=today">⏸ Pause</small>
+      <small v-else-if="habitLateDays(habit)>0">{{habitLateDays(habit)}} j de retard</small>
+    </div>
+    <div class="tqm-habit-main-actions">
+      <label class="tqm-habit-quantity" v-if="habitQuantity(habit)">Fait <input type="number" min="0" :max="habitQuantity(habit).max" :value="habitQuantity(habit).done" :disabled="habitDoneToday(habit)" @change="setHabitQuantity(habit,'done',$event.target.value)"/> / {{habitQuantity(habit).max}}</label>
+      <button type="button" v-if="!habitDoneToday(habit)" :disabled="habitIsFinished(habit) || (habit.pausedUntil && habit.pausedUntil>=today)" @click="completeHabit(habit)">✓ Terminer</button>
+      <button type="button" v-else @click="undoHabit(habit)">↶ Annuler</button>
+      <button type="button" v-if="!habitDoneToday(habit) && !(habit.pausedUntil && habit.pausedUntil>=today)" @click="postponeHabit(habit)">Demain</button>
+    </div>
+    <details class="tqm-habit-more">
+      <summary>Plus d’actions</summary>
+      <div class="tqm-habit-more-actions">
+        <button type="button" @click="openHabitForm(habit)">Modifier</button>
+        <button type="button" @click="toggleHabitPause(habit)">{{habit.pausedUntil && habit.pausedUntil>=today?'Reprendre':'Pause'}}</button>
+        <button type="button" v-if="habitLateDays(habit)>0" @click="completeHabitPast(habit)">Fait un jour passé</button>
+        <button type="button" v-if="habitLateDays(habit)>0" @click="postponeLateHabit(habit)">Reporter un retard</button>
+        <button type="button" @click="markHabitFinished(habit)">Terminer la routine</button>
+        <button type="button" @click="deleteHabit(habit)">Supprimer</button>
+      </div>
+    </details>
+  </article>
+  <details class="tqm-habit-other" v-if="sortedHabits.some(h=>habitIsFinished(h))"><summary>Routines terminées ({{sortedHabits.filter(h=>habitIsFinished(h)).length}})</summary><div v-for="habit in sortedHabits.filter(h=>habitIsFinished(h))" :key="habit.id" class="tqm-habit-other-row"><strong>{{habit.title}}</strong><button type="button" @click="openHabitForm(habit)">Modifier</button></div></details>
+</div>
 </section>
 <!-- ============ DÉFIS CONFIGURABLES ============ -->
 <section class="view view-challenges" v-if="view === 'challenges'">
