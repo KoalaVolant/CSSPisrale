@@ -1,6 +1,0 @@
-V76.1 PC + Mobile V9.1 (TEST)
-
-Corrige : accès visible en haut du dashboard aux tâches incomplètes, compteur, formulaire et filtres ; vue simple avec champs colorés éditables et présentation en colonne ; vue détaillée repliable.
-Suggestions : tranches de durée (<5, 5-10, 10-15, 15-30, 30-60, 60-120, 120-180, >=180 min), durée ET/OU effort, et option d'inclure les tâches sans valeurs (cochée par défaut). Les bornes basses sont incluses ; bornes hautes exclues. Les autres sources de suggestion ne sont pas filtrées par durée/effort. Les critères d'effort sont des maximums.
-
-ATTENTION : la synchronisation des changements concurrents n'a toujours pas été testée en conditions réelles. Utiliser une base de test et une sauvegarde.
