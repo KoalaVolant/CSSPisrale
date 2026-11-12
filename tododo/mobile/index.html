@@ -10,17 +10,17 @@
 <meta content="TQ Mobile" name="apple-mobile-web-app-title"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<title>Todo Quest · Mobile V9.5 TEST</title>
-<link href="./style.css?v=20261110-mobile-v9-3" rel="stylesheet"/>
-<link href="./stylekoala.css?v=20261110-mobile-v9-3" rel="stylesheet"/>
-<link href="./styletest.css?v=20261110-mobile-v9-3" rel="stylesheet"/>
-<link href="mobile.css?v=9-5" rel="stylesheet"/>
-<link href="nonsticky-v9-5.css?v=9-5" rel="stylesheet"/>
+<title>Todo Quest · Mobile V10.0 RC</title>
+<link href="./style.css?build=10-0-rc" rel="stylesheet"/>
+<link href="./stylekoala.css?build=10-0-rc" rel="stylesheet"/>
+<link href="./styletest.css?build=10-0-rc" rel="stylesheet"/>
+<link href="mobile.css?build=10-0-rc" rel="stylesheet"/>
+<link href="nonsticky-v9-5.css?build=10-0-rc" rel="stylesheet"/>
 </head>
 <body>
 <div id="app" v-cloak="">
 <header class="tqm-header">
-<div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span><small class="tqm-version-tag" title="Version installée : Mobile V9.5 TEST">v9.5 test</small></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
+<div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span><small class="tqm-version-tag" title="Version installée : Mobile V10.0 RC">v10.0 RC</small></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
 <div class="tqm-auth"><button class="tqm-install" hidden="" id="tqm-install" type="button">Installer</button><template v-if="firebaseReady"><button @click="signIn" type="button" v-if="!user">Se connecter avec Google</button><template v-else=""><span class="tqm-email">{{user.email}}</span><button @click="signOut" type="button">Quitter</button></template></template><a href="../index.html">Version complète ↗</a></div>
 </header>
 <div id="tqm-network-warning" class="tqm-network-warning" role="status" hidden>
@@ -1725,15 +1725,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js"></script>
-<script src="./sport-catalog-v67.js?v=20261110-mobile-v9-3"></script>
+<script src="./firebase-config.js?build=10-0-rc"></script>
+<script src="./sport-catalog-v67.js?build=10-0-rc"></script>
 <script>window.TODO_QUEST_MOBILE = true;</script>
-<script src="./sync-merge-v72.js?v=20261110-v72-v7"></script>
-<script src="./js/01-core.js?v=mobile-v9-3-refactor"></script>
-<script src="./js/02-catalogue.js?v=mobile-v9-3-refactor"></script>
-<script src="./js/03-storage.js?v=mobile-v9-3-refactor"></script>
-<script src="./js/04-task-components.js?v=mobile-v9-3-refactor"></script>
-<script src="./js/05-application.js?v=mobile-v9-3-refactor"></script>
+<script src="./sync-merge-v72.js?build=10-0-rc"></script>
+<script src="./js/01-core.js?build=10-0-rc"></script>
+<script src="./js/02-catalogue.js?build=10-0-rc"></script>
+<script src="./js/03-storage.js?build=10-0-rc"></script>
+<script src="./js/04-task-components.js?build=10-0-rc"></script>
+<script src="./js/05-application.js?build=10-0-rc"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
