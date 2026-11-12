@@ -1,0 +1,35 @@
+/* Mobile V9.5: defaire les anciens titres collants herites des CSS PC.
+   Navigation inferieure et fenetres modales conservees. */
+@media screen {
+  #app .page-header,
+  #app .page-title,
+  #app .task-toolbar,
+  #app .view-home .task-toolbar,
+  #app .view-all .task-toolbar,
+  #app .view-done .task-toolbar,
+  #app .view-work .work-mode-actions,
+  #app .filters,
+  #app .dashboard-mini-nav,
+  #app .mobile-nav-bar,
+  #app .view-evening .textarea-toc,
+  #app .nav-group-title,
+  #app .tqm-header,
+  #app .tqm-notes-title,
+  #app .tqm-calendar-filters-title,
+  #app .tqm-agenda-day-head {
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+  }
+  /* Les titres ne doivent pas couvrir les elements suivants au defilement. */
+  #app .page-header,
+  #app .task-toolbar,
+  #app .filters,
+  #app .dashboard-mini-nav,
+  #app .view-evening .textarea-toc {
+    box-shadow: none !important;
+    max-height: none !important;
+  }
+  /* Barres d'actions dans les fiches toujours accessibles : non touchees. */
+}
