@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Todo Quest · PC V78.0 RC</title>
-  <link rel="stylesheet" href="style.css?build=78-0-rc">
-  <link rel="stylesheet" href="stylekoala.css?build=78-0-rc">
-  <link rel="stylesheet" href="styletest.css?build=78-0-rc">
-  <link rel="stylesheet" href="dashboard-v77.css?build=78-0-rc">
+  <title>Todo Quest · PC v79 test</title>
+  <link rel="stylesheet" href="style.css?build=79-0-test">
+  <link rel="stylesheet" href="stylekoala.css?build=79-0-test">
+  <link rel="stylesheet" href="styletest.css?build=79-0-test">
+  <link rel="stylesheet" href="dashboard-v77.css?build=79-0-test">
 </head>
 <body>
 
@@ -17,7 +17,7 @@
   <header class="app-header tq69-header">
     <div class="tq69-topline">
       <div class="app-brand tq69-brand">
-        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC V78.0 RC">v78.0 <span>RC</span></small></h1>
+        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC v79 test">v79 <span>TEST</span></small></h1>
         <div class="sync-box tq69-sync">
           <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
           <template v-if="firebaseReady">
@@ -169,7 +169,7 @@
     <!-- Popup : ajouter / modifier une tâche -->
     <div class="modal-backdrop" v-if="taskForm.open">
     <section class="form-panel modal task-form" role="dialog" aria-modal="true">
-      <h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
+      <h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2><aside class="v79-source-note" v-if="taskForm.id && data.tasks.find(t=>t.id===taskForm.id)?.sourceNoteId"><strong>Note d’origine :</strong> <span style="white-space:pre-wrap">{{data.tasks.find(t=>t.id===taskForm.id)?.sourceNoteContent}}</span></aside>
       <form @submit.prevent="saveTask">
         <label>Titre
           <input type="text" v-model="taskForm.title" required placeholder="Ex : Ranger le bureau">
@@ -473,6 +473,9 @@
       <section id="v761-incomplete-panel" class="v76-incomplete" v-if="incompleteOpen" aria-label="Tâches incomplètes">
  <div class="v76-incomplete-head"><h2>🧩 Tâches à compléter <small>({{incompleteCount}})</small></h2><button type="button" @click="incompleteOpen=false">Fermer</button></div>
  <p class="hint">Tâches non terminées auxquelles il manque au moins une durée, un effort, une catégorie ou un projet. Rien n'est obligatoire pour terminer une tâche.</p>
+<details class="v79-missing-config"><summary>⚙ Choisir les champs à compléter</summary><p class="hint">Les champs décochés ne comptent pas dans les tâches incomplètes ; aucune donnée n'est supprimée.</p>
+ <label v-for="f in incompleteFieldOptions" :key="f.key"><input type="checkbox" :checked="incompleteRequiredFields.includes(f.key)" @change="toggleIncompleteRequiredField(f.key,$event.target.checked)"> {{f.label}}</label>
+ </details><div class="v79-incomplete-bulk"><button type="button" :disabled="!incompleteDirtyCount" @click="saveAllIncompleteDrafts">Enregistrer les {{incompleteDirtyCount}} tâche(s) modifiée(s)</button><button type="button" :disabled="!incompleteDirtyCount" @click="cancelAllIncompleteDrafts">Annuler les modifications</button></div>
   <label>Afficher les tâches sans <select v-model="incompleteFilter"><option value="all">N'importe quel champ</option><option value="duration">Durée</option><option value="effort">Effort</option><option value="category">Catégorie</option><option value="project">Projet</option></select></label>
   <p v-if="!incompleteTasks.length">Aucune tâche à compléter pour ce filtre.</p>
   <div class="v76-incomplete-list">
@@ -495,6 +498,7 @@
       </div>
 
       <section class="v59-hub v76-chooser"><h2>🎲 Je ne sais pas quoi faire</h2><p class="hint">Suggestions selon les échéances, la durée approximative et l’effort renseignés. Une durée inconnue reste éligible.</p>
+<div class="v79-quick-chooser" role="group" aria-label="Suggestion rapide"><button type="button" @click="chooseQuickAction('five')">⏱ 5 minutes</button><button type="button" @click="chooseQuickAction('low')">🔋 Peu d'énergie</button><button type="button" @click="chooseQuickAction('tasks')">✓ Mes tâches</button><button type="button" @click="chooseQuickAction('surprise')">🎲 Surprends-moi</button></div><small class="hint">Les filtres détaillés restent disponibles. Évite les propositions trop récentes.</small>
         <div class="v761-chooser-controls">
   <label>Durée estimée <select v-model="chooserTime"><option value="any">Toutes les durées</option><option value="lt5">Moins de 5 min</option><option value="b5_10">5 à moins de 10 min</option><option value="b10_15">10 à moins de 15 min</option><option value="b15_30">15 à moins de 30 min</option><option value="b30_60">30 à moins de 60 min</option><option value="b60_120">1 h à moins de 2 h</option><option value="b120_180">2 h à moins de 3 h</option><option value="gte180">3 h et plus</option></select></label>
   <label>Effort maximal <select v-model="chooserEffort"><option value="any">Tous les efforts</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="high">Important</option></select></label>
@@ -640,11 +644,15 @@
         <div class="random-note-types"><input v-model="randomNoteTypeDraft" placeholder="Créer un type" @keyup.enter="addRandomNoteType"><button type="button" @click="addRandomNoteType">Créer un type</button></div>
         <div class="random-type-manager"><div class="random-type-entry" v-for="type in data.randomNoteTypes" :key="type" draggable="true" @dragstart="randomNoteTypeDragged=type" @dragend="randomNoteTypeDragged=''" @dragover.prevent @drop.prevent="reorderRandomNoteType(type)"><span class="drag-grip" title="Réordonner">⠿</span><strong>{{type}}</strong><button type="button" @click="renameRandomNoteType(type)">Renommer</button><button type="button" @click="deleteRandomNoteType(type)">Supprimer</button></div></div>
       </details>
+      <div class="v79-note-tools">
+ <label>Rechercher <input type="search" v-model="randomNoteSearch" placeholder="Titre ou contenu…"></label>
+ <label>Afficher <select v-model="randomNoteStatus"><option value="active">Actives</option><option value="favorites">Favoris</option><option value="archived">Archives</option></select></label>
+ </div>
       <label class="random-note-filter">Afficher <select v-model="randomNoteTypeFilter"><option value="">Tous les types</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select></label>
       <section v-for="group in randomNoteGroups" :key="group.type" class="random-note-group">
         <h4>{{group.title}} <small>({{group.notes.length}})</small></h4>
         <article class="random-note-card" v-for="note in group.notes" :key="note.id" draggable="true" @dragstart="randomNoteDragged=note.id" @dragover.prevent @drop.prevent="dropRandomNote(note)" @dragend="randomNoteDragged=''">
-          <div class="random-note-head"><span class="drag-grip" title="Changer l'ordre">⠿</span><input v-if="randomNoteEditing===note.id" v-model="note.title" placeholder="Titre facultatif" aria-label="Titre facultatif"><button type="button" @click="randomNoteEditing=randomNoteEditing===note.id?'':note.id">{{randomNoteEditing===note.id?'Terminer':'Modifier'}}</button><button type="button" @click="deleteRandomNote(note)">Supprimer</button></div>
+          <div class="random-note-head"><span class="drag-grip" title="Changer l'ordre">⠿</span><input v-if="randomNoteEditing===note.id" v-model="note.title" placeholder="Titre facultatif" aria-label="Titre facultatif"><button type="button" @click="randomNoteEditing=randomNoteEditing===note.id?'':note.id">{{randomNoteEditing===note.id?'Terminer':'Modifier'}}</button><button type="button" @click="toggleRandomNoteFavorite(note)" :aria-pressed="!!note.favorite">{{note.favorite?'★ Favori':'☆ Favori'}}</button><button type="button" @click="toggleRandomNoteArchive(note)">{{note.archived?'Restaurer':'Archiver'}}</button><button type="button" @click="randomNoteToTask(note)">→ Tâche</button><button type="button" @click="deleteRandomNote(note)">Supprimer</button></div>
           <template v-if="randomNoteEditing===note.id"><select v-model="note.type"><option value="">Sans type</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select><textarea v-model="note.content" rows="2" placeholder="Ta note…"></textarea></template>
           <p v-else class="random-note-body">{{note.content||'Note vide'}}</p>
         </article>
@@ -993,6 +1001,10 @@
         <h3>Tendance hebdomadaire</h3><div class="v52-history" v-for="w in weightWeekly" :key="w.week">Semaine du {{formatDate(w.week)}} : {{w.average}} kg ({{w.count}} mesure(s))</div>
         <details><summary>Historique détaillé</summary><div class="v52-history" v-for="w in weightRecent" :key="w.id">{{formatDate(w.date)}} : {{w.weight}} kg <button @click="deleteWeight(w)">Supprimer</button></div></details>
       </section>
+<section class="v79-sport-preferences"><h3>Préférences d’exercices</h3><p class="hint">J’aime : plus souvent proposé · Éviter : exclu des tirages · Neutre : normal. Les 98 exercices restent dans le catalogue.</p>
+ <input v-model="sportPreferenceQuery" type="search" placeholder="Rechercher un exercice…" aria-label="Rechercher un exercice">
+ <div class="v79-sport-preference-list"><label v-for="ex in sportPreferenceExercises" :key="ex.id"><span>{{ex.name}} <small>{{ex.category}}</small></span><select :value="ex.tqPreference||'neutral'" @change="setSportPreference(ex,$event.target.value)"><option value="neutral">Neutre</option><option value="like">J’aime</option><option value="avoid">Éviter</option></select></label></div>
+ </section>
       <section class="v52-card"><h2>📜 Activités effectuées</h2><p v-if="!sportHistory.length">Aucune activité enregistrée.</p><div class="v52-history" v-for="s in sportHistory.slice(0,60)" :key="s.id">{{formatDate(s.date)}} · {{s.name}} · {{s.minutes}} min <template v-if="s.kind==='walk' && s.steps!==null && s.steps!==undefined"> · {{s.steps}} pas</template> · +{{s.points}} pts <button @click="deleteSportSession(s)">Supprimer</button></div></section>
     </section>
 
@@ -1772,14 +1784,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js?build=78-0-rc"></script>
-<script src="sport-catalog-v67.js?build=78-0-rc"></script>
-<script src="./sync-merge-v72.js?build=78-0-rc"></script>
-<script src="./js/01-core.js?build=78-0-rc"></script>
-<script src="./js/02-catalogue.js?build=78-0-rc"></script>
-<script src="./js/03-storage.js?build=78-0-rc"></script>
-<script src="./js/04-task-components.js?build=78-0-rc"></script>
-<script src="./js/05-application.js?build=78-0-rc"></script>
+<script src="firebase-config.js?build=79-0-test"></script>
+<script src="sport-catalog-v67.js?build=79-0-test"></script>
+<script src="./sync-merge-v72.js?build=79-0-test"></script>
+<script src="./js/01-core.js?build=79-0-test"></script>
+<script src="./js/02-catalogue.js?build=79-0-test"></script>
+<script src="./js/03-storage.js?build=79-0-test"></script>
+<script src="./js/04-task-components.js?build=79-0-test"></script>
+<script src="./js/05-application.js?build=79-0-test"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

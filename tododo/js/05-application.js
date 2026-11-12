@@ -475,6 +475,23 @@ const app = createApp({
     const randomNoteTypeDragged=ref('');
     const randomNoteDragged=ref('');
     const randomNoteTypeFilter=ref('');
+    // V79 : favoris, recherche et archives restent dans le même objet Firebase.
+    const randomNoteSearch=ref('');
+    const randomNoteStatus=ref('active');
+    const isRandomNoteVisible=(n)=>{
+      if(randomNoteStatus.value==='archived'?!n.archived:randomNoteStatus.value==='favorites'?(n.archived||!n.favorite):!!n.archived)return false;
+      const q=randomNoteSearch.value.trim().toLocaleLowerCase('fr');
+      return !q||String(n.title||'').toLocaleLowerCase('fr').includes(q)||String(n.content||'').toLocaleLowerCase('fr').includes(q);
+    };
+    function toggleRandomNoteFavorite(n){n.favorite=!n.favorite;}
+    function toggleRandomNoteArchive(n){n.archived=!n.archived;if(n.archived&&randomNoteEditing.value===n.id)randomNoteEditing.value='';}
+    function randomNoteToTask(n){
+      if(!confirm('Créer une tâche personnelle à partir de « '+String(n.title||'Note au pif')+' » ? La note sera conservée.'))return;
+      const title=String(n.title||n.content||'Note au pif').trim().slice(0,120)||'Note au pif';
+      data.tasks.push(newTask({title,scope:'personal',sourceNoteId:n.id,sourceNoteContent:String(n.content||'')}));
+      notify('Tâche créée depuis la note');
+    }
+
     const dashboardNewNoteType=ref('');
     function addRandomNote(fromDashboard=false){
       const created=fromDashboard?dashboardNewNoteType.value.trim():'';
@@ -499,10 +516,10 @@ const app = createApp({
       const types=[...data.randomNoteTypes,''];
       for(const note of data.randomNotes) if(note.type&&!types.includes(note.type))types.splice(types.length-1,0,note.type);
       return types.filter(type=>!randomNoteTypeFilter.value||type===randomNoteTypeFilter.value)
-        .map(type=>({type,title:type||'Sans type',notes:data.randomNotes.filter(note=>(note.type||'')===type)}))
+        .map(type=>({type,title:type||'Sans type',notes:data.randomNotes.filter(note=>(note.type||'')===type&&isRandomNoteVisible(note))}))
         .filter(group=>group.notes.length);
     });
-    const visibleRandomNotes=computed(()=>data.randomNotes.filter(n=>!randomNoteTypeFilter.value||n.type===randomNoteTypeFilter.value));
+    const visibleRandomNotes=computed(()=>data.randomNotes.filter(n=>(!randomNoteTypeFilter.value||n.type===randomNoteTypeFilter.value)&&isRandomNoteVisible(n)));
     // Les listes de suggestions ne sont jamais affichées avant une saisie.
     const taskSuggestFocused=ref(false),ingredientSuggestFocused=ref(false);
     const taskSuggestions=computed(()=>{const q=filters.search.trim().toLocaleLowerCase();return q?data.tasks.filter(x=>String(x.title||'').toLocaleLowerCase().includes(q)).slice(0,5):[];});
@@ -2458,6 +2475,15 @@ const app = createApp({
     function openChooserChoice(){const choice=chooserChoice.value;if(!choice)return;if(choice.source==='Tâche'){const t=data.tasks.find(x=>x.id===choice.id);if(t){openTaskForm(t);return;}}if(choice.source==='Habitude'){const h=data.habits.find(x=>x.id===choice.id);if(h){openHabitForm(h);return;}}if(choice.source==='Projet'){setTab('projects');nextTick(()=>document.querySelector('[data-project-id=\"'+choice.id+'\"]')?.scrollIntoView({block:'center'}));return;}if(choice.source==='Repas'){menuTab.value='planning';}setTab(choice.tab);}
     // La difficulté influe sur la sélection des tâches, pas sur leur présence dans le pool.
     const chooserLastSources=ref([]);
+    const chooserRecentIds=ref([]);
+    function chooseQuickAction(mode){
+      chooserTime.value='any';chooserEffort.value='any';chooserKind.value='all';chooserEnergy.value='normal';chooserUnknown.value=true;
+      if(mode==='five'){chooserTime.value='lt5';chooserKind.value='useful';chooserUnknown.value=false;}
+      if(mode==='low'){chooserEffort.value='light';chooserEnergy.value='low';chooserUnknown.value=false;}
+      if(mode==='tasks'){chooserKind.value='useful';}
+      chooseAction();
+    }
+
     function chooseAction(){
       const pool=chooserFilteredPool.value;
       if(!pool.length){chooserChoice.value=null;notify('Aucune proposition disponible');return;}
@@ -2467,18 +2493,26 @@ const app = createApp({
       const candidates=sources.filter(s=>!recent.has(s));
       const choices=candidates.length?candidates:sources;
       const source=choices[Math.floor(Math.random()*choices.length)];
-      const same=pool.filter(x=>x.source===source&&x.id!==chooserChoice.value?.id);
-      const eligible=same.length?same:pool.filter(x=>x.source===source);
+      const same=pool.filter(x=>x.source===source&&!chooserRecentIds.value.includes(x.id));
+      const eligible=same.length?same:pool.filter(x=>x.source===source&&x.id!==chooserChoice.value?.id).length?pool.filter(x=>x.source===source&&x.id!==chooserChoice.value?.id):pool.filter(x=>x.source===source);
       // Tirage pondéré : échéances proches et habitudes du jour sont favorisées, jamais imposées.
       const weights=eligible.map(x=>chooserPriority(x));
       const totalWeight=weights.reduce((a,b)=>a+b,0);
       let draw=Math.random()*totalWeight,chosen=eligible[eligible.length-1];
       for(let i=0;i<eligible.length;i++){draw-=weights[i];if(draw<=0){chosen=eligible[i];break;}}
       chooserChoice.value=chosen;
+      chooserRecentIds.value=[...chooserRecentIds.value.slice(-9),chosen.id];
       chooserLastSources.value=[...chooserLastSources.value.slice(-5),source];
     }
 
     // V76 : les informations manquantes sont un diagnostic, pas une contrainte pour clôturer.
+    const incompleteFieldOptions=[{key:'duration',label:'Durée'},{key:'effort',label:'Effort'},{key:'category',label:'Catégorie'},{key:'project',label:'Projet'}];
+    const incompleteRequiredFields=ref(['duration','effort','category','project']);
+    try{const saved=JSON.parse(localStorage.getItem('tq-v79-required-incomplete')||'null');if(Array.isArray(saved))incompleteRequiredFields.value=saved.filter(x=>incompleteFieldOptions.some(f=>f.key===x));}catch(e){}
+    function toggleIncompleteRequiredField(field,enabled){
+      incompleteRequiredFields.value=enabled?[...new Set([...incompleteRequiredFields.value,field])]:incompleteRequiredFields.value.filter(x=>x!==field);
+      try{localStorage.setItem('tq-v79-required-incomplete',JSON.stringify(incompleteRequiredFields.value));}catch(e){}
+    }
     const incompleteFilter=ref('all');
     const incompleteOpen=ref(false);
     const taskMissingFields=(t)=>{
@@ -2488,7 +2522,7 @@ const app = createApp({
       if(!['light','medium','high'].includes(t.estimatedEffort))result.push('effort');
       if(!String(t.category||'').trim())result.push('category');
       if(t.scope!=='work' && !t.projectId)result.push('project');
-      return result;
+      return result.filter(f=>incompleteRequiredFields.value.includes(f));
     };
     const missingFieldLabels={duration:'Durée',effort:'Effort',category:'Catégorie',project:'Projet'};
     const incompleteTasks=computed(()=>data.tasks.filter(t=>t.status!=='done' && taskMissingFields(t).length && (incompleteFilter.value==='all'||taskMissingFields(t).includes(incompleteFilter.value))).sort((a,b)=>taskMissingFields(b).length-taskMissingFields(a).length||String(a.title).localeCompare(String(b.title))));
@@ -2510,6 +2544,19 @@ const app = createApp({
       incompleteDrafts[task.id][field]=value;
     }
     function cancelIncompleteDraft(task){delete incompleteDrafts[task.id];}
+    const incompleteDirtyCount=computed(()=>Object.keys(incompleteDrafts).length);
+    function cancelAllIncompleteDrafts(){for(const id of Object.keys(incompleteDrafts))delete incompleteDrafts[id];}
+    function saveAllIncompleteDrafts(){
+      const edits=Object.entries(incompleteDrafts).map(([id,d])=>({task:data.tasks.find(t=>t.id===id),d})).filter(x=>x.task);
+      for(const {task,d} of edits){
+        const raw=String(d.estimatedMinutes??'').trim().replace(',','.');const m=raw===''?null:Number(raw);
+        if(raw!==''&&(!Number.isFinite(m)||m<=0||m>100000||Math.abs(m*100-Math.round(m*100))>1e-7)){
+          notify('Durée invalide pour '+task.title+' : corrige avant enregistrement.');return;
+        }
+      }
+      for(const {task} of edits)saveIncompleteDraft(task);
+      notify(edits.length+' tâche(s) enregistrée(s)');
+    }
     function saveIncompleteDraft(task){
       const d=incompleteDrafts[task.id];
       if(!d)return;
@@ -3103,7 +3150,18 @@ const app = createApp({
     }));
     const sportHistory=computed(()=>[...data.sportSessions].sort((a,b)=>String(b.createdAt||b.date).localeCompare(String(a.createdAt||a.date))));
     const sportReminder=computed(()=>{const dow=new Date(today.value+'T12:00:00').getDay();return dow>=4||dow===0;});
-    const sportPool=computed(()=>data.sportExercises.filter(x=>x && x.active!==false && (sportLevel.value==='difficile' || (sportLevel.value==='moyen' && x.level!=='difficile') || (sportLevel.value==='doux' && x.level==='doux'))));
+    const sportPreferenceQuery=ref('');
+    const sportPreferenceExercises=computed(()=>data.sportExercises.filter(x=>String(x.name||'').toLocaleLowerCase('fr').includes(sportPreferenceQuery.value.trim().toLocaleLowerCase('fr'))));
+    function setSportPreference(ex,value){ex.tqPreference=['neutral','like','avoid'].includes(value)?value:'neutral';}
+    const sportRecentIds=computed(()=>new Set([...data.sportSessions].filter(s=>Array.isArray(s.exerciseIds)).sort((a,b)=>String(b.createdAt||b.date||'').localeCompare(String(a.createdAt||a.date||''))).slice(0,3).flatMap(s=>s.exerciseIds)));
+    const sportWeightedPick=(items)=>{
+      if(!items.length)return null;
+      const weights=items.map(x=>(x.tqPreference==='like'?3:1)*(sportRecentIds.value.has(x.id)?0.3:1));
+      let draw=Math.random()*weights.reduce((a,b)=>a+b,0);
+      for(let i=0;i<items.length;i++){draw-=weights[i];if(draw<=0)return items[i];}
+      return items[items.length-1];
+    };
+    const sportPool=computed(()=>data.sportExercises.filter(x=>x && x.active!==false && x.tqPreference!=='avoid' && (sportLevel.value==='difficile' || (sportLevel.value==='moyen' && x.level!=='difficile') || (sportLevel.value==='doux' && x.level==='doux'))));
     const sportRandom=(items)=>items[Math.floor(Math.random()*items.length)];
     // La durée totale est la somme des temps attribués aux exercices.
     // Pour une séance longue, on répartit 10-15 min sur les exercices sélectionnés.
@@ -3161,11 +3219,11 @@ const app = createApp({
       if((kind==='mini'||kind==='long') && sportMode.value==='surprise'){
         const knee=available.filter(x=>x.category==='genoux');
         while(picked.length<2 && knee.length){
-          const chosen=knee.splice(Math.floor(Math.random()*knee.length),1)[0];
+          const chosen=sportWeightedPick(knee);knee.splice(knee.indexOf(chosen),1);
           picked.push(chosen);available.splice(available.findIndex(x=>x.id===chosen.id),1);
         }
       }
-      while(picked.length<n && available.length){const ix=Math.floor(Math.random()*available.length);picked.push(available.splice(ix,1)[0]);}
+      while(picked.length<n && available.length){const chosen=sportWeightedPick(available);picked.push(chosen);available.splice(available.indexOf(chosen),1);}
       sportDraft.value=kind==='long' ? distributeSportDuration(picked.map(x=>({...x,completed:false})),sportMinutes.value) : picked.map(x=>({...x,completed:false,plannedSeconds:Number(x.seconds)||60}));
       if(kind==='long')sportActualMinutes.value=sportDraftTotalSeconds.value/60;
       sportPick.value=null;
@@ -3176,7 +3234,7 @@ const app = createApp({
         (sportMode.value==='surprise'||x.category===sportMode.value) &&
         (!['mini','short'].includes(sportDraftKind.value)||(Number(x.seconds)||60)<=90));
       if(!choices.length){notify('Aucun autre exercice disponible avec ces filtres');return;}
-      const newExercise={...sportRandom(choices),completed:false};
+      const newExercise={...sportWeightedPick(choices),completed:false};
       sportDraft.value.splice(index,1,{...newExercise,plannedSeconds:Number(newExercise.seconds)||60});
       if(sportDraftKind.value==='long'){sportDraft.value=distributeSportDuration(sportDraft.value,sportMinutes.value);sportActualMinutes.value=sportDraftTotalSeconds.value/60;}
     }
@@ -3422,13 +3480,13 @@ const app = createApp({
     const badHabitsHomeOpen = ref(true);
     return {
       routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,groceryExcludedIds,groceryShoppingExists,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,leftoverPlanDate,leftoverPlanKind,planLeftoverSelected,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
-      wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooserFilteredPool,chooserTime,chooserEffort,chooserOperator,chooserUnknown,chooserTaskDurationLabel,chooserTaskCategoryColor,chooserTaskProjectColor,chooserTaskInfo,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
-      sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
+      wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooserFilteredPool,chooseQuickAction,chooserTime,chooserEffort,chooserOperator,chooserUnknown,chooserTaskDurationLabel,chooserTaskCategoryColor,chooserTaskProjectColor,chooserTaskInfo,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
+      sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportPreferenceQuery,sportPreferenceExercises,setSportPreference,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
       projectAlterFilter,alterForm,alterTab,alterAssignment,alterActivityDraft,addAlterActivity,removeAlterActivity,alterDayFor,currentAlter,saveAlter,editAlter,removeAlter,assignAlterDay,alterWeekDays,alterReviewQuestions,alterReviewConfigOpen,newAlterReviewQuestion,addAlterReviewQuestion,removeAlterReviewQuestion,moveAlterReviewQuestion,alterReviewForm,uniqueAlterReviews,editAlterReview,dismissAlterReview,saveAlterReview,pendingAlterReview,openPendingAlterReview,moodForm,newMoodType,moodChartDays,moodChart,moodTypeFor,moodEntryTypes,moodTone,moodTypeValue,normalizeMoodOrder,draggedMood,dropMoodType,saveMoodType,removeMoodType,saveMood,editMoodEntry,removeMoodEntry,moodPromptOpen,moodPromptDate,openMoodPrompt,dismissMoodPrompt,nowMinute,dashboardNav,jumpDashboard,dashboardNewNoteType,appointmentWeek,
       ingredientOwnedFilter,pantryExpiring,pantryOverdue,calMode,calAnchor,calendarTitle,calendarDays,appointmentsOn,calendarLayers,calendarTasksOn,calendarMilestonesOn,openCalendarTask,openCalendarMilestone,categoryFor,appointmentUpcoming,appointmentToday,appointmentNext3,weekDate,linkedLabel,reminderChoices,toggleReminder,createLinkedTask,createLinkedProject,pendingDeadlineAlert,acknowledgeDeadlineAlert,moveCalendar,openAppointment,apptForm,saveAppointment,deleteAppointment,apptCategoryName,apptCategoryColor,draggedCategory,draggedAppointment,addAppointmentCategory,renameAppointmentCategory,deleteAppointmentCategory,dropAppointmentCategory,dropAppointment,pendingAppointment,postponeDate,confirmAppointment,rescheduleAppointment,achievementForm,openAchievement,saveAchievement,removeAchievement,sortedHabits,
       ingredientEditId,ingredientEditName,startIngredientEdit,saveIngredientEdit,shoppingEditId,money,suggestedMealDraft,openSuggestedMeal,confirmSuggestedMeal,ticketItemBlocker,validateTicketDependency,groceryExpected,groceryPaid,dashboardCatalogue,dashboardEdit,dashboardDisplayModes,dashboardWidgetMode,dashboardShouldShow,dashboardEssentialSummary,widgetVisible,setWidgetVisible,moveDashboardWidget,dashboardSorted,dashboardDragged,dropDashboardWidget,depPicker,dependencyMatches,dependencyChoices,setTaskDependency,blockingTask,plannerDate,plannerCandidates,plannedTasks,plannedMinutes,availableDishes,suggestionMode,suggestionLeftovers,suggestMeal,groceryTotal,groceryRemaining,successProgress,v29Date,
       dishLevelDraft,addDishLevel,renameDishLevel,deleteDishLevel,dishLevelDragged,reorderDishLevel,dishDifficultyFilter,dishTimeFilter,dishSort,
-      randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
+      randomNoteDraft,randomNoteTypeDraft,randomNoteNewType,randomNoteEditing,randomNoteDragged,randomNoteTypeDragged,randomNoteTypeFilter,randomNoteSearch,randomNoteStatus,toggleRandomNoteFavorite,toggleRandomNoteArchive,randomNoteToTask,addRandomNote,addRandomNoteType,renameRandomNoteType,deleteRandomNoteType,reorderRandomNoteType,deleteRandomNote,dropRandomNote,randomNoteGroups,visibleRandomNotes,taskSuggestFocused,ingredientSuggestFocused,taskSuggestions,ingredientSuggestions,shoppingSuggestions,
       dishEditSearch,toggleDishIngredient,dishCategoryOpen,dishCategoryDragged,dishCategoryIsOpen,toggleDishCategory,reorderDishCategory,ticketWaiting,ticketCreatedLabel,ingredientCategoryOpen,ingredientCategoryDragged,ingredientIsOpen,toggleIngredientCategory,reorderIngredientCategory,deleteIngredientCategory,renameMilestone,ticketColorState,ticketStale,ticketNeedsAction,touchTicket,noteEditing,showArchivedNotes,noteDragged,visibleNotes,toggleNoteArchive,dropNote,menuRulesEditing,dishEditing,dishCategoryNew,dishDragged,ingredientDragged,dishCategoryList,addDishCategory,renameDishCategory,deleteDishCategory,dropDishCategory,dropIngredientCategory,renameIngredientCategory,saveDishEdit,shoppingEstimatedDraft,shoppingPriceItem,shoppingPriceInput,confirmShoppingPrice,finishShopping,
       favoriteDish,addReplacedMealToCatalogue,dishCats,setDishCats,dishFoodTypes,dishCategoryFilter,dishFoodTypeFilter,suggestDishCategory,suggestFoodType,suggestPage,suggestPageSize,suggestedDishPages,paginatedDishes,menuTab,dishQuery,ingredientQuery,dishIngredientQuery,dishIngredientChoices,shoppingQuery,dishDraft,ingredientDraft,ingredientCategoryDraft,newIngredientCategory,ingredientLocationDraft,newIngredientLocation,ingredientLocationList,addIngredientLocation,ingredientCategoryList,groupedDishIngredients,groupedIngredients,groupedShopping,shoppingDraft,shoppingQuantityDraft,shoppingIngredientId,shoppingAddMode,shoppingIngredientSearch,shoppingIngredientChoices,shoppingCategoryDraft,shoppingStoreDraft,shoppingStoreFilter,shoppingStores,pendingMeal,shoppingVisible,filteredDishes,filteredIngredients,addIngredient,addIngredientCategory,setIngredientOwned,moveShoppingCategory,shoppingCategoryDragged,addIngredientToShopping,addDish,dishName,dishIngredients,assignDish,confirmDishMissing,addShoppingItem,checkShoppingItem,removeShoppingItem,removeDish,removeIngredient,restoreTrash,emptyTrash,todayMeals,mealStats,habitStats,suggestedTasks,refreshPriorities,milestoneDraft,milestoneTaskDraft,milestoneDrag,startMilestoneTaskDrag,endMilestoneTaskDrag,dropTaskIntoMilestone,milestoneTaskLabel,milestoneTasks,milestoneDone,linkMilestoneTask,addMilestone,addMilestoneTask,toggleMilestone,setMilestonePoints,removeMilestone,milestones,weekSummary,
       menuWeekOffset,menuWeekStart,menuWeekDays,mealSlot,setMeal,dragMeal,dropMeal,setMealState,menuDragged,goodHabitsHomeOpen,badHabitsHomeOpen,pausedDashboardHabits,
@@ -3451,7 +3509,7 @@ const app = createApp({
       filters, resetFilters, activeFilterCount, taskDue, todayTasks, upcomingTasks, undatedTasks, allTasks, workTasks, doneTasks, doneWorkTasks, copyForm, copyText, copyTaskTitles,
       // tâches
       quickForm, openQuickForm, toggleQuickForm, addQuickRow, removeQuickRow, applyQuickDue, saveQuick, pastePreview, savePaste,
-      taskForm, openTaskForm, toggleTaskForm, saveTask, duplicateTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName, incompleteFilter,incompleteOpen,taskMissingFields,missingFieldLabels,incompleteTasks,incompleteCount,incompleteDrafts,incompleteDraftValue,setIncompleteDraft,cancelIncompleteDraft,saveIncompleteDraft,dashboardTasksMode,
+      taskForm, openTaskForm, toggleTaskForm, saveTask, duplicateTask, deleteTask, changeStatus, changePoints, changeDue, updateTask, projectName, incompleteFilter,incompleteOpen,incompleteFieldOptions,incompleteRequiredFields,toggleIncompleteRequiredField,incompleteDirtyCount,saveAllIncompleteDrafts,cancelAllIncompleteDrafts,taskMissingFields,missingFieldLabels,incompleteTasks,incompleteCount,incompleteDrafts,incompleteDraftValue,setIncompleteDraft,cancelIncompleteDraft,saveIncompleteDraft,dashboardTasksMode,
       selection, toggleSelect, selectMany, deselectMany, editSelected, deleteSelected, bulkForm, saveBulk,
       todayPoints, upcomingPoints,
       // projets

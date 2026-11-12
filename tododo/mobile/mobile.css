@@ -381,3 +381,17 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 #app .view-habits .tqm-habit-more-actions button{font-size:12px!important;min-height:34px!important;padding:5px 8px!important}
 #app .view-habits .tqm-habit-other{margin:8px 0;border:1px solid var(--tqm-border);border-radius:10px;padding:10px;background:white}
 #app .view-habits .tqm-habit-other-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;gap:8px}
+
+/* V79-81 : blocs additionnels, sans modifier les styles métier historiques. */
+.v79-note-tools,.v79-quick-chooser,.v79-incomplete-bulk{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.v79-note-tools label{display:flex;gap:6px;align-items:center;flex:1 1 160px}
+.v79-note-tools input,.v79-note-tools select{max-width:100%;min-width:0}
+.v79-quick-chooser button,.v79-incomplete-bulk button{padding:8px 11px;min-height:38px}
+.v79-missing-config{margin:10px 0}.v79-missing-config label{display:inline-flex;gap:5px;margin:6px 12px 6px 0;align-items:center}
+.v79-sport-preferences{margin:16px 0;padding:12px;border:1px solid var(--border,#ccc);border-radius:10px}
+.v79-sport-preferences input{width:100%;max-width:450px}.v79-sport-preference-list{max-height:260px;overflow:auto}
+.v79-sport-preference-list label{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #8883}
+.v79-sport-preference-list small{opacity:.7}.v79-sport-preference-list select{max-width:115px}
+.v79-mobile-quick{margin:10px 0}.v79-choice{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+
+.v79-source-note{padding:9px;margin:8px 0;border:1px solid #8885;border-radius:8px;font-size:.92em}

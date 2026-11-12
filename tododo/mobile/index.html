@@ -10,17 +10,17 @@
 <meta content="TQ Mobile" name="apple-mobile-web-app-title"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<title>Todo Quest · Mobile V10.0 RC</title>
-<link href="./style.css?build=10-0-rc" rel="stylesheet"/>
-<link href="./stylekoala.css?build=10-0-rc" rel="stylesheet"/>
-<link href="./styletest.css?build=10-0-rc" rel="stylesheet"/>
-<link href="mobile.css?build=10-0-rc" rel="stylesheet"/>
-<link href="nonsticky-v9-5.css?build=10-0-rc" rel="stylesheet"/>
+<title>Todo Quest · Mobile v11 test</title>
+<link href="./style.css?build=11-0-test" rel="stylesheet"/>
+<link href="./stylekoala.css?build=11-0-test" rel="stylesheet"/>
+<link href="./styletest.css?build=11-0-test" rel="stylesheet"/>
+<link href="mobile.css?build=11-0-test" rel="stylesheet"/>
+<link href="nonsticky-v9-5.css?build=11-0-test" rel="stylesheet"/>
 </head>
 <body>
 <div id="app" v-cloak="">
 <header class="tqm-header">
-<div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span><small class="tqm-version-tag" title="Version installée : Mobile V10.0 RC">v10.0 RC</small></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
+<div class="tqm-brandline"><div><div class="tqm-brand">Todo Quest <span>Mobile</span><small class="tqm-version-tag" title="Version installée : Mobile v11 test">v11 test</small></div><div :class="'sync-'+syncState" class="tqm-status"><span class="tqm-dot"></span>{{syncLabel}}</div></div><div class="tqm-balance">{{balance}} <small>pts</small></div></div>
 <div class="tqm-auth"><button class="tqm-install" hidden="" id="tqm-install" type="button">Installer</button><template v-if="firebaseReady"><button @click="signIn" type="button" v-if="!user">Se connecter avec Google</button><template v-else=""><span class="tqm-email">{{user.email}}</span><button @click="signOut" type="button">Quitter</button></template></template><a href="../index.html">Version complète ↗</a></div>
 </header>
 <div id="tqm-network-warning" class="tqm-network-warning" role="status" hidden>
@@ -165,7 +165,7 @@
 <!-- Popup : ajouter / modifier une tâche -->
 <div class="modal-backdrop" v-if="taskForm.open">
 <section aria-modal="true" class="form-panel modal task-form" role="dialog">
-<h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
+<h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2><aside class="v79-source-note" v-if="taskForm.id && data.tasks.find(t=>t.id===taskForm.id)?.sourceNoteId"><strong>Note d’origine :</strong> <span style="white-space:pre-wrap">{{data.tasks.find(t=>t.id===taskForm.id)?.sourceNoteContent}}</span></aside>
 <form @submit.prevent="saveTask">
 <label>Titre
           <input placeholder="Ex : Ranger le bureau" required="" type="text" v-model="taskForm.title"/>
@@ -561,6 +561,9 @@
 <section class="v76-incomplete" aria-label="Tâches incomplètes">
  <div class="v76-incomplete-head"><h2>🧩 Tâches incomplètes <small>({{incompleteCount}})</small></h2><button type="button" @click="incompleteOpen=!incompleteOpen" :aria-expanded="incompleteOpen">{{incompleteOpen?'Masquer':'Compléter les tâches'}}</button></div>
  <p class="hint">Tâches non terminées auxquelles il manque au moins une durée, un effort, une catégorie ou un projet. Rien n'est obligatoire pour terminer une tâche.</p>
+<details class="v79-missing-config"><summary>⚙ Choisir les champs à compléter</summary><p class="hint">Les champs décochés ne comptent pas dans les tâches incomplètes ; aucune donnée n'est supprimée.</p>
+ <label v-for="f in incompleteFieldOptions" :key="f.key"><input type="checkbox" :checked="incompleteRequiredFields.includes(f.key)" @change="toggleIncompleteRequiredField(f.key,$event.target.checked)"> {{f.label}}</label>
+ </details><div class="v79-incomplete-bulk"><button type="button" :disabled="!incompleteDirtyCount" @click="saveAllIncompleteDrafts">Enregistrer les {{incompleteDirtyCount}} tâche(s) modifiée(s)</button><button type="button" :disabled="!incompleteDirtyCount" @click="cancelAllIncompleteDrafts">Annuler les modifications</button></div>
  <template v-if="incompleteOpen">
   <label>Afficher les tâches sans <select v-model="incompleteFilter"><option value="all">N'importe quel champ</option><option value="duration">Durée</option><option value="effort">Effort</option><option value="category">Catégorie</option><option value="project">Projet</option></select></label>
   <p v-if="!incompleteTasks.length">Aucune tâche à compléter pour ce filtre.</p>
@@ -579,6 +582,7 @@
 </section>
 
 <div class="tqm-task-head"><p>Les tâches personnelles, sans les champs inutiles sur téléphone.</p><button @click="openTaskForm()" class="tqm-primary" type="button">＋ Nouvelle tâche</button></div>
+<details class="v79-mobile-quick"><summary>🎲 Je ne sais pas quoi faire</summary><div class="v79-quick-chooser" role="group" aria-label="Suggestion rapide"><button type="button" @click="chooseQuickAction('five')">⏱ 5 minutes</button><button type="button" @click="chooseQuickAction('low')">🔋 Peu d'énergie</button><button type="button" @click="chooseQuickAction('tasks')">✓ Mes tâches</button><button type="button" @click="chooseQuickAction('surprise')">🎲 Surprends-moi</button></div><small class="hint">Les filtres détaillés restent disponibles. Évite les propositions trop récentes.</small><div v-if="chooserChoice" class="v79-choice"><strong>{{chooserChoice.source}} : {{chooserChoice.title}}</strong><button type="button" @click="openChooserChoice">Ouvrir</button><button type="button" @click="chooseAction">Autre idée</button></div><details><summary>Filtres avancés</summary><label>Durée<select v-model="chooserTime"><option value="any">Toutes</option><option value="lt5">Moins de 5 min</option><option value="b5_10">5 à 10 min</option><option value="b10_15">10 à 15 min</option><option value="b15_30">15 à 30 min</option><option value="b30_60">30 à 60 min</option><option value="b60_120">1 à 2 h</option><option value="b120_180">2 à 3 h</option><option value="gte180">3 h et plus</option></select></label><label>Effort<select v-model="chooserEffort"><option value="any">Tous</option><option value="light">Léger</option><option value="medium">Moyen</option><option value="high">Important</option></select></label><label>Opérateur<select v-model="chooserOperator"><option value="and">ET</option><option value="or">OU</option></select></label><label><input type="checkbox" v-model="chooserUnknown"> Inclure les valeurs inconnues</label><button type="button" @click="chooseAction">Tirer une idée</button></details></details>
 <div aria-label="Afficher les tâches" class="tqm-task-pills" role="group">
 <button :class="{active:mobileTaskScope===choice.id}" :key="choice.id" @click="mobileTaskScope=choice.id" type="button" v-for="choice in [{id:'today',name:'Aujourd’hui'},{id:'upcoming',name:'À venir'},{id:'late',name:'En retard'},{id:'all',name:'Toutes'}]">{{choice.name}}</button>
 </div>
@@ -616,6 +620,10 @@
       <button type="button" @click="addRandomNote()" :disabled="!randomNoteDraft.trim()">+ Ajouter</button>
     </div>
   </div>
+<div class="v79-note-tools">
+ <label>Rechercher <input type="search" v-model="randomNoteSearch" placeholder="Titre ou contenu…"></label>
+ <label>Afficher <select v-model="randomNoteStatus"><option value="active">Actives</option><option value="favorites">Favoris</option><option value="archived">Archives</option></select></label>
+ </div>
   <label class="tqm-notes-filter">Afficher
     <select v-model="randomNoteTypeFilter"><option value="">Toutes les notes</option><option v-for="type in data.randomNoteTypes" :key="type" :value="type">{{type}}</option></select>
   </label>
@@ -629,7 +637,7 @@
       <template v-else><h3>{{note.title||'Sans titre'}}</h3><p>{{note.content||'Note vide'}}</p><small v-if="note.type">{{note.type}}</small></template>
       <div class="tqm-note-actions">
         <button type="button" @click="randomNoteEditing=randomNoteEditing===note.id?'':note.id">{{randomNoteEditing===note.id?'Terminer':'Modifier'}}</button>
-        <button type="button" class="tqm-note-delete" @click="deleteRandomNote(note)">Supprimer</button>
+        <button type="button" @click="toggleRandomNoteFavorite(note)" :aria-pressed="!!note.favorite">{{note.favorite?'★ Favori':'☆ Favori'}}</button><button type="button" @click="toggleRandomNoteArchive(note)">{{note.archived?'Restaurer':'Archiver'}}</button><button type="button" @click="randomNoteToTask(note)">→ Tâche</button><button type="button" class="tqm-note-delete" @click="deleteRandomNote(note)">Supprimer</button>
       </div>
     </article>
     <p v-if="!visibleRandomNotes.length" class="tqm-notes-empty">Aucune note dans cette sélection.</p>
@@ -1016,6 +1024,10 @@
 <h3>Tendance hebdomadaire</h3><div :key="w.week" class="v52-history" v-for="w in weightWeekly">Semaine du {{formatDate(w.week)}} : {{w.average}} kg ({{w.count}} mesure(s))</div>
 <details><summary>Historique détaillé</summary><div :key="w.id" class="v52-history" v-for="w in weightRecent">{{formatDate(w.date)}} : {{w.weight}} kg <button @click="deleteWeight(w)">Supprimer</button></div></details>
 </section>
+<section class="v79-sport-preferences"><h3>Préférences d’exercices</h3><p class="hint">J’aime : plus souvent proposé · Éviter : exclu des tirages · Neutre : normal. Les 98 exercices restent dans le catalogue.</p>
+ <input v-model="sportPreferenceQuery" type="search" placeholder="Rechercher un exercice…" aria-label="Rechercher un exercice">
+ <div class="v79-sport-preference-list"><label v-for="ex in sportPreferenceExercises" :key="ex.id"><span>{{ex.name}} <small>{{ex.category}}</small></span><select :value="ex.tqPreference||'neutral'" @change="setSportPreference(ex,$event.target.value)"><option value="neutral">Neutre</option><option value="like">J’aime</option><option value="avoid">Éviter</option></select></label></div>
+ </section>
 <section class="v52-card"><h2>📜 Activités effectuées</h2><p v-if="!sportHistory.length">Aucune activité enregistrée.</p><div :key="s.id" class="v52-history" v-for="s in sportHistory.slice(0,60)">{{formatDate(s.date)}} · {{s.name}} · {{s.minutes}} min <template v-if="s.kind==='walk' &amp;&amp; s.steps!==null &amp;&amp; s.steps!==undefined"> · {{s.steps}} pas</template> · +{{s.points}} pts <button @click="deleteSportSession(s)">Supprimer</button></div></section>
 </section>
 <section class="view view-wellness-report" v-if="view==='wellness-report'">
@@ -1725,15 +1737,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?build=10-0-rc"></script>
-<script src="./sport-catalog-v67.js?build=10-0-rc"></script>
+<script src="./firebase-config.js?build=11-0-test"></script>
+<script src="./sport-catalog-v67.js?build=11-0-test"></script>
 <script>window.TODO_QUEST_MOBILE = true;</script>
-<script src="./sync-merge-v72.js?build=10-0-rc"></script>
-<script src="./js/01-core.js?build=10-0-rc"></script>
-<script src="./js/02-catalogue.js?build=10-0-rc"></script>
-<script src="./js/03-storage.js?build=10-0-rc"></script>
-<script src="./js/04-task-components.js?build=10-0-rc"></script>
-<script src="./js/05-application.js?build=10-0-rc"></script>
+<script src="./sync-merge-v72.js?build=11-0-test"></script>
+<script src="./js/01-core.js?build=11-0-test"></script>
+<script src="./js/02-catalogue.js?build=11-0-test"></script>
+<script src="./js/03-storage.js?build=11-0-test"></script>
+<script src="./js/04-task-components.js?build=11-0-test"></script>
+<script src="./js/05-application.js?build=11-0-test"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {

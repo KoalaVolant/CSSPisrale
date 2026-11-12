@@ -1,0 +1,8 @@
+TODO QUEST V79 PC / V11 MOBILE - REGROUPE V79+V80+V81 - VERSION TEST
+
+V79 : Notes au pif, recherche, favoris, archivage et restauration, conversion en tâche avec confirmation. Une note archivée reste dans l’export.
+V80 : préférences J’aime/Neutre/Éviter pour exercices ; anti-répétition pondérée sur les 3 dernières séances. Les préférences se synchronisent dans sportExercises.
+V81 : boutons de suggestion rapide PC/mobile ; historique local des 10 dernières idées de la session ; réglage local des champs considérés manquants et enregistrement groupé des brouillons.
+
+INSTALLATION: conserver une sauvegarde JSON, déployer tous les fichiers sur une BRANCHE DE TEST, y compris js/ et mobile/js/. Recharger les pages et relancer la PWA.
+ATTENTION : les tests automatiques ne remplacent pas la recette des conflits Firebase entre deux appareils. N'effectuez pas de tests concurrentiels sur vos données de production.
