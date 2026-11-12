@@ -1,0 +1,10 @@
+/* V80 : uniquement Maintenance et Statistiques PC. */
+.v80-maintenance,.v80-report{margin:18px 0;padding:16px;border:1px solid var(--border,#cbd5e1);border-radius:12px}
+.v80-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin:12px 0}
+.v80-stats-grid article{display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid #cbd5e1;border-radius:9px}
+.v80-stats-grid strong{font-size:1.3rem}
+.v80-stats-grid small,.v80-findings{overflow-wrap:anywhere}
+.v80-findings{max-height:420px;overflow:auto;padding-left:22px}
+.v80-findings li{margin:8px 0}
+.v80-warning{padding:12px;border-left:3px solid #ca8a04;background:rgba(202,138,4,.06)}
+@media(max-width:700px){.v80-maintenance,.v80-report{padding:10px}}

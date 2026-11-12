@@ -88,7 +88,7 @@ const TABS = [
   { id: 'rewards',    label: 'Récompenses' },
   { id: 'inventory',  label: 'Inventaire' },
   { id: 'activities', label: 'Idées d’activités' },
-  { id: 'data',       label: 'Sauvegarde' },
+  { id: 'data',       label: 'Maintenance' },
 ];
 
 const NAV_GROUPS = [

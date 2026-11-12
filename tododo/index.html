@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Todo Quest · PC v79 test</title>
-  <link rel="stylesheet" href="style.css?build=79-0-test">
-  <link rel="stylesheet" href="stylekoala.css?build=79-0-test">
-  <link rel="stylesheet" href="styletest.css?build=79-0-test">
-  <link rel="stylesheet" href="dashboard-v77.css?build=79-0-test">
+  <title>Todo Quest · PC v80 test</title>
+  <link rel="stylesheet" href="style.css?build=80-test">
+  <link rel="stylesheet" href="stylekoala.css?build=80-test">
+  <link rel="stylesheet" href="styletest.css?build=80-test">
+  <link rel="stylesheet" href="dashboard-v77.css?build=80-test"
+  <link rel="stylesheet" href="maintenance-v80.css?build=80-test">
 </head>
 <body>
 
@@ -17,7 +18,7 @@
   <header class="app-header tq69-header">
     <div class="tq69-topline">
       <div class="app-brand tq69-brand">
-        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC v79 test">v79 <span>TEST</span></small></h1>
+        <h1 class="app-title">Todo Quest <small class="tq-version-tag" title="Version installée : PC v80 test">v80 <span>TEST</span></small></h1>
         <div class="sync-box tq69-sync">
           <span class="sync-status" :class="'sync-' + syncState">{{ syncLabel }}</span>
           <template v-if="firebaseReady">
@@ -169,7 +170,7 @@
     <!-- Popup : ajouter / modifier une tâche -->
     <div class="modal-backdrop" v-if="taskForm.open">
     <section class="form-panel modal task-form" role="dialog" aria-modal="true">
-      <h2>{{ taskForm.id ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2><aside class="v79-source-note" v-if="taskForm.id && data.tasks.find(t=>t.id===taskForm.id)?.sourceNoteId"><strong>Note d’origine :</strong> <span style="white-space:pre-wrap">{{data.tasks.find(t=>t.id===taskForm.id)?.sourceNoteContent}}</span></aside>
+      <h2>{{ taskForm.id ? 'Modifier la tâche' : (taskForm.sourceNoteId ? 'Créer une tâche depuis la note' : 'Nouvelle tâche') }}</h2><aside class="v79-source-note" v-if="taskForm.sourceNoteId"><strong>Note d’origine (conservée) :</strong> <span style="white-space:pre-wrap">{{taskForm.sourceNoteContent}}</span></aside><label v-if="taskForm.sourceNoteId" class="tq-note-task-scope">Type de tâche <select v-model="taskForm.scope"><option value="personal">Personnelle</option><option value="work">Professionnelle</option></select></label>
       <form @submit.prevent="saveTask">
         <label>Titre
           <input type="text" v-model="taskForm.title" required placeholder="Ex : Ranger le bureau">
@@ -911,6 +912,28 @@
         ]" :key="card.name"><small>{{ card.name }}</small><strong>{{ card.value }}</strong></article>
       </div>
       <section class="week-summary"><h3>Bilan de la semaine en cours</h3><p>{{ weekSummary.tasks }} tâches terminées · {{ weekSummary.tickets }} tickets clôturés · {{ weekSummary.points }} points · {{ weekSummary.meals }} repas respectés</p><p>Respect des menus évalués (historique global) : <strong>{{ mealStats.rate }} %</strong> ({{ mealStats.done }} faits, {{ mealStats.missed }} non respectés).</p></section>
+      <section class="v80-report" aria-label="Comparaison de période">
+        <h3>Comparaison des périodes</h3>
+        <label>Période
+          <select v-model="v80Period">
+            <option value="week">Semaine en cours</option><option value="lastWeek">Semaine précédente</option>
+            <option value="month">Mois en cours</option><option value="lastMonth">Mois précédent</option>
+          </select>
+        </label>
+        <p class="hint">{{v80Stats.range.start}} au {{v80Stats.range.end}} · comparaison avec la période précédente de même durée.</p>
+        <div class="v80-stats-grid">
+          <article><small>Tâches terminées</small><strong>{{v80Stats.current.tasks}}</strong><small>Avant : {{v80Stats.previous.tasks}} · écart {{v80Stats.current.tasks-v80Stats.previous.tasks>=0?'+':''}}{{v80Stats.current.tasks-v80Stats.previous.tasks}}</small></article>
+          <article><small>Points des tâches terminées</small><strong>{{v80Stats.current.points}}</strong><small>Avant : {{v80Stats.previous.points}}</small></article>
+          <article><small>Durées approximatives renseignées</small><strong>{{v80Stats.current.estimatedMinutes}} min</strong><small>{{v80Stats.current.estimatedCount}} tâche(s) avec durée · {{v80Stats.current.unknownCount}} sans durée</small></article>
+          <article><small>Séances sportives enregistrées</small><strong>{{v80Stats.current.sportSessions}}</strong><small>Avant : {{v80Stats.previous.sportSessions}}</small></article>
+          <article><small>Validations d'habitudes enregistrées</small><strong>{{v80Stats.current.habitValidations}}</strong><small>Avant : {{v80Stats.previous.habitValidations}}</small></article>
+        </div>
+        <details><summary>Répartition des tâches terminées par catégorie</summary>
+          <p v-if="!v80Stats.current.categories.length">Aucune tâche terminée sur cette période.</p>
+          <p v-for="c in v80Stats.current.categories" :key="c.name">{{c.name}} : {{c.count}} tâche(s)</p>
+        </details>
+        <small>Les minutes sont des estimations déclarées, pas un chronométrage. Les habitudes comptent les dates de validation historisées, sans reconstituer les occurrences attendues. Les points concernent les tâches enregistrées, pas l'ensemble du solde.</small>
+      </section>
       <h3>Répartition personnel et travail</h3>
       <div class="stats-cards"><article v-for="scope in ['personal','work']" :key="scope"><strong>{{ scope==='personal'?'Personnel':'Travail' }}</strong><p>{{ doneStats[scope].count }} tâches · {{ doneStats[scope].total }} pts · moyenne {{ doneStats[scope].average }} pts</p></article></div>
       <section class="habit-statistics"><h3>Régularité des habitudes : {{ habitStats.period }}</h3><p>Bonnes habitudes : <strong>{{ habitStats.good.rate===null?'Aucune occurrence prévue':habitStats.good.rate+' %' }}</strong> ({{ habitStats.good.achieved }} / {{ habitStats.good.expected }} occasions réalisées).</p><p>Mauvaises habitudes : <strong>{{ habitStats.bad.rate===null?'Aucune journée':habitStats.bad.rate+' %' }}</strong> de journées sans malus ({{ habitStats.bad.items.reduce((s,x)=>s+x.incidents,0) }} malus consignés).</p><details><summary>Détail par habitude</summary><p v-for="h in habitStats.good.items" :key="h.title">✓ {{ h.title }} : {{ h.achieved }} / {{ h.expected }}</p><p v-for="h in habitStats.bad.items" :key="h.title">✕ {{ h.title }} : {{ h.achieved }} / {{ h.expected }} journées sans malus, {{ h.incidents }} malus</p></details><small>Calcul sur les dates actives connues ; les reports de bonnes habitudes sont exclus. Les semaines partielles plafonnent l'objectif hebdomadaire aux jours actifs.</small></section>
@@ -1620,6 +1643,21 @@
       <p v-if="user">Tes données sont synchronisées dans ton cloud Firebase ({{ user.email }}) et copiées sur cet appareil.</p>
       <p v-else>Tes données sont stockées dans ce navigateur. Connecte-toi avec Google (en haut) pour les synchroniser entre tes appareils.</p>
       <p>Tu peux aussi faire une sauvegarde manuelle en JSON, par précaution.</p>
+      <section class="v80-maintenance" aria-label="Contrôle de cohérence des données">
+        <h3>Contrôle de santé (lecture seule)</h3>
+        <p>Vérifie les identifiants, les liens entre tâches, projets et jalons, les dates et certaines valeurs. Aucune donnée n'est modifiée.</p>
+        <button type="button" @click="v80RunAudit">Analyser les données actuelles</button>
+        <template v-if="v80Audit">
+          <p role="status"><strong>{{v80Audit.checked}}</strong> objets examinés · <strong>{{v80Audit.errors}}</strong> erreur(s) · <strong>{{v80Audit.warnings}}</strong> avertissement(s).</p>
+          <p v-if="!v80Audit.findings.length">Aucune anomalie détectée par les contrôles disponibles.</p>
+          <details v-else open><summary>Voir les anomalies ({{v80Audit.findings.length}})</summary>
+            <ul class="v80-findings"><li v-for="(issue,i) in v80Audit.findings" :key="i"><strong>{{issue.severity==='error'?'Erreur':'À vérifier'}}</strong> : {{issue.message}}</li></ul>
+            <small v-if="v80Audit.truncated">Rapport limité à 250 anomalies.</small>
+          </details>
+          <button type="button" @click="v80DownloadReport">Télécharger le rapport JSON (sans modifier les données)</button>
+        </template>
+      </section>
+      <p class="v80-warning">Avant tout import ou réinitialisation, conserve une sauvegarde JSON. L'import remplace les données actuelles et peut se synchroniser vers Firebase.</p>
       <div class="data-actions">
         <button type="button" @click="exportData">Exporter (JSON)</button>
         <label class="file-button">Importer (JSON)
@@ -1784,14 +1822,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js?build=79-0-test"></script>
-<script src="sport-catalog-v67.js?build=79-0-test"></script>
-<script src="./sync-merge-v72.js?build=79-0-test"></script>
-<script src="./js/01-core.js?build=79-0-test"></script>
-<script src="./js/02-catalogue.js?build=79-0-test"></script>
-<script src="./js/03-storage.js?build=79-0-test"></script>
-<script src="./js/04-task-components.js?build=79-0-test"></script>
-<script src="./js/05-application.js?build=79-0-test"></script>
+<script src="firebase-config.js?build=80-test"></script>
+<script src="sport-catalog-v67.js?build=80-test"></script>
+<script src="./sync-merge-v72.js?build=80-test"></script>
+<script src="./js/01-core.js?build=80-test"></script>
+<script src="./js/02-catalogue.js?build=80-test"></script>
+<script src="./js/03-storage.js?build=80-test"></script>
+<script src="./js/04-task-components.js?build=80-test"></script>
+<script src="./maintenance-v80.js?build=80-test"></script>
+<script src="./js/05-application.js?build=80-test"></script>
 <script>
   // Diagnostic visible si l'application Vue ne s'est pas initialisee.
   window.addEventListener('load', function () {
@@ -1801,7 +1840,7 @@
         var warning = document.createElement('div');
         warning.setAttribute('role', 'alert');
         warning.style.cssText = 'padding:24px;margin:30px auto;max-width:760px;background:#fff3f3;border:2px solid #bd2020;color:#711;font:16px Arial,sans-serif;line-height:1.5';
-        warning.textContent = 'Todo Quest PC V77.4 n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, dossier js/, firebase-config.js et fichiers CSS), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
+        warning.textContent = 'Todo Quest PC V80 n’a pas réussi à démarrer. Vérifie que les 5 fichiers de la même version sont présents ensemble (index.html, dossier js/, firebase-config.js et fichiers CSS), puis recharge avec Ctrl+F5. Pour identifier l’erreur exacte : F12 > Console.';
         document.body.prepend(warning);
       }
     }, 1200);

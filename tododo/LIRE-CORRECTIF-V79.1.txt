@@ -1,0 +1,10 @@
+TODO QUEST PC V79.1 + MOBILE V11.1 - CORRECTIF NOTES VERS TACHES
+
+Le bouton « -> Tâche » ouvre le formulaire de création sans enregistrer de tâche.
+Le titre et le contenu de la note sont préremplis.
+Choisir type personnel/professionnel, date butoir, catégorie, projet, points et autres options puis Enregistrer.
+Annuler ne crée aucune tâche. La note initiale reste intacte.
+Une tâche créée garde sourceNoteId et sourceNoteContent pour traçabilité.
+
+Installation: remplacer les fichiers correspondants à la racine /tododo/ et dans /mobile/.
+Sauvegarder le JSON avant la mise à jour.

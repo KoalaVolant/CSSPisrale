@@ -149,3 +149,6 @@
 .v79-mobile-quick{margin:10px 0}.v79-choice{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
 
 .v79-source-note{padding:9px;margin:8px 0;border:1px solid #8885;border-radius:8px;font-size:.92em}
+
+/* V79.1: type visible lors de conversion d'une note en tâche. */
+.tq-note-task-scope {display:block;}

@@ -486,10 +486,13 @@ const app = createApp({
     function toggleRandomNoteFavorite(n){n.favorite=!n.favorite;}
     function toggleRandomNoteArchive(n){n.archived=!n.archived;if(n.archived&&randomNoteEditing.value===n.id)randomNoteEditing.value='';}
     function randomNoteToTask(n){
-      if(!confirm('Créer une tâche personnelle à partir de « '+String(n.title||'Note au pif')+' » ? La note sera conservée.'))return;
-      const title=String(n.title||n.content||'Note au pif').trim().slice(0,120)||'Note au pif';
-      data.tasks.push(newTask({title,scope:'personal',sourceNoteId:n.id,sourceNoteContent:String(n.content||'')}));
-      notify('Tâche créée depuis la note');
+      // Pas de creation tant que le formulaire n'a pas ete valide.
+      openTaskForm();
+      taskForm.scope='personal';
+      taskForm.title=String(n.title||n.content||'Note au pif').trim().slice(0,120)||'Note au pif';
+      taskForm.sourceNoteId=n.id;
+      taskForm.sourceNoteContent=String(n.content||'');
+      taskForm.due=''; // L'utilisateur choisit lui-meme son echeance.
     }
 
     const dashboardNewNoteType=ref('');
@@ -922,7 +925,7 @@ const app = createApp({
     /* ---------- Tâches ---------- */
     const taskForm = reactive({
       open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', estimatedMinutes: null, estimatedEffort: '',
-      urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',alterId:'',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',
+      urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',alterId:'',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',sourceNoteId:'',sourceNoteContent:'',
     });
 
     const DRAFT_KEY='todo-quest-form-drafts-v62-test';
@@ -936,15 +939,16 @@ const app = createApp({
         Object.assign(taskForm, {
           id: task.id, title: task.title, category: task.category || '', points: task.points, malus: !!task.malus, scope:task.scope||'personal', estimatedMinutes: task.estimatedMinutes ?? null, estimatedEffort: task.estimatedEffort || '',
           status: task.status, projectId: task.projectId || '', due: task.due || '',
-          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '', dependsOn: task.dependsOn || '', milestoneId:task.milestoneId||'',alterId:task.alterId||'',startDate:task.startDate||'',recurrence:task.recurrence||'',recurrenceEnd:task.recurrenceEnd||'',subtaskBonusMode:task.subtaskBonusMode||'add',subtaskBonusPoints:task.subtaskBonusPoints??task.points??10,subtaskBonusMultiplier:task.subtaskBonusMultiplier||1.5,subtasks:clone(task.subtasks||[]).map(s=>({...s,points:Number.isFinite(Number(s.points))?Number(s.points):5})),subtaskDraft:'',
+          urgency: task.urgency || '', difficulty: task.difficulty || '', doneAt: task.doneAt || '', workCategoryNames: workTags(task), ticketName: task.ticketName || '', dependsOn: task.dependsOn || '', milestoneId:task.milestoneId||'',alterId:task.alterId||'',startDate:task.startDate||'',recurrence:task.recurrence||'',recurrenceEnd:task.recurrenceEnd||'',subtaskBonusMode:task.subtaskBonusMode||'add',subtaskBonusPoints:task.subtaskBonusPoints??task.points??10,subtaskBonusMultiplier:task.subtaskBonusMultiplier||1.5,subtasks:clone(task.subtasks||[]).map(s=>({...s,points:Number.isFinite(Number(s.points))?Number(s.points):5})),subtaskDraft:'',sourceNoteId:task.sourceNoteId||'',sourceNoteContent:task.sourceNoteContent||'',
         });
       } else {
         Object.assign(taskForm, {
           id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId, scope: view.value==='work'?'work':'personal', estimatedMinutes: null, estimatedEffort: '',
-          due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',
+          due: today.value, urgency: '', difficulty: '', doneAt: '', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',sourceNoteId:'',sourceNoteContent:'',
         });
       }
       if(!task && persistedDrafts.task && persistedDrafts.task.scope===taskForm.scope)Object.assign(taskForm,persistedDrafts.task,{open:false,id:null});
+      if(!task){taskForm.sourceNoteId='';taskForm.sourceNoteContent='';}
       quickForm.open = false;
       taskForm.open = true;
     }
@@ -1023,6 +1027,7 @@ const app = createApp({
         subtaskBonusPoints: Math.max(0,Number(taskForm.subtaskBonusPoints)||0),
         subtaskBonusMultiplier: Math.max(1,Number(taskForm.subtaskBonusMultiplier)||1.5),
         subtasks: clone(taskForm.subtasks || []),
+        ...(taskForm.sourceNoteId?{sourceNoteId:taskForm.sourceNoteId,sourceNoteContent:taskForm.sourceNoteContent||''}:{}),
         urgency: taskForm.urgency || '',
         difficulty: taskForm.difficulty || '',
         dependsOn: taskForm.dependsOn || '',
@@ -2424,6 +2429,21 @@ const app = createApp({
     function toggleMilestone(m){const list=milestoneTasks(m);if(list.length&&!milestoneDone(m)){notify('Termine les sous-tâches du jalon avant de le valider');return;}m.done=!milestoneDone(m);m.doneAt=m.done?today.value:'';}
     function removeMilestone(m){data.trash.unshift({id:uid(),type:'milestone',deletedAt:new Date().toISOString(),payload:clone(m)});data.tasks.forEach(t=>{if(t.milestoneId===m.id)t.milestoneId='';});data.projectMilestones=data.projectMilestones.filter(x=>x.id!==m.id);}
     function milestones(project){return data.projectMilestones.filter(m=>m.projectId===project.id);}
+    /* V80 : comparatifs et audit en lecture seule. */
+    const v80Period = ref('week');
+    const v80Stats = computed(()=>window.TQMaintenanceV80.stats(data,v80Period.value,today.value,taskValue));
+    const v80Audit = ref(null);
+    function v80RunAudit(){
+      v80Audit.value=window.TQMaintenanceV80.audit(data);
+    }
+    function v80DownloadReport(){
+      if(!v80Audit.value)return;
+      const payload={version:'v80',auditedAt:new Date().toISOString(),report:v80Audit.value};
+      const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+      const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;
+      link.download='todo-quest-diagnostic-'+today.value+'.json';link.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
     const weekSummary=computed(()=>{const start=monday(today.value);const end=new Date(start+'T12:00:00');end.setDate(end.getDate()+6);const toDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const endS=toDate(end);const tasks=data.tasks.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.status==='done');const tickets=data.workTickets.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.done);return {tasks:tasks.length,tickets:tickets.length,points:tasks.reduce((s,t)=>s+taskValue(t),0),meals:Array.from({length:7},(_,i)=>{const d=new Date(start+'T12:00:00');d.setDate(d.getDate()+i);const date=toDate(d);return ['lunch','dinner'].map(k=>mealSlot(date,k));}).flat().filter(m=>m.state==='done').length};});
 
     // V29 : dépendances, planification, calendrier, repas, budget courses, succès et widgets.
@@ -3522,6 +3542,7 @@ const app = createApp({
       // inventaire
       invForm, startEditInv, saveInv, deleteInv, refundInv,
       // données
+      v80Period,v80Stats,v80Audit,v80RunAudit,v80DownloadReport,
       exportData, importData, resetAll,
       CHALLENGE_KINDS, challengeForm, openChallengeForm,newChallengeFromHabit, saveChallenge, deleteChallenge, toggleChallenge, hideChallengeHome, currentChallenges, challengeHistory, challengeProgress,
       habitForm, habitWeekdays,addHabitProgressionStep,removeHabitProgressionStep,activateHabitProgression,habitProgressionCompleted,openHabitForm, saveHabit, dashboardHabits, habitIsFinished, markHabitFinished, habitDue, habitDoneToday, completeHabit, postponeHabit, completeHabitPast, postponeLateHabit, undoHabitPast, habitPeriodStats, undoHabit, deleteHabit, habitCount, habitAwards, habitLateDays, habitQuantity, setHabitQuantity, habitTotal, habitPenaltiesToday, penalizeHabit, undoHabitPenalty,

@@ -2,7 +2,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 import re, subprocess
 base=Path(__file__).resolve().parents[1]
-for root,badge,tag in ((base,'v79','79-0-test'),(base/'mobile','v11 test','11-0-test')):
+for root,badge,tag in ((base,'v79','79-1-test'),(base/'mobile','v11.1 test','11-1-test')):
  s=(root/'index.html').read_text()
  assert badge in s
  soup=BeautifulSoup(s,'html.parser')
@@ -15,6 +15,6 @@ for root,badge,tag in ((base,'v79','79-0-test'),(base/'mobile','v11 test','11-0-
   subprocess.run(['node','--check',str(root/'js'/name)],check=True,capture_output=True)
  print('OK:',badge,'assets and diagnostic')
 sw=(base/'mobile/sw.js').read_text()
-assert 'tqm-shell-v11-0-test' in sw and 'ignoreSearch:true' in sw
+assert 'tqm-shell-v11-1-test' in sw and 'ignoreSearch:true' in sw
 subprocess.run(['node','--check',str(base/'mobile/sw.js')],check=True)
 print('OK: cache revision, offline query fallback')

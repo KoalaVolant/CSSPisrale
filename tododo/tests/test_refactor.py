@@ -20,5 +20,5 @@ for home,source in [(BASE,'app.js'),(BASE/'mobile','app-mobile.js')]:
     print('OK modular source preservation + script order + syntax:',home)
 sw=(BASE/'mobile'/'sw.js').read_text(encoding='utf-8')
 for label in labels: assert './js/'+label in sw
-assert 'tqm-shell-v11-0-test' in sw
+assert 'tqm-shell-v11-1-test' in sw
 print('OK service-worker cache version and assets')

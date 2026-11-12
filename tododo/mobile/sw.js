@@ -1,5 +1,5 @@
 /* Todo Quest Mobile V10: versioned shell, network first, offline fallback. */
-const CACHE = 'tqm-shell-v11-0-test';
+const CACHE = 'tqm-shell-v11-1-test';
 const ASSETS = ['./','./index.html','./mobile.css','./nonsticky-v9-5.css',
   './js/01-core.js','./js/02-catalogue.js','./js/03-storage.js',
   './js/04-task-components.js','./js/05-application.js',

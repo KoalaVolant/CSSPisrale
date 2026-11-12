@@ -395,3 +395,7 @@ body{padding:0!important;margin:0!important;font-family:system-ui,-apple-system,
 .v79-mobile-quick{margin:10px 0}.v79-choice{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
 
 .v79-source-note{padding:9px;margin:8px 0;border:1px solid #8885;border-radius:8px;font-size:.92em}
+
+/* V11.1: formulaire complet lors d'une conversion note -> tâche. */
+.tqm-note-task-creation .tqm-hide-field {display:block !important;}
+.tqm-note-task-creation .tqm-note-task-scope {display:block;}

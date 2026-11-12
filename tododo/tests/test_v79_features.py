@@ -7,7 +7,7 @@ for folder in (BASE,BASE/'mobile'):
  for name in ('randomNoteSearch','randomNoteStatus','toggleRandomNoteArchive','toggleRandomNoteFavorite','randomNoteToTask','sportPreferenceExercises','setSportPreference','saveAllIncompleteDrafts','incompleteRequiredFields','chooseQuickAction'):
   assert name in app and name in html,(folder,name)
  assert 'sportRecentIds' in app and 'chooserRecentIds' in app
- assert "sourceNoteId:n.id" in app
+ assert "taskForm.sourceNoteId=n.id" in app
  assert "sourceNoteContent" in html
  assert "x.tqPreference!=='avoid'" in app
  assert "sportWeightedPick(available)" in app

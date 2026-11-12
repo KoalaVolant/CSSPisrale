@@ -1,0 +1,8 @@
+TODO QUEST V80 : PC uniquement. Mobile V11.1 inchangé.
+- Statistiques : comparaison semaines/mois et répartition des tâches terminées.
+- Configuration > Maintenance : export/import existants + audit de lecture seule.
+- Pas de nouveau bloc sur le dashboard.
+- Le moteur métier et la synchronisation Firebase ne sont pas modifiés.
+- Avant déploiement : sauvegarde JSON et copie de la V79.1.
+- Après déploiement : badge PC v80 TEST, tester audit et statistiques.
+- ATTENTION : les statistiques historiques dépendent des dates de validation enregistrées ; aucun historique n'est reconstruit artificiellement.
