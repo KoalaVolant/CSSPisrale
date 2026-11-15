@@ -10,6 +10,8 @@
 .fl989 br{ display:none; }
 .fl989 img{ object-fit:cover; }
 
+.koala{display:flex; justify-content:center; font-size:8px; letter-spacing:5px; }
+
 [class*="f989-circ"]{ background:var(--fl989-mc); 
     width:200px; height:200px; border-radius:50%; position:absolute;
 z-index:2; }
