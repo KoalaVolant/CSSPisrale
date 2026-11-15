@@ -1,0 +1,35 @@
+TODO QUEST PC V78.0 RC + MOBILE V10.0 RC
+=========================================
+
+CANDIDATE DE STABILISATION : PAS UNE VALIDATION FIREBASE PRODUCTION.
+
+NOUVEAUTES
+- Identifiants visibles PC v78.0 RC et mobile v10.0 RC.
+- Références JavaScript et CSS locales uniformément versionnées : les navigateurs
+  ne doivent plus mélanger les révisions précédentes et la version courante.
+- Service worker mobile : cache v10, correspondance hors ligne possible même
+  si l'URL du script comporte ?build=..., repli vers index.html si navigation.
+- diagnostic.html (PC) et mobile/diagnostic.html : contrôles HTTP de fichiers,
+  indépendants de Firebase. Aucune donnée de l'utilisateur n'y est manipulée.
+- Tests de structure et d'intégrité ajoutés dans tests/test_release_v78.py.
+
+CONSERVE
+- Toutes les fonctionnalités et données PC V77.5 / Mobile V9.5 ; la logique métier
+  de l'application est inchangée, y compris tous les calculs de points et habitudes.
+- Navigation mobile, titres non sticky et dashboard simple/détaille.
+
+DEPLOIEMENT
+1. Export JSON + conserver le ZIP V77.5/V9.5 pour retour arrière.
+2. Déployer tous les fichiers du paquet sous /tododo/ sur une branche de test.
+   Les dossiers js/ et mobile/js/ font partie du paquet et sont indispensables.
+3. Ouvrir /tododo/diagnostic.html et /tododo/mobile/diagnostic.html ;
+   vérifier que tous les fichiers locaux sont présents.
+4. Vérifier les badges, tester les tâches, les habitudes, les notes, les cours
+   et le sport, puis des écritures croisées sur des données fictives.
+5. Pour revenir en arrière, redéployer le ZIP V77.5/V9.5 complet.
+
+LIMITES
+- Ne pas prendre les tests simulés pour une preuve de sécurité sur Firebase réel.
+- Le mode hors connexion n'est pas garanti pour les dépendances CDN ni les écritures Firebase.
+- Le cœur Vue reste volumineux, même si son JavaScript est découpé en 5 fichiers.
+- Aucune modification destructive ni migration des données n'est incluse.

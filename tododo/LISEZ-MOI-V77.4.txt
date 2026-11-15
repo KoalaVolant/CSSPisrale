@@ -1,0 +1,8 @@
+Todo Quest V77.4 PC et Mobile V9.4 (TEST)
+
+PC : titre des tâches Simple 16px, texte des boutons 10px, bouton Modifier ouvrant la fiche complète. Les champs catégorie/projet/échéance restent modifiables directement.
+Mobile : onglet Habitudes simplifié, quantité, valider, demain ; actions avancées dans « Plus d’actions ». Les formulaires métier sont inchangés.
+
+Installer dans /tododo/ en remplaçant les fichiers correspondants, sans supprimer le dossier mobile. Tester d’abord hors production et sauvegarder le JSON.
+
+Firebase : mécanisme inchangé. Les conflits d’écritures entre appareils ne sont pas validés par un test réel.

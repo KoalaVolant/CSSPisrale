@@ -1,0 +1,29 @@
+TODO QUEST PC V77.5 / MOBILE V9.5 — CORRECTIF ET AUDIT DE REGRESSION
+
+PC : identique à V77.4 sauf badge v77.5 test. Le moteur métier est INCHANGE.
+MOBILE : ajout de mobile/nonsticky-v9-5.css, chargé APRES les anciennes feuilles.
+Cette feuille supprime les titres/barres collants en mobile (page, filtres, entêtes).
+Elle ne touche PAS à la barre d'onglets fixe en bas ni aux popups.
+Cache PWA renouvelé : tqm-shell-v9-5.
+
+INSTALLATION
+1. Sauvegarder/exporter les données et conserver les ZIP précédents.
+2. Déployer le dossier PC racine dans /tododo/ ; mobile/ dans /tododo/mobile/.
+3. Ne pas fusionner les fichiers JS de différentes versions.
+4. Recharger, vérifier PC v77.5 test et Mobile v9.5 test.
+
+TESTS AUTOMATIQUES (racine, Python 3, Node.js ; BeautifulSoup nécessaire)
+python3 tests/test_refactor.py
+python3 tests/test_dashboard_static.py
+python3 tests/test_release_v77_5.py
+node tests/test_smoke.cjs
+node tests/test_merge_edge_cases.cjs
+
+LIMITES IMPORTANTES
+- L'environnement Firebase de production n'est pas accessible aux tests.
+- Les conflits PC/mobile réels, la synchro hors ligne et la résolution utilisateur
+  d'un conflit ne sont PAS validés.
+- Les cinq scripts sont séparés sans modifier leur contenu, mais la grosse fonction
+  setup Vue reste monolithique : ce n'est pas une refonte métier totale.
+- Les tests de navigateur ci-joints ne remplacent pas une recette complète réelle.
+- Utiliser une branche et un environnement de test pour tout essai destructif.
