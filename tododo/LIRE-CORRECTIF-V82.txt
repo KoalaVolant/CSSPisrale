@@ -1,0 +1,19 @@
+TODO QUEST - correctif expérimental V82 (23/11/2026)
+
+Changements PC ET mobile :
+- Modification groupée : début et date butoir + retrait de chaque date.
+- Calendrier : les trois cases d’affichage sont mémorisées sur cet appareil (localStorage).
+- Tickets : saisie facultative ancienneté Salesforce en HEURES, date/heure d’ouverture reconstituée, ancienneté modifiable, tri ancienneté décroissante par défaut. Attention : la date calculée est une approximation au moment de la saisie ; Salesforce peut afficher des valeurs arrondies.
+- Saisie de tâche express sans date ni points, depuis la liste des tâches.
+- Suppression des quatre fenêtres de rappel automatiques (humeur, échéances, rendez-vous, repas) et de l’ouverture spontanée du bilan Alter. Les écrans métiers restent accessibles.
+- Menu de la semaine simplifié par défaut, avec saisie libre midi/soir ; mode détaillé réactivable.
+- Cache et scripts versionnés pour déclencher les mises à jour.
+- Tests historiques (V77.5, V78, V79) conservés sous tests/historical.
+
+LIMITES / AVANT MISE EN PRODUCTION :
+- Pas de validation navigateur multi-appareils ni de test Firebase réel.
+- Firestore : vérifier règles de sécurité et propriété des documents côté console ; aucune règle fournie dans l’archive source.
+- Une ancienne donnée modifiée par un autre appareil peut toujours entrer en conflit de synchronisation.
+- Sauvegarder l’export JSON des données avant déploiement, puis vérifier l’import et le mode hors ligne.
+- Les filtres du calendrier sont locaux à chaque navigateur et non synchronisés (choix intentionnel).
+- Modifier les anciennes dates de tickets en heures peut changer les statistiques fondées sur la date de création.
