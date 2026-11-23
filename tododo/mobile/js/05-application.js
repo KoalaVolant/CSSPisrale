@@ -712,7 +712,7 @@ const app = createApp({
       try { const u=new URL(value);return ['https:','http:'].includes(u.protocol) ? u.href : ''; }
       catch(e){return '';}
     }
-    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',startDate:todayStr(),due:'',category:'',typeId:'',url:''});
+    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',startDate:'',ageHours:'',due:'',category:'',typeId:'',url:''});
     const collapsedTickets = reactive({});
     function isTicketCollapsed(id) { return collapsedTickets[id] !== false; }
     function toggleTicketCollapse(id) { collapsedTickets[id] = !isTicketCollapsed(id); }
@@ -736,7 +736,7 @@ const app = createApp({
     }
     const ticketInputs = reactive({});
     data.workTickets.forEach(t=>{ticketInputs[t.id]={name:'',points:10};});
-    const ticketSort = ref('manual');
+    const ticketSort = ref('age-desc');
     const hideWaitingTickets = ref(false);
     const ticketNow = ref(Date.now());
     const ticketActivityDate = t => { const raw=t.lastActivityAt || t.createdAtTime || t.createdAt || t.startDate; if(!raw)return NaN; const ms=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw).getTime();return ms; };
@@ -745,6 +745,8 @@ const app = createApp({
     const ticketWaiting = t => !!t.waiting && !ticketNeedsAction(t);
     const ticketColorState = t => ticketNeedsAction(t)?'pending':ticketWaiting(t)?'waiting':ticketStale(t)?'stale':'clear';
     const ticketStateRank = t => ({pending:0,stale:1,waiting:2,clear:3})[ticketColorState(t)];
+    const ticketAgeHours = t => {const d=new Date(t.createdAtTime||t.createdAt||t.startDate);return Number.isNaN(d.getTime())?null:Math.max(0,Math.floor((ticketNow.value-d.getTime())/3600000));};
+    function setTicketAgeHours(t,value){if(value===''||value===null)return;const hours=Number(value);if(!Number.isFinite(hours)||hours<0||hours>100000)return;const d=new Date(Date.now()-Math.round(hours*3600000));t.createdAtTime=d.toISOString();t.createdAt=d.toISOString().slice(0,10);t.startDate=t.createdAt;touchTicket(t);}
     const ticketCreatedLabel = t => {const raw=t.createdAtTime||t.createdAt; if(!raw)return 'Date inconnue'; const dt=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw);return Number.isNaN(dt.getTime())?String(raw):dt.toLocaleString('fr-FR',{dateStyle:'short',timeStyle: /^\d{4}-\d{2}-\d{2}$/.test(raw)?undefined:'short'});};
     function touchTicket(t){t.lastActivityAt=new Date().toISOString();ticketNow.value=Date.now();}
     // Rafraîchissement lorsqu'une interaction sur la page intervient, sans boucle de synchronisation.
@@ -755,6 +757,8 @@ const app = createApp({
       const urgency=t=>levelRank(data.workUrgencies,t.urgency);
       const difficulty=t=>levelRank(data.workDifficulties,t.difficulty);
       switch(ticketSort.value){
+        case 'age-desc': return [...list].sort((a,b)=>(ticketAgeHours(b)??-1)-(ticketAgeHours(a)??-1));
+        case 'age-asc': return [...list].sort((a,b)=>(ticketAgeHours(a)??Infinity)-(ticketAgeHours(b)??Infinity));
         case 'action': return [...list].sort((a,b)=>ticketStateRank(a)-ticketStateRank(b));
         case 'inactive': return [...list].sort((a,b)=>(Number.isFinite(ticketActivityDate(a))?ticketActivityDate(a):-Infinity)-(Number.isFinite(ticketActivityDate(b))?ticketActivityDate(b):-Infinity));
         case 'urgency-desc': return [...list].sort((a,b)=>urgency(b)-urgency(a));
@@ -788,8 +792,11 @@ const app = createApp({
     function createTicket() {
       const name=ticketDraft.name.trim(); if(!name)return;
       const id=uid();ticketInputs[id]={name:'',points:10};
-      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,typeId:ticketDraft.typeId,url:ticketDraft.url.trim(),due:ticketDraft.due,startDate:ticketDraft.startDate||today.value,category:ticketDraft.category,createdAt:today.value,createdAtTime:new Date().toISOString(),waiting:false,customStatus:'',done:false,doneAt:'',items:[]});
-      ticketDraft.name='';ticketDraft.startDate=today.value;ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';
+      const hours=ticketDraft.ageHours===''?0:Number(ticketDraft.ageHours);
+      if(!Number.isFinite(hours)||hours<0||hours>100000){notify('Ancienneté invalide');return;}
+      const opened=new Date(Date.now()-Math.round(hours*3600000));
+      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,typeId:ticketDraft.typeId,url:ticketDraft.url.trim(),due:ticketDraft.due,startDate:ticketDraft.startDate||opened.toISOString().slice(0,10),category:ticketDraft.category,createdAt:opened.toISOString().slice(0,10),createdAtTime:opened.toISOString(),waiting:false,customStatus:'',done:false,doneAt:'',items:[]});
+      ticketDraft.name='';ticketDraft.ageHours='';ticketDraft.startDate='';ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';
     }
     function addTicketItem(ticket) {
       const draft=ticketInputs[ticket.id]||(ticketInputs[ticket.id]={name:'',points:10});const name=String(draft.name||'').trim();if(!name)return;
@@ -1149,6 +1156,8 @@ const app = createApp({
     }
 
     /* ---------- Sélection (clic sur le bloc d'une tâche) ---------- */
+    const quickWord=ref('');
+    function addQuickWord(){const title=quickWord.value.trim();if(!title)return;data.tasks.push(newTask({title,scope:'personal',points:0,due:'',startDate:'',status:'todo'}));quickWord.value='';notify('Tâche ajoutée');}
     const selection = ref([]);   // ids des tâches sélectionnées
 
     function toggleSelect(id) {
@@ -1166,7 +1175,7 @@ const app = createApp({
     // '__keep' = ne rien changer
     const bulkForm = reactive({
       open: false, ids: [], category: '__keep', points: '', kind: '__keep', status: '', projectId: '__keep',
-      urgency: '__keep', difficulty: '__keep', due: '', clearDue: false, workCategoryNames: [], editWorkCategories: false,
+      urgency: '__keep', difficulty: '__keep', startDate: '', clearStartDate: false, due: '', clearDue: false, workCategoryNames: [], editWorkCategories: false,
     });
 
     function editSelected(ids) {
@@ -1177,7 +1186,7 @@ const app = createApp({
       }
       Object.assign(bulkForm, {
         open: true, ids: [...ids], category: '__keep', points: '', kind: '__keep', status: '', projectId: '__keep',
-        urgency: '__keep', difficulty: '__keep', due: '', clearDue: false, workCategoryNames: [], editWorkCategories: false, workCategoryNames: [], editWorkCategories: false,
+        urgency: '__keep', difficulty: '__keep', startDate: '', clearStartDate: false, due: '', clearDue: false, workCategoryNames: [], editWorkCategories: false, workCategoryNames: [], editWorkCategories: false,
       });
     }
 
@@ -1202,6 +1211,8 @@ const app = createApp({
         if (t.scope !== 'work' && bulkForm.projectId !== '__keep') t.projectId = bulkForm.projectId;
         if (bulkForm.urgency !== '__keep') t.urgency = bulkForm.urgency;
         if (bulkForm.difficulty !== '__keep') t.difficulty = bulkForm.difficulty;
+        if (bulkForm.clearStartDate) t.startDate = '';
+        else if (bulkForm.startDate) t.startDate = bulkForm.startDate;
         if (bulkForm.clearDue) t.due = '';
         else if (bulkForm.due) t.due = bulkForm.due;
       });
@@ -2190,6 +2201,8 @@ const app = createApp({
     }
 
     // Planning repas : 7 jours, lundi à dimanche. Les déplacements échangent les deux cases.
+    const menuSimple=ref(true);
+    function updateSimpleMeal(date,kind,name){setMeal(date,kind,'dishId','');setMeal(date,kind,'name',name);}
     const menuWeekOffset = ref(0);
     const menuDragged = ref(null);
     const menuDays = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
@@ -3090,8 +3103,8 @@ const app = createApp({
     function openMoodPrompt(){if(!moodPromptDate.value)return;Object.assign(moodForm,{id:'',date:moodPromptDate.value,moodIds:[],note:'',score:0});dismissMoodPrompt();setTab('mood');}
     function dismissMoodPrompt(){moodPromptDismissed.value=moodPromptDate.value||today.value;}
     const nowMinute=ref(0);
-    setInterval(()=>{nowMinute.value++;today.value=todayStr();if(pendingAlterReview.value&&!alterReviewForm.open&&!pendingAppointment.value&&!apptForm.open)openPendingAlterReview();},60000);
-    nextTick(()=>{if(pendingAlterReview.value)openPendingAlterReview();});
+    setInterval(()=>{nowMinute.value++;today.value=todayStr();/* les bilans restent accessibles manuellement, sans ouverture automatique */},60000);
+    // Aucun bilan automatique au chargement : ouverture manuelle uniquement.
     // =============== V52 : Sport, poids et bilans de repas ===============
     const sportMode = ref('surprise');
     const sportLevel = ref('doux');
@@ -3492,6 +3505,7 @@ const app = createApp({
     const mobileCalendarDays=computed(()=>calMode.value==='day'?[calAnchor.value]:calendarDays.value);
     return {
       mobileTaskScope,mobileTaskQuery,mobileTaskProject,mobileTaskCategory,mobileTaskSort,mobileLastDone,mobileTasks,mobilePostponeTask,mobileCalendarDays,
+      quickWord,addQuickWord,ticketAgeHours,setTicketAgeHours,menuSimple,updateSimpleMeal,
       routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,groceryExcludedIds,groceryShoppingExists,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,leftoverPlanDate,leftoverPlanKind,planLeftoverSelected,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
       wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooserFilteredPool,chooseQuickAction,chooserTime,chooserEffort,chooserOperator,chooserUnknown,chooserTaskDurationLabel,chooserTaskCategoryColor,chooserTaskProjectColor,chooserTaskInfo,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
       sportFocusOpen,sportFocusIndex,startSportFocus,closeSportFocus,sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportPreferenceQuery,sportPreferenceExercises,setSportPreference,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
