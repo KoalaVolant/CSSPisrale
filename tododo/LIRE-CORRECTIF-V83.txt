@@ -1,0 +1,10 @@
+TODO QUEST V83 TEST - 24/11/2026
+
+- Points express : création d’une tâche déjà terminée avec points saisis.
+- Tickets : l’ancienneté Salesforce n’entraîne plus d’alerte d’inactivité ; activité basée exclusivement sur une action effective dans Todo Quest.
+- Tickets : suggestions d’intitulés depuis les tâches précédentes, mémorisées et synchronisées.
+- Création ticket : première tâche facultative et type libre ; un nouveau type est créé si absent du catalogue.
+- Mobile : menu simplifié de la semaine, une colonne sur petits écrans.
+- Cache PWA mis à jour pour V83.
+
+ATTENTION : export JSON avant mise en production et essais sur données non critiques. Synchronisation Firebase réelle non validée.

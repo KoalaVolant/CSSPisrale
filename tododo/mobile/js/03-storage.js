@@ -4,6 +4,7 @@ function defaultData() {
     customAchievements: [],
     appointments: [],
     testNotifications: [],
+    reminderDismissals: {}, // rappels ignores individuellement, synchronises entre appareils
     budgetEnvelopes: {},
     plannedPurchases: [],
     customRoutines: [],
@@ -57,6 +58,7 @@ function defaultData() {
     randomNoteTypes: [],
     usualLists: [], // listes de suivi sans points
     workTicketTypes: [], // types avec bonus de points
+    workTicketTaskTemplates: [], // suggestions de tâches de ticket
     workTickets: [],  // tickets avec sous-tâches et historique
     tasks: [],        // { id, title, category, points, malus, status, projectId, due, urgency, difficulty, doneAt }
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
@@ -110,6 +112,7 @@ function loadData() {
     if (!Array.isArray(d.workTickets)) d.workTickets = [];
     d.workTickets=d.workTickets.filter(t=>t&&typeof t==='object').map(t=>{const items=Array.isArray(t.items)?t.items:[];return {...t,items,waiting:items.some(i=>!i.done)?false:!!t.waiting};});
     if (!Array.isArray(d.workTicketTypes)) d.workTicketTypes = [];
+    if (!Array.isArray(d.workTicketTaskTemplates)) d.workTicketTaskTemplates = [];
     if (!Array.isArray(d.usualLists)) d.usualLists = [];
     d.eveningNotes = typeof d.eveningNotes === 'string' ? d.eveningNotes : '';
     if (!Array.isArray(d.budgetCategories)) d.budgetCategories = defaultData().budgetCategories;
@@ -144,6 +147,8 @@ function loadData() {
      d.inventory.forEach(i=>{if(i.used && !i.usedAt)i.usedAt=i.date||todayStr();});
     if (!Array.isArray(d.challenges)) d.challenges = [];
     if (!Array.isArray(d.challengeAwards)) d.challengeAwards = [];
+    if(!d.reminderDismissals||typeof d.reminderDismissals!=='object'||Array.isArray(d.reminderDismissals))d.reminderDismissals={};
+    d.workTickets=(Array.isArray(d.workTickets)?d.workTickets:[]).map(t=>({...t,waiting:t.done?false:!!t.waiting}));
     if (!Array.isArray(d.gratitude)) d.gratitude = [];
     if (d.gratitudePointsVersion !== 3) { migrateGratitudePoints(d.gratitude); d.gratitudePointsVersion = 3; }
     if (!Array.isArray(d.workCategories)) d.workCategories = [];

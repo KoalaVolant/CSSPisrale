@@ -1,0 +1,11 @@
+TODO QUEST V84 TEST – 25/11/2026
+
+Depuis V83 :
+- Tickets : saisie rapide par defaut, options avancees sur demande, suggestions frequentes.
+- Cooling : bouton explicite, onglet dedie, 7 jours a partir de la mise en Cooling. Cloture locale lors du prochain lancement / rafraichissement / synchronisation apres expiration; pas de cloture Salesforce. Les actions non terminees bloquent la cloture automatique. Rouvrir annule le delai. Aucun ancien texte "Cooling" n'est converti.
+- Statuts : un ticket termine n'est plus marque "en attente" a l'import, a la cloture manuelle ou automatique.
+- Rappels : centre consultable PC/mobile, sans popup; humeur veille/jour selon l'heure, repas prevus des 7 derniers jours sans bilan, echeances liees; bouton ignorer memorise. Aucune notification push OS.
+- Menu : confirmation rapide Mange / Remplace / Prevu et saisie de remplacement. Les bilans rapides ont un champ quick=true; les bilans detailles existants sont conserves et modifiables dans leur formulaire.
+- PWA : cache v84.
+
+ATTENTION : Sauvegarder les donnees via export JSON avant remplacement. Tester hors donnees reelles et sur PC/mobile avant usage habituel. La synchronisation Firebase et la cloture des tickets au sein de Salesforce ne sont pas validees ni realisees par ce correctif.

@@ -38,6 +38,7 @@ const app = createApp({
       data.customAchievements=Array.isArray(src.customAchievements)?src.customAchievements:[];
       data.appointments=Array.isArray(src.appointments)?src.appointments:[];
       data.testNotifications=Array.isArray(src.testNotifications)?src.testNotifications:[];
+      data.reminderDismissals=src.reminderDismissals&&typeof src.reminderDismissals==='object'&&!Array.isArray(src.reminderDismissals)?clone(src.reminderDismissals):{};
       data.budgetEnvelopes=src.budgetEnvelopes&&typeof src.budgetEnvelopes==='object'?src.budgetEnvelopes:{};
       data.plannedPurchases=Array.isArray(src.plannedPurchases)?clone(src.plannedPurchases):[];
       data.plannedPurchases=data.plannedPurchases.filter(p=>p&&typeof p==='object'&&String(p.name||'').trim()).map(p=>({...p,amount:Math.max(0,Number(p.amount)||0),status:p.status||'planned'}));
@@ -71,7 +72,8 @@ const app = createApp({
       if (data.eveningNotes.trim()) { if (!data.textareas.length) data.textareas.push({id:uid(),title:'To do du soir',content:data.eveningNotes}); data.eveningNotes=''; }
       data.usualLists = Array.isArray(src.usualLists) ? src.usualLists : [];
       data.workTicketTypes = Array.isArray(src.workTicketTypes) ? src.workTicketTypes : [];
-      data.workTickets = (Array.isArray(src.workTickets) ? src.workTickets : []).filter(t=>t&&typeof t==='object').map(t=>{const items=Array.isArray(t.items)?t.items:[];return {...t,items,waiting:items.some(i=>!i.done)?false:!!t.waiting};});
+      data.workTicketTaskTemplates = Array.isArray(src.workTicketTaskTemplates) ? src.workTicketTaskTemplates : [];
+      data.workTickets = (Array.isArray(src.workTickets) ? src.workTickets : []).filter(t=>t&&typeof t==='object').map(t=>{const items=Array.isArray(t.items)?t.items:[];return {...t,items,waiting:t.done?false:(items.some(i=>!i.done)?false:!!t.waiting)};});
       // Les tickets synchronisés doivent également disposer de champs de saisie locaux.
       if (typeof ticketInputs !== 'undefined') {
         data.workTickets.forEach(t => { if (!ticketInputs[t.id]) ticketInputs[t.id] = {name:'',points:10}; });
@@ -712,7 +714,7 @@ const app = createApp({
       try { const u=new URL(value);return ['https:','http:'].includes(u.protocol) ? u.href : ''; }
       catch(e){return '';}
     }
-    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',startDate:'',ageHours:'',due:'',category:'',typeId:'',url:''});
+    const ticketDraft = reactive({name:'',urgency:'',difficulty:'',startDate:'',ageHours:'',due:'',category:'',typeId:'',typeName:'',initialTaskName:'',initialTaskPoints:10,url:''});
     const collapsedTickets = reactive({});
     function isTicketCollapsed(id) { return collapsedTickets[id] !== false; }
     function toggleTicketCollapse(id) { collapsedTickets[id] = !isTicketCollapsed(id); }
@@ -736,14 +738,48 @@ const app = createApp({
     }
     const ticketInputs = reactive({});
     data.workTickets.forEach(t=>{ticketInputs[t.id]={name:'',points:10};});
+    const ticketQuickMode=ref(true);
+    const ticketView=ref('active'); // active | cooling
     const ticketSort = ref('age-desc');
     const hideWaitingTickets = ref(false);
     const ticketNow = ref(Date.now());
-    const ticketActivityDate = t => { const raw=t.lastActivityAt || t.createdAtTime || t.createdAt || t.startDate; if(!raw)return NaN; const ms=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw).getTime();return ms; };
-    const ticketStale = t => Number.isFinite(ticketActivityDate(t)) && ticketNow.value-ticketActivityDate(t)>=86400000;
+    const ticketActivityDate = t => { const raw=t.lastActivityAt; if(!raw)return NaN; const ms=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw).getTime();return ms; };
+    const ticketStale = t => !!t.lastActivityAt && Number.isFinite(ticketActivityDate(t)) && ticketNow.value-ticketActivityDate(t)>=86400000;
+    // V84 : cooling ne depend ni de la date Salesforce ni de la derniere activite.
+    const ticketInCooling=t=>!t.done&&!!t.coolingAt&&!!t.coolingUntil;
+    const coolingDaysLeft=t=>!ticketInCooling(t)?0:Math.max(0,Math.ceil((new Date(t.coolingUntil).getTime()-ticketNow.value)/86400000));
+    const coolingTickets=computed(()=>data.workTickets.filter(ticketInCooling).sort((a,b)=>String(a.coolingUntil).localeCompare(String(b.coolingUntil))));
+    const displayedTickets=computed(()=>ticketView.value==='cooling'?coolingTickets.value:openTickets.value);
+    function stopCooling(t,reason='reopened'){
+      if(!t.coolingAt&&!t.coolingUntil)return;
+      if(!Array.isArray(t.coolingHistory))t.coolingHistory=[];
+      t.coolingHistory.push({at:t.coolingAt||'',until:t.coolingUntil||'',endedAt:new Date().toISOString(),result:reason});
+      t.coolingAt='';t.coolingUntil='';
+    }
+    function startCooling(t){
+      if(t.done)return;
+      const now=new Date();
+      if(ticketInCooling(t))stopCooling(t,'restarted');
+      t.coolingAt=now.toISOString();t.coolingUntil=new Date(now.getTime()+7*86400000).toISOString();
+      t.waiting=false;t.lastActivityAt=now.toISOString();ticketNow.value=now.getTime();
+      if((t.items||[]).some(i=>!i.done))notify('Cooling actif : les actions inachevees bloqueront la cloture automatique.');
+      ticketView.value='cooling';
+    }
+    function reopenCooling(t){stopCooling(t);t.done=false;t.doneAt='';t.waiting=false;touchTicket(t);ticketView.value='active';}
+    function processCooling(){
+      const now=Date.now();ticketNow.value=now;
+      for(const t of data.workTickets){
+        if(!ticketInCooling(t))continue;
+        const due=new Date(t.coolingUntil).getTime();
+        if(!Number.isFinite(due)||now<due||(t.items||[]).some(i=>!i.done))continue;
+        stopCooling(t,'auto-closed');
+        t.done=true;t.doneAt=today.value;t.waiting=false;t.coolingClosedAt=new Date(now).toISOString();
+        t.lastActivityAt=new Date(now).toISOString();
+      }
+    }
     const ticketNeedsAction = t => (t.items||[]).some(i=>!i.done);
     const ticketWaiting = t => !!t.waiting && !ticketNeedsAction(t);
-    const ticketColorState = t => ticketNeedsAction(t)?'pending':ticketWaiting(t)?'waiting':ticketStale(t)?'stale':'clear';
+    const ticketColorState = t => ticketInCooling(t)?'cooling':ticketNeedsAction(t)?'pending':ticketWaiting(t)?'waiting':ticketStale(t)?'stale':'clear';
     const ticketStateRank = t => ({pending:0,stale:1,waiting:2,clear:3})[ticketColorState(t)];
     const ticketAgeHours = t => {const d=new Date(t.createdAtTime||t.createdAt||t.startDate);return Number.isNaN(d.getTime())?null:Math.max(0,Math.floor((ticketNow.value-d.getTime())/3600000));};
     function setTicketAgeHours(t,value){if(value===''||value===null)return;const hours=Number(value);if(!Number.isFinite(hours)||hours<0||hours>100000)return;const d=new Date(Date.now()-Math.round(hours*3600000));t.createdAtTime=d.toISOString();t.createdAt=d.toISOString().slice(0,10);t.startDate=t.createdAt;touchTicket(t);}
@@ -753,7 +789,7 @@ const app = createApp({
 
     const ticketDragged = ref(null);
     const openTickets = computed(()=>{
-      const list=data.workTickets.filter(t=>!t.done && (!hideWaitingTickets.value || !ticketWaiting(t)));
+      const list=data.workTickets.filter(t=>!t.done && !ticketInCooling(t) && (!hideWaitingTickets.value || !ticketWaiting(t)));
       const urgency=t=>levelRank(data.workUrgencies,t.urgency);
       const difficulty=t=>levelRank(data.workDifficulties,t.difficulty);
       switch(ticketSort.value){
@@ -789,33 +825,64 @@ const app = createApp({
       ticketDragged.value=null;
     }
     const closedTickets = computed(()=>[...data.workTickets.filter(t=>t.done)].sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||'')));
+    // Suggestions : fusion des intitulés déjà utilisés et du petit catalogue synchronisé.
+    const ticketTaskSuggestions = computed(() => {
+      const names = [...(data.workTicketTaskTemplates||[]),...data.workTickets.flatMap(t=>(t.items||[]).map(i=>i.name))];
+      return [...new Map(names.filter(x=>typeof x==='string'&&x.trim()).map(x=>[x.trim().toLocaleLowerCase('fr'),x.trim()])).values()].sort((a,b)=>a.localeCompare(b,'fr'));
+    });
+    const frequentTicketTasks=computed(()=>{
+      const counts=new Map();
+      for(const t of data.workTickets)for(const item of (t.items||[])){
+        const name=String(item.name||'').trim();if(!name)continue;
+        const key=name.toLocaleLowerCase('fr');
+        const v=counts.get(key)||{name,n:0};v.n++;counts.set(key,v);
+      }
+      return [...counts.values()].sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name,'fr')).slice(0,6).map(x=>x.name);
+    });
+    function rememberTicketTask(name) {
+      const clean=String(name||'').trim(); if(!clean)return;
+      if(!Array.isArray(data.workTicketTaskTemplates))data.workTicketTaskTemplates=[];
+      if(!data.workTicketTaskTemplates.some(x=>String(x).toLocaleLowerCase('fr')===clean.toLocaleLowerCase('fr')))data.workTicketTaskTemplates.push(clean);
+    }
+    function resolveTicketTypeName() {
+      const name=String(ticketDraft.typeName||'').trim();
+      if(!name)return ticketDraft.typeId||'';
+      let item=data.workTicketTypes.find(t=>String(t.name||'').trim().toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'));
+      if(!item){item={id:uid(),name,color:'#64748b',pointMode:'add',pointValue:0};data.workTicketTypes.push(item);}
+      return item.id;
+    }
     function createTicket() {
       const name=ticketDraft.name.trim(); if(!name)return;
       const id=uid();ticketInputs[id]={name:'',points:10};
       const hours=ticketDraft.ageHours===''?0:Number(ticketDraft.ageHours);
       if(!Number.isFinite(hours)||hours<0||hours>100000){notify('Ancienneté invalide');return;}
       const opened=new Date(Date.now()-Math.round(hours*3600000));
-      data.workTickets.push({id,name,urgency:ticketDraft.urgency,difficulty:ticketDraft.difficulty,typeId:ticketDraft.typeId,url:ticketDraft.url.trim(),due:ticketDraft.due,startDate:ticketDraft.startDate||opened.toISOString().slice(0,10),category:ticketDraft.category,createdAt:opened.toISOString().slice(0,10),createdAtTime:opened.toISOString(),waiting:false,customStatus:'',done:false,doneAt:'',items:[]});
-      ticketDraft.name='';ticketDraft.ageHours='';ticketDraft.startDate='';ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';
+      const firstTask=String(ticketDraft.initialTaskName||'').trim();
+      const pts=Number(ticketDraft.initialTaskPoints);
+      if(firstTask&&(!Number.isFinite(pts)||pts<0)){notify('Points invalides');return;}
+      const typeId=resolveTicketTypeName();
+      if(firstTask)rememberTicketTask(firstTask);
+      data.workTickets.push({id,name,coolingAt:'',coolingUntil:'',coolingHistory:[],urgency:ticketQuickMode.value?'':ticketDraft.urgency,difficulty:ticketQuickMode.value?'':ticketDraft.difficulty,typeId,url:ticketQuickMode.value?'':ticketDraft.url.trim(),due:ticketQuickMode.value?'':ticketDraft.due,startDate:(ticketQuickMode.value?'':ticketDraft.startDate)||opened.toISOString().slice(0,10),category:ticketDraft.category,createdAt:opened.toISOString().slice(0,10),createdAtTime:opened.toISOString(),lastActivityAt:'',waiting:false,customStatus:'',done:false,doneAt:'',items:firstTask?[{id:uid(),name:firstTask,points:pts,done:false,doneAt:''}]:[]});
+      ticketDraft.name='';ticketDraft.ageHours='';ticketDraft.startDate='';ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';ticketDraft.typeName='';ticketDraft.typeId='';ticketDraft.initialTaskName='';ticketDraft.initialTaskPoints=10;ticketDraft.urgency='';ticketDraft.difficulty='';
     }
     function addTicketItem(ticket) {
       const draft=ticketInputs[ticket.id]||(ticketInputs[ticket.id]={name:'',points:10});const name=String(draft.name||'').trim();if(!name)return;
-      ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});ticket.waiting=false;touchTicket(ticket);
+      stopCooling(ticket,'action-added');rememberTicketTask(name);ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});ticket.waiting=false;touchTicket(ticket);
       ticketInputs[ticket.id]={name:'',points:10};
     }
     function ticketItemBlocker(ticket,item){const prev=(ticket.items||[]).find(x=>x.id===item.dependsOn);return prev&&!prev.done?prev:null;}
     function validateTicketDependency(ticket,item){let id=item.dependsOn;const seen=new Set([item.id]);while(id){if(seen.has(id)){item.dependsOn='';notify('Dépendance circulaire interdite');return;}seen.add(id);id=ticket.items.find(x=>x.id===id)?.dependsOn||'';}}
     function toggleTicketItem(ticket,item) {
       if(!item.done&&ticketItemBlocker(ticket,item)){notify('Termine la tâche précédente avant celle-ci');return;}
-      item.done=!item.done;item.doneAt=item.done?today.value:'';if(!item.done)ticket.waiting=false;touchTicket(ticket);
+      item.done=!item.done;item.doneAt=item.done?today.value:'';if(!item.done){ticket.waiting=false;stopCooling(ticket,'action-reopened');}touchTicket(ticket);
       if(!item.done&&ticket.done){ticket.done=false;ticket.doneAt='';}
     }
     function finishTicket(ticket) {
       if(!ticket.items.length){notify('Ajoute au moins une tâche avant de terminer le ticket');return;}
       if(ticket.items.some(x=>!x.done)){notify('Termine toutes les tâches avant de clôturer le ticket');return;}
-      ticket.done=true;ticket.doneAt=today.value;touchTicket(ticket);
+      stopCooling(ticket,'manual-close');ticket.done=true;ticket.doneAt=today.value;ticket.waiting=false;touchTicket(ticket);
     }
-    function reopenTicket(ticket){ticket.done=false;ticket.doneAt='';touchTicket(ticket);}
+    function reopenTicket(ticket){stopCooling(ticket,'reopened');ticket.done=false;ticket.doneAt='';ticket.waiting=false;touchTicket(ticket);}
     function removeTicket(ticket){
       if(!confirm(`Supprimer le ticket « ${ticket.name} » et toutes ses tâches ? Les points validés seront conservés.`))return;
       data.trash.unshift({id:uid(),type:'ticket',deletedAt:new Date().toISOString(),payload:clone(ticket)});
@@ -825,7 +892,7 @@ const app = createApp({
     function removeTicketItem(ticket,item){
       if(!confirm(`Supprimer « ${item.name} » ?`))return;
       if(item.done)data.archived+=ticketItemValue(ticket,item);
-      ticket.items=ticket.items.filter(x=>x.id!==item.id);
+      stopCooling(ticket,'action-removed');ticket.items=ticket.items.filter(x=>x.id!==item.id);
       if(ticket.done){ticket.done=false;ticket.doneAt='';}
       if(ticketNeedsAction(ticket))ticket.waiting=false;
     }
@@ -1157,7 +1224,8 @@ const app = createApp({
 
     /* ---------- Sélection (clic sur le bloc d'une tâche) ---------- */
     const quickWord=ref('');
-    function addQuickWord(){const title=quickWord.value.trim();if(!title)return;data.tasks.push(newTask({title,scope:'personal',points:0,due:'',startDate:'',status:'todo'}));quickWord.value='';notify('Tâche ajoutée');}
+    const quickWordPoints=ref(10);
+    function addQuickWord(){const title=quickWord.value.trim();if(!title)return;const pts=Number(quickWordPoints.value);if(!Number.isFinite(pts)||pts<0){notify('Points invalides');return;}data.tasks.push(newTask({title,scope:'personal',points:pts,due:'',startDate:'',status:'done',doneAt:today.value}));quickWord.value='';notify(`${pts} points ajoutés (tâche terminée)`);}
     const selection = ref([]);   // ids des tâches sélectionnées
 
     function toggleSelect(id) {
@@ -2202,7 +2270,13 @@ const app = createApp({
 
     // Planning repas : 7 jours, lundi à dimanche. Les déplacements échangent les deux cases.
     const menuSimple=ref(true);
-    function updateSimpleMeal(date,kind,name){setMeal(date,kind,'dishId','');setMeal(date,kind,'name',name);}
+    function updateSimpleMeal(date,kind,name){
+      const previous=mealSlot(date,kind).name||'';
+      if(previous===name)return;
+      const key=date+'|'+kind;
+      if(data.foodReviews[key]?.quick)delete data.foodReviews[key];
+      setMeal(date,kind,'dishId','');setMeal(date,kind,'name',name);
+    }
     const menuWeekOffset = ref(0);
     const menuDragged = ref(null);
     const menuDays = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
@@ -2661,7 +2735,7 @@ const app = createApp({
     function startFocus(task){focusTask.value=task;}
     const waitingPersonFilter=ref('');
     const waitingPeople=computed(()=>[...new Set(data.workTickets.map(x=>String(x.waitingPerson||'').trim()).filter(Boolean))].sort());
-    const workLoad=computed(()=>({open:data.workTickets.filter(x=>!x.done).length,waiting:data.workTickets.filter(x=>!x.done&&(x.waiting||x.customStatus?.toLowerCase().includes('attente'))).length,actions:data.workTickets.reduce((n,t)=>n+(t.items||[]).filter(i=>!i.done).length,0),done:data.workTickets.filter(x=>x.done).length}));
+    const workLoad=computed(()=>({open:data.workTickets.filter(x=>!x.done&&!ticketInCooling(x)).length,cooling:data.workTickets.filter(ticketInCooling).length,waiting:data.workTickets.filter(x=>!x.done&&!ticketInCooling(x)&&(x.waiting||x.customStatus?.toLowerCase().includes('attente'))).length,actions:data.workTickets.reduce((n,t)=>n+(t.items||[]).filter(i=>!i.done).length,0),done:data.workTickets.filter(x=>x.done).length}));
     const notificationItems=computed(()=>{
       if(data.testSettings.automationEnabled===false)return [];
       const all=[];
@@ -2693,7 +2767,8 @@ const app = createApp({
     const workDetailed=computed(()=>{
       const {start,end}=workStatRange.value;
       const all=data.workTickets||[];
-      const active=all.filter(t=>!t.done&&(t.startDate||t.createdAt||'0000-01-01')<=end);
+      const active=all.filter(t=>!t.done&&!ticketInCooling(t)&&(t.startDate||t.createdAt||'0000-01-01')<=end);
+      const cooling=all.filter(ticketInCooling).length;
       const closed=all.filter(t=>t.done && String(t.doneAt||'').slice(0,10)>=start && String(t.doneAt||'').slice(0,10)<=end);
       const late=active.filter(t=>t.due&&t.due<today.value).length;
       const relaunch=active.filter(t=>t.followUpDate&&t.followUpDate<=today.value).length;
@@ -2703,7 +2778,7 @@ const app = createApp({
       const newTickets=all.filter(t=>{const date=String(t.createdAt||t.startDate||'').slice(0,10);return date>=start&&date<=end;}).length;
       const actions=active.reduce((n,t)=>n+(t.items||[]).filter(x=>!x.done).length,0);
       const age=waiting.map(t=>{const d=String(t.startDate||t.createdAt||'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)?Math.max(0,Math.round((new Date(today.value+'T12:00:00Z')-new Date(d+'T12:00:00Z'))/86400000)):null;}).filter(v=>v!==null);
-      return {active:active.length,closed:closed.length,late,relaunch,byType,byPerson,waiting:waiting.length,actions,newTickets,avgWaitingAge:age.length?Math.round(age.reduce((a,b)=>a+b,0)/age.length):null,rangeStart:start,rangeEnd:end};
+      return {active:active.length,cooling,closed:closed.length,late,relaunch,byType,byPerson,waiting:waiting.length,actions,newTickets,avgWaitingAge:age.length?Math.round(age.reduce((a,b)=>a+b,0)/age.length):null,rangeStart:start,rangeEnd:end};
     });
     // V62 : routines qui référencent les habitudes existantes : aucun double gain de points.
     const routineDraft=reactive({name:'',habitIds:[]});
@@ -3160,7 +3235,9 @@ const app = createApp({
     function openMoodPrompt(){if(!moodPromptDate.value)return;Object.assign(moodForm,{id:'',date:moodPromptDate.value,moodIds:[],note:'',score:0});dismissMoodPrompt();setTab('mood');}
     function dismissMoodPrompt(){moodPromptDismissed.value=moodPromptDate.value||today.value;}
     const nowMinute=ref(0);
-    setInterval(()=>{nowMinute.value++;today.value=todayStr();/* les bilans restent accessibles manuellement, sans ouverture automatique */},60000);
+    setInterval(()=>{nowMinute.value++;today.value=todayStr();processCooling();/* rappels consultables sans popup */},60000);
+    nextTick(()=>processCooling());
+    watch(()=>data.workTickets,()=>nextTick(()=>processCooling()));
     // Aucun bilan automatique au chargement : ouverture manuelle uniquement.
     // =============== V52 : Sport, poids et bilans de repas ===============
     const sportMode = ref('surprise');
@@ -3302,6 +3379,24 @@ const app = createApp({
     const foodContainerNew=ref('');
     function foodReviewKey(date,kind){return date+'|'+kind;}
     function foodReview(date,kind){return data.foodReviews[foodReviewKey(date,kind)]||null;}
+    function quickMealState(date,kind,state){
+      const slot=mealSlot(date,kind);
+      if(state && !(slot.name||slot.dishId)){notify('Renseigne d’abord le repas.');return;}
+      const key=foodReviewKey(date,kind),old=data.foodReviews[key];
+      if(!state){setMeal(date,kind,'state','');if(old?.quick===true)delete data.foodReviews[key];return;}
+      const status=state==='done'?'taken':'changed';
+      if(old?.completed&&!old.quick){
+        // Ne pas detruire un bilan detaille par un clic dans le menu rapide.
+        notify('Un bilan detaille existe deja : utilise Modifier le bilan.');return;
+      }
+      const actual=status==='changed'?(old?.actual||''):'';
+      data.foodReviews[key]={completed:status==='taken'||!!actual,date,kind,status,actual,category:'',quantity:'unknown',container:'',containerRating:'',health:'unknown',quick:true};
+      setMeal(date,kind,'state',state);
+    }
+    function updateQuickMealActual(date,kind,value){
+      const key=foodReviewKey(date,kind),review=data.foodReviews[key];if(!review?.quick||review.status!=='changed')return;
+      review.actual=String(value||'').trim();review.completed=!!review.actual;
+    }
     function openFoodReview(date,kind,status='taken'){
       const prior=foodReview(date,kind);
       Object.assign(foodForm,{open:true,date,kind,status:prior?.status||status,actual:prior?.actual||'',category:prior?.category||'',quantity:prior?.quantity||'ok',container:prior?.container||data.foodContainers[0]||'',containerRating:prior?.containerRating||'good',health:prior?.health||'unknown'});
@@ -3344,8 +3439,57 @@ const app = createApp({
       foodForm.open=false;
       if(foodReminder.activeKind){foodReminder.activeKind='';foodReminder.open=true;}
     }
-    nextTick(()=>checkFoodReminder());
-    watch(today,()=>checkFoodReminder());
+    // V84 : le centre des rappels calcule les repas manquants, sans popup ni marquage au chargement.
+    // V84 : centre non bloquant. Les anciennes notifications forcees restent desactivees.
+    const remindersOpen=ref(false);
+    const reminderItems=computed(()=>{
+      void nowMinute.value; // actualisation au changement d'heure sans recharger la page
+      const items=[];
+      const dismissed=data.reminderDismissals||{};
+      const yesterday=sportDateAdd(today.value,-1);
+      if(!data.moodEntries.some(x=>x.date===yesterday)&&!dismissed['mood:'+yesterday])
+        items.push({key:'mood:'+yesterday,kind:'mood',date:yesterday,label:'Humeur du '+yesterday});
+      if(new Date().getHours()>=(Number.isInteger(data.moodReminderHour)?data.moodReminderHour:19)&&!data.moodEntries.some(x=>x.date===today.value)&&!dismissed['mood:'+today.value])
+        items.push({key:'mood:'+today.value,kind:'mood',date:today.value,label:'Humeur du jour'});
+      for(let days=1;days<=7;days++){
+        const date=sportDateAdd(today.value,-days);
+        for(const kind of ['lunch','dinner']){
+          const meal=mealSlot(date,kind),key='meal:'+date+':'+kind;
+          if((meal.name||meal.dishId)&&!(meal.state==='done'||(meal.state==='missed'&&foodReview(date,kind)?.completed))&&!foodReview(date,kind)?.completed&&!dismissed[key])
+            items.push({key,kind:'meal',date,mealKind:kind,label:(kind==='lunch'?'Déjeuner':'Dîner')+' du '+date});
+        }
+      }
+      for(const alert of deadlineAlerts.value){
+        const key='deadline:'+alert.a.id+':'+alert.key;
+        if(alert.date>=sportDateAdd(today.value,-7)&&alert.a.status!=='done'&&!dismissed[key])items.push({key,kind:'deadline',date:alert.date,label:'Échéance : '+alert.a.title,alert});
+      }
+      // Les rappels d'evenements sans lien a un projet ou une tache doivent rester accessibles.
+      for(const a of data.appointments){
+        if(a.linkedId||a.status==='done'||!a.end||!Array.isArray(a.reminders))continue;
+        for(const days of a.reminders){
+          if(!Number.isInteger(days)||days<0)continue;
+          const date=sportDateAdd(a.end,-days),ack=a.end+':'+days;
+          const key='appointment:'+a.id+':'+ack;
+          if(date<=today.value&&date>=sportDateAdd(today.value,-7)&&!(a.reminderAcknowledged||[]).includes(ack)&&!dismissed[key])
+            items.push({key,kind:'appointment',date,label:'Rendez-vous : '+a.title,appointment:a,ack});
+        }
+      }
+      return items.slice(0,40);
+    });
+    function dismissReminder(item){
+      if(item.kind==='deadline')acknowledgeDeadlineAlert(item.alert);
+      else if(item.kind==='appointment'){
+        if(!Array.isArray(item.appointment.reminderAcknowledged))item.appointment.reminderAcknowledged=[];
+        if(!item.appointment.reminderAcknowledged.includes(item.ack))item.appointment.reminderAcknowledged.push(item.ack);
+      } else data.reminderDismissals[item.key]=today.value;
+    }
+    function openReminder(item){
+      if(item.kind==='mood'){setTab('mood');nextTick(()=>openMoodDay(item.date));}
+      else if(item.kind==='meal'){setTab('menu');menuTab.value='planning';openFoodReview(item.date,item.mealKind);}
+      else if(item.kind==='deadline'){setTab('calendar');openAppointment(item.alert.a);}
+      else if(item.kind==='appointment'){setTab('calendar');openAppointment(item.appointment);}
+      remindersOpen.value=false;
+    }
     // =============== V53 : statistiques descriptives Sport / menu / poids ===============
     const wellnessRange=ref(8);
     const wellnessWeeks=computed(()=>{
@@ -3515,7 +3659,7 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      quickWord,addQuickWord,ticketAgeHours,setTicketAgeHours,menuSimple,updateSimpleMeal,
+      quickWord,quickWordPoints,addQuickWord,ticketTaskSuggestions,frequentTicketTasks,ticketQuickMode,ticketView,coolingTickets,displayedTickets,ticketInCooling,coolingDaysLeft,startCooling,reopenCooling,processCooling,ticketAgeHours,setTicketAgeHours,menuSimple,updateSimpleMeal,quickMealState,updateQuickMealActual,remindersOpen,reminderItems,dismissReminder,openReminder,
       routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,groceryExcludedIds,groceryShoppingExists,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,leftoverPlanDate,leftoverPlanKind,planLeftoverSelected,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
       wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooserFilteredPool,chooseQuickAction,chooserTime,chooserEffort,chooserOperator,chooserUnknown,chooserTaskDurationLabel,chooserTaskCategoryColor,chooserTaskProjectColor,chooserTaskInfo,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
       sportFeedback,sportMode,sportLevel,sportDraft,sportDraftKind,sportMinutes,sportActualMinutes,sportDraftTotalSeconds,sportDraftDoneSeconds,sportTimeLabel,sportPassages,setSportTargetMinutes,sportLongExerciseCount,sportPick,sportWalkSteps,sportProgress,sportHistory,sportPreferenceQuery,sportPreferenceExercises,setSportPreference,sportReminder,walkCycleStart,sportExerciseForm,sportLocationName,generateSport,replaceSportExercise,completeSport,deleteSportSession,addSportExercise,removeSportExercise,addSportLocation,removeSportLocation,weightForm,weightRecent,weightLatest,weightWeekly,saveWeight,deleteWeight,foodForm,foodReview,foodReviewKey,openFoodReview,addFoodContainer,foodContainerNew,saveFoodReview,foodSummary,foodWeekReviews,foodReminder,closeFoodReminder,reviewReminderMeal,cancelFoodReview,wellnessRange,wellnessGrouping,wellnessPeriodCharts,wellnessWeeks,wellnessTotals,wellnessFeelGroups,wellnessPct,wellnessMaxMinutes,wellnessMaxMeals,wellnessWeightChart,wellnessPaired,wellnessTrend,wellnessFoodCategories,wellnessContainers,wellnessSportTypes,
