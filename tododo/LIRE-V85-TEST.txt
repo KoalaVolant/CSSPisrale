@@ -1,0 +1,40 @@
+TODO QUEST V85 TEST – 26/11/2026
+
+Base : Todo Quest V84 TEST. Interfaces PC et mobile modifiees.
+
+FONCTIONNALITES V85
+1. Tickets : recherche sur sujet, statut personnalise, personne attendue, URL et noms d'actions ; filtres combinables par type et etat. Les onglets En cours / Cooling sont conserves. Un historique horodate des operations de tickets est enregistre a partir de V85 (creation, ajout/validation/reouverture d'action, cloture, Cooling, reouverture, prolongation).
+2. Cooling : affichage des tickets dont la cloture approche (48 h), filtre dedie, prolongation explicite de +7 jours. La cloture automatique apres 7 jours reste conditionnee a la fin des actions et s'effectue au prochain lancement ou rafraichissement, sans fermeture Salesforce.
+3. Modeles de taches : depuis l'ecran Toutes les taches, creation de modeles reutilisables (une tache par ligne), projet et points facultatifs. Possibilite de constituer un modele depuis les titres d'un projet. L'application cree des taches a faire non terminees et n'attribue aucun point avant leur validation. Les listes habituelles sans points restent independantes.
+4. Centre de rappels : rappels personnels avec date/heure et recurrence quotidienne ou hebdomadaire ; boutons Reporter +1 h / Demain ; acquittement par occurrence. Aucun popup bloquant ni notification push / systeme. Les rappels existants sont conserves.
+5. Statistiques : bilan des quatre dernieres semaines (taches terminees, tickets clotures, points des taches et actions des tickets, validations d'habitudes) en plus des statistiques existantes.
+6. Fiabilite : erreurs d'ecriture localStorage rendues visibles dans l'ecran Donnees, derniere ecriture locale, statut hors ligne via navigateur, apercu du nombre d'objets avant import. Version de cache mobile v85.
+
+COMPATIBILITE
+- La sauvegarde todo-quest-2026-11-24.json a ete chargee et testee en simulation sur PC et mobile sans perte des comptes d'objets historiques.
+- Les champs de V85 sont initialises sur les anciens exports et inclus dans l'export JSON et la synchronisation habituelle.
+- Les tickets anciens n'ont PAS d'historique d'actions reconstitue avant V85.
+- Aucun ticket Cooling historique n'est converti automatiquement depuis un texte libre.
+
+LIMITES IMPORTANTES
+- Tests locaux simulant Vue, chargement des fichiers JS et les scenarii de merge : reussis.
+- Pas de validation en navigateur reel avec toutes les dependances externes ni de test Firebase reel sur deux appareils.
+- Le test hors ligne reste statique (verification du cache PWA et message reseau), pas une simulation de deconnexion avec service worker actif.
+- Il n'y a pas de fermeture automatique de tickets dans Salesforce.
+- Les notifications ne sont pas push. Le centre des rappels est consulte dans l'application.
+
+AVANT DE DEPLOYER
+1. Exporter un JSON depuis la version actuelle sur chaque appareil concerné.
+2. Conserver la version V84 et deployer V85 dans un environnement de test ou un emplacement distinct.
+3. Tester les actions, les modeles, les rappels et la fermeture Cooling sur un ticket fictif.
+4. Verifier la synchronisation Firebase entre PC/mobile avec des donnees de test. En cas de conflit, exporter AVANT toute action.
+5. Actualiser la PWA mobile (nouveau cache) et verifier la version affichee V85 TEST.
+
+TESTS DEVELOPPEUR (Node.js + Python installes)
+  node tests/test_v85_behaviour.cjs
+  node tests/test_v84_behaviour.cjs
+  node tests/test_merge_edge_cases.cjs
+  node tests/test_smoke.cjs
+  python tests/test_refactor.py
+Le test V85 accepte en option un chemin de sauvegarde JSON, sans l'importer dans l'application :
+  node tests/test_v85_behaviour.cjs chemin/vers/sauvegarde.json

@@ -4,7 +4,10 @@ function defaultData() {
     customAchievements: [],
     appointments: [],
     testNotifications: [],
-    reminderDismissals: {}, // rappels ignores individuellement, synchronises entre appareils
+    reminderDismissals: {},
+    reminderSnoozes: {},
+    customReminders: [],
+    taskListTemplates: [], // rappels ignores individuellement, synchronises entre appareils
     budgetEnvelopes: {},
     plannedPurchases: [],
     customRoutines: [],
@@ -114,6 +117,7 @@ function loadData() {
     if (!Array.isArray(d.workTicketTypes)) d.workTicketTypes = [];
     if (!Array.isArray(d.workTicketTaskTemplates)) d.workTicketTaskTemplates = [];
     if (!Array.isArray(d.usualLists)) d.usualLists = [];
+    if (!Array.isArray(d.taskListTemplates)) d.taskListTemplates = [];
     d.eveningNotes = typeof d.eveningNotes === 'string' ? d.eveningNotes : '';
     if (!Array.isArray(d.budgetCategories)) d.budgetCategories = defaultData().budgetCategories;
     d.budgetCategories = [...new Set([...d.budgetCategories, ...[...(d.budgetEntries||[]),...(d.budgetRecurring||[]),...(d.budgetSwile||[])].map(x=>x.category)].filter(x=>typeof x==='string'&&x.trim()))];
@@ -148,6 +152,8 @@ function loadData() {
     if (!Array.isArray(d.challenges)) d.challenges = [];
     if (!Array.isArray(d.challengeAwards)) d.challengeAwards = [];
     if(!d.reminderDismissals||typeof d.reminderDismissals!=='object'||Array.isArray(d.reminderDismissals))d.reminderDismissals={};
+    if(!d.reminderSnoozes||typeof d.reminderSnoozes!=='object'||Array.isArray(d.reminderSnoozes))d.reminderSnoozes={};
+    if(!Array.isArray(d.customReminders))d.customReminders=[];
     d.workTickets=(Array.isArray(d.workTickets)?d.workTickets:[]).map(t=>({...t,waiting:t.done?false:!!t.waiting}));
     if (!Array.isArray(d.gratitude)) d.gratitude = [];
     if (d.gratitudePointsVersion !== 3) { migrateGratitudePoints(d.gratitude); d.gratitudePointsVersion = 3; }

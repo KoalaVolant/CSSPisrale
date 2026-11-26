@@ -18,11 +18,15 @@ const app = createApp({
       });
     }
     syncCategories();
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible */ }   // enregistre la migration tout de suite
-
-    watch(data, () => {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible */ }
-    }, { deep: true });
+    // V85 : une erreur de stockage ne doit plus etre silencieuse.
+    const localSaveError=ref('');
+    const localSaveAt=ref('');
+    function saveLocalData(){
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data));localSaveError.value='';localSaveAt.value=new Date().toLocaleString('fr-FR'); }
+      catch(e){localSaveError.value='Sauvegarde locale impossible : '+(e?.message||'stockage indisponible');console.error('Todo Quest stockage local',e);}
+    }
+    saveLocalData(); // migration enregistree immediatement
+    watch(data, saveLocalData, {deep:true});
 
     // Remplace toutes les données (import de fichier, synchro cloud)
     function applyData(src) {
@@ -39,6 +43,9 @@ const app = createApp({
       data.appointments=Array.isArray(src.appointments)?src.appointments:[];
       data.testNotifications=Array.isArray(src.testNotifications)?src.testNotifications:[];
       data.reminderDismissals=src.reminderDismissals&&typeof src.reminderDismissals==='object'&&!Array.isArray(src.reminderDismissals)?clone(src.reminderDismissals):{};
+      data.reminderSnoozes=src.reminderSnoozes&&typeof src.reminderSnoozes==='object'&&!Array.isArray(src.reminderSnoozes)?clone(src.reminderSnoozes):{};
+      data.customReminders=Array.isArray(src.customReminders)?clone(src.customReminders):[];
+      data.taskListTemplates=Array.isArray(src.taskListTemplates)?clone(src.taskListTemplates):[];
       data.budgetEnvelopes=src.budgetEnvelopes&&typeof src.budgetEnvelopes==='object'?src.budgetEnvelopes:{};
       data.plannedPurchases=Array.isArray(src.plannedPurchases)?clone(src.plannedPurchases):[];
       data.plannedPurchases=data.plannedPurchases.filter(p=>p&&typeof p==='object'&&String(p.name||'').trim()).map(p=>({...p,amount:Math.max(0,Number(p.amount)||0),status:p.status||'planned'}));
@@ -741,6 +748,9 @@ const app = createApp({
     const ticketQuickMode=ref(true);
     const ticketView=ref('active'); // active | cooling
     const ticketSort = ref('age-desc');
+    const ticketSearch=ref('');
+    const ticketTypeFilter=ref('');
+    const ticketStatusFilter=ref('all');
     const hideWaitingTickets = ref(false);
     const ticketNow = ref(Date.now());
     const ticketActivityDate = t => { const raw=t.lastActivityAt; if(!raw)return NaN; const ms=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T00:00:00':raw).getTime();return ms; };
@@ -750,6 +760,29 @@ const app = createApp({
     const coolingDaysLeft=t=>!ticketInCooling(t)?0:Math.max(0,Math.ceil((new Date(t.coolingUntil).getTime()-ticketNow.value)/86400000));
     const coolingTickets=computed(()=>data.workTickets.filter(ticketInCooling).sort((a,b)=>String(a.coolingUntil).localeCompare(String(b.coolingUntil))));
     const displayedTickets=computed(()=>ticketView.value==='cooling'?coolingTickets.value:openTickets.value);
+    const filteredDisplayedTickets=computed(()=>displayedTickets.value.filter(t=>{
+      const query=String(ticketSearch.value||'').trim().toLocaleLowerCase('fr');
+      const content=[t.name,t.customStatus,t.waitingPerson,t.url,...(t.items||[]).map(i=>i.name)].join(' ').toLocaleLowerCase('fr');
+      if(query&&!content.includes(query))return false;
+      if(ticketTypeFilter.value && t.typeId!==ticketTypeFilter.value)return false;
+      const state=ticketStatusFilter.value;
+      return state==='all'||(state==='pending'&&ticketNeedsAction(t))||(state==='waiting'&&ticketWaiting(t))||
+        (state==='stale'&&ticketStale(t)&&!ticketInCooling(t))||(state==='clear'&&!ticketNeedsAction(t)&&!ticketWaiting(t)&&!ticketInCooling(t))||
+        (state==='expiring'&&ticketInCooling(t)&&coolingDaysLeft(t)<=2)||(state==='blocked'&&ticketInCooling(t)&&ticketNeedsAction(t));
+    }));
+    function addTicketEvent(t,label){
+      if(!Array.isArray(t.activityHistory))t.activityHistory=[];
+      t.activityHistory.push({id:uid(),at:new Date().toISOString(),label:String(label||'Action').slice(0,160)});
+      if(t.activityHistory.length>120)t.activityHistory=t.activityHistory.slice(-120);
+    }
+    function extendCooling(t,days=7){
+      if(!ticketInCooling(t))return;
+      const n=Number(days);if(!Number.isInteger(n)||n<1||n>30)return;
+      const base=Math.max(Date.now(),new Date(t.coolingUntil).getTime());
+      if(!Number.isFinite(base))return;
+      t.coolingUntil=new Date(base+n*86400000).toISOString();
+      addTicketEvent(t,'Cooling prolongé de '+n+' jours');ticketNow.value=Date.now();
+    }
     function stopCooling(t,reason='reopened'){
       if(!t.coolingAt&&!t.coolingUntil)return;
       if(!Array.isArray(t.coolingHistory))t.coolingHistory=[];
@@ -761,11 +794,12 @@ const app = createApp({
       const now=new Date();
       if(ticketInCooling(t))stopCooling(t,'restarted');
       t.coolingAt=now.toISOString();t.coolingUntil=new Date(now.getTime()+7*86400000).toISOString();
+      addTicketEvent(t,'Passage en Cooling pour 7 jours');
       t.waiting=false;t.lastActivityAt=now.toISOString();ticketNow.value=now.getTime();
       if((t.items||[]).some(i=>!i.done))notify('Cooling actif : les actions inachevees bloqueront la cloture automatique.');
       ticketView.value='cooling';
     }
-    function reopenCooling(t){stopCooling(t);t.done=false;t.doneAt='';t.waiting=false;touchTicket(t);ticketView.value='active';}
+    function reopenCooling(t){stopCooling(t);t.done=false;t.doneAt='';t.waiting=false;touchTicket(t);addTicketEvent(t,'Réouverture depuis Cooling');ticketView.value='active';}
     function processCooling(){
       const now=Date.now();ticketNow.value=now;
       for(const t of data.workTickets){
@@ -774,6 +808,7 @@ const app = createApp({
         if(!Number.isFinite(due)||now<due||(t.items||[]).some(i=>!i.done))continue;
         stopCooling(t,'auto-closed');
         t.done=true;t.doneAt=today.value;t.waiting=false;t.coolingClosedAt=new Date(now).toISOString();
+        addTicketEvent(t,'Clôture automatique après Cooling');
         t.lastActivityAt=new Date(now).toISOString();
       }
     }
@@ -862,27 +897,27 @@ const app = createApp({
       if(firstTask&&(!Number.isFinite(pts)||pts<0)){notify('Points invalides');return;}
       const typeId=resolveTicketTypeName();
       if(firstTask)rememberTicketTask(firstTask);
-      data.workTickets.push({id,name,coolingAt:'',coolingUntil:'',coolingHistory:[],urgency:ticketQuickMode.value?'':ticketDraft.urgency,difficulty:ticketQuickMode.value?'':ticketDraft.difficulty,typeId,url:ticketQuickMode.value?'':ticketDraft.url.trim(),due:ticketQuickMode.value?'':ticketDraft.due,startDate:(ticketQuickMode.value?'':ticketDraft.startDate)||opened.toISOString().slice(0,10),category:ticketDraft.category,createdAt:opened.toISOString().slice(0,10),createdAtTime:opened.toISOString(),lastActivityAt:'',waiting:false,customStatus:'',done:false,doneAt:'',items:firstTask?[{id:uid(),name:firstTask,points:pts,done:false,doneAt:''}]:[]});
+      data.workTickets.push({id,name,activityHistory:[{id:uid(),at:new Date().toISOString(),label:'Ticket créé'}],coolingAt:'',coolingUntil:'',coolingHistory:[],urgency:ticketQuickMode.value?'':ticketDraft.urgency,difficulty:ticketQuickMode.value?'':ticketDraft.difficulty,typeId,url:ticketQuickMode.value?'':ticketDraft.url.trim(),due:ticketQuickMode.value?'':ticketDraft.due,startDate:(ticketQuickMode.value?'':ticketDraft.startDate)||opened.toISOString().slice(0,10),category:ticketDraft.category,createdAt:opened.toISOString().slice(0,10),createdAtTime:opened.toISOString(),lastActivityAt:'',waiting:false,customStatus:'',done:false,doneAt:'',items:firstTask?[{id:uid(),name:firstTask,points:pts,done:false,doneAt:''}]:[]});
       ticketDraft.name='';ticketDraft.ageHours='';ticketDraft.startDate='';ticketDraft.due='';ticketDraft.category='';ticketDraft.url='';ticketDraft.typeName='';ticketDraft.typeId='';ticketDraft.initialTaskName='';ticketDraft.initialTaskPoints=10;ticketDraft.urgency='';ticketDraft.difficulty='';
     }
     function addTicketItem(ticket) {
       const draft=ticketInputs[ticket.id]||(ticketInputs[ticket.id]={name:'',points:10});const name=String(draft.name||'').trim();if(!name)return;
-      stopCooling(ticket,'action-added');rememberTicketTask(name);ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});ticket.waiting=false;touchTicket(ticket);
+      stopCooling(ticket,'action-added');rememberTicketTask(name);ticket.items.push({id:uid(),name,points:Math.max(0,Number(draft.points)||0),done:false,doneAt:''});ticket.waiting=false;touchTicket(ticket);addTicketEvent(ticket,'Action ajoutée : '+name);
       ticketInputs[ticket.id]={name:'',points:10};
     }
     function ticketItemBlocker(ticket,item){const prev=(ticket.items||[]).find(x=>x.id===item.dependsOn);return prev&&!prev.done?prev:null;}
     function validateTicketDependency(ticket,item){let id=item.dependsOn;const seen=new Set([item.id]);while(id){if(seen.has(id)){item.dependsOn='';notify('Dépendance circulaire interdite');return;}seen.add(id);id=ticket.items.find(x=>x.id===id)?.dependsOn||'';}}
     function toggleTicketItem(ticket,item) {
       if(!item.done&&ticketItemBlocker(ticket,item)){notify('Termine la tâche précédente avant celle-ci');return;}
-      item.done=!item.done;item.doneAt=item.done?today.value:'';if(!item.done){ticket.waiting=false;stopCooling(ticket,'action-reopened');}touchTicket(ticket);
+      item.done=!item.done;item.doneAt=item.done?today.value:'';if(!item.done){ticket.waiting=false;stopCooling(ticket,'action-reopened');}touchTicket(ticket);addTicketEvent(ticket,(item.done?'Action terminée : ':'Action rouverte : ')+item.name);
       if(!item.done&&ticket.done){ticket.done=false;ticket.doneAt='';}
     }
     function finishTicket(ticket) {
       if(!ticket.items.length){notify('Ajoute au moins une tâche avant de terminer le ticket');return;}
       if(ticket.items.some(x=>!x.done)){notify('Termine toutes les tâches avant de clôturer le ticket');return;}
-      stopCooling(ticket,'manual-close');ticket.done=true;ticket.doneAt=today.value;ticket.waiting=false;touchTicket(ticket);
+      stopCooling(ticket,'manual-close');ticket.done=true;ticket.doneAt=today.value;ticket.waiting=false;touchTicket(ticket);addTicketEvent(ticket,'Ticket clôturé manuellement');
     }
-    function reopenTicket(ticket){stopCooling(ticket,'reopened');ticket.done=false;ticket.doneAt='';ticket.waiting=false;touchTicket(ticket);}
+    function reopenTicket(ticket){stopCooling(ticket,'reopened');ticket.done=false;ticket.doneAt='';ticket.waiting=false;touchTicket(ticket);addTicketEvent(ticket,'Ticket rouvert');}
     function removeTicket(ticket){
       if(!confirm(`Supprimer le ticket « ${ticket.name} » et toutes ses tâches ? Les points validés seront conservés.`))return;
       data.trash.unshift({id:uid(),type:'ticket',deletedAt:new Date().toISOString(),payload:clone(ticket)});
@@ -997,6 +1032,30 @@ const app = createApp({
     });
 
     /* ---------- Tâches ---------- */
+    // V85 : modeles de VRAIES taches, independants des listes habituelles sans points.
+    const taskTemplateDraft=reactive({name:'',projectId:'',category:'',points:5,lines:''});
+    function saveTaskListTemplate(){
+      const name=String(taskTemplateDraft.name||'').trim();
+      const titles=[...new Set(String(taskTemplateDraft.lines||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean))].slice(0,60);
+      if(!name||!titles.length){notify('Renseigne un nom de modèle et au moins une tâche.');return;}
+      if(data.taskListTemplates.some(x=>String(x.name).toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'))){notify('Un modèle porte déjà ce nom.');return;}
+      data.taskListTemplates.push({id:uid(),name,projectId:taskTemplateDraft.projectId||'',category:taskTemplateDraft.category||'',points:Math.max(0,Number(taskTemplateDraft.points)||0),titles});
+      taskTemplateDraft.name='';taskTemplateDraft.lines='';notify('Modèle enregistré');
+    }
+    function createTasksFromTemplate(model){
+      if(!model||!Array.isArray(model.titles)||!model.titles.length)return;
+      const titles=model.titles.filter(x=>typeof x==='string'&&x.trim()).slice(0,60);
+      const projectId=data.projects.some(p=>p.id===model.projectId)?model.projectId:'';
+      if(!confirm('Créer '+titles.length+' tâche(s) à faire depuis « '+model.name+' » ?'))return;
+      for(const title of titles)data.tasks.push(newTask({title:title.trim(),scope:'personal',projectId,category:model.category||'',points:Math.max(0,Number(model.points)||0),status:'todo',doneAt:'',due:'',startDate:'',recurrence:'',subtasks:[],templateId:model.id}));
+      notify(titles.length+' tâches ajoutées (aucun point attribué avant validation).');
+    }
+    function removeTaskListTemplate(model){if(confirm('Supprimer ce modèle ? Les tâches créées restent intactes.'))data.taskListTemplates=data.taskListTemplates.filter(x=>x.id!==model.id);}
+    function fillTaskTemplateFromProject(){
+      if(!taskTemplateDraft.projectId)return;
+      taskTemplateDraft.lines=[...new Set(data.tasks.filter(t=>t.projectId===taskTemplateDraft.projectId&&t.scope!=='work').map(t=>String(t.title||'').trim()).filter(Boolean))].slice(0,60).join('\n');
+    }
+
     const taskForm = reactive({
       open: false, id: null, title: '', category: '', points: 10, malus: false, status: 'todo', projectId: '', due: '', estimatedMinutes: null, estimatedEffort: '',
       urgency: '', difficulty: '', doneAt: '', scope:'personal', workCategoryNames: [], ticketName: '', dependsOn: '', milestoneId: '',alterId:'',startDate:'',recurrence:'',recurrenceEnd:'',subtaskBonusMode:'add',subtaskBonusPoints:10,subtaskBonusMultiplier:1.5,subtasks:[],subtaskDraft:'',sourceNoteId:'',sourceNoteContent:'',
@@ -2048,7 +2107,8 @@ const app = createApp({
           const json = JSON.parse(reader.result);
           const ok = ['tasks', 'projects', 'rewards', 'inventory'].every(k => Array.isArray(json[k]));
           if (!ok) throw new Error('format');
-          if (!confirm('Remplacer toutes les données actuelles par celles du fichier ?')) return;
+          const preview='Sauvegarde : '+json.tasks.length+' tâches, '+(json.workTickets||[]).length+' tickets, '+json.projects.length+' projets.';
+          if (!confirm(preview+'\n\nCette opération REMPLACERA les données locales et pourra se propager à Firebase. Exporte tes données actuelles avant de continuer. Continuer ?')) return;
           applyData(json);
           notify(user.value ? 'Import réussi : synchronisation Firebase en cours' : 'Import réussi');
         } catch (e) {
@@ -2074,7 +2134,12 @@ const app = createApp({
 
     const user = ref(null);
     const syncState = ref(firebaseReady ? 'signedout' : 'local');
-    const syncLabel = computed(() => ({
+    const networkOnline=ref(typeof navigator==='undefined'||navigator.onLine!==false);
+    if(typeof window.addEventListener==='function'){
+      window.addEventListener('online',()=>{networkOnline.value=true;});
+      window.addEventListener('offline',()=>{networkOnline.value=false;});
+    }
+    const syncLabel = computed(() => !networkOnline.value ? 'Signalé hors ligne : synchro non confirmée' : ({
       local:     'Firebase indisponible : données locales',
       signedout: 'Non connecté : données sur cet appareil uniquement',
       syncing:   'Synchronisation…',
@@ -2516,6 +2581,17 @@ const app = createApp({
     function toggleMilestone(m){const list=milestoneTasks(m);if(list.length&&!milestoneDone(m)){notify('Termine les sous-tâches du jalon avant de le valider');return;}m.done=!milestoneDone(m);m.doneAt=m.done?today.value:'';}
     function removeMilestone(m){data.trash.unshift({id:uid(),type:'milestone',deletedAt:new Date().toISOString(),payload:clone(m)});data.tasks.forEach(t=>{if(t.milestoneId===m.id)t.milestoneId='';});data.projectMilestones=data.projectMilestones.filter(x=>x.id!==m.id);}
     function milestones(project){return data.projectMilestones.filter(m=>m.projectId===project.id);}
+    const v85WeeklyTrends=computed(()=>{
+      const start=monday(today.value);
+      return Array.from({length:4},(_,index)=>{
+        const d=dateAdd(start,-7*index),end=dateAdd(d,6);
+        const tasks=data.tasks.filter(t=>t.status==='done'&&t.doneAt>=d&&t.doneAt<=end);
+        const tickets=data.workTickets.filter(t=>t.done&&t.doneAt>=d&&t.doneAt<=end);
+        const actions=data.workTickets.flatMap(t=>(t.items||[]).filter(i=>i.done&&i.doneAt>=d&&i.doneAt<=end).map(i=>ticketItemValue(t,i)));
+        const habits=data.habits.reduce((n,h)=>n+(h.history||[]).filter(x=>x>=d&&x<=end).length,0);
+        return {start:d,end,tasks:tasks.length,tickets:tickets.length,habits,points:Math.round((tasks.reduce((n,t)=>n+taskValue(t),0)+actions.reduce((a,b)=>a+b,0))*100)/100};
+      });
+    });
     const weekSummary=computed(()=>{const start=monday(today.value);const end=new Date(start+'T12:00:00');end.setDate(end.getDate()+6);const toDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const endS=toDate(end);const tasks=data.tasks.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.status==='done');const tickets=data.workTickets.filter(t=>t.doneAt>=start&&t.doneAt<=endS&&t.done);return {tasks:tasks.length,tickets:tickets.length,points:tasks.reduce((s,t)=>s+taskValue(t),0),meals:Array.from({length:7},(_,i)=>{const d=new Date(start+'T12:00:00');d.setDate(d.getDate()+i);const date=toDate(d);return ['lunch','dinner'].map(k=>mealSlot(date,k));}).flat().filter(m=>m.state==='done').length};});
 
     // V29 : dépendances, planification, calendrier, repas, budget courses, succès et widgets.
@@ -3394,6 +3470,36 @@ const app = createApp({
     // V84 : le centre des rappels calcule les repas manquants, sans popup ni marquage au chargement.
     // V84 : centre non bloquant. Les anciennes notifications forcees restent desactivees.
     const remindersOpen=ref(false);
+    const reminderDraft=reactive({label:'',date:today.value,time:'09:00',repeat:'none'});
+    function addCustomReminder(){
+      const label=String(reminderDraft.label||'').trim();
+      if(!label||!/^\d{4}-\d{2}-\d{2}$/.test(reminderDraft.date)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(reminderDraft.time)){
+        notify('Nom, date et heure valides obligatoires');return;
+      }
+      data.customReminders.push({id:uid(),label:label.slice(0,160),date:reminderDraft.date,time:reminderDraft.time,repeat:['daily','weekly'].includes(reminderDraft.repeat)?reminderDraft.repeat:'none'});
+      reminderDraft.label='';notify('Rappel ajouté');
+    }
+    function removeCustomReminder(item){
+      if(!confirm('Supprimer ce rappel ?'))return;
+      data.customReminders=data.customReminders.filter(x=>x.id!==item.id);
+    }
+    function snoozeReminder(item,hours){
+      const n=Number(hours);if(!Number.isFinite(n)||n<1||n>168)return;
+      data.reminderSnoozes[item.key]=new Date(Date.now()+n*3600000).toISOString();
+    }
+    function getCustomReminderOccurrence(item){
+      const start=new Date(item.date+'T'+(item.time||'09:00')+':00');
+      if(!Number.isFinite(start.getTime()))return null;
+      const now=new Date();if(start>now)return null;
+      const repeat=item.repeat||'none';const occ=new Date(start);
+      if(repeat==='daily'||repeat==='weekly'){
+        const step=repeat==='daily'?1:7;
+        while(occ.getTime()+step*86400000<=now.getTime())occ.setDate(occ.getDate()+step);
+      }
+      if(now.getTime()-occ.getTime()>7*86400000)return null;
+      const localDate=occ.getFullYear()+'-'+String(occ.getMonth()+1).padStart(2,'0')+'-'+String(occ.getDate()).padStart(2,'0');
+      return {key:'custom:'+item.id+':'+localDate,kind:'custom',date:localDate,label:item.label,reminder:item};
+    }
     const reminderItems=computed(()=>{
       void nowMinute.value; // actualisation au changement d'heure sans recharger la page
       const items=[];
@@ -3426,16 +3532,25 @@ const app = createApp({
             items.push({key,kind:'appointment',date,label:'Rendez-vous : '+a.title,appointment:a,ack});
         }
       }
-      return items.slice(0,40);
+      for(const reminder of data.customReminders||[]){
+        const occurrence=getCustomReminderOccurrence(reminder);
+        if(occurrence&&!dismissed[occurrence.key])items.push(occurrence);
+      }
+      return items.filter(item=>{
+        const until=new Date((data.reminderSnoozes||{})[item.key]||0).getTime();
+        return !Number.isFinite(until)||Date.now()>=until;
+      }).slice(0,40);
     });
     function dismissReminder(item){
-      if(item.kind==='deadline')acknowledgeDeadlineAlert(item.alert);
+      if(item.kind==='custom'){data.reminderDismissals[item.key]=today.value;}
+      else if(item.kind==='deadline')acknowledgeDeadlineAlert(item.alert);
       else if(item.kind==='appointment'){
         if(!Array.isArray(item.appointment.reminderAcknowledged))item.appointment.reminderAcknowledged=[];
         if(!item.appointment.reminderAcknowledged.includes(item.ack))item.appointment.reminderAcknowledged.push(item.ack);
       } else data.reminderDismissals[item.key]=today.value;
     }
     function openReminder(item){
+      if(item.kind==='custom'){notify('Rappel : '+item.label);remindersOpen.value=false;return;}
       if(item.kind==='mood'){setTab('mood');nextTick(()=>openMoodDay(item.date));}
       else if(item.kind==='meal'){setTab('menu');menuTab.value='planning';openFoodReview(item.date,item.mealKind);}
       else if(item.kind==='deadline'){setTab('calendar');openAppointment(item.alert.a);}
@@ -3649,6 +3764,7 @@ const app = createApp({
     const mobileCalendarDays=computed(()=>calMode.value==='day'?[calAnchor.value]:calendarDays.value);
     return {
       mobileTaskScope,mobileTaskQuery,mobileTaskProject,mobileTaskCategory,mobileTaskSort,mobileLastDone,mobileTasks,mobilePostponeTask,mobileCalendarDays,
+      localSaveError,localSaveAt,taskTemplateDraft,saveTaskListTemplate,createTasksFromTemplate,removeTaskListTemplate,fillTaskTemplateFromProject,v85WeeklyTrends,ticketSearch,ticketTypeFilter,ticketStatusFilter,filteredDisplayedTickets,addTicketEvent,extendCooling,reminderDraft,addCustomReminder,removeCustomReminder,snoozeReminder,
       quickWord,quickWordPoints,addQuickWord,ticketTaskSuggestions,frequentTicketTasks,ticketQuickMode,ticketView,coolingTickets,displayedTickets,ticketInCooling,coolingDaysLeft,startCooling,reopenCooling,processCooling,ticketAgeHours,setTicketAgeHours,menuSimple,updateSimpleMeal,quickMealState,updateQuickMealActual,remindersOpen,reminderItems,dismissReminder,openReminder,
       routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,groceryExcludedIds,groceryShoppingExists,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,leftoverPlanDate,leftoverPlanKind,planLeftoverSelected,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
       wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooserFilteredPool,chooseQuickAction,chooserTime,chooserEffort,chooserOperator,chooserUnknown,chooserTaskDurationLabel,chooserTaskCategoryColor,chooserTaskProjectColor,chooserTaskInfo,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,
