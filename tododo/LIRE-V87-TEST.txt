@@ -1,0 +1,63 @@
+TODO QUEST V87 TEST - 26 novembre 2026
+=======================================
+
+1. CONTENU
+Version PC : tododo/index.html
+Version mobile / PWA : tododo/mobile/index.html
+Les versions affichent V87 TEST, le cache mobile est tqm-shell-v87-test.
+
+2. NOUVELLES ACTIONS
+Menu Taches > Bonnes & mauvaises actions (PC et mobile).
+Deux types d'actions ajoutes, entierement independants du module Habitudes.
+Les habitudes positives et negatives existantes, leurs objectifs et historiques sont conserves.
+
+Pour chaque action : nom, points de base, progression par repetition,
+plafond par occurrence et plafond par JOUR. Le compteur repart de zero chaque jour.
+Exemple bonne action : 3 pts, +2 pts/repetition, max 7 pts/fois, 15 pts/jour
+=> 3 + 5 + 7 + 0 points le meme jour.
+Exemple mauvaise action : -2, -4, -0 points pour une limite de -6/jour.
+La deduction est limitee au solde disponible au moment de la saisie.
+Si plusieurs appareils saisissent sans synchroniser, le solde apres fusion peut
+neanmoins diverger de la limite evaluee localement. Ne pas utiliser comme comptabilite.
+
+Possibilites : creer, modifier, archiver, reactiver, enregistrer une occurrence,
+annuler la derniere occurrence du jour, statistiques et historique.
+Le calcul de points de chaque occurrence est conserve dans son journal ;
+modifier un bareme ne recalcule pas les anciens points.
+Aucune conversion des anciennes habitudes n'est effectuee.
+
+3. AUTOMATISATION FACULTATIVE DES MODELES
+Taches > Modeles de taches : un modele peut desormais etre manuel (defaut),
+quotidien ou hebdomadaire (jour de semaine choisi).
+La generation se produit quand Todo Quest est ouvert, pas sur un serveur.
+Chaque tache generee a un identifiant deterministe par modele/date/ligne,
+qui empeche les recreations multiples sur un meme jour apres rechargement.
+Chaque tache generee reste A FAIRE, sans attribution de points a sa creation.
+IMPORTANT : l'option d'automatisation doit etre activee dans les parametres
+existants si elle avait ete desactivee ; les modeles historiques restent manuels.
+
+4. FONCTIONS REPRISES DES V84-86
+Tickets rapides et suggestions, etat Cooling, prolongation et cloture apres 7 jours,
+centre de rappels sans pop-up, repas rapides, sauvegarde JSON, navigation,
+statistiques avancees et historique. Affichage d'absence de reseau et messages
+sur les erreurs de stockage local.
+
+5. MIGRATION / SAUVEGARDE
+Avant installation : exporter une sauvegarde JSON depuis l'application actuelle.
+Conserver l'ancienne version et ne pas melanger les fichiers JS de versions differentes.
+Tester l'import sur une copie d'abord. La V87 accepte le format de sauvegarde V86 :
+les collections goodBadActions et goodBadEvents sont vides si elles sont absentes.
+L'import, la synchro distante et le remplacement complet de donnees peuvent ecraser
+l'etat local : verifier le compte et les donnees avant validation.
+
+6. TESTS EFFECTUES
+- Tests Node PC + mobile V84/V85/V86/V87 : OK sur la sauvegarde 2026-11-24.
+- Controle charge des objets existants, migration, points progressifs et plafonds,
+  annulation, archivage, reglage du solde, generation de taches sans doublons : OK.
+- Simulation de fusion V72 et evenements V87 : OK.
+- Verification syntaxe JS, structure et ancien dashboard : OK.
+
+NON VALIDE : utilisation visuelle complete sur navigateur et PWA installee,
+regles de securite Firestore, conflits Firebase reels multi-appareils,
+performances en charge et fiabilite hors ligne en situation reelle.
+Cette version porte donc volontairement le suffixe TEST.

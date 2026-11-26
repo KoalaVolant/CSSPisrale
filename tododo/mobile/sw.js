@@ -1,5 +1,5 @@
-/* Todo Quest Mobile V85: versioned shell, network first, offline fallback. */
-const CACHE = 'tqm-shell-v85-test';
+/* Todo Quest Mobile V87: versioned shell, network first, offline fallback. */
+const CACHE = 'tqm-shell-v87-test';
 const ASSETS = ['./','./index.html','./mobile.css','./nonsticky-v9-5.css',
   './js/01-core.js','./js/02-catalogue.js','./js/03-storage.js',
   './js/04-task-components.js','./js/05-application.js',

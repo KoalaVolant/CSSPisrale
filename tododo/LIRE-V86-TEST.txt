@@ -1,0 +1,49 @@
+TODO QUEST V86 TEST – 26/11/2026
+Base : V85 TEST. PC et mobile inclus.
+
+OU SONT LES MODELES DE TACHES ?
+- PC : menu de gauche > Taches > Modeles de taches.
+- Mobile : Menu > Taches > Modeles de taches.
+- Le lien « Ouvrir les modeles de taches » est aussi dans Toutes les taches.
+- Selectionner un projet puis « Reprendre les taches de ce projet » pour reprendre les intitules existants (max. 60 intitules distincts).
+- Saisir les points par tache, enregistrer puis « Creer les taches ».
+- Le modele genere de nouvelles taches NON TERMINEES. Il ne donne pas de points avant validation, ne modifie pas les anciennes taches ni les habitudes.
+- Les modeles deja crees sous V85 restent disponibles via data.taskListTemplates.
+
+ANALYSE V86
+- Menu > Autres > Statistiques > Analyse detaillee V86.
+- Periode : 7/30/90 jours ou toutes les dates enregistrees jusqu'a aujourd'hui.
+- Filtre personnel/travail uniquement pour les taches ; les tickets restent affiches independamment.
+- Indicateurs : taches terminees et leurs points, actions de tickets terminees et leurs points, tickets clotures, habitudes validees.
+- Classement des categories de taches, projets, actions de tickets, types de tickets clos.
+- Evolution sur les 14 derniers jours de la periode, avec jours sans activite affiches.
+- Historique horodate des evenements de tickets depuis la V85 (max. 30 derniers dans la vue).
+- Export CSV local des jours avec activite sur la periode (point-virgule, UTF-8 BOM).
+- Analyse en lecture seule : aucune modification des points, taches ou tickets.
+
+LIMITES ET HYPOTHESES
+- Les taches sans date de cloture et les actions de tickets sans date de validation ne sont pas attribuees a une periode.
+- Les points sont recalcules selon les parametres actuels de chaque tache/ticket, ils ne constituent pas un grand-livre comptable historique. Le solde total peut differer (habitudes, recompenses, anciennes donnees, etc.).
+- Les validations d'habitudes sont dedoublonnees par habitude et par date ; leur total n'est pas un score de regularite.
+- Les categories presentes sur plusieurs taches sont comptees, mais une tache n'est attribuee qu'a sa categorie principale.
+- Les histories de tickets anterieurs a V85 ne peuvent pas etre reconstitues.
+- Les donnees historiques de la V85 sont conservees ; pas de migration destructive.
+- La synchronisation Firebase reelle et les interactions dans un navigateur de production restent a verifier. Les tests automatises sont des simulations hors-ligne de la logique metier et de la structure HTML.
+
+TESTS
+node tests/test_v86_behaviour.cjs chemin/vers/une/sauvegarde.json
+node tests/test_v85_behaviour.cjs chemin/vers/une/sauvegarde.json
+node tests/test_v84_behaviour.cjs chemin/vers/une/sauvegarde.json
+node tests/test_smoke.cjs
+node tests/test_merge_edge_cases.cjs
+python tests/test_refactor.py
+python tests/test_v79_features.py
+python tests/test_dashboard_static.py
+
+DEPLOIEMENT / ROLLBACK
+1. Exporter les donnees JSON de chaque appareil AVANT mise a jour.
+2. Conserver la V85 et faire un essai sur une copie des fichiers/du projet.
+3. Tester les modeles sur des taches fictives et les statistiques avec une sauvegarde connue.
+4. Verifier PC et PWA mobile sur les donnees de test et la synchronisation Firebase (modification croisee puis controle).
+5. En cas de probleme, restaurer le code V85 puis reimporter uniquement la sauvegarde desiree, en evitant de synchroniser simultanement d'autres appareils non verifies.
+6. Cache PWA mobile : tqm-shell-v86-test (le manifeste conserve son identifiant PWA pour les installations existantes).

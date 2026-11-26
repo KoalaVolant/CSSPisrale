@@ -66,6 +66,7 @@ const TABS = [
   { id: 'alters', label: 'Alters' },
   { id: 'mood', label: 'Humeur & Psychologie' },
   { id: 'all',        label: 'Toutes les tâches' },
+  { id: 'task-templates', label: 'Modèles de tâches' },
   { id: 'work',       label: 'Travail' },
   { id: 'usual-lists', label: 'Listes' },
   { id: 'menu', label: 'Menu de la semaine' },
@@ -78,6 +79,7 @@ const TABS = [
   { id: 'random-notes', label: 'Notes au pif' },
   { id: 'evening', label: 'Textareas' },
   { id: 'habits',     label: 'Habitudes & routines' },
+  { id: 'actions',    label: 'Bonnes & mauvaises actions' },
   { id: 'challenges', label: 'Défis' },
   { id: 'statistics', label: 'Statistiques' },
   { id: 'budget', label: 'Budget' },
@@ -92,7 +94,7 @@ const TABS = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'Tâches', ids: ['home','calendar','all','work','habits','done'] },
+  { title: 'Tâches', ids: ['home','calendar','all','task-templates','work','habits','actions','done'] },
   { title: 'Psychologie', ids: ['alters','mood'] },
   { title: 'TCA et poids', ids: ['menu','shopping','sport','wellness-report'] },
   { title: 'Plaisir', ids: ['rewards','inventory','activities'] },

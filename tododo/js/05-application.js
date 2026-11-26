@@ -97,6 +97,8 @@ const app = createApp({
       data.categories = data.categories.filter(c=>c.name!=='Travail');
       data.rewardCategories = normalizeCategories(src.rewardCategories || [...(src.rewards || []), ...(src.inventory || [])].map(x => x.category).filter(Boolean));
       data.habits = Array.isArray(src.habits) ? src.habits : [];
+      data.goodBadActions=Array.isArray(src.goodBadActions)?clone(src.goodBadActions):[];
+      data.goodBadEvents=Array.isArray(src.goodBadEvents)?clone(src.goodBadEvents):[];
       data.activities = Array.isArray(src.activities) ? src.activities : [];
       data.inventory.forEach(i=>{if(i.used&&!i.usedAt)i.usedAt=i.date||todayStr();});
       data.challenges = Array.isArray(src.challenges) ? src.challenges : [];
@@ -378,6 +380,63 @@ const app = createApp({
       return index < 0 ? 0 : list.length - index;
     };
 
+    /* ---------- V87 : bonnes/mauvaises actions, independantes des habitudes ---------- */
+    const actionDraft=reactive({id:'',name:'',kind:'good',base:3,step:1,maxPerUse:5,dailyCap:20});
+    const actionPeriod=ref('30');
+    const actionRound=n=>Math.round((Number(n)||0)*100)/100;
+    const actionsActive=computed(()=>data.goodBadActions.filter(a=>!a.archived));
+    const actionEntriesFor=(a,date)=>data.goodBadEvents.filter(e=>e.actionId===a.id && (!date||e.date===date));
+    const actionSpentToday=a=>actionRound(actionEntriesFor(a,today.value).reduce((sum,e)=>sum+Math.abs(Number(e.points)||0),0));
+    const actionCountToday=a=>actionEntriesFor(a,today.value).length;
+    const actionAwardTotal=computed(()=>actionRound(data.goodBadEvents.reduce((s,e)=>s+(Number(e.points)||0),0)));
+    const actionGoodToday=computed(()=>actionRound(data.goodBadEvents.filter(e=>e.date===today.value&&e.kind==='good').reduce((s,e)=>s+(Number(e.points)||0),0)));
+    const actionBadToday=computed(()=>actionRound(data.goodBadEvents.filter(e=>e.date===today.value&&e.kind==='bad').reduce((s,e)=>s+Math.abs(Number(e.points)||0),0)));
+    const actionRecent=computed(()=>[...data.goodBadEvents].sort((a,b)=>String(b.at||'').localeCompare(String(a.at||''))).slice(0,35).map(e=>({...e,title:data.goodBadActions.find(a=>a.id===e.actionId)?.name||e.name||'Action archivée'})));
+    const actionPeriodStats=computed(()=>{
+      const length=Number(actionPeriod.value)||0;
+      const start=length?dateAdd(today.value,-length+1):'';
+      const events=data.goodBadEvents.filter(e=>!start||e.date>=start);
+      const items=data.goodBadActions.map(a=>{
+        const matching=events.filter(e=>e.actionId===a.id);
+        return {id:a.id,name:a.name,kind:a.kind,occurrences:matching.length,points:actionRound(matching.reduce((s,e)=>s+(Number(e.points)||0),0))};
+      }).sort((a,b)=>b.occurrences-a.occurrences);
+      const good=events.filter(e=>e.kind==='good'); const bad=events.filter(e=>e.kind==='bad');
+      return {good:good.length,bad:bad.length,gain:actionRound(good.reduce((s,e)=>s+(Number(e.points)||0),0)),loss:actionRound(bad.reduce((s,e)=>s+Math.abs(Number(e.points)||0),0)),items};
+    });
+    function editGoodBadAction(a=null,kind='good'){
+      Object.assign(actionDraft,a?{id:a.id,name:a.name,kind:a.kind,base:a.base,step:a.step,maxPerUse:a.maxPerUse,dailyCap:a.dailyCap}:{id:'',name:'',kind,base:kind==='good'?3:2,step:1,maxPerUse:kind==='good'?5:4,dailyCap:kind==='good'?20:10});
+      setTab('actions');
+    }
+    function saveGoodBadAction(){
+      const name=String(actionDraft.name||'').trim().slice(0,120);
+      const base=Number(actionDraft.base),step=Number(actionDraft.step),maxPerUse=Number(actionDraft.maxPerUse),dailyCap=Number(actionDraft.dailyCap);
+      if(!name||![base,step,maxPerUse,dailyCap].every(n=>Number.isFinite(n)&&n>=0&&n<=10000)||maxPerUse<base||dailyCap<base){notify('Vérifie le nom et les plafonds (plafond >= points de base).');return;}
+      const old=data.goodBadActions.find(x=>x.id===actionDraft.id);
+      if(old){Object.assign(old,{name,base,step,maxPerUse,dailyCap});notify('Action modifiée : les points passés restent identiques.');}
+      else {data.goodBadActions.push({id:uid(),name,kind:actionDraft.kind==='bad'?'bad':'good',base,step,maxPerUse,dailyCap,archived:false});notify('Action ajoutée, indépendante des habitudes.');}
+      Object.assign(actionDraft,{id:'',name:'',kind:'good',base:3,step:1,maxPerUse:5,dailyCap:20});
+    }
+    function recordGoodBadAction(a){
+      if(!a||a.archived)return;
+      const prior=actionEntriesFor(a,today.value);
+      const count=prior.length;
+      const base=Math.max(0,Number(a.base)||0),step=Math.max(0,Number(a.step)||0),maxPerUse=Math.max(0,Number(a.maxPerUse)||0),dailyCap=Math.max(0,Number(a.dailyCap)||0);
+      const maxToday=Math.max(0,actionRound(dailyCap-actionSpentToday(a)));
+      let amount=actionRound(Math.max(0,Math.min(base+count*step,maxPerUse,maxToday)));
+      // Aucun debit de point superieur au solde disponible au moment de la saisie.
+      if(a.kind==='bad')amount=actionRound(Math.min(amount,Math.max(0,balance.value)));
+      data.goodBadEvents.push({id:uid(),actionId:a.id,name:a.name,kind:a.kind,date:today.value,at:new Date().toISOString(),points:a.kind==='bad'?-amount:amount});
+      notify((a.kind==='bad'?'':'+' )+(a.kind==='bad'?(-amount):amount)+' pts · '+a.name+(maxToday<=0?' (plafond atteint)':''));
+    }
+    function undoGoodBadAction(a){
+      const items=actionEntriesFor(a,today.value);
+      if(!items.length)return;
+      const last=items[items.length-1];
+      data.goodBadEvents=data.goodBadEvents.filter(e=>e.id!==last.id);
+      notify('Dernière occurrence du jour annulée ('+(last.points>=0?'+':'')+last.points+' pts).');
+    }
+    function toggleGoodBadArchive(a){a.archived=!a.archived;notify(a.archived?'Action archivée ; historique et points conservés.':'Action réactivée.');}
+
     /* ---------- Points ---------- */
     // Points des tâches terminées (bonus en +, malus en −) + points des tâches terminées puis supprimées
     const earned = computed(() =>
@@ -389,7 +448,7 @@ const app = createApp({
     const savedTotal = computed(() => data.rewards.reduce((sum,r)=>sum+Math.max(0,Number(r.saved)||0),0));
     const habitTotal = computed(() => Math.round(data.habits.reduce((sum,h)=>sum+habitAwards(h).reduce((s,a)=>s+a.points,0) - (h.penalties||[]).reduce((s,a)=>s+Math.max(0,Number(a.points)||0),0),0)*100)/100);
     const challengeTotal = computed(() => Math.round(data.challengeAwards.reduce((sum,a) => sum + (Number(a.points)||0), 0)*100)/100);
-    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value + data.sportSessions.reduce((s,x)=>s+(Number(x.points)||0),0) + Object.values(data.foodReviews).reduce((s,x)=>s+(x&&x.completed?2:0),0) - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
+    const balance = computed(() => Math.round((earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value + actionAwardTotal.value + data.sportSessions.reduce((s,x)=>s+(Number(x.points)||0),0) + Object.values(data.foodReviews).reduce((s,x)=>s+(x&&x.completed?2:0),0) - data.spent - savedTotal.value + (Number(data.adjust) || 0))*100)/100);
 
     // Modification manuelle du solde : on règle "adjust" pour tomber pile sur la valeur voulue
     const balanceForm = reactive({ open: false, value: 0 });
@@ -400,13 +459,13 @@ const app = createApp({
     function applyBalance() {
       const target = Number(balanceForm.value);
       if (!Number.isFinite(target)) return;
-      data.adjust = Math.round((target - (earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value - data.spent - savedTotal.value))*100)/100;
+      data.adjust = actionRound((Number(data.adjust)||0) + target - balance.value);
       balanceForm.open = false;
       notify(`Solde réglé à ${Math.round(target)} pts`);
     }
     function resetBalance() {
       if (!confirm('Remettre le solde de points à 0 ?')) return;
-      data.adjust = -(earned.value + gratitudeTotal.value + habitTotal.value + challengeTotal.value - data.spent - savedTotal.value);
+      data.adjust = actionRound((Number(data.adjust)||0) - balance.value);
       balanceForm.open = false;
       notify('Solde remis à 0');
     }
@@ -1033,13 +1092,13 @@ const app = createApp({
 
     /* ---------- Tâches ---------- */
     // V85 : modeles de VRAIES taches, independants des listes habituelles sans points.
-    const taskTemplateDraft=reactive({name:'',projectId:'',category:'',points:5,lines:''});
+    const taskTemplateDraft=reactive({name:'',projectId:'',category:'',points:5,lines:'',schedule:'manual',weekday:1});
     function saveTaskListTemplate(){
       const name=String(taskTemplateDraft.name||'').trim();
       const titles=[...new Set(String(taskTemplateDraft.lines||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean))].slice(0,60);
       if(!name||!titles.length){notify('Renseigne un nom de modèle et au moins une tâche.');return;}
       if(data.taskListTemplates.some(x=>String(x.name).toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'))){notify('Un modèle porte déjà ce nom.');return;}
-      data.taskListTemplates.push({id:uid(),name,projectId:taskTemplateDraft.projectId||'',category:taskTemplateDraft.category||'',points:Math.max(0,Number(taskTemplateDraft.points)||0),titles});
+      data.taskListTemplates.push({id:uid(),name,projectId:taskTemplateDraft.projectId||'',category:taskTemplateDraft.category||'',points:Math.max(0,Number(taskTemplateDraft.points)||0),titles,schedule:taskTemplateDraft.schedule,weekday:Number(taskTemplateDraft.weekday)||1});
       taskTemplateDraft.name='';taskTemplateDraft.lines='';notify('Modèle enregistré');
     }
     function createTasksFromTemplate(model){
@@ -1050,6 +1109,30 @@ const app = createApp({
       for(const title of titles)data.tasks.push(newTask({title:title.trim(),scope:'personal',projectId,category:model.category||'',points:Math.max(0,Number(model.points)||0),status:'todo',doneAt:'',due:'',startDate:'',recurrence:'',subtasks:[],templateId:model.id}));
       notify(titles.length+' tâches ajoutées (aucun point attribué avant validation).');
     }
+    // V87 : generation volontairement opt-in ; id deterministe = pas de doublon apres reouverture/synchro.
+    // Les generation manuelles restent independantes. Aucun point n'est gagne avant validation.
+    function processScheduledTaskTemplates(){
+      if(data.testSettings?.automationEnabled===false)return 0;
+      const day=today.value;
+      const localWeekday=new Date(day+'T12:00:00').getDay()||7;
+      let count=0;
+      for(const model of data.taskListTemplates){
+        if(!['daily','weekly'].includes(model.schedule))continue;
+        if(model.schedule==='weekly'&&Number(model.weekday||1)!==localWeekday)continue;
+        const projectId=data.projects.some(p=>p.id===model.projectId)?model.projectId:'';
+        for(const [i,title] of (model.titles||[]).entries()){
+          if(!String(title||'').trim()||i>=60)break;
+          const id='v87-auto:'+model.id+':'+day+':'+i;
+          if(data.tasks.some(t=>t.id===id))continue;
+          data.tasks.push(newTask({id,title:String(title).trim(),scope:'personal',projectId,category:model.category||'',points:Math.max(0,Number(model.points)||0),status:'todo',doneAt:'',due:day,startDate:day,recurrence:'',subtasks:[],templateId:model.id,autoTemplateDate:day}));
+          count++;
+        }
+      }
+      if(count)notify(count+' tâches prévues générées (sans attribution de points).');
+      return count;
+    }
+    nextTick(()=>processScheduledTaskTemplates());
+    setInterval(()=>{today.value=todayStr();processScheduledTaskTemplates();},60000);
     function removeTaskListTemplate(model){if(confirm('Supprimer ce modèle ? Les tâches créées restent intactes.'))data.taskListTemplates=data.taskListTemplates.filter(x=>x.id!==model.id);}
     function fillTaskTemplateFromProject(){
       if(!taskTemplateDraft.projectId)return;
@@ -2596,6 +2679,67 @@ const app = createApp({
       link.download='todo-quest-diagnostic-'+today.value+'.json';link.click();
       setTimeout(()=>URL.revokeObjectURL(url),1000);
     }
+    /* V86 : analytique en lecture seule, sans inventer d'historique manquant. */
+    const v86Period=ref('30'),v86Scope=ref('all');
+    const v86Round=n=>Math.round((Number(n)||0)*100)/100;
+    const v86Analytics=computed(()=>{
+      const end=today.value;
+      const period=v86Period.value;
+      const start=period==='all'?'0000-01-01':dateAdd(end,1-Math.max(1,Number(period)||30));
+      const inRange=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}/.test(d)&&d.slice(0,10)>=start&&d.slice(0,10)<=end;
+      const scoped=data.tasks.filter(t=>t.status==='done'&&inRange(t.doneAt)&&(v86Scope.value==='all'||t.scope===v86Scope.value));
+      const categoryMap=new Map(),projectMap=new Map(),actionMap=new Map(),ticketTypeMap=new Map(),dayMap=new Map();
+      const projects=new Map(data.projects.map(p=>[p.id,p.name]));
+      const types=new Map(data.workTicketTypes.map(t=>[t.id,t.name]));
+      const daily=date=>{if(!dayMap.has(date))dayMap.set(date,{date,tasks:0,taskPoints:0,actions:0,actionPoints:0,tickets:0,habits:0,points:0});return dayMap.get(date)};
+      const group=(map,name,points=0)=>{const key=name||'Sans catégorie';const old=map.get(key)||{name:key,count:0,points:0};old.count++;old.points=v86Round(old.points+points);map.set(key,old)};
+      let taskPoints=0,actionPoints=0,actions=0,habits=0;
+      for(const t of scoped){
+        const pts=v86Round(taskValue(t));taskPoints=v86Round(taskPoints+pts);
+        const cat=String(t.category||'').trim()||'Sans catégorie';
+        const proj=projects.get(t.projectId)||'Sans projet';
+        group(categoryMap,cat,pts);group(projectMap,proj,pts);
+        const day=daily(t.doneAt.slice(0,10));day.tasks++;day.taskPoints=v86Round(day.taskPoints+pts);
+      }
+      const tickets=data.workTickets.filter(t=>t.done&&inRange(t.doneAt));
+      for(const t of tickets){group(ticketTypeMap,types.get(t.typeId)||'Sans type');daily(t.doneAt.slice(0,10)).tickets++}
+      for(const t of data.workTickets)for(const item of t.items||[]){
+        if(!item.done||!inRange(item.doneAt))continue;
+        actions++;
+        const pts=v86Round(ticketItemValue(t,item));actionPoints=v86Round(actionPoints+pts);
+        const name=String(item.name||'Action sans nom').trim()||'Action sans nom', key=name.toLocaleLowerCase('fr');
+        const old=actionMap.get(key)||{key,name,count:0,points:0};old.count++;old.points=v86Round(old.points+pts);actionMap.set(key,old);
+        const day=daily(item.doneAt.slice(0,10));day.actions++;day.actionPoints=v86Round(day.actionPoints+pts);
+      }
+      for(const h of data.habits)for(const date of new Set((h.history||[]).filter(inRange))){habits++;daily(date.slice(0,10)).habits++}
+      const days=[...dayMap.values()].sort((a,b)=>a.date.localeCompare(b.date));
+      for(const day of days)day.points=v86Round(day.taskPoints+day.actionPoints);
+      // Graphique des 14 derniers jours calendaires ; jours sans activité explicitement présents.
+      const chartEnd=end;
+      const graph=Array.from({length:14},(_,i)=>{
+        const date=dateAdd(chartEnd,i-13);return dayMap.get(date)||{date,tasks:0,actions:0,tickets:0,habits:0,points:0};
+      }).filter(d=>d.date>=start);
+      const events=[];
+      for(const t of data.workTickets)for(const e of t.activityHistory||[]){
+        if(!e||!inRange(e.at))continue;
+        events.push({key:t.id+'-'+String(e.id||e.at||e.label),date:String(e.at||'').replace('T',' ').slice(0,16),ticket:String(t.name||'Ticket'),label:String(e.label||'Action')});
+      }
+      events.sort((a,b)=>b.date.localeCompare(a.date));
+      const top=map=>[...map.values()].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'fr')).slice(0,12);
+      return {periodLabel:period==='all'?'Toutes les dates conservées':start+' au '+end,from:start,to:end,tasks:scoped.length,taskPoints,actions,actionPoints,tickets:tickets.length,habits,
+        categories:top(categoryMap),projects:top(projectMap),topActions:top(actionMap),ticketTypes:top(ticketTypeMap),
+        days,recentDays:graph,graphMax:Math.max(1,...graph.map(d=>d.points)),events:events.slice(0,30)};
+    });
+    function downloadV86Csv(){
+      const a=v86Analytics.value;
+      const rows=[['Date','Tâches terminées','Points tâches','Actions tickets terminées','Points actions','Tickets clôturés','Habitudes validées'],
+        ...a.days.map(d=>[d.date,d.tasks,d.taskPoints,d.actions,d.actionPoints,d.tickets,d.habits])];
+      const safe=x=>{const s=String(x??'');return '"'+(/^[=+\-@]/.test(s)?"'"+s:s).replace(/"/g,'""')+'"'};
+      const csv='\ufeff'+rows.map(r=>r.map(safe).join(';')).join('\r\n');
+      const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+      const link=document.createElement('a');link.href=url;link.download='todo-quest-analyse-v86-'+today.value+'.csv';link.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
     const v85WeeklyTrends=computed(()=>{
       const start=monday(today.value);
       return Array.from({length:4},(_,index)=>{
@@ -3774,7 +3918,8 @@ const app = createApp({
     const goodHabitsHomeOpen = ref(true);
     const badHabitsHomeOpen = ref(true);
     return {
-      localSaveError,localSaveAt,taskTemplateDraft,saveTaskListTemplate,createTasksFromTemplate,removeTaskListTemplate,fillTaskTemplateFromProject,v85WeeklyTrends,ticketSearch,ticketTypeFilter,ticketStatusFilter,filteredDisplayedTickets,addTicketEvent,extendCooling,reminderDraft,addCustomReminder,removeCustomReminder,snoozeReminder,
+      actionDraft,actionPeriod,actionPeriodStats,actionsActive,actionAwardTotal,actionGoodToday,actionBadToday,actionRecent,actionCountToday,actionSpentToday,editGoodBadAction,saveGoodBadAction,recordGoodBadAction,undoGoodBadAction,toggleGoodBadArchive,
+      v86Period,v86Scope,v86Analytics,downloadV86Csv,localSaveError,localSaveAt,taskTemplateDraft,saveTaskListTemplate,createTasksFromTemplate,processScheduledTaskTemplates,removeTaskListTemplate,fillTaskTemplateFromProject,v85WeeklyTrends,ticketSearch,ticketTypeFilter,ticketStatusFilter,filteredDisplayedTickets,addTicketEvent,extendCooling,reminderDraft,addCustomReminder,removeCustomReminder,snoozeReminder,
       quickWord,quickWordPoints,addQuickWord,ticketTaskSuggestions,frequentTicketTasks,ticketQuickMode,ticketView,coolingTickets,displayedTickets,ticketInCooling,coolingDaysLeft,startCooling,reopenCooling,processCooling,ticketAgeHours,setTicketAgeHours,menuSimple,updateSimpleMeal,quickMealState,updateQuickMealActual,remindersOpen,reminderItems,dismissReminder,openReminder,
       routineDraft,saveRoutine,removeRoutine,routineProgress,routineHabits,routineStatsPeriod,routineStatsAnchor,routineStatsRange,routineStats,ingredientWeekDate,ingredientWeekStart,ingredientWeekEnd,ingredientWeekMeals,selectIngredientWeek,shiftIngredientWeek,groceryExcludedIds,groceryShoppingExists,leftoverDraft,addLeftover,consumeLeftover,planLeftover,removeLeftover,leftoverPlanDate,leftoverPlanKind,planLeftoverSelected,menuIngredientNeeds,addNeededIngredients,moodQuestionDraft,addMoodQuestion,removeMoodQuestion,moodCalendarMonth,moodCalendarDays,moodEntriesForDate,moodQuestionsAnswers,openMoodDay,workStatMonth,plannedPurchaseDraft,plannedPurchaseTotal,addPlannedPurchase,markPurchaseBought,removePlannedPurchase,workDetailed,workStatPeriod,dayView,dayOverview,dayMilestones,nextDeadlineDays,upcomingMilestones,openMilestoneItem,openDayItem,toggleHabitPause,setSubtaskPoints,openChooserChoice,
       wellnessTimeline,globalQuery,globalResults,openGlobalResult,chooserEnergy,chooserKind,chooserChoice,chooserPool,chooserFilteredPool,chooseQuickAction,chooserTime,chooserEffort,chooserOperator,chooserUnknown,chooserTaskDurationLabel,chooserTaskCategoryColor,chooserTaskProjectColor,chooserTaskInfo,chooseAction,dayTasks,dayHabits,contextPeriod,focusTask,startFocus,waitingPersonFilter,waitingPeople,workLoad,notificationItems,dismissNotification,automationRules,envelopeMonth,envelopeRows,envelopeKey,dashboardLive,addFormSubtask,removeFormSubtask,toggleTaskSubtask,

@@ -67,6 +67,8 @@ function defaultData() {
     projects: [],     // { id, name, description, color }  (l'ordre du tableau = l'ordre manuel)
     rewardCategories: [], // catégories indépendantes des récompenses et de l'inventaire
     habits: [], // habitudes + historique de réalisations
+    goodBadActions: [], // V87 : definitions des actions positives ou negatives, SANS conversion des habitudes
+    goodBadEvents: [], // V87 : occurrences horodatees et points immuables par evenement
     activities: [], // idées d'activités personnelles
     challenges: [], // défis paramétrables
     challengeAwards: [], // journal immuable des points attribués
@@ -111,6 +113,8 @@ function loadData() {
     if(!Array.isArray(d.moodQuestions))d.moodQuestions=[];
     if (!d.testSettings || typeof d.testSettings!=='object') d.testSettings={contextualDashboard:true,automationEnabled:true};
     if (!Array.isArray(d.habits)) d.habits = [];
+    if (!Array.isArray(d.goodBadActions)) d.goodBadActions = [];
+    if (!Array.isArray(d.goodBadEvents)) d.goodBadEvents = [];
     if (!Array.isArray(d.activities)) d.activities = [];
     if (!Array.isArray(d.workTickets)) d.workTickets = [];
     d.workTickets=d.workTickets.filter(t=>t&&typeof t==='object').map(t=>{const items=Array.isArray(t.items)?t.items:[];return {...t,items,waiting:items.some(i=>!i.done)?false:!!t.waiting};});

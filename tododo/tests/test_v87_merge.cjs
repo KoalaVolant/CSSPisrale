@@ -1,0 +1,18 @@
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
+const root=path.resolve(__dirname,'..');const ctx={window:{}};vm.createContext(ctx);
+vm.runInContext(fs.readFileSync(path.join(root,'sync-merge-v72.js'),'utf8'),ctx);
+const merge=ctx.window.TodoQuestMerge.threeWay;
+const a={id:'action1',name:'Lire',kind:'good',base:3,step:1,maxPerUse:5,dailyCap:20,archived:false};
+const base={goodBadActions:[a],goodBadEvents:[]};
+const event1={id:'eventA',actionId:a.id,kind:'good',date:'2026-11-26',points:3};
+const event2={id:'eventB',actionId:a.id,kind:'good',date:'2026-11-26',points:3};
+let result=merge(base,{...base,goodBadEvents:[event1]},{...base,goodBadEvents:[event2]});
+assert.equal(result.conflicts.length,0);
+assert.equal(result.result.goodBadEvents.length,2);
+assert.equal(result.result.goodBadEvents.reduce((s,e)=>s+e.points,0),6);
+result=merge(base,{...base,goodBadEvents:[event1]},{...base,goodBadEvents:[event1]});
+assert.equal(result.conflicts.length,0);
+assert.equal(result.result.goodBadEvents.length,1,'One event ID counted only once');
+result=merge(base,{...base,goodBadActions:[{...a,name:'Lire un livre'}]},{...base,goodBadActions:[{...a,name:'Lecture'}]});
+assert(result.conflicts.some(x=>x.includes('name')),'Simultaneous incompatible rename must be reported');
+console.log('OK V87 merge: distinct occurrences, idempotent occurrence, conflicting edits');

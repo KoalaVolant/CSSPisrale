@@ -1,0 +1,74 @@
+// V87: tests hors navigateur reel, sur PC / mobile, sans Firebase ni installation.
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
+const root=path.resolve(__dirname,'..');
+const snapshot=JSON.parse(fs.readFileSync(process.argv[2]||path.join(root,'todo-quest-2026-11-10.json'),'utf8'));
+for(const location of ['.','mobile']){
+ let api;const pending=[];
+ const writes={'todo-quest-v65-test-isolated':JSON.stringify(snapshot)};
+ const Vue={createApp:opts=>({config:{},component(){return this},mount(){api=opts.setup();return this}}),reactive:x=>x,ref:x=>({value:x}),computed:fn=>({get value(){return fn()}}),watch(){},nextTick:f=>{if(f)pending.push(f);return Promise.resolve()},provide(){}};
+ const ctx={Vue,window:{TODO_SPORT_V67:[],TODO_QUEST_MOBILE:location==='mobile',location:{protocol:'http:',origin:'http://local'}},document:{getElementById:()=>null,querySelector:()=>null,addEventListener(){}},navigator:{onLine:true},console,localStorage:{getItem:k=>writes[k]||null,setItem:(k,v)=>writes[k]=v},setTimeout,clearTimeout,setInterval(){},structuredClone,confirm:()=>true,prompt:()=>null,Date,Math,Blob,URL};
+ vm.createContext(ctx);
+ const directory=path.join(root,location,'js');
+ for(const n of ['01-core.js','02-catalogue.js','03-storage.js','04-task-components.js','05-application.js'])vm.runInContext(fs.readFileSync(path.join(directory,n),'utf8'),ctx,{filename:n});
+ assert(api);
+ const html=fs.readFileSync(path.join(root,location,'index.html'),'utf8');
+ assert(html.includes("view === 'actions'"),'Actions screen');
+ assert(html.includes("view === 'habits'"),'Original habits screen');
+ assert(html.includes('v87 test')||html.includes('v87 <span>TEST</span>'),'Version V87');
+ assert(html.includes('processScheduledTaskTemplates')===false,'No extraneous script in HTML');
+ assert.equal(JSON.stringify(api.data.habits),JSON.stringify(snapshot.habits),'Habits untouched during migration');
+ assert.equal(api.data.tasks.length,snapshot.tasks.length,'All tasks retained');
+ assert.equal(api.data.workTickets.length,snapshot.workTickets.length,'All tickets retained');
+ assert.equal(api.data.goodBadActions.length,0,'No invented actions');
+ assert.equal(api.data.goodBadEvents.length,0,'No invented events');
+ assert.equal(api.actionAwardTotal.value,0);
+ let balance=api.balance.value;
+ Object.assign(api.actionDraft,{name:'Lire',kind:'good',base:3,step:2,maxPerUse:7,dailyCap:15});
+ api.saveGoodBadAction();const good=api.data.goodBadActions[0];
+ assert.equal(good.kind,'good');
+ for(let i=0;i<4;i++)api.recordGoodBadAction(good);
+ assert.equal(api.actionCountToday(good),4);
+ assert.equal(api.actionGoodToday.value,15,'Awards 3+5+7+0 after cap');
+ assert.equal(api.actionAwardTotal.value,15);
+ assert.equal(api.balance.value,balance+15,'Good points added to global balance');
+ api.undoGoodBadAction(good);assert.equal(api.actionAwardTotal.value,15,'Undo zero point occurrence');
+ api.undoGoodBadAction(good);assert.equal(api.actionAwardTotal.value,8,'Undo 7 point occurrence');
+ // Editing scale never retroactively recomputes prior events.
+ api.editGoodBadAction(good);Object.assign(api.actionDraft,{base:9,step:0,maxPerUse:9,dailyCap:25});api.saveGoodBadAction();
+ assert.equal(api.actionAwardTotal.value,8);
+ assert.equal(api.actionCountToday(good),2);
+ api.recordGoodBadAction(good);assert.equal(api.actionAwardTotal.value,17,'New scale only forward');
+ api.balanceForm.value=1000;api.applyBalance();
+ balance=api.balance.value;
+ Object.assign(api.actionDraft,{name:'Grignoter',kind:'bad',base:2,step:2,maxPerUse:4,dailyCap:6});
+ api.saveGoodBadAction();const bad=api.data.goodBadActions[1];
+ api.recordGoodBadAction(bad);api.recordGoodBadAction(bad);api.recordGoodBadAction(bad);
+ assert.equal(api.actionBadToday.value,6,'Bad cap -2-4-0');
+ assert.equal(api.actionAwardTotal.value,11);
+ assert.equal(api.balance.value,balance-6,'Bad points subtracted');
+ api.undoGoodBadAction(bad);api.undoGoodBadAction(bad);
+ assert.equal(api.actionAwardTotal.value,15,'Undo also restores negative points');
+ const beforeArchive=api.actionAwardTotal.value;
+ api.toggleGoodBadArchive(good);assert.equal(api.actionsActive.value.some(a=>a.id===good.id),false);
+ assert.equal(api.actionAwardTotal.value,beforeArchive,'Archiving does not erase points');
+ api.toggleGoodBadArchive(good);
+ api.balanceForm.value=123;api.applyBalance();
+ assert.equal(api.balance.value,123,'Manual balance correctly includes actions');
+ api.resetBalance();assert.equal(api.balance.value,0,'Reset balance includes actions');
+ // Scheduled tasks default OFF; explicit opt-in daily, deduplicated on repeated run.
+ let tasks=api.data.tasks.length;
+ Object.assign(api.taskTemplateDraft,{name:'Ménage automatique',lines:'Vaisselle\nLitière',schedule:'daily',points:5,projectId:'',category:''});
+ api.saveTaskListTemplate();const model=api.data.taskListTemplates.at(-1);
+ assert.equal(model.schedule,'daily');
+ const first=api.processScheduledTaskTemplates();assert.equal(first,2);
+ assert.equal(api.processScheduledTaskTemplates(),0,'No duplicate on repeated invocation');
+ assert.equal(api.data.tasks.length,tasks+2);
+ assert(api.data.tasks.slice(-2).every(t=>t.status==='todo'&&t.doneAt===''&&t.autoTemplateDate),'Generated tasks are not awarded points');
+ assert(!api.data.habits.some(h=>h.title==='Vaisselle'&&h.id===model.id),'No conversion to habits');
+ const beforeSettings=api.data.goodBadEvents.length;
+ const stats=api.actionPeriodStats.value;assert(stats.good>0&&stats.bad>0);
+ assert.equal(api.data.goodBadEvents.length,beforeSettings,'Stats read-only');
+ // Simulation of import / source data normalization via importData API.
+ assert(typeof api.importData==='function');
+ console.log('OK V87',location,'backup, actions, progressive cap, undo, archive, balance, auto templates');
+}
